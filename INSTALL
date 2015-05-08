@@ -1,0 +1,117 @@
+====================
+GENERAL INFORMATION:
+====================
+
+The clamav-unofficial-sigs script and accompanying files are provided by Bill Landry
+(unofficialsigs@gmail.com) under general BSD licensing guidelines.
+
+The two files needed to download, test and update third-party ClamAV database files
+provided by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc., are the script itself
+(clamav-unofficial-sig.sh), and the user configuration file (clamav-unofficial-sigs.conf).
+
+Since the user configuration section has been separated from the script itself, the script now
+needs to reference the configuration file when run by using the "-c" flag when running the script.
+It is also recommended that a copy of the configuration file be place in the "default" location
+"/etc" so that it can be used when running the script manually without using the "-c" flag, or
+when running the script with the "-d" (decode virus signature), "-g" (check gpg signature), or
+"-s" (check database integrity) flags.  This also provides a way to run the script with different
+configuration options when run via cron versus when run manually.
+
+Script updates can be found at: http://sourceforge.net/projects/unofficial-sigs
+
+==========================
+INSTALLATION INSTRUCTIONS:
+==========================
+
+WARNING:  Renaming any of the files included in the tarball may cause the script to fail to remove
+all files, databases, and work directories from the system if the '-r' (remove script) flag is used.
+
+Uncompress/Unpackage the tarball:
+   tar -zxf clamav-unofficial-sigs.tar.gz
+
+Move into the package directory:
+   cd clamav-unofficial-sigs-(version)
+
+Make sure script files are executable and have the appropriate UID/GID set:
+   chmod 755 *.sh
+   chown <user>:<group> *.sh
+
+Configure:
+   Edit the clamav-unofficial-sigs.conf file
+   IMPORTANT CONFIGURATION CONSIDERATIONS:
+   - Make sure that the PATH statement correctly defines the location of your binary files.  These
+     include: find, sed, awk, cut, grep, tail, chown, chmod, cmp, diff, dig, host, gzip, ls, cp, mv,
+     test, gpg, xargs, sleep, urandom, chksum, rsync, curl, socat, etc.  It has been reported that
+     on Sun systems, the GNU utilities should be used rather than the default Sun versions.
+   - System shell setting:  Based on user feedback, it has been reported that "sh" works best for
+     BSD variants, "ksh" for Sun Solaris, and "bash" for Linux variants.  If you experience problems
+     running the script, please try editing the top line of the script file and changing "sh" to
+     either "ksh" or "bash" before reporting a problem.
+   - Adjust configuration settings to meet your system requirements.
+
+Install:
+   cp clamav-unofficial-sigs.sh /path/to/script_dir  (usually something like /usr/local/bin)
+   cp clamav-unofficial-sigs.conf /path/to/config_dir  (/etc & usually something like /usr/local/etc)
+   cp clamav-unofficial-sigs.8 /path/to/man/man8  (usually something like /usr/local/man/man8)
+   cp clamav-unofficial-sigs-cron /path/to/cron.d  (usually something like /etc/cron.d)
+   cp clamav-unofficial-sigs-logrotate /path/to/logrotate.d  (usually something like /etc/logrotate.d)
+
+==================
+USAGE INFORMATION:
+==================
+
+To run at specific time intervals, either use the include cron file or edit the user crontab:
+   crontab -e
+
+To run hourly, at 15 minute after the hour (for example), add the following to crontab:
+   15 * * * *  /path/to/clamav-unofficial-sigs.sh -c /path/to/clamav-unofficial-sigs.conf
+
+To run manually:
+   /path/to/clamav-unofficial-sigs.sh -c /path/to/clamav-unofficial-sigs.conf
+ or, if a copy of the config file is located in "/etc", simply:
+   /path/to/clamav-unofficial-sigs.sh
+
+===================
+SCRIPT FLAGS USAGE:
+===================
+
+To create a bypass signature for temporarily resolving a false-positive issue with a third-party signature:
+   /path/to/clamav-unofficial-sigs.sh -b
+
+To direct the script to use an alternate configuration file other than the one in /etc:
+   /path/to/clamav-unofficial-sigs.sh -c /path/to/clamav-unofficial-sigs.conf
+
+To decode a hexadecimal encoded string or specific third-party signature and determine what database it is in:
+   /path/to/clamav-unofficial-sigs.sh -d
+
+To encode an entire data string in hexadecimal for signature use in any '*.ndb' file:
+   /path/to/clamav-unofficial-sigs.sh -e
+
+To encode a formatted data string that contains field spacers '{}, (), *' in hexadecimal, without encoding the
+   field spacers, for signature use in any '*.ndb' file:
+   /path/to/clamav-unofficial-sigs.sh -f
+
+To GPG Signature test a specific Sanesecurity database file:
+   /path/to/clamav-unofficial-sigs.sh -g filename  (e.g., -g junk.ndb)
+
+To view Help and Usage instructions:
+   /path/to/clamav-unofficial-sigs.sh -h
+
+To output script configuration and system information:
+   /path/to/clamav-unofficial-sigs.sh -i
+
+To make a hexadecimal signature database file (*.ndb) from a clear text ascii file:
+   /path/to/clamav-unofficial-sigs.sh -m
+
+To completely remove the script and all of its associated files, databases and work directories:
+   /path/to/clamav-unofficial-sigs.sh -r
+
+To clamscan integrity test a specific database file:
+   /path/to/clamav-unofficial-sigs.sh -s filename  (e.g., -s junk.ndb)
+
+To output third-party signature names that triggered during local HAM directory scanning,
+   if enabled in the configuration file:
+   /path/to/clamav-unofficial-sigs.sh -t
+
+To check version:
+   /path/to/clamav-unofficial-sigs.sh -v

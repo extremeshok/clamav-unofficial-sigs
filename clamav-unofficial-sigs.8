@@ -1,0 +1,82 @@
+.\" Manual page for clamav-unofficial-sigs.sh
+.TH clamav-unofficial-sigs 8 "August 25, 2013" "Version 3.7.2" "SCRIPT COMMANDS"
+.SH NAME
+clamav-unofficial-sigs \- Download, test, and install third-party ClamAV signature databases.
+.SH SYNOPSIS
+.B clamav-unofficial-sigs
+.RI [ options ]
+.SH DESCRIPTION
+\fBclamav-unofficial-sigs\fP is a shell script that downloads, updates
+and tests the Sanesecurity, SecuriteInfo, MalwarePatrol, OITC,
+etc. third-party signature databases for ClamAV.
+.SH OPTIONS
+This script follows the standard GNU command line syntax.
+A summary of the options is shown below.
+.TP
+.B \-b
+DEPRECATED - Consider using -w instead, it supports the newer ClamAV signature whitelist functionality.
+.br
+Add a bypass signature entry to local.ign in order to temporarily resolve a false-positive issue with a 
+third-party signature.  The script will monitor any entries it makes to local.ign and will automatically 
+remove bypass entries if either the original signature has been modified or removed from the database.
+.TP
+.B \-c FILE-NAME
+Source configuration information from a different file.
+.TP
+.B \-d
+Decode a hexadecimal encoded string or an individual ClamAV 3rd-party signature for viewing.
+This will not decode image signatures nor the official signatures.
+.TP
+.B \-e
+Encode a entire input string in hexadecimal for signature usage in any *.ndb database.
+.TP
+.B \-f
+Encode a formated input string in hexadecimal that contains spacing field '{}, (), *', without
+encoding the spacing fields, for signature usage in any '*.ndb' database.
+.TP
+.B \-g FILE-NAME
+Verify the GPG signature for a specific SaneSecurity database file.
+Only specify the filename as listed in the configuration file
+and the script will search for it in the work directory.
+.TP
+.B \-h
+Print the script help and usage information.
+.TP
+.B \-i
+Print system and script configuration information.
+.TP
+.B \-m
+Make a hexadecimal signature database file (*.ndb) from a clear text ascii file.  Provides support
+for both full and formatted signatures.  Additional information is provided when using the flag.
+.TP
+.B -r
+Remove the clamav-unofficial-sigs script and all of its associated
+files, databases and work directories from the system.
+.TP
+.B \-s FILE-NAME
+Test the integrity of a third-party signature database with clamscan.
+Only specify the filename as listed in the configuration file
+and the script will search for it in the work directory.
+.TP
+.B \-t
+If HAM directory scanning is enabled in the script's configuration file, then output
+the names of any third-party signatures that triggered during the HAM directory scan.
+.TP
+.B \-v
+Print the script version and date information.
+.TP
+.B \-w
+Adds a signature whitelist entry in the newer ClamAV IGN2 format to 'my-whitelist.ign2' in order to temporarily resolve a 
+false-positive issue with a specific third-party signature.  Script added whitelist entries will automatically be removed 
+if the original signature is either modified or removed from the third-party signature database.
+.SH SEE ALSO
+.BR clamd (8),
+.BR clamscan (1)
+.SH COPYRIGHT
+Bill Landry <unofficialsigs@gmail.com>
+.SH LICENSE
+BSD (Berkeley Software Distribution)
+.SH BUGS
+Report bugs to Bill Landry <unofficialsigs@gmail.com>
+.SH AUTHOR
+Bill Landry <unofficialsigs@gmail.com>
