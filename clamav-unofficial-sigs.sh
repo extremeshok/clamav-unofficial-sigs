@@ -960,7 +960,6 @@ if [ -n "$ss_dbs" ] ; then
       comment "Sanesecurity mirror site used: $ss_mirror_site_info"
       log "INFO - Sanesecurity mirror site used: $ss_mirror_site_info"
       rsync $rsync_output_level $no_motd --files-from=$ss_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$ss_mirror_ip/sanesecurity $ss_dir
-      #if rsync $rsync_output_level $no_motd --files-from=$ss_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$ss_mirror_ip/sanesecurity $ss_dir 2>/dev/null
       if [ "$?" -eq "0" ] #the correct way
          then
             ss_rsync_success="1"

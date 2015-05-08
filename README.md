@@ -11,8 +11,6 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 ## Version 4.0.0
    - eXtremeSHOK.com Maintenance
-   - Removed MalwarePatrol due to being mirrored on Sanesecurity
-   - Removed SecuriteInfo due to being mirrored on Sanesecurity
    - Enabled all low false positive sources by default
    - Added all Sanesecurity database files
    - Disabled all med/high false positive sources by default
@@ -24,6 +22,7 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
    - Updated Default locations to reflect installation instructions
    - Fix: correctly remove comments and blacklines from config before eval
    - Remove: invalid config values (eg. EXPORT path)
+   - Fix: correctly check if rsync was successful
 
 ## ORIGINAL README CONTENTS
 The clamav-unofficial-sigs script and accompanying files are provided by Bill Landry
