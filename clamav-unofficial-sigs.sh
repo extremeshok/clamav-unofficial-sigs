@@ -107,64 +107,8 @@ perms () {
 }
 
 # Take input from the commandline and process.
-while getopts 'bc:defg:himrs:tvw' option ; do
+while getopts 'c:defg:himrs:tvw' option ; do
    case $option in
-      b)  no_default_config
-          echo "Input a third-party signature name that you wish to bypass due to false-positives"
-          echo "and press enter (do not include '.UNOFFICIAL' in the signature name nor add quote"
-          echo "marks to any input string):"
-          echo ""
-          read input
-          if [ -n "$input" ]
-             then
-                cd "$clam_dbs"
-                input=`echo "$input" | tr -d "'" | tr -d '"'`
-                file_sig=`grep -n "$input:" *.ndb`
-                sig_ign=`echo "$file_sig" | cut -d ":" -f-3`
-                if [ -n "$sig_ign" ]
-                   then
-                      if ! grep "$sig_ign" local.ign > /dev/null 2>&1
-                         then
-                            cp -f local.ign "$config_dir" 2>/dev/null
-                            echo "$sig_ign" | tr -d "\r" >> "$config_dir/local.ign"
-                            echo "$file_sig" | tr -d "\r" >> "$config_dir/monitor-ign.txt"
-                            if clamscan --quiet -d "$config_dir/local.ign" "$config_dir/scan-test.txt"
-                               then
-                                  if rsync -pcqt $config_dir/local.ign $clam_dbs
-                                     then
-                                        perms chown $clam_user:$clam_group local.ign
-                                        chmod 0644 local.ign "$config_dir/monitor-ign.txt"
-                                        $reload_opt
-                                        echo ""
-                                        echo "Signature '$input' has been added to the local.ign signature bypass"
-                                        echo "file and databases have been reloaded.  The script will track any changes to the"
-                                        echo "offending third-party signature and will automatically remove the signature bypass"
-                                        echo "entry if either the signature is modified or removed from the third-party database."
-                                     else
-                                        echo ""
-                                        echo "Failed to successfully update local.ign file - SKIPPING."
-                                  fi
-                               else
-                                  echo ""
-                                  echo "Clamscan reports local.ign database integrity is bad - SKIPPING."
-                            fi
-                         else
-                            echo ""
-                            echo "Signature '$input' already exists in local.ign - no action taken."
-                      fi
-                   else
-                      echo ""
-                      echo "Signature '$input' could not be found."
-                      echo ""
-                      echo "This script will only create a bypass entry in local.ign for ClamAV"
-                      echo "'UNOFFICIAL' third-Party signatures as found in the *.ndb databases."
-                fi
-             else
-                echo "No input detected - no action taken."
-          fi
-          echo ""
-          exit
-          ;;
       c)  conf_file="$OPTARG"
           ;;
       d)  no_default_config
@@ -231,11 +175,9 @@ while getopts 'bc:defg:himrs:tvw' option ; do
              then
                 echo "GPG signature testing database file: $ss_dir/$db_file"
                 echo ""
-                if ! gpg --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg \
-                     --verify $ss_dir/$db_file.sig $ss_dir/$db_file
+                if ! gpg --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $ss_dir/$db_file.sig $ss_dir/$db_file
                    then
-                     gpg --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg \
-                     --verify $ss_dir/$db_file.sig $ss_dir/$db_file
+                     gpg --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $ss_dir/$db_file.sig $ss_dir/$db_file
                 fi
              else
                 echo "File '$db_file' cannot be found or is not a Sanesecurity database file."
@@ -358,11 +300,9 @@ while getopts 'bc:defg:himrs:tvw' option ; do
                          line_prefix=`echo "$line" | awk -F ':' '{print $1}'`
                          if [ "$line_prefix" = "-" ]
                             then
-                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | \
-                               sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
                             elif [ "$line_prefix" = "=" ] ; then
-                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined \
-                               $1 ? $1 : sprintf("%02lx", ord $2)/eg' | sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
                             else
                                echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
                          fi
@@ -679,8 +619,7 @@ chmod 0700 "$gpg_dir"
 
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$gpg_dir/publickey.gpg" ] ; then
-   if ! curl -s -S $curl_proxy --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" \
-        -L -R $ss_gpg_url -o $gpg_dir/publickey.gpg
+   if ! curl -s -S $curl_proxy --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$ss_gpg_url" -o $gpg_dir/publickey.gpg
       then
          echo ""
          echo "Could not download Sanesecurity public GPG key"
@@ -692,8 +631,7 @@ if [ ! -s "$gpg_dir/publickey.gpg" ] ; then
          comment ""
          log "INFO - Sanesecurity public GPG key successfully downloaded"
          rm -f -- "$gpg_dir/ss-keyring.gp*"
-         if ! gpg -q --no-options --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg \
-              --import $gpg_dir/publickey.gpg 2>/dev/null
+         if ! gpg -q --no-options --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --import $gpg_dir/publickey.gpg 2>/dev/null
             then
                echo "Could not import Sanesecurity public GPG key to custom keyring"
                log "ALERT - Could not import Sanesecurity public GPG key to custom keyring"
@@ -867,8 +805,7 @@ if [ -n "$clamd_socket" ] ; then
    if [ "`perl -e 'use IO::Socket::UNIX; print $IO::Socket::UNIX::VERSION,"\n"' 2>/dev/null`" ]
       then
          io_socket1=1
-         if [ "`perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); \
-            print $s->getline; $s->close' "$clamd_socket" 2>/dev/null`" = "PONG" ] ; then
+         if [ "`perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null`" = "PONG" ] ; then
             io_socket2=1
             comment "===================="
             comment "= ClamD is running ="
@@ -917,8 +854,7 @@ if [ -n "$clamd_socket" ] ; then
                   then
                      rm -f -- "$clamd_pid" "$clamd_lock" "$clamd_socket" 2>/dev/null
                      $start_clamd > /dev/null && sleep 5
-                     if [ "`perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); \
-                        print $s->getline; $s->close' "$clamd_socket" 2>/dev/null`" = "PONG" ]
+                     if [ "`perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null`" = "PONG" ]
                         then
                            echo "=================================="
                            echo "= ClamD was successfully started ="
@@ -986,7 +922,7 @@ if [ -n "$ss_dbs" ] ; then
       comment "Sanesecurity mirror site used: $ss_mirror_site_info"
       log "INFO - Sanesecurity mirror site used: $ss_mirror_site_info"
       if rsync $rsync_output_level $no_motd --files-from=$ss_include_dbs -ctuz $connect_timeout \
-         --timeout="$rsync_max_time" --stats rsync://$ss_mirror_ip $ss_dir 2>/dev/null
+         --timeout="$rsync_max_time" --stats rsync://$ss_mirror_ip/sanesecurity $ss_dir 2>/dev/null
          then
             ss_rsync_success="1"
             for db_file in $ss_dbs ; do
