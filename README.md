@@ -4,7 +4,9 @@ ClamAV Unofficial Signatures Updater
 Github fork of the sourceforge hosted and non maintained utility.
 
 ## Description
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc. The package also contains cron, logrotate, and man files.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
+
+### Please consider a donation to http://sanesecurity.com
 
 
 ## Version 4.0.0
@@ -23,10 +25,6 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 
 ## ORIGINAL README CONTENTS
-======================
-CLAMAV-UNOFFICIAL-SIGS
-======================
-
 The clamav-unofficial-sigs script and accompanying files are provided by Bill Landry
 (unofficialsigs@gmail.com) under general BSD licensing guidelines.
 
