@@ -747,9 +747,6 @@ if [ ! -s "$config_dir/scan-test.txt" ] ; then
    echo "This is the clamscan test file..." > "$config_dir/scan-test.txt"
 fi
 
-# Unofficial ClamAV database provider URLs
-ss_url="rsync.sanesecurity.net"
-
 # Create the Sanesecurity rsync "include" file (defines which files to download).
 ss_include_dbs="$config_dir/ss-include-dbs.txt"
 if [ -n "$ss_dbs" ] ; then
