@@ -10,6 +10,9 @@ Version 4.0.0 (updated 2015-05-08)
    - Enabled all low false positive sources by default
    - Disabled all med/high false positive sources by default
    - Set default configs to work out of the box on a centos system
+   - Silence cron job
+   - Set correct paths throughout the script
+   - Updated Installation Instructions
 
 Version 3.7.2 (updated 2013-08-25)
    - Added Sanesecurity signature whitelist "sigwhitelist.ign2" file
