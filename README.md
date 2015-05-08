@@ -7,6 +7,21 @@ Github fork of the sourceforge hosted and non maintained utility.
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc. The package also contains cron, logrotate, and man files.
 
 
+## Version 4.0.0
+   - eXtremeSHOK.com Maintenance
+   - Removed MalwarePatrol due to being mirrored on Sanesecurity
+   - Removed SecuriteInfo due to being mirrored on Sanesecurity
+   - Enabled all low false positive sources by default
+   - Added all Sanesecurity database files
+   - Disabled all med/high false positive sources by default
+   - Set default configs to work out of the box on a centos system
+   - Silence cron job
+   - Set correct paths throughout the script
+   - Updated Installation Instructions
+   - Updated Paths for removal
+   - Updated Default locations to reflect installation instructions
+
+
 ## ORIGINAL README CONTENTS
 ======================
 CLAMAV-UNOFFICIAL-SIGS
