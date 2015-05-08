@@ -1,10 +1,16 @@
 #!/bin/sh
-
+###################
+# This is property of eXtremeSHOK.com
+# You are free to use, modify and distribute, however you may not remove this notice.
+# Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+##################
+# 
+# Originially based on: 
 # This script freely provided by Bill Landry (unofficialsigs@gmail.com).
 # Comments, suggestions, and recommendations for improving this script
 # are always welcome.
 #
-# Script updates can be found at: http://sourceforge.net/projects/unofficial-sigs
+# Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 #
 # License: BSD (Berkeley Software Distribution)
 
@@ -18,7 +24,7 @@
 
 default_config="/etc/clamav-unofficial-sigs.conf"
 
-version="v3.7.2 (updated 2013-08-25)"
+version="v4.0.0 (updated 2015-05-08)"
 output_ver="
    `basename $0` $version
 "

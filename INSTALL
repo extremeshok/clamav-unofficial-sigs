@@ -17,7 +17,7 @@ when running the script with the "-d" (decode virus signature), "-g" (check gpg 
 "-s" (check database integrity) flags.  This also provides a way to run the script with different
 configuration options when run via cron versus when run manually.
 
-Script updates can be found at: http://sourceforge.net/projects/unofficial-sigs
+Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 
 ==========================
 INSTALLATION INSTRUCTIONS:

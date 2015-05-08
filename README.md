@@ -76,4 +76,6 @@ Script (clamav-unofficial-sigs.sh) features & capabilities:
 - Script logging can be enabled/disabled in the configuration file.
 - Includes cron, manual, and logrotate files.
 
-Script updates can be found at: http://sourceforge.net/projects/unofficial-sigs
+Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
+
+Original Script can be found at: http://sourceforge.net/projects/unofficial-sigs
