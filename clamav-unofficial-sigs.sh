@@ -19,6 +19,8 @@
 #            THERE ARE NO USER CONFIGURABLE OPTIONS IN THIS SCRIPT             #
 #                                    * * *                                     #
 #   ALL CONFIGURATION OPTIONS ARE LOCATED IN THE INCLUDED CONFIGURATION FILE   #
+#                                    * * *                                     #
+#                NOT COMPATIBLE WITH VERSION 3.XX CONFIG                       #
 #                                                                              #
 ################################################################################
 
@@ -603,7 +605,8 @@ if [ "$1" = -c ] ;
       config_source="$default_config"
 fi
 
-. "$config_source"
+clean_config=`sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
+eval "$clean_config"
 
 ################################################################################
 
@@ -983,7 +986,7 @@ if [ -n "$ss_dbs" ] ; then
       comment "Sanesecurity mirror site used: $ss_mirror_site_info"
       log "INFO - Sanesecurity mirror site used: $ss_mirror_site_info"
       if rsync $rsync_output_level $no_motd --files-from=$ss_include_dbs -ctuz $connect_timeout \
-         --timeout="$rsync_max_time" --stats rsync://$ss_mirror_ip/sanesecurity $ss_dir 2>/dev/null
+         --timeout="$rsync_max_time" --stats rsync://$ss_mirror_ip $ss_dir 2>/dev/null
          then
             ss_rsync_success="1"
             for db_file in $ss_dbs ; do

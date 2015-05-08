@@ -22,7 +22,8 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
    - Updated Installation Instructions
    - Updated Paths for removal
    - Updated Default locations to reflect installation instructions
-
+   - Fix: correctly remove comments and blacklines from config before eval
+   - Remove: invalid config values (eg. EXPORT path)
 
 ## ORIGINAL README CONTENTS
 The clamav-unofficial-sigs script and accompanying files are provided by Bill Landry
