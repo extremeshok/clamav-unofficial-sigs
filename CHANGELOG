@@ -13,6 +13,8 @@ Version 4.0.0 (updated 2015-05-08)
    - Silence cron job
    - Set correct paths throughout the script
    - Updated Installation Instructions
+   - Updaqted Paths for removal
+   - Updated Default locations to reflect installation instructions
 
 Version 3.7.2 (updated 2013-08-25)
    - Added Sanesecurity signature whitelist "sigwhitelist.ign2" file

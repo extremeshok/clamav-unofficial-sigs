@@ -434,15 +434,20 @@ while getopts 'bc:defg:himrs:tvw' option ; do
                                rm -f -- "$file"
                                echo "     Removed file: $file"
                             done
-                            cron_file=`find /etc/ -name clamav-unofficial-sigs-cron`
+                            cron_file="/etc/cron.d/clamav-unofficial-sigs-cron"
                             if [ -s "$cron_file" ] ; then
                                rm -f "$cron_file"
                                echo "     Removed file: $cron_file"
                             fi
-                            log_rotate_file=`find /etc/ -name clamav-unofficial-sigs-logrotate`
+                            log_rotate_file="/etc/logrotate.d/clamav-unofficial-sigs-logrotate"
                             if [ -s "$log_rotate_file" ] ; then
                                rm -f "$log_rotate_file"
                                echo "     Removed file: $log_rotate_file"
+                            fi
+                            man_file="/usr/share/man/man8/clamav-unofficial-sigs.8"
+                            if [ -s "$man_file" ] ; then
+                               rm -f "$man_file"
+                               echo "     Removed file: $man_file"
                             fi
                             rm -f -- "$default_config" && echo "     Removed file: $default_config"
                             rm -f -- "$0" && echo "     Removed file: $0"
