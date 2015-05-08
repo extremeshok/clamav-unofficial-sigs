@@ -423,7 +423,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
                 echo "File '$input' cannot be found."
                 echo "Here is a list of third-party databases that can be clamscan integrity tested:"
                 echo ""
-                echo "Sanesecurity $ss_dbs"
+                echo "Sanesecurity $ss_dbs""SecuriteInfo $si_dbs""MalwarePatrol $mbl_dbs"
                 echo "Check the file name and try again..."
           fi
           echo ""
@@ -729,6 +729,18 @@ if [ -n "$ss_dbs" ] ; then
       clamav_files
    done
 fi
+if [ -n "$si_dbs" ] ; then
+   for db in $si_dbs ; do
+      echo "$si_dir/$db" >> "$current_tmp"
+      clamav_files
+   done
+fi
+if [ -n "$mbl_dbs" ] ; then
+   for db in $mbl_dbs ; do
+      echo "$mbl_dir/$db" >> "$current_tmp"
+      clamav_files
+   done
+fi
 if [ -n "$add_dbs" ] ; then
    for db in $add_dbs ; do
       echo "$add_dir/$db" >> "$current_tmp"
@@ -905,6 +917,32 @@ if [ -n "$clamd_socket" ] ; then
    fi
 fi
 
+# Check and save current system time since epoch for time related database downloads.
+# However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
+if [ -n "$si_dbs" -o -n "mbl_dbs" ]
+   then
+      if [ `date +%s` -gt 0 2>/dev/null ]
+         then
+            current_time=`date +%s`
+         else
+            if [ `perl -le print+time 2>/dev/null` ] ; then
+               current_time=`perl -le print+time`
+            fi
+      fi
+   else
+      echo ""
+      echo "                           --- WARNING ---"
+      echo "The system's date function does not appear to support 'date +%s', nor was 'perl' found"
+      echo "on the system.  The SecuriteInfo and MalwarePatrol updates were bypassed at this time."
+      echo ""
+      echo "You can silence this warning by either commenting out the 'si_dbs' and 'mbl_dbs'"
+      echo "variables in the 'USER CONFIGURATION' section of the script, or by installing perl or"
+      echo "the GNU date utility, either of which can calculate the needed seconds since epoch."
+      log "WARNING - Systems does not support calculating time since epoch, SecuriteInfo and MalwarePatrol updates bypassed"
+      si_dbs=""
+      mbl_dbs=""
+fi
+
 ################################################################
 # Check for Sanesecurity database & GPG signature file updates #
 ################################################################
@@ -921,8 +959,9 @@ if [ -n "$ss_dbs" ] ; then
       comment ""
       comment "Sanesecurity mirror site used: $ss_mirror_site_info"
       log "INFO - Sanesecurity mirror site used: $ss_mirror_site_info"
-      if rsync $rsync_output_level $no_motd --files-from=$ss_include_dbs -ctuz $connect_timeout \
-         --timeout="$rsync_max_time" --stats rsync://$ss_mirror_ip/sanesecurity $ss_dir 2>/dev/null
+      rsync $rsync_output_level $no_motd --files-from=$ss_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$ss_mirror_ip/sanesecurity $ss_dir
+      #if rsync $rsync_output_level $no_motd --files-from=$ss_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$ss_mirror_ip/sanesecurity $ss_dir 2>/dev/null
+      if [ "$?" -eq "0" ] #the correct way
          then
             ss_rsync_success="1"
             for db_file in $ss_dbs ; do
@@ -1022,6 +1061,261 @@ if [ -n "$ss_dbs" ] ; then
       log "WARNING - or signature database name(s) misspelled in the script's configuration file."
    fi
 fi
+
+#######################################################################
+# Check for updated SecuriteInfo database files every set number of   #
+# hours as defined in the "USER CONFIGURATION" section of this script #
+#######################################################################
+if [ -n "$si_dbs" ] ; then
+   rm -f "$si_dir/*.gz"
+   if [ -s "$config_dir/last-si-update.txt" ]
+      then
+         last_si_update=`cat $config_dir/last-si-update.txt`
+      else
+         last_si_update="0"
+   fi
+   db_file=""
+   loop=""
+   update_interval=$(($si_update_hours * 3600))
+   time_interval=$(($current_time - $last_si_update))
+   if [ "$time_interval" -ge $(($update_interval - 600)) ]
+      then
+         echo "$current_time" > "$config_dir"/last-si-update.txt
+         comment ""
+         comment "======================================================================"
+         comment "SecuriteInfo Database File Updates"
+         comment "======================================================================"
+         log "INFO - Checking for SecuriteInfo updates..."
+         si_updates="0"
+         for db_file in $si_dbs ; do
+            if [ "$loop" = "1" ]
+               then
+                  comment "---"
+               else
+                  comment ""
+            fi
+            comment "Checking for updated SecuriteInfo database file: $db_file"
+            comment ""
+            si_db_update="0"
+            if [ -s "$si_dir/$db_file" ]
+               then
+                  z_opt="-z $si_dir/$db_file"
+               else
+                  z_opt=""
+            fi
+            if curl $curl_proxy $curl_output_level --connect-timeout "$curl_connect_timeout" \
+               --max-time "$curl_max_time" -L -R $z_opt -o $si_dir/$db_file http://$si_url/$db_file
+               then
+                  loop="1"
+                  if ! cmp -s $si_dir/$db_file $clam_dbs/$db_file ; then
+                     if [ "$?" = "0" ] ; then
+                        db_ext=`echo $db_file | cut -d "." -f2`
+      comment ""
+                        comment "Testing updated SecuriteInfo database file: $db_file"
+                        log "INFO - Testing updated SecuriteInfo database file: $db_file"
+                        if [ -z "$ham_dir" -o "$db_ext" != "ndb" ]
+                           then
+                              if clamscan --quiet -d "$si_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
+                                 then
+                                    comment "Clamscan reports SecuriteInfo $db_file database integrity tested good"
+                                    log "INFO - Clamscan reports SecuriteInfo $db_file database integrity tested good" ; true
+                                 else
+                                    echo "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
+                                    log "WARNING - Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING" ; false
+                                    rm -f "$si_dir/$db_file"
+                              fi && \
+                              (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
+                              if rsync -pcqt $si_dir/$db_file $clam_dbs
+                                 then
+                                    perms chown $clam_user:$clam_group $clam_dbs/$db_file
+                                    comment "Successfully updated SecuriteInfo production database file: $db_file"
+                                    log "INFO - Successfully updated SecuriteInfo production database file: $db_file"
+                                    si_updates=1
+                                    si_db_update=1
+                                    do_clamd_reload=1
+                                 else
+                                    echo "Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
+                                    log "WARNING - Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
+                              fi
+                           else
+                              grep -h -v -f "$config_dir/whitelist.hex" "$si_dir/$db_file" > "$test_dir/$db_file"
+                              clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | \
+                              sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
+                              grep -h -f "$config_dir/whitelist.txt" "$test_dir/$db_file" | \
+                              cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
+                              grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
+                              mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
+                              if clamscan --quiet -d "$test_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
+                                 then
+                                    comment "Clamscan reports SecuriteInfo $db_file database integrity tested good"
+                                    log "INFO - Clamscan reports SecuriteInfo $db_file database integrity tested good" ; true
+                                 else
+                                    echo "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
+                                    log "WARNING - Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING" ; false
+                                    rm -f "$si_dir/$db_file"
+                              fi && \
+                              (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
+                              if rsync -pcqt $test_dir/$db_file $clam_dbs
+                                 then
+                                    perms chown $clam_user:$clam_group $clam_dbs/$db_file
+                                    comment "Successfully updated SecuriteInfo production database file: $db_file"
+                                    log "INFO - Successfully updated SecuriteInfo production database file: $db_file"
+                                    si_updates=1
+                                    si_db_update=1
+                                    do_clamd_reload=1
+                                 else
+                                    echo "Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
+                                    log "WARNING - Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
+                              fi
+                        fi
+                     fi
+                  fi
+               else
+                  log "WARNING - Failed curl connection to $si_url - SKIPPED SecuriteInfo $db_file update"
+            fi
+            if [ "$si_db_update" != "1" ] ; then
+               comment ""
+               comment "No updated SecuriteInfo $db_file database file found"
+            fi
+         done
+         if [ "$si_updates" != "1" ] ; then
+            log "INFO - No SecuriteInfo database file updates found"
+         fi
+      else
+         comment ""
+         comment "======================================================================"
+         comment "SecuriteInfo Database File Updates"
+         comment "======================================================================"
+         comment ""
+         time_remaining=$(($update_interval - $time_interval))
+         hours_left=$(($time_remaining / 3600))
+         minutes_left=$(($time_remaining % 3600 / 60))
+         comment "$si_update_hours hours have not yet elapsed since the last SecuriteInfo update check"
+         comment ""
+         comment "     --- No update check was performed at this time ---"
+         comment ""
+         comment "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+         log "INFO - Next SecuriteInfo check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+   fi
+fi
+
+#####################################################################
+# Download MalwarePatrol database file(s) every set number of hours #
+# as defined in the "USER CONFIGURATION" section of this script.    #
+#####################################################################
+if [ -n "$mbl_dbs" ] ; then
+   if [ -s "$config_dir/last-mbl-update.txt" ]
+      then
+         last_mbl_update=`cat $config_dir/last-mbl-update.txt`
+      else
+         last_mbl_update="0"
+   fi
+   db_file=""
+   update_interval=$(($mbl_update_hours * 3600))
+   time_interval=$(($current_time - $last_mbl_update))
+   if [ "$time_interval" -ge $(($update_interval - 600)) ]
+      then
+         echo "$current_time" > "$config_dir"/last-mbl-update.txt
+         log "INFO - Checking for MalwarePatrol updates..."
+         for db_file in $mbl_dbs ; do
+            # Delete the old MBL (mbl.db) database file if it exists and start using the newer
+            # format (mbl.ndb) database file instead.
+            test -e $clam_dbs/$db_file -o -e $clam_dbs/$db_file-bak && rm -f -- "$clam_dbs/mbl.d*"
+            comment ""
+            comment "======================================================================"
+            comment "MalwarePatrol $db_file Database File Update"
+            comment "======================================================================"
+            comment ""
+            if curl $curl_proxy $curl_output_level -R --connect-timeout "$curl_connect_timeout" \
+               --max-time "$curl_max_time" -o $mbl_dir/$db_file http://$mbl_url/cgi/submit?action=list_clamav_ext
+               then
+                  if ! cmp -s $mbl_dir/$db_file $clam_dbs/$db_file 
+                     then
+                        if [ "$?" = "0" ] ; then
+                           db_ext=`echo $db_file | cut -d "." -f2`
+                           comment ""
+                           comment "Testing updated MalwarePatrol database file: $db_file"
+                           log "INFO - Testing updated database file: $db_file"
+                           if [ -z "$ham_dir" -o "$db_ext" != "ndb" ]
+                              then
+                                 if clamscan --quiet -d "$mbl_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
+                                    then
+                                       comment "Clamscan reports MalwarePatrol $db_file database integrity tested good"
+                                       log "INFO - Clamscan reports MalwarePatrol $db_file database integrity tested good" ; true
+                                    else
+                                       echo "Clamscan reports MalwarePatrol $db_file database integrity tested BAD - SKIPPING"
+                                       log "WARNING - Clamscan reports MalwarePatrol $db_file database integrity tested BAD - SKIPPING" ; false
+                                 fi && \
+                                 (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
+                                 if rsync -pcqt $mbl_dir/$db_file $clam_dbs
+                                    then
+                                       perms chown $clam_user:$clam_group $clam_dbs/$db_file
+                                       comment "Successfully updated MalwarePatrol production database file: $db_file"
+                                       log "INFO - Successfully updated MalwarePatrol production database file: $db_file"
+                                       mbl_update=1
+                                       do_clamd_reload=1
+                                    else
+                                       echo "Failed to successfully update MalwarePatrol production database file: $db_file - SKIPPING"
+                                       log "WARNING - Failed to successfully update MalwarePatrol production database file: $db_file - SKIPPING"
+                                 fi
+                              else
+                                 grep -h -v -f "$config_dir/whitelist.hex" "$mbl_dir/$db_file" > "$test_dir/$db_file"
+                                 clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | \
+                                 sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
+                                 grep -h -f "$config_dir/whitelist.txt" "$test_dir/$db_file" | \
+                                 cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
+                                 grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
+                                 mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
+                                 if clamscan --quiet -d "$test_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
+                                    then
+                                       comment "Clamscan reports MalwarePatrol $db_file database integrity tested good"
+                                       log "INFO - Clamscan reports MalwarePatrol $db_file database integrity tested good" ; true
+                                    else
+                                       echo "Clamscan reports MalwarePatrol $db_file database integrity tested BAD - SKIPPING"
+                                       log "WARNING - Clamscan reports MalwarePatrol $db_file database integrity tested BAD - SKIPPING" ; false
+                                 fi && \
+                                 (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
+                                 if rsync -pcqt $test_dir/$db_file $clam_dbs
+                                    then
+                                       perms chown $clam_user:$clam_group $clam_dbs/$db_file
+                                       comment "Successfully updated MalwarePatrol production database file: $db_file"
+                                       log "INFO - Successfully updated MalwarePatrol production database file: $db_file"
+                                       mbl_update=1
+                                       do_clamd_reload=1
+                                    else
+                                       echo "Failed to successfully update MalwarePatrol production database file: $db_file - SKIPPING"
+                                       log "WARNING - Failed to successfully update MalwarePatrol production database file: $db_file - SKIPPING"
+                                 fi
+                           fi
+                        fi
+                     else
+                        comment ""
+                        comment "MalwarePatrol signature database ($db_file) did not change - skipping"
+                        log "INFO - MalwarePatrol signature database ($db_file) did not change - skipping"
+                  fi
+               else
+                  log "WARNING - Failed curl connection to $mbl_url - SKIPPED MalwarePatrol $db_file update"
+            fi
+         done
+      else
+         comment ""
+         comment "======================================================================"
+         comment "MalwarePatrol Database File Update"
+         comment "======================================================================"
+         comment ""
+         time_remaining=$(($update_interval - $time_interval))
+         hours_left=$(($time_remaining / 3600))
+         minutes_left=$(($time_remaining % 3600 / 60))
+         comment "$mbl_update_hours hours have not yet elapsed since the last MalwarePatrol download"
+         comment ""
+         comment "     --- No database download was performed at this time ---"
+         comment ""
+         comment "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+         log "INFO - Next MalwarePatrol download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+   fi
+fi
+
+
 
 ###################################################
 # Check for user added signature database updates #
