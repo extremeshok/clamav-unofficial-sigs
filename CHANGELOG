@@ -3,6 +3,10 @@ by Bill Landry (unofficialsigs@gmail.com).  The script provides a simple
 way to download, test, and use third-party ClamAV signature databases
 provided by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
 
+Version 4.0.0 (updated 2015-05-08)
+   - eXtremeSHOK.com Maintenance
+   - Removed MalwarePatrol
+
 Version 3.7.2 (updated 2013-08-25)
    - Added Sanesecurity signature whitelist "sigwhitelist.ign2" file
      to the list of default databases in the config file.
