@@ -5,7 +5,8 @@ provided by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
 
 Version 4.0.0 (updated 2015-05-08)
    - eXtremeSHOK.com Maintenance
-   - Removed MalwarePatrol
+   - Removed MalwarePatrol due to being mirrored on Sanesecurity
+   - Removed SecuriteInfo due to being mirrored on Sanesecurity
 
 Version 3.7.2 (updated 2013-08-25)
    - Added Sanesecurity signature whitelist "sigwhitelist.ign2" file

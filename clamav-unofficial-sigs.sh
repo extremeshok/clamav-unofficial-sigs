@@ -476,7 +476,7 @@ while getopts 'bc:defg:himrs:tvw' option ; do
                 echo "File '$input' cannot be found."
                 echo "Here is a list of third-party databases that can be clamscan integrity tested:"
                 echo ""
-                echo "Sanesecurity $ss_dbs""SecuriteInfo $si_dbs"
+                echo "Sanesecurity $ss_dbs"
                 echo "Check the file name and try again..."
           fi
           echo ""
@@ -664,7 +664,7 @@ fi
 
 # Check to see if the working directories have been created.
 # If not, create them.  Otherwise, ignore and proceed with script.
-mkdir -p "$work_dir" "$ss_dir" "$si_dir" "$config_dir" "$gpg_dir" "$add_dir"
+mkdir -p "$work_dir" "$ss_dir" "$config_dir" "$gpg_dir" "$add_dir"
 
 # Set secured access permissions to the GPG directory
 chmod 0700 "$gpg_dir"
@@ -749,7 +749,6 @@ fi
 
 # Unofficial ClamAV database provider URLs
 ss_url="rsync.sanesecurity.net"
-si_url="clamav.securiteinfo.com"
 
 # Create the Sanesecurity rsync "include" file (defines which files to download).
 ss_include_dbs="$config_dir/ss-include-dbs.txt"
@@ -784,12 +783,6 @@ if [ -n "$ss_dbs" ] ; then
    for db in $ss_dbs ; do
       echo "$ss_dir/$db" >> "$current_tmp"
       echo "$ss_dir/$db.sig" >> "$current_tmp"
-      clamav_files
-   done
-fi
-if [ -n "$si_dbs" ] ; then
-   for db in $si_dbs ; do
-      echo "$si_dir/$db" >> "$current_tmp"
       clamav_files
    done
 fi
@@ -1086,143 +1079,6 @@ if [ -n "$ss_dbs" ] ; then
       echo "or signature database name(s) misspelled in the script's configuration file."
       log "WARNING - Access to all Sanesecurity mirror sites failed - Check for connectivity issues"
       log "WARNING - or signature database name(s) misspelled in the script's configuration file."
-   fi
-fi
-
-#######################################################################
-# Check for updated SecuriteInfo database files every set number of   #
-# hours as defined in the "USER CONFIGURATION" section of this script #
-#######################################################################
-if [ -n "$si_dbs" ] ; then
-   rm -f "$si_dir/*.gz"
-   if [ -s "$config_dir/last-si-update.txt" ]
-      then
-         last_si_update=`cat $config_dir/last-si-update.txt`
-      else
-         last_si_update="0"
-   fi
-   db_file=""
-   loop=""
-   update_interval=$(($si_update_hours * 3600))
-   time_interval=$(($current_time - $last_si_update))
-   if [ "$time_interval" -ge $(($update_interval - 600)) ]
-      then
-         echo "$current_time" > "$config_dir"/last-si-update.txt
-         comment ""
-         comment "======================================================================"
-         comment "SecuriteInfo Database File Updates"
-         comment "======================================================================"
-         log "INFO - Checking for SecuriteInfo updates..."
-         si_updates="0"
-         for db_file in $si_dbs ; do
-            if [ "$loop" = "1" ]
-               then
-                  comment "---"
-               else
-                  comment ""
-            fi
-            comment "Checking for updated SecuriteInfo database file: $db_file"
-            comment ""
-            si_db_update="0"
-            if [ -s "$si_dir/$db_file" ]
-               then
-                  z_opt="-z $si_dir/$db_file"
-               else
-                  z_opt=""
-            fi
-            if curl $curl_proxy $curl_output_level --connect-timeout "$curl_connect_timeout" \
-               --max-time "$curl_max_time" -L -R $z_opt -o $si_dir/$db_file http://$si_url/$db_file
-               then
-                  loop="1"
-                  if ! cmp -s $si_dir/$db_file $clam_dbs/$db_file ; then
-                     if [ "$?" = "0" ] ; then
-                        db_ext=`echo $db_file | cut -d "." -f2`
-			comment ""
-                        comment "Testing updated SecuriteInfo database file: $db_file"
-                        log "INFO - Testing updated SecuriteInfo database file: $db_file"
-                        if [ -z "$ham_dir" -o "$db_ext" != "ndb" ]
-                           then
-                              if clamscan --quiet -d "$si_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
-                                 then
-                                    comment "Clamscan reports SecuriteInfo $db_file database integrity tested good"
-                                    log "INFO - Clamscan reports SecuriteInfo $db_file database integrity tested good" ; true
-                                 else
-                                    echo "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
-                                    log "WARNING - Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING" ; false
-                                    rm -f "$si_dir/$db_file"
-                              fi && \
-                              (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
-                              if rsync -pcqt $si_dir/$db_file $clam_dbs
-                                 then
-                                    perms chown $clam_user:$clam_group $clam_dbs/$db_file
-                                    comment "Successfully updated SecuriteInfo production database file: $db_file"
-                                    log "INFO - Successfully updated SecuriteInfo production database file: $db_file"
-                                    si_updates=1
-                                    si_db_update=1
-                                    do_clamd_reload=1
-                                 else
-                                    echo "Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
-                                    log "WARNING - Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
-                              fi
-                           else
-                              grep -h -v -f "$config_dir/whitelist.hex" "$si_dir/$db_file" > "$test_dir/$db_file"
-                              clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | \
-                              sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
-                              grep -h -f "$config_dir/whitelist.txt" "$test_dir/$db_file" | \
-                              cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
-                              grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
-                              mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-                              if clamscan --quiet -d "$test_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
-                                 then
-                                    comment "Clamscan reports SecuriteInfo $db_file database integrity tested good"
-                                    log "INFO - Clamscan reports SecuriteInfo $db_file database integrity tested good" ; true
-                                 else
-                                    echo "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
-                                    log "WARNING - Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING" ; false
-                                    rm -f "$si_dir/$db_file"
-                              fi && \
-                              (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
-                              if rsync -pcqt $test_dir/$db_file $clam_dbs
-                                 then
-                                    perms chown $clam_user:$clam_group $clam_dbs/$db_file
-                                    comment "Successfully updated SecuriteInfo production database file: $db_file"
-                                    log "INFO - Successfully updated SecuriteInfo production database file: $db_file"
-                                    si_updates=1
-                                    si_db_update=1
-                                    do_clamd_reload=1
-                                 else
-                                    echo "Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
-                                    log "WARNING - Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
-                              fi
-                        fi
-                     fi
-                  fi
-               else
-                  log "WARNING - Failed curl connection to $si_url - SKIPPED SecuriteInfo $db_file update"
-            fi
-            if [ "$si_db_update" != "1" ] ; then
-               comment ""
-               comment "No updated SecuriteInfo $db_file database file found"
-            fi
-         done
-         if [ "$si_updates" != "1" ] ; then
-            log "INFO - No SecuriteInfo database file updates found"
-         fi
-      else
-         comment ""
-         comment "======================================================================"
-         comment "SecuriteInfo Database File Updates"
-         comment "======================================================================"
-         comment ""
-         time_remaining=$(($update_interval - $time_interval))
-         hours_left=$(($time_remaining / 3600))
-         minutes_left=$(($time_remaining % 3600 / 60))
-         comment "$si_update_hours hours have not yet elapsed since the last SecuriteInfo update check"
-         comment ""
-         comment "     --- No update check was performed at this time ---"
-         comment ""
-         comment "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
-         log "INFO - Next SecuriteInfo check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
    fi
 fi
 
