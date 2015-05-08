@@ -672,7 +672,7 @@ chmod 0700 "$gpg_dir"
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$gpg_dir/publickey.gpg" ] ; then
    if ! curl -s -S $curl_proxy --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" \
-        -L -R http://www.sanesecurity.net/publickey.gpg -o $gpg_dir/publickey.gpg
+        -L -R $ss_gpg_url -o $gpg_dir/publickey.gpg
       then
          echo ""
          echo "Could not download Sanesecurity public GPG key"
