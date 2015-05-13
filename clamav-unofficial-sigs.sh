@@ -23,6 +23,8 @@
 #
 ################################################################################
 
+default_config="/etc/clamav-unofficial-sigs.conf"
+
 ######  #######    #     # ####### #######    ####### ######  ### ####### 
 #     # #     #    ##    # #     #    #       #       #     #  #     #    
 #     # #     #    # #   # #     #    #       #       #     #  #     #    
@@ -32,7 +34,30 @@
 ######  #######    #     # #######    #       ####### ######  ###    #    
 
 
-default_config="/etc/clamav-unofficial-sigs.conf"
+# Function to handle general response if script cannot find the config file in /etc.
+no_default_config () {
+  if [ ! -s "$default_config" ] ; then
+     echo "Cannot find your configuration file - $default_config"
+     exit
+  fi
+}
+
+# Function to support user config settings for applying file and directory access permissions.
+perms () {
+   if [ -n "$clam_user" -a -n "$clam_group" ] ; then
+      "${@:-}"
+   fi
+}
+
+# Function to handle comments and logging.
+comment () {
+   test "$comment_silence" = "no" && echo "${@:-}"
+}
+
+# Function to handle logging.
+log () {
+   test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
+}
 
 version="4.2.0"
 version_date="13 May 2015"
@@ -92,27 +117,11 @@ ClamAV Unofficial Signature Databases Update Script - v$version ($version_date)
 
 Alternative to using '-c': Place config file in /etc ($default_config)
 "
-
 echo "======================================================================"
 echo " eXtremeSHOk.com ClamAV Unofficial Signature Updater"
 echo " Version: v$version ($version_date)"
 echo " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 echo "======================================================================"
-
-# Function to handle general response if script cannot find the config file in /etc.
-no_default_config () {
-  if [ ! -s "$default_config" ] ; then
-     echo "Cannot find your configuration file - $default_config"
-     exit
-  fi
-}
-
-# Function to support user config settings for applying file and directory access permissions.
-perms () {
-   if [ -n "$clam_user" -a -n "$clam_group" ] ; then
-      "${@:-}"
-   fi
-}
 
 # Take input from the commandline and process.
 while getopts 'c:defg:himrs:tvw' option ; do
@@ -548,15 +557,6 @@ if [ "$configuration_version" != "4.2" ]; then
 fi
 
 ################################################################################
-
-# Using functions here to handle config settings for script comments and logging.
-comment () {
-   test "$comment_silence" = "no" && echo "${@:-}"
-}
-
-log () {
-   test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
-}
 
 # Check to see if the script's "USER CONFIGURATION FILE" has been completed.
 if [ "$user_configuration_complete" != "yes" ]; then
