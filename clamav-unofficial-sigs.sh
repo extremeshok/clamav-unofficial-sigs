@@ -1390,9 +1390,10 @@ if [ -s "$clam_dbs/local.ign" -a -s "$config_dir/monitor-ign.txt" ] ; then
    ign_updated=0
    cd "$clam_dbs"
    cp -f local.ign "$config_dir/local.ign"
+   cp -f "$config_dir/monitor-ign.txt" "$config_dir/monitor-ign-old.txt"
    comment ""
    comment "======================================================================"
-   for entry in `cat "$config_dir/monitor-ign.txt" 2>/dev/null` ; do
+   for entry in `cat "$config_dir/monitor-ign-old.txt" 2>/dev/null` ; do
       sig_file=`echo "$entry" | tr -d "\r" | awk -F ":" '{print $1}'`
       sig_hex=`echo "$entry" | tr -d "\r" | awk -F ":" '{print $NF}'`
       sig_name_old=`echo "$entry" | tr -d "\r" | awk -F ":" '{print $3}'`
