@@ -32,6 +32,7 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
  - Complete rewrite of securiteinfo support, full support for Free/Delayed clamav by securiteinfo.com ;-P
    Note: securite info requires you to create a free account and add your authorisation code to the config.
  - Config updated to 4.3
+ - Restructured Config
 
 ## Version 4.2.0
  - eXtremeSHOK.com Maintenance

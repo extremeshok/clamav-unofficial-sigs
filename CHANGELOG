@@ -20,6 +20,7 @@ Version 4.3.0 (updated 2015-05-13)
  - Complete rewrite of securiteinfo support, full support for Free/Delayed clamav by securiteinfo.com ;-P
    Note: securite info requires you to create a free account and add your authorisation code to the config.
  - Config updated to 4.3
+ - Restructured Config
 
 Version 4.2.0 (updated 2015-05-13)
  - eXtremeSHOK.com Maintenance
