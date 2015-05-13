@@ -26,7 +26,7 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
 
 ### Please consider a donation to http://sanesecurity.com
 
-Version 4.3.0 (updated 2015-05-13)
+## Version 4.3.0 (updated 2015-05-13)
  - eXtremeSHOK.com Maintenance
  - Code refactoring: group and move functions to top of script
  - Complete rewrite of securiteinfo support, full support for Free/Delayed clamav by securiteinfo.com ;-P
