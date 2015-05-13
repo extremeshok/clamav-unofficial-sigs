@@ -26,7 +26,7 @@
 
 default_config="/etc/clamav-unofficial-sigs.conf"
 
-version="v4.0.0 (updated 2015-05-08)"
+version="v4.1.0 (updated 2015-05-08)"
 output_ver="
    `basename $0` $version
 "
