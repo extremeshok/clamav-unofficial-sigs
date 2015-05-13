@@ -5,9 +5,14 @@
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
 ##################
 # 
-# Originially based on:
-# Author: Bill Landry <unofficialsigs@gmail.com>
+# Originially based on: 
+# Script provide by Bill Landry (unofficialsigs@gmail.com).
 #
+# Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
+#
+# License: BSD (Berkeley Software Distribution)
+#
+##################
 # This cron file will execute the clamav-unofficial-sigs.sh script that
 # currently supports updating third-party signature databases provided
 # by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
