@@ -552,9 +552,6 @@ do
   eval $i
 done
 
-echo "$user_configuration_complete"
-
-exit 
 ################################################################################
 
 # Using functions here to handle config settings for script comments and logging.
