@@ -6,25 +6,41 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Description
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
 
-##MalwarePatrol Free/Delayed list support (as of May 2015)
+### MalwarePatrol Free/Delayed list support (as of May 2015)
 Usage of MalwarePatrol 2015 free clamav signatures : https://www.malwarepatrol.net
  - 1. Sign up for a free account : https://www.malwarepatrol.net/signup-free.shtml
  - 2. You will recieve an email containing your password/receipt number
- - 3. Enter the receipt number into the config: eeplacing YOUR-RECEIPT-NUMBER with your receipt number from the email
- malwarepatrol_receipt_code="YOUR-RECEIPT-NUMBER"
+ - 3. Enter the receipt number into the config malwarepatrol_receipt_code: replacing YOUR-RECEIPT-NUMBER with your receipt number from the email
+
+### SecuriteInfo Free/Delayed list support (as of May 2015)
+Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
+ - 1. Sign up for a free account : https://www.securiteinfo.com/clients/customers/signup
+ - 2. You will recieve an email to activate your account and then a followup email with your login name
+ - 3. Login and navigate to your customer account : https://www.securiteinfo.com/clients/customers/account
+ - 4. Click on the Installation tab
+ - 5. You will need to get your unique identifier from one of the download links for manual setup, you will need your 128 character authorisation signature.
+   eg. https://www.securiteinfo.com/get/signatures/bb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnhbb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnh/securiteinfo.hdb
+   Your 128 character authorisation signature would be : bb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnhbb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnh
+ - 6. Enter the authorisation signature into the config securiteinfo_authorisation_signature: replacing YOUR-SIGNATURE-NUMBER with your authorisation signature from the link
 
 
 ### Please consider a donation to http://sanesecurity.com
 
-## Version 4.2.0 (updated 2015-05-13)
+Version 4.3.0 (updated 2015-05-13)
+ - eXtremeSHOK.com Maintenance
+ - Code refactoring: group and move functions to top of script
+ - Complete rewrite of securiteinfo support, full support for Free/Delayed clamav by securiteinfo.com ;-P
+   Note: securite info requires you to create a free account and add your authorisation code to the config.
+ - Config updated to 4.3
+
+## Version 4.2.0
  - eXtremeSHOK.com Maintenance
  - Replace annoying si_ , mbl_,  ss_  with actual names ie. securiteinfo_ malwarepatrol_ sanesecurity_
  - Complete rewrite of malwarepatrol support, full support for Free/Delayed clamav ;-P
    Note: malware patrol requires you to create a free account and add your "purchase" code to the config.
  - More fixes to config prasing and stripping of comments and whitespace
  - Code refactoring: remove empty commands: echo "" and comment ""
- - Config version detection and enforcing 
-
+ - Config version detection and enforcing
 
 ## Version 4.1.0
    - eXtremeSHOK.com Maintenance
