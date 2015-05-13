@@ -1194,7 +1194,8 @@ fi
 ##########################################################################################################################################
 # Download MalwarePatrol database file every set number of hours as defined in the "USER CONFIGURATION" section of this script.    #
 ##########################################################################################################################################
-if [ -n "$malwarepatrol_db" ] ; then
+if [ "$malwarepatrol_receipt_code" != "YOUR-RECEIPT-NUMBER" ] ; then
+  if [ -n "$malwarepatrol_db" ] ; then
    if [ -s "$config_dir/last-mbl-update.txt" ]
       then
          last_malwarepatrol_update=`cat $config_dir/last-mbl-update.txt`
@@ -1299,6 +1300,7 @@ if [ -n "$malwarepatrol_db" ] ; then
          comment "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
          log "INFO - Next MalwarePatrol download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
    fi
+ fi
 fi
 
 
