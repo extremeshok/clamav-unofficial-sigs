@@ -1410,10 +1410,10 @@ if [ -s "$clam_dbs/local.ign" -a -s "$config_dir/monitor-ign.txt" ] ; then
                echo "$sig_mon_new" >> "$config_dir/monitor-ign.txt"
                perl -p -i -e "s/$sig_ign_old/$sig_ign_new/" "$config_dir/local.ign"
                comment ""
-               comment "$sig_name_old hexadecimal signature unchanged, however signature name and/or line placement"
-               comment "in $sig_file has change to $sig_name_new - updated local.ign to reflect this change."
-               log "INFO - $sig_name_old hexadecimal signature unchanged, however signature name and/or line placement"
-               log "INFO - in $sig_file has change to $sig_name_new - updated local.ign to reflect this change."
+               comment "$sig_name_old hexadecimal signature is unchanged, however signature name and/or line placement"
+               comment "in $sig_file has changed to $sig_name_new - updated local.ign to reflect this change."
+               log "INFO - $sig_name_old hexadecimal signature is unchanged, however signature name and/or line placement"
+               log "INFO - in $sig_file has changed to $sig_name_new - updated local.ign to reflect this change."
                ign_updated=1
             fi
          else
