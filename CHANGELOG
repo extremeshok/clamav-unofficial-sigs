@@ -14,6 +14,12 @@
 #
 ##################
 
+## Version 4.4.0 (updated 2015-05-14)
+ - eXtremeSHOK.com Maintenance
+ - Code refactoring: 
+ - Added full support for Linux Malware Detect clamav databases
+ - Config updated to 4.4
+
 Version 4.3.0 (updated 2015-05-13)
  - eXtremeSHOK.com Maintenance
  - Code refactoring: group and move functions to top of script

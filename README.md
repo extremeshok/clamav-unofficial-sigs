@@ -23,10 +23,19 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
    Your 128 character authorisation signature would be : bb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnhbb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnh
  - 6. Enter the authorisation signature into the config securiteinfo_authorisation_signature: replacing YOUR-SIGNATURE-NUMBER with your authorisation signature from the link
 
+### Linux Malware Detect support (as of May 2015)
+Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/projects/linux-malware-detect/
+ - Enabled by default, no configuration required
 
 ### Please consider a donation to http://sanesecurity.com
 
-## Version 4.3.0 (updated 2015-05-13)
+## Version 4.4.0 (updated 2015-05-14)
+ - eXtremeSHOK.com Maintenance
+ - Code refactoring: 
+ - Added full support for Linux Malware Detect clamav databases
+ - Config updated to 4.4
+
+## Version 4.3.0
  - eXtremeSHOK.com Maintenance
  - Code refactoring: group and move functions to top of script
  - Complete rewrite of securiteinfo support, full support for Free/Delayed clamav by securiteinfo.com ;-P

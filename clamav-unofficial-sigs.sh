@@ -1,9 +1,9 @@
 #!/bin/sh
-###################
+################################################################################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
-##################
+################################################################################
 # 
 # Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 #
@@ -12,18 +12,16 @@
 #
 # License: BSD (Berkeley Software Distribution)
 #
-##################
 ################################################################################
 #
-#  THERE ARE NO USER CONFIGURABLE OPTIONS IN THIS SCRIPT
-#
+#    THERE ARE NO USER CONFIGURABLE OPTIONS IN THIS SCRIPT
 #   ALL CONFIGURATION OPTIONS ARE LOCATED IN THE INCLUDED CONFIGURATION FILE 
-#
-#   ONLY COMPATIBLE WITH CONFIG VERSION 4.3
 #
 ################################################################################
 
 default_config="/etc/clamav-unofficial-sigs.conf"
+
+################################################################################
 
 ######  #######    #     # ####### #######    ####### ######  ### ####### 
 #     # #     #    ##    # #     #    #       #       #     #  #     #    
@@ -33,6 +31,7 @@ default_config="/etc/clamav-unofficial-sigs.conf"
 #     # #     #    #    ## #     #    #       #       #     #  #     #    
 ######  #######    #     # #######    #       ####### ######  ###    #    
 
+################################################################################
 
 # Function to handle general response if script cannot find the config file in /etc.
 no_default_config () {
@@ -59,9 +58,9 @@ log () {
    test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
 }
 
-version="4.3.0"
-required_config_version="4.3"
-version_date="13 May 2015"
+version="4.4.0"
+required_config_version="4.4"
+version_date="14 May 2015"
 
 output_ver="`basename $0` $version ($version_date)"
 
@@ -552,7 +551,7 @@ do
 done
 
 if [ "$configuration_version" != "$required_config_version" ]; then
-      echo "*** Your configuration version is not compatible with this version ***"       
+      echo "*** Your configuration version is not compatible with this version ***"     
       log "ALERT - SCRIPT HALTED, user configuration is not compatible with this version"
    exit 1
 fi
@@ -611,7 +610,7 @@ fi
 
 # Check to see if the working directories have been created.
 # If not, create them.  Otherwise, ignore and proceed with script.
-mkdir -p "$work_dir" "$securiteinfo_dir" "$malwarepatrol_dir" "$sanesecurity_dir" "$config_dir" "$gpg_dir" "$add_dir"
+mkdir -p "$work_dir" "$securiteinfo_dir" "$malwarepatrol_dir" "$linuxmalwaredetect_dir" "$sanesecurity_dir" "$config_dir" "$gpg_dir" "$add_dir"
 
 # Set secured access permissions to the GPG directory
 chmod 0700 "$gpg_dir"
@@ -1058,10 +1057,9 @@ if [ -n "$sanesecurity_dbs" ] ; then
    fi
 fi
 
-#######################################################################
-# Check for updated SecuriteInfo database files every set number of   #
-# hours as defined in the "USER CONFIGURATION" section of this script #
-#######################################################################
+##############################################################################################################################################
+# Check for updated SecuriteInfo database files every set number of  hours as defined in the "USER CONFIGURATION" section of this script #
+##############################################################################################################################################
 if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
   if [ -n "$securiteinfo_dbs" ] ; then
      rm -f "$securiteinfo_dir/*.gz"
@@ -1084,12 +1082,12 @@ if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
            comment "======================================================================"
            log "INFO - Checking for SecuriteInfo updates..."
            securiteinfo_updates="0"
-           for db_file in $securiteinfo_dbs ; do
+           for download_db_file in $securiteinfo_dbs ; do
               if [ "$loop" = "1" ]; then
                     comment "---"      
               fi
               comment "Checking for updated SecuriteInfo database file: $db_file"
-     
+              
               securiteinfo_db_update="0"
               if [ -s "$securiteinfo_dir/$db_file" ]
                  then
@@ -1193,6 +1191,140 @@ if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
      fi
   fi
 fi
+
+##############################################################################################################################################
+# Check for updated linuxmalwaredetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
+##############################################################################################################################################
+if [ -n "$linuxmalwaredetect_dbs" ] ; then
+ rm -f "$linuxmalwaredetect_dir/*.gz"
+ if [ -s "$config_dir/last-linuxmalwaredetect-update.txt" ]
+  then
+     last_linuxmalwaredetect_update=`cat $config_dir/last-linuxmalwaredetect-update.txt`
+  else
+     last_linuxmalwaredetect_update="0"
+ fi
+ db_file=""
+ loop=""
+ update_interval=$(($linuxmalwaredetect_update_hours * 3600))
+ time_interval=$(($current_time - $last_linuxmalwaredetect_update))
+ if [ "$time_interval" -ge $(($update_interval - 600)) ]
+  then
+     echo "$current_time" > "$config_dir"/last-linuxmalwaredetect-update.txt
+
+     comment "======================================================================"
+     comment "linuxmalwaredetect Database File Updates"
+     comment "======================================================================"
+     log "INFO - Checking for linuxmalwaredetect updates..."
+     linuxmalwaredetect_updates="0"
+     for db_file in $linuxmalwaredetect_dbs ; do
+      if [ "$loop" = "1" ]; then
+        comment "---"      
+      fi
+      comment "Checking for updated linuxmalwaredetect database file: $db_file"
+ 
+      linuxmalwaredetect_db_update="0"
+      if [ -s "$linuxmalwaredetect_dir/$db_file" ]
+       then
+        z_opt="-z $linuxmalwaredetect_dir/$db_file"
+       else
+        z_opt=""
+      fi
+      if curl $curl_proxy $curl_output_level --connect-timeout "$curl_connect_timeout" \
+       --max-time "$curl_max_time" -L -R $z_opt -o $linuxmalwaredetect_dir/$db_file "$linuxmalwaredetect_url/$linuxmalwaredetect_authorisation_signature/$db_file"
+       then
+        loop="1"
+        if ! cmp -s $linuxmalwaredetect_dir/$db_file $clam_dbs/$db_file ; then
+           if [ "$?" = "0" ] ; then
+            db_ext=`echo $db_file | cut -d "." -f2`
+  
+            comment "Testing updated linuxmalwaredetect database file: $db_file"
+            log "INFO - Testing updated linuxmalwaredetect database file: $db_file"
+            if [ -z "$ham_dir" -o "$db_ext" != "ndb" ]
+             then
+              if clamscan --quiet -d "$linuxmalwaredetect_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
+                 then
+                  comment "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
+                  log "INFO - Clamscan reports linuxmalwaredetect $db_file database integrity tested good" ; true
+                 else
+                  echo "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING"
+                  log "WARNING - Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING" ; false
+                  rm -f "$linuxmalwaredetect_dir/$db_file"
+              fi && \
+              (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
+              if rsync -pcqt $linuxmalwaredetect_dir/$db_file $clam_dbs
+                 then
+                  perms chown $clam_user:$clam_group $clam_dbs/$db_file
+                  comment "Successfully updated linuxmalwaredetect production database file: $db_file"
+                  log "INFO - Successfully updated linuxmalwaredetect production database file: $db_file"
+                  linuxmalwaredetect_updates=1
+                  linuxmalwaredetect_db_update=1
+                  do_clamd_reload=1
+                 else
+                  echo "Failed to successfully update linuxmalwaredetect production database file: $db_file - SKIPPING"
+                  log "WARNING - Failed to successfully update linuxmalwaredetect production database file: $db_file - SKIPPING"
+              fi
+             else
+              grep -h -v -f "$config_dir/whitelist.hex" "$linuxmalwaredetect_dir/$db_file" > "$test_dir/$db_file"
+              clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | \
+              sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
+              grep -h -f "$config_dir/whitelist.txt" "$test_dir/$db_file" | \
+              cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
+              grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
+              mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
+              if clamscan --quiet -d "$test_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
+                 then
+                  comment "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
+                  log "INFO - Clamscan reports linuxmalwaredetect $db_file database integrity tested good" ; true
+                 else
+                  echo "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING"
+                  log "WARNING - Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING" ; false
+                  rm -f "$linuxmalwaredetect_dir/$db_file"
+              fi && \
+              (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
+              if rsync -pcqt $test_dir/$db_file $clam_dbs
+                 then
+                  perms chown $clam_user:$clam_group $clam_dbs/$db_file
+                  comment "Successfully updated linuxmalwaredetect production database file: $db_file"
+                  log "INFO - Successfully updated linuxmalwaredetect production database file: $db_file"
+                  linuxmalwaredetect_updates=1
+                  linuxmalwaredetect_db_update=1
+                  do_clamd_reload=1
+                 else
+                  echo "Failed to successfully update linuxmalwaredetect production database file: $db_file - SKIPPING"
+                  log "WARNING - Failed to successfully update linuxmalwaredetect production database file: $db_file - SKIPPING"
+              fi
+            fi
+           fi
+        fi
+       else
+        log "WARNING - Failed curl connection to $linuxmalwaredetect_url - SKIPPED linuxmalwaredetect $db_file update"
+      fi
+      if [ "$linuxmalwaredetect_db_update" != "1" ] ; then
+  
+       comment "No updated linuxmalwaredetect $db_file database file found"
+      fi
+     done
+     if [ "$linuxmalwaredetect_updates" != "1" ] ; then
+      log "INFO - No linuxmalwaredetect database file updates found"
+     fi
+  else
+
+     comment "======================================================================"
+     comment "linuxmalwaredetect Database File Updates"
+     comment "======================================================================"
+
+     time_remaining=$(($update_interval - $time_interval))
+     hours_left=$(($time_remaining / 3600))
+     minutes_left=$(($time_remaining % 3600 / 60))
+     comment "$linuxmalwaredetect_update_hours hours have not yet elapsed since the last linux malware detect update check"
+
+     comment "     --- No update check was performed at this time ---"
+
+     comment "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+     log "INFO - Next linux malware detect check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+ fi
+fi
+
 
 ##########################################################################################################################################
 # Download MalwarePatrol database file every set number of hours as defined in the "USER CONFIGURATION" section of this script.    #
@@ -1586,3 +1718,5 @@ if [ "$reload_dbs" = "yes" -a -z "$reload_opt" ]
 fi
 
 exit $?
+
+# https://eXtremeSHOK.com ##############################################################  
