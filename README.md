@@ -8,6 +8,12 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 ### Please consider a donation to http://sanesecurity.com
 
+## Version 4.1.0
+   - eXtremeSHOK.com Maintenance
+   - Fix on default enable of foxhole medium and High false positive sources
+   - grammatical corrections to some comments and log output
+   - sig-boundary patch by Alan Stern
+   - create intermediate monitor-ign-old.txt to prevent reading and writing of local.ign by Alan Stern
 
 ## Version 4.0.0
    - eXtremeSHOK.com Maintenance

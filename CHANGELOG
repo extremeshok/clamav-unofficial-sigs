@@ -3,6 +3,13 @@ by Bill Landry (unofficialsigs@gmail.com).  The script provides a simple
 way to download, test, and use third-party ClamAV signature databases
 provided by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
 
+Version 4.1.0 (updated 2015-05-13)
+   - eXtremeSHOK.com Maintenance
+   - Fix on default enable of foxhole medium and High false positive sources
+   - grammatical corrections to some comments and log output
+   - sig-boundary patch by Alan Stern
+   - create intermediate monitor-ign-old.txt to prevent reading and writing of local.ign by Alan Stern
+
 Version 4.0.0 (updated 2015-05-08)
    - eXtremeSHOK.com Maintenance
    - Enabled all low false positive sources by default
