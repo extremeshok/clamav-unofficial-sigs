@@ -546,8 +546,15 @@ if [ "$1" = -c ] ;
 fi
 
 clean_config=`sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
-eval "$clean_config"
 
+for i in "${clean_config[@]}"
+do
+  eval $i
+done
+
+echo "$user_configuration_complete"
+
+exit 
 ################################################################################
 
 # Using functions here to handle config settings for script comments and logging.
@@ -560,8 +567,7 @@ log () {
 }
 
 # Check to see if the script's "USER CONFIGURATION FILE" has been completed.
-if [ "$user_configuration_complete" != "yes" ]
-   then
+if [ "$user_configuration_complete" != "yes" ]; then
       echo ""
       echo "              *** SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED ***"
       echo "   Please review the script configuration file: `basename $default_config`."
