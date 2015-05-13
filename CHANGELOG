@@ -17,9 +17,11 @@
 Version 4.2.0 (updated 2015-05-13)
  - eXtremeSHOK.com Maintenance
  - Replace annoying si_ , mbl_,  ss_  with actual names ie. securiteinfo_ malwarepatrol_ sanesecurity_
- - Complete rewrite of malwarepatrol support, full support for Free/Delayed clamav ;-P
+ - Complete rewrite of malwarepatrol support, full support for Free/Delayed clamav by malwarepatrol.net ;-P
    Note: malware patrol requires you to create a free account and add your "purchase" code to the config.
- -
+ - More fixes to config prasing and stripping of comments and whitespace
+ - Code refactoring: remove empty commands: echo "" and comment ""
+ - Config version detection and enforcing 
 
 Version 4.1.0 (updated 2015-05-13)
  - eXtremeSHOK.com Maintenance

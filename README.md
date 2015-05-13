@@ -6,7 +6,13 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Description
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
 
-MalwarePatrol Free/Delayed list support (as of May 2015)
+##MalwarePatrol Free/Delayed list support (as of May 2015)
+Usage of MalwarePatrol 2015 free clamav signatures : https://www.malwarepatrol.net
+ - 1. Sign up for a free account : https://www.malwarepatrol.net/signup-free.shtml
+ - 2. You will recieve an email containing your password/receipt number
+ - 3. Enter the receipt number into the config: eeplacing YOUR-RECEIPT-NUMBER with your receipt number from the email
+ malwarepatrol_receipt_code="YOUR-RECEIPT-NUMBER"
+
 
 ### Please consider a donation to http://sanesecurity.com
 
@@ -15,7 +21,10 @@ MalwarePatrol Free/Delayed list support (as of May 2015)
  - Replace annoying si_ , mbl_,  ss_  with actual names ie. securiteinfo_ malwarepatrol_ sanesecurity_
  - Complete rewrite of malwarepatrol support, full support for Free/Delayed clamav ;-P
    Note: malware patrol requires you to create a free account and add your "purchase" code to the config.
- -
+ - More fixes to config prasing and stripping of comments and whitespace
+ - Code refactoring: remove empty commands: echo "" and comment ""
+ - Config version detection and enforcing 
+
 
 ## Version 4.1.0
    - eXtremeSHOK.com Maintenance

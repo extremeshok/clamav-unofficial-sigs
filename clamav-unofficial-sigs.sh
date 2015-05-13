@@ -5,34 +5,42 @@
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
 ##################
 # 
+# Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
+#
 # Originially based on: 
 # Script provide by Bill Landry (unofficialsigs@gmail.com).
-#
-# Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 #
 # License: BSD (Berkeley Software Distribution)
 #
 ##################
+################################################################################
+#
+#  THERE ARE NO USER CONFIGURABLE OPTIONS IN THIS SCRIPT
+#
+#   ALL CONFIGURATION OPTIONS ARE LOCATED IN THE INCLUDED CONFIGURATION FILE 
+#
+#   ONLY COMPATIBLE WITH VERSION 4.2.X CONFIG
+#
+################################################################################
 
-################################################################################
-#                                                                              #
-#            THERE ARE NO USER CONFIGURABLE OPTIONS IN THIS SCRIPT             #
-#                                    * * *                                     #
-#   ALL CONFIGURATION OPTIONS ARE LOCATED IN THE INCLUDED CONFIGURATION FILE   #
-#                                    * * *                                     #
-#                NOT COMPATIBLE WITH VERSION 3.XX CONFIG                       #
-#                                                                              #
-################################################################################
+######  #######    #     # ####### #######    ####### ######  ### ####### 
+#     # #     #    ##    # #     #    #       #       #     #  #     #    
+#     # #     #    # #   # #     #    #       #       #     #  #     #    
+#     # #     #    #  #  # #     #    #       #####   #     #  #     #    
+#     # #     #    #   # # #     #    #       #       #     #  #     #    
+#     # #     #    #    ## #     #    #       #       #     #  #     #    
+######  #######    #     # #######    #       ####### ######  ###    #    
+
 
 default_config="/etc/clamav-unofficial-sigs.conf"
 
-version="v4.1.0 (updated 2015-05-13)"
-output_ver="
-   `basename $0` $version
-"
+version="4.2.0"
+version_date="13 May 2015"
+
+output_ver="`basename $0` $version ($version_date)"
 
 usage="
-ClamAV Unofficial Signature Databases Update Script - $version
+ClamAV Unofficial Signature Databases Update Script - v$version ($version_date)
 
    Usage: `basename $0` [OPTION] [PATH|FILE]
 
@@ -85,18 +93,18 @@ ClamAV Unofficial Signature Databases Update Script - $version
 Alternative to using '-c': Place config file in /etc ($default_config)
 "
 
+echo "======================================================================"
+echo " eXtremeSHOk.com ClamAV Unofficial Signature Updater"
+echo " Version: v$version ($version_date)"
+echo " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
+echo "======================================================================"
+
 # Function to handle general response if script cannot find the config file in /etc.
 no_default_config () {
-if [ ! -s "$default_config" ] ; then
-   echo ""
-   echo "Cannot find your configuration file - place a copy in /etc and try again..."
-   echo ""
-   echo "     e.g.: $default_config"
-   echo ""
-   exit
-fi
-. "$default_config"
-echo ""
+  if [ ! -s "$default_config" ] ; then
+     echo "Cannot find your configuration file - $default_config"
+     exit
+  fi
 }
 
 # Function to support user config settings for applying file and directory access permissions.
@@ -115,10 +123,8 @@ while getopts 'c:defg:himrs:tvw' option ; do
           echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
           echo "a hexadecimal encoded data string and press enter (do not include '.UNOFFICIAL'"
           echo "in the signature name nor add quote marks to any input string):"
-          echo ""
           read input
           input=`echo "$input" | tr -d "'" | tr -d '"'`
-          echo ""
           if `echo "$input" | grep "\." > /dev/null`
              then
                 cd "$clam_dbs"
@@ -128,45 +134,33 @@ while getopts 'c:defg:himrs:tvw' option ; do
                       db_file=`echo "$sig" | cut -d ':' -f1`
                       echo "$input found in: $db_file"
                       echo "$input signature decodes to:"
-                      echo ""
                       echo "$sig" | cut -d ":" -f5 | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
                    else
                       echo "Signature '$input' could not be found."
-                      echo ""
                       echo "This script will only decode ClamAV 'UNOFFICIAL' third-Party,"
                       echo "non-image based, signatures as found in the *.ndb databases."
                 fi
             else
                echo "Here is the decoded hexadecimal input string:"
-               echo ""
                echo "$input" | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
           fi
-          echo ""
           exit
           ;;
       e)  no_default_config
           echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
           echo "any quotes around the string unless you want them included in the hexadecimal encoded output:"
-          echo ""
           read input
-          echo ""
           echo "Here is the hexadecimal encoded input string:"
-          echo ""
           echo "$input" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg'
-          echo ""
           exit
           ;;
       f)  no_default_config
           echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
           echo "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
           echo "around the string unless you want them included in the hexadecimal encoded output:"
-          echo ""
           read input
-          echo ""
           echo "Here is the hexadecimal encoded input string:"
-          echo ""
           echo "$input" | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg'
-          echo ""
           exit
           ;;
       g)  no_default_config
@@ -174,7 +168,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
           if [ -s "$sanesecurity_dir/$db_file" ]
              then
                 echo "GPG signature testing database file: $sanesecurity_dir/$db_file"
-                echo ""
+       
                 if ! gpg --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file
                    then
                      gpg --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file
@@ -185,7 +179,6 @@ while getopts 'c:defg:himrs:tvw' option ; do
                 echo "$sanesecurity_dbs"
                 echo "Check the file name and try again..."
           fi
-          echo ""
           exit
           ;;
       h)  echo "$usage"
@@ -193,45 +186,41 @@ while getopts 'c:defg:himrs:tvw' option ; do
           ;;
       i)  no_default_config
           echo "*** SCRIPT VERSION ***"
-          echo "`basename $0` $version"
-          echo ""
+          echo "`basename $0` $version ($version_date)"
           echo "*** SYSTEM INFORMATION ***"
           uname=`which uname`
           $uname -a
-          echo ""
           echo "*** CLAMSCAN LOCATION & VERSION ***"
           clamscan=`which clamscan`
           echo "$clamscan"
           $clamscan --version | head -1
-          echo ""
           echo "*** RSYNC LOCATION & VERSION ***"
           rsync=`which rsync`
           echo "$rsync"
           $rsync --version | head -1
-          echo ""
           echo "*** CURL LOCATION & VERSION ***"
           curl=`which curl`
           echo "$curl"
           $curl --version | head -1
-          echo ""
+ 
           echo "*** GPG LOCATION & VERSION ***"
           gpg=`which gpg`
           echo "$gpg"
           $gpg --version | head -1
-          echo ""
+ 
           echo "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
           ls -ld $work_dir
-          echo ""
+ 
           ls -lR $work_dir | grep -v total
-          echo ""
+ 
           echo "*** CLAMAV DIRECTORY INFORMATION ***"
           ls -ld $clam_dbs
           echo "---"
           ls -l $clam_dbs | grep -v total
-          echo ""
+ 
           echo "*** SCRIPT CONFIGURATION SETTINGS ***"
           egrep -v "^#|^$" $default_config
-          echo ""
+ 
           exit
           ;;
       m)  no_default_config
@@ -278,16 +267,16 @@ while getopts 'c:defg:himrs:tvw' option ; do
           read reply
           if [ "$reply" = "y" -o "$reply" = "Y" ]
              then
-                echo ""
+       
                 echo -n "Enter the source file as /path/filename: "
                 read source
                 if [ -s "$source" ]
                    then
                       source_file=`basename "$source"`
-                      echo ""
+             
                       echo "What signature prefix would you like to use?  For example: 'Phish.Domains'"
                       echo "will create signatures that looks like: 'Phish.Domains.1:4:*:HexSigHere'"
-                      echo ""
+             
                       echo -n "Enter signature prefix: "
                       read prefix
                       path_file=`echo "$source" | cut -d "." -f-1 | sed 's/$/.ndb/'`
@@ -295,7 +284,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
                       rm -f "$path_file"
                       total=`wc -l "$source" | cut -d " " -f1`
                       line_num=1
-                      echo ""
+             
                       cat "$source" | while read line ; do
                          line_prefix=`echo "$line" | awk -F ':' '{print $1}'`
                          if [ "$line_prefix" = "-" ]
@@ -310,19 +299,19 @@ while getopts 'c:defg:himrs:tvw' option ; do
                          line_num=$(($line_num + 1))
                       done
                    else
-                      echo ""
+             
                       echo "Source file not found, exiting..."
-                      echo ""
+             
                       exit
                 fi
-                echo ""
-                echo ""
+       
+       
                 echo "Signature database file created at: $path_file"
                 if clamscan --quiet -d "$path_file" "$config_dir/scan-test.txt" 2>/dev/null
                    then
-                      echo ""
+             
                       echo "Clamscan reports database integrity tested good."
-                      echo ""
+             
                       echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases? (y/n): "
                       read reply
                       if [ "$reply" = "y" -o "$reply" = "Y" ]
@@ -334,26 +323,26 @@ while getopts 'c:defg:himrs:tvw' option ; do
                                         perms chown $clam_user:$clam_group "$clam_dbs/$db_file"
                                         chmod 0644 "$clam_dbs/$db_file"
                                         $reload_opt
-                                        echo ""
+                               
                                         echo "Signature database '$db_file' was successfully implemented and ClamD databases reloaded."
                                      else
-                                        echo ""
+                               
                                         echo "Failed to add/update '$db_file', ClamD database not reloaded."
                                   fi
                                else
-                                  echo ""
+                         
                                   echo "Database '$db_file' has not changed - skipping"
                             fi
                          else
-                            echo ""
+                   
                             echo "No action taken."
                       fi
                    else
-                      echo ""
+             
                       echo "Clamscan reports that '$db_file' signature database integrity tested bad."
                 fi
           fi
-          echo ""
+ 
           exit
           ;;
       r)  no_default_config
@@ -362,7 +351,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
                 echo "  This script (clamav-unofficial-sigs) was installed on the system"
                 echo "  via '$pkg_mgr', use '$pkg_rm' to remove the script"
                 echo "  and all of its associated files and databases from the system."
-                echo ""
+       
              else
                 echo "  Are you sure you want to remove the clamav-unofficial-sigs script and all of its"
                 echo -n "  associated files, third-party databases, and work directories from the system? (y/n): "
@@ -371,7 +360,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
                    then
                       if [ -s "$config_dir/purge.txt" ] 
                          then
-                            echo ""
+                   
                             for file in `cat $config_dir/purge.txt` ; do
                                rm -f -- "$file"
                                echo "     Removed file: $file"
@@ -394,14 +383,14 @@ while getopts 'c:defg:himrs:tvw' option ; do
                             rm -f -- "$default_config" && echo "     Removed file: $default_config"
                             rm -f -- "$0" && echo "     Removed file: $0"
                             rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
-                            echo ""
+                   
                             echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
                             echo "  databases, and work directories have been successfully removed from the system."
-                            echo ""
+                   
                          else
                             echo "  Cannot locate 'purge.txt' file in $config_dir."
                             echo "  Files and signature database will need to be removed manually."
-                            echo ""
+                   
                       fi
                    else
                       echo "$usage"
@@ -415,18 +404,18 @@ while getopts 'c:defg:himrs:tvw' option ; do
           if [ -s "$db_file" ]
              then
                 echo "Clamscan integrity testing: $db_file"
-                echo ""
+       
                 if clamscan --quiet -d "$db_file" "$config_dir/scan-test.txt" ; then
                    echo "Clamscan reports that '$input' database integrity tested GOOD"
                 fi
              else
                 echo "File '$input' cannot be found."
                 echo "Here is a list of third-party databases that can be clamscan integrity tested:"
-                echo ""
+       
                 echo "Sanesecurity $sanesecurity_dbs""SecuriteInfo $securiteinfo_dbs""MalwarePatrol $malwarepatrol_dbs"
                 echo "Check the file name and try again..."
           fi
-          echo ""
+ 
           exit
           ;;
       t)  no_default_config
@@ -435,7 +424,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
                 if [ -s "$config_dir/whitelist.hex" ]
                    then
                       echo "The following third-party signatures triggered hits during the HAM Directory scan:"
-                      echo ""
+             
                       grep -h -f "$config_dir/whitelist.hex" "$work_dir"/*/*.ndb | cut -d ":" -f1
                    else
                       echo "No third-party signatures have triggered hits during the HAM Directory scan."
@@ -443,7 +432,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
              else
                 echo "Ham directory scanning is not currently enabled in the script's configuration file."
           fi
-          echo ""
+ 
           exit
           ;;
       v)  echo "$output_ver"
@@ -453,7 +442,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
           echo "Input a third-party signature name that you wish to whitelist due to false-positives"
           echo "and press enter (do not include '.UNOFFICIAL' in the signature name nor add quote"
           echo "marks to the input string):"
-          echo ""
+ 
           read input
           if [ -n "$input" ]
              then
@@ -475,34 +464,34 @@ while getopts 'c:defg:himrs:tvw' option ; do
                                         perms chown $clam_user:$clam_group my-whitelist.ign2
                                         chmod 0644 my-whitelist.ign2 "$config_dir/monitor-ign.txt"
                                         $reload_opt
-                                        echo ""
+                               
                                         echo "Signature '$input' has been added to my-whitelist.ign2 and"
                                         echo "all databases have been reloaded.  The script will track any changes"
                                         echo "to the offending signature and will automatically remove it if the"
                                         echo "signature is modified or removed from the third-party database."
                                      else
-                                        echo ""
+                               
                                         echo "Failed to successfully update my-whitelist.ign2 file - SKIPPING."
                                   fi
                                else
-                                  echo ""
+                         
                                   echo "Clamscan reports my-whitelist.ign2 database integrity is bad - SKIPPING."
                             fi
                          else
-                            echo ""
+                   
                             echo "Signature '$input' already exists in my-whitelist.ign2 - no action taken."
                       fi
                    else
-                      echo ""
+             
                       echo "Signature '$input' could not be found."
-                      echo ""
+             
                       echo "This script will only create a whitelise entry in my-whitelist.ign2 for ClamAV"
                       echo "'UNOFFICIAL' third-Party signatures as found in the *.ndb databases."
                 fi
              else
                 echo "No input detected - no action taken."
           fi
-          echo ""
+ 
           exit
           ;;
       *)  echo "$usage"
@@ -515,14 +504,14 @@ done
 if [ "$1" = -c ] ;
    then
       if [ ! -s "$conf_file" ] ; then
-         echo ""
+
          echo "   Config file does not exist at: $2"
          echo "   Check the config file path and try again..."
          echo "$usage"
          exit
       fi
       if [ "`basename "$conf_file"`" != "`basename "$default_config"`" ] ; then
-         echo ""
+
          echo "   Invalid config file: $2"
          echo "   Config file must be named: `basename $default_config`"
          echo "$usage"
@@ -531,13 +520,13 @@ if [ "$1" = -c ] ;
       config_source="$conf_file"
    else
       if [ $# -ne 0 ] ; then
-         echo ""
+
          echo "   Invalid option: $1"
          echo "$usage"
          exit
       fi
       if [ ! -s "$default_config" ] ; then
-         echo ""
+
          echo "   Cannot find default config file at: $default_config"
          echo "$usage"
          exit
@@ -549,8 +538,14 @@ clean_config=`sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
 
 for i in "${clean_config[@]}"
 do
-  eval $i
+  eval $(echo ${i} | sed -e 's/[[:space:]]*$//')
 done
+
+if [ "$configuration_version" != "4.2" ]; then
+      echo "*** Yout configuration version is not compatible with this version ***"       
+      log "ALERT - SCRIPT HALTED, user configuration is not compatible with this version"
+   exit 1
+fi
 
 ################################################################################
 
@@ -565,11 +560,11 @@ log () {
 
 # Check to see if the script's "USER CONFIGURATION FILE" has been completed.
 if [ "$user_configuration_complete" != "yes" ]; then
-      echo ""
+      
       echo "              *** SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED ***"
       echo "   Please review the script configuration file: `basename $default_config`."
       echo "       Once the user configuration has been completed, rerun the script."
-      echo ""
+      
       log "ALERT - SCRIPT HALTED, user configuration not completed"
    exit 1
 fi
@@ -599,7 +594,7 @@ if [ -n "$ham_dir" -a -d "$work_dir" -a ! -d "$test_dir" ] ; then
          if [ -s "$config_dir/whitelist.hex" ]
             then
                echo "*** Initial HAM directory scan whitelist file created in $config_dir ***"
-               echo ""
+      
                log "INFO - Initial HAM directory scan whitelist file created in $config_dir"
             else
                echo "No false-positives detected in initial HAM directory scan"
@@ -615,7 +610,7 @@ fi
 
 # Check to see if the working directories have been created.
 # If not, create them.  Otherwise, ignore and proceed with script.
-mkdir -p "$work_dir" "$sanesecurity_dir" "$config_dir" "$gpg_dir" "$add_dir"
+mkdir -p "$work_dir" "$securiteinfo_dir" "$malwarepatrol_dir" "$sanesecurity_dir" "$config_dir" "$gpg_dir" "$add_dir"
 
 # Set secured access permissions to the GPG directory
 chmod 0700 "$gpg_dir"
@@ -624,14 +619,14 @@ chmod 0700 "$gpg_dir"
 if [ ! -s "$gpg_dir/publickey.gpg" ] ; then
    if ! curl -s -S $curl_proxy --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o $gpg_dir/publickey.gpg
       then
-         echo ""
+
          echo "Could not download Sanesecurity public GPG key"
          log "ALERT - Could not download Sanesecurity public GPG key"
          exit 1
       else
-         comment ""
+
          comment "Sanesecurity public GPG key successfully downloaded"
-         comment ""
+
          log "INFO - Sanesecurity public GPG key successfully downloaded"
          rm -f -- "$gpg_dir/ss-keyring.gp*"
          if ! gpg -q --no-options --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --import $gpg_dir/publickey.gpg 2>/dev/null
@@ -658,7 +653,7 @@ if [ ! -s "$gpg_dir/ss-keyring.gpg" ] ; then
       else
          chmod 0644 $gpg_dir/*.*
          comment "Sanesecurity custom keyring MISSING!  GPG key successfully re-imported to custom keyring"
-         comment ""
+
          log "INFO - Sanesecurity custom keyring MISSING!  GPG key successfully re-imported to custom keyring"
    fi
 fi
@@ -680,7 +675,7 @@ if [ "$enable_random" = "yes" ] ; then
          comment "`date` - Pausing database file updates for $sleep_time seconds..."
          log "INFO - Pausing database file updates for $sleep_time seconds..."
          sleep $sleep_time
-         comment ""
+
          comment "`date` - Pause complete, checking for new database files..."
       else
          curl_silence="no"
@@ -738,11 +733,9 @@ if [ -n "$securiteinfo_dbs" ] ; then
       clamav_files
    done
 fi
-if [ -n "$malwarepatrol_dbs" ] ; then
-   for db in $malwarepatrol_dbs ; do
-      echo "$malwarepatrol_dir/$db" >> "$current_tmp"
+if [ -n "$malwarepatrol_db" ] ; then
+      echo "$malwarepatrol_dir/$malwarepatrol_db" >> "$current_tmp"
       clamav_files
-   done
 fi
 if [ -n "$add_dbs" ] ; then
    for db in $add_dbs ; do
@@ -763,7 +756,7 @@ if [ -s "$db_changes" ] ; then
    if grep -vq "bak" $db_changes 2>/dev/null ; then
       do_clamd_reload=2
    fi
-   comment ""
+   
    for file in `cat $db_changes` ; do
       rm -f -- "$file"
       comment "File removed: $file"
@@ -842,29 +835,29 @@ if [ -n "$clamd_socket" ] ; then
    fi
    if [ -z "$io_socket1" -a -z "$socket_cat1" ]
       then
-         echo ""
+
          echo "                         --- WARNING ---"
          echo "   It appears that neither 'SOcket CAT' (socat) nor the perl module"
          echo "   'IO::Socket::UNIX' are installed on the system.  In order to run"
          echo "   the ClamD socket test to determine whether ClamD is running or"
          echo "   or not, either 'socat' or 'IO::Socket::UNIX' must be installed."
-         echo ""
+
          echo "   You can silence this warning by either installing 'socat' or the"
          echo "   'IO::Socket::UNIX' perl module, or by simply commenting out the"
          echo "   'clamd_socket' variable in the clamav-unofficial-sigs.conf file."
          log "WARNING - Neither socat nor IO::Socket::UNIX perl module found, cannot test whether ClamD is running"
       else
          if [ -z "$io_socket2" -a -z "$socket_cat2" ] ; then
-            echo ""
+   
             echo "     *************************"
             echo "     *     !!! ALERT !!!     *"
             echo "     * CLAMD IS NOT RUNNING! *"
             echo "     *************************"
-            echo ""
+   
             log "ALERT - ClamD is not running"
             if [ -n "$start_clamd" ] ; then
                echo "    Attempting to start ClamD..."
-               echo ""
+      
                if [ -n "$io_socket1" ]
                   then
                      rm -f -- "$clamd_pid" "$clamd_lock" "$clamd_socket" 2>/dev/null
@@ -880,12 +873,12 @@ if [ -n "$clamd_socket" ] ; then
                            echo "     *     !!! PANIC !!!     *"
                            echo "     * CLAMD FAILED TO START *"
                            echo "     *************************"
-                           echo ""
+                  
                            echo "Check to confirm that the clamd start process defined for"
                            echo "the 'start_clamd' variable in the 'USER EDIT SECTION' is"
                            echo "set correctly for your particular distro.  If it is, then"
                            echo "check your logs to determine why clamd failed to start."
-                           echo ""
+                  
                            log "CRITICAL - ClamD failed to start"
                         exit 1
                      fi
@@ -904,12 +897,12 @@ if [ -n "$clamd_socket" ] ; then
                               echo "     *     !!! PANIC !!!     *"
                               echo "     * CLAMD FAILED TO START *"
                               echo "     *************************"
-                              echo ""
+                     
                               echo "Check to confirm that the clamd start process defined for"
                               echo "the 'start_clamd' variable in the 'USER EDIT SECTION' is"
                               echo "set correctly for your particular distro.  If it is, then"
                               echo "check your logs to determine why clamd failed to start."
-                              echo ""
+                     
                               log "CRITICAL - ClamD failed to start"
                            exit 1
                         fi
@@ -922,7 +915,7 @@ fi
 
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
-if [ -n "$securiteinfo_dbs" -o -n "malwarepatrol_dbs" ]
+if [ -n "$securiteinfo_dbs" -o -n "malwarepatrol_db" ]
    then
       if [ `date +%s` -gt 0 2>/dev/null ]
          then
@@ -933,17 +926,17 @@ if [ -n "$securiteinfo_dbs" -o -n "malwarepatrol_dbs" ]
             fi
       fi
    else
-      echo ""
+      
       echo "                           --- WARNING ---"
       echo "The system's date function does not appear to support 'date +%s', nor was 'perl' found"
       echo "on the system.  The SecuriteInfo and MalwarePatrol updates were bypassed at this time."
-      echo ""
-      echo "You can silence this warning by either commenting out the 'securiteinfo_dbs' and 'malwarepatrol_dbs'"
+      
+      echo "You can silence this warning by either commenting out the 'securiteinfo_dbs' and 'malwarepatrol_db'"
       echo "variables in the 'USER CONFIGURATION' section of the script, or by installing perl or"
       echo "the GNU date utility, either of which can calculate the needed seconds since epoch."
       log "WARNING - Systems does not support calculating time since epoch, SecuriteInfo and MalwarePatrol updates bypassed"
       securiteinfo_dbs=""
-      malwarepatrol_dbs=""
+      malwarepatrol_db=""
 fi
 
 ################################################################
@@ -951,7 +944,7 @@ fi
 ################################################################
 if [ -n "$sanesecurity_dbs" ] ; then
    db_file=""
-   comment ""
+   
    comment "======================================================================"
    comment "Sanesecurity Database & GPG Signature File Updates"
    comment "======================================================================"
@@ -959,7 +952,7 @@ if [ -n "$sanesecurity_dbs" ] ; then
    for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
       sanesecurity_mirror_name=`dig +short -x $sanesecurity_mirror_ip | sed 's/\.$//'`
       sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
-      comment ""
+      
       comment "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
       log "INFO - Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
       rsync $rsync_output_level $no_motd --files-from=$sanesecurity_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$sanesecurity_mirror_ip/sanesecurity $sanesecurity_dir
@@ -968,7 +961,7 @@ if [ -n "$sanesecurity_dbs" ] ; then
             sanesecurity_rsync_success="1"
             for db_file in $sanesecurity_dbs ; do
                if ! cmp -s $sanesecurity_dir/$db_file $clam_dbs/$db_file ; then
-                  comment ""
+         
                   comment "Testing updated Sanesecurity database file: $db_file"
                   log "INFO - Testing updated Sanesecurity database file: $db_file"
                   if ! gpg --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg \
@@ -1043,7 +1036,7 @@ if [ -n "$sanesecurity_dbs" ] ; then
             done
             if [ "$sanesecurity_update" != "1" ]
                then
-                  comment ""
+         
                   comment "No Sanesecurity database file updates found"
                   log "INFO - No Sanesecurity database file updates found"
                   break
@@ -1056,7 +1049,7 @@ if [ -n "$sanesecurity_dbs" ] ; then
       fi
    done
    if [ "$sanesecurity_rsync_success" != "1" ] ; then
-      echo ""
+      
       echo "Access to all Sanesecurity mirror sites failed - Check for connectivity issues"
       echo "or signature database name(s) misspelled in the script's configuration file."
       log "WARNING - Access to all Sanesecurity mirror sites failed - Check for connectivity issues"
@@ -1083,21 +1076,18 @@ if [ -n "$securiteinfo_dbs" ] ; then
    if [ "$time_interval" -ge $(($update_interval - 600)) ]
       then
          echo "$current_time" > "$config_dir"/last-si-update.txt
-         comment ""
+
          comment "======================================================================"
          comment "SecuriteInfo Database File Updates"
          comment "======================================================================"
          log "INFO - Checking for SecuriteInfo updates..."
          securiteinfo_updates="0"
          for db_file in $securiteinfo_dbs ; do
-            if [ "$loop" = "1" ]
-               then
-                  comment "---"
-               else
-                  comment ""
+            if [ "$loop" = "1" ]; then
+                  comment "---"      
             fi
             comment "Checking for updated SecuriteInfo database file: $db_file"
-            comment ""
+   
             securiteinfo_db_update="0"
             if [ -s "$securiteinfo_dir/$db_file" ]
                then
@@ -1112,7 +1102,7 @@ if [ -n "$securiteinfo_dbs" ] ; then
                   if ! cmp -s $securiteinfo_dir/$db_file $clam_dbs/$db_file ; then
                      if [ "$?" = "0" ] ; then
                         db_ext=`echo $db_file | cut -d "." -f2`
-      comment ""
+      
                         comment "Testing updated SecuriteInfo database file: $db_file"
                         log "INFO - Testing updated SecuriteInfo database file: $db_file"
                         if [ -z "$ham_dir" -o "$db_ext" != "ndb" ]
@@ -1176,7 +1166,7 @@ if [ -n "$securiteinfo_dbs" ] ; then
                   log "WARNING - Failed curl connection to $securiteinfo_url - SKIPPED SecuriteInfo $db_file update"
             fi
             if [ "$securiteinfo_db_update" != "1" ] ; then
-               comment ""
+      
                comment "No updated SecuriteInfo $db_file database file found"
             fi
          done
@@ -1184,28 +1174,27 @@ if [ -n "$securiteinfo_dbs" ] ; then
             log "INFO - No SecuriteInfo database file updates found"
          fi
       else
-         comment ""
+
          comment "======================================================================"
          comment "SecuriteInfo Database File Updates"
          comment "======================================================================"
-         comment ""
+
          time_remaining=$(($update_interval - $time_interval))
          hours_left=$(($time_remaining / 3600))
          minutes_left=$(($time_remaining % 3600 / 60))
          comment "$securiteinfo_update_hours hours have not yet elapsed since the last SecuriteInfo update check"
-         comment ""
+
          comment "     --- No update check was performed at this time ---"
-         comment ""
+
          comment "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
          log "INFO - Next SecuriteInfo check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
    fi
 fi
 
-#####################################################################
-# Download MalwarePatrol database file(s) every set number of hours #
-# as defined in the "USER CONFIGURATION" section of this script.    #
-#####################################################################
-if [ -n "$malwarepatrol_dbs" ] ; then
+##########################################################################################################################################
+# Download MalwarePatrol database file every set number of hours as defined in the "USER CONFIGURATION" section of this script.    #
+##########################################################################################################################################
+if [ -n "$malwarepatrol_db" ] ; then
    if [ -s "$config_dir/last-mbl-update.txt" ]
       then
          last_malwarepatrol_update=`cat $config_dir/last-mbl-update.txt`
@@ -1219,99 +1208,94 @@ if [ -n "$malwarepatrol_dbs" ] ; then
       then
          echo "$current_time" > "$config_dir"/last-mbl-update.txt
          log "INFO - Checking for MalwarePatrol updates..."
-         for db_file in $malwarepatrol_dbs ; do
             # Delete the old MBL (mbl.db) database file if it exists and start using the newer
             # format (mbl.ndb) database file instead.
-            test -e $clam_dbs/$db_file -o -e $clam_dbs/$db_file-bak && rm -f -- "$clam_dbs/mbl.d*"
-            comment ""
+            # test -e $clam_dbs/$malwarepatrol_db -o -e $clam_dbs/$malwarepatrol_db-bak && rm -f -- "$clam_dbs/mbl.d*"
+   
             comment "======================================================================"
             comment "MalwarePatrol $db_file Database File Update"
             comment "======================================================================"
-            comment ""
+   
+
             if curl $curl_proxy $curl_output_level -R --connect-timeout "$curl_connect_timeout" \
-               --max-time "$curl_max_time" -o $malwarepatrol_dir/$db_file http://$malwarepatrol_url/cgi/submit?action=list_clamav_ext
+               --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
                then
-                  if ! cmp -s $malwarepatrol_dir/$db_file $clam_dbs/$db_file 
+                  if ! cmp -s $malwarepatrol_dir/$malwarepatrol_db $clam_dbs/$malwarepatrol_db 
                      then
                         if [ "$?" = "0" ] ; then
-                           db_ext=`echo $db_file | cut -d "." -f2`
-                           comment ""
-                           comment "Testing updated MalwarePatrol database file: $db_file"
-                           log "INFO - Testing updated database file: $db_file"
-                           if [ -z "$ham_dir" -o "$db_ext" != "ndb" ]
-                              then
-                                 if clamscan --quiet -d "$malwarepatrol_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
+                  
+                           comment "Testing updated MalwarePatrol database file: $malwarepatrol_db"
+                           log "INFO - Testing updated database file: $malwarepatrol_db"
+                                 if clamscan --quiet -d "$malwarepatrol_dir/$malwarepatrol_db" "$config_dir/scan-test.txt" 2>/dev/null
                                     then
-                                       comment "Clamscan reports MalwarePatrol $db_file database integrity tested good"
-                                       log "INFO - Clamscan reports MalwarePatrol $db_file database integrity tested good" ; true
+                                       comment "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
+                                       log "INFO - Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good" ; true
                                     else
-                                       echo "Clamscan reports MalwarePatrol $db_file database integrity tested BAD - SKIPPING"
-                                       log "WARNING - Clamscan reports MalwarePatrol $db_file database integrity tested BAD - SKIPPING" ; false
+                                       echo "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING"
+                                       log "WARNING - Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING" ; false
                                  fi && \
-                                 (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
-                                 if rsync -pcqt $malwarepatrol_dir/$db_file $clam_dbs
+                                 (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && \
+                                 if rsync -pcqt $malwarepatrol_dir/$malwarepatrol_db $clam_dbs
                                     then
-                                       perms chown $clam_user:$clam_group $clam_dbs/$db_file
-                                       comment "Successfully updated MalwarePatrol production database file: $db_file"
-                                       log "INFO - Successfully updated MalwarePatrol production database file: $db_file"
+                                       perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
+                                       comment "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
+                                       log "INFO - Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
                                        malwarepatrol_update=1
                                        do_clamd_reload=1
                                     else
-                                       echo "Failed to successfully update MalwarePatrol production database file: $db_file - SKIPPING"
-                                       log "WARNING - Failed to successfully update MalwarePatrol production database file: $db_file - SKIPPING"
+                                       echo "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
+                                       log "WARNING - Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
                                  fi
                               else
-                                 grep -h -v -f "$config_dir/whitelist.hex" "$malwarepatrol_dir/$db_file" > "$test_dir/$db_file"
-                                 clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | \
+                                 grep -h -v -f "$config_dir/whitelist.hex" "$malwarepatrol_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
+                                 clamscan --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | \
                                  sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
-                                 grep -h -f "$config_dir/whitelist.txt" "$test_dir/$db_file" | \
+                                 grep -h -f "$config_dir/whitelist.txt" "$test_dir/$malwarepatrol_db" | \
                                  cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
-                                 grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
-                                 mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-                                 if clamscan --quiet -d "$test_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
+                                 grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
+                                 mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
+                                 if clamscan --quiet -d "$test_dir/$malwarepatrol_db" "$config_dir/scan-test.txt" 2>/dev/null
                                     then
-                                       comment "Clamscan reports MalwarePatrol $db_file database integrity tested good"
-                                       log "INFO - Clamscan reports MalwarePatrol $db_file database integrity tested good" ; true
+                                       comment "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
+                                       log "INFO - Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good" ; true
                                     else
-                                       echo "Clamscan reports MalwarePatrol $db_file database integrity tested BAD - SKIPPING"
-                                       log "WARNING - Clamscan reports MalwarePatrol $db_file database integrity tested BAD - SKIPPING" ; false
+                                       echo "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING"
+                                       log "WARNING - Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING" ; false
                                  fi && \
-                                 (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
-                                 if rsync -pcqt $test_dir/$db_file $clam_dbs
+                                 (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && \
+                                 if rsync -pcqt $test_dir/$malwarepatrol_db $clam_dbs
                                     then
-                                       perms chown $clam_user:$clam_group $clam_dbs/$db_file
-                                       comment "Successfully updated MalwarePatrol production database file: $db_file"
-                                       log "INFO - Successfully updated MalwarePatrol production database file: $db_file"
+                                       perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
+                                       comment "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
+                                       log "INFO - Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
                                        malwarepatrol_update=1
                                        do_clamd_reload=1
                                     else
-                                       echo "Failed to successfully update MalwarePatrol production database file: $db_file - SKIPPING"
-                                       log "WARNING - Failed to successfully update MalwarePatrol production database file: $db_file - SKIPPING"
+                                       echo "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
+                                       log "WARNING - Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
                                  fi
-                           fi
                         fi
                      else
-                        comment ""
-                        comment "MalwarePatrol signature database ($db_file) did not change - skipping"
-                        log "INFO - MalwarePatrol signature database ($db_file) did not change - skipping"
+               
+                        comment "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
+                        log "INFO - MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
                   fi
                else
-                  log "WARNING - Failed curl connection to $malwarepatrol_url - SKIPPED MalwarePatrol $db_file update"
+                  log "WARNING - Failed curl connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
             fi
-         done
       else
-         comment ""
+
          comment "======================================================================"
          comment "MalwarePatrol Database File Update"
          comment "======================================================================"
-         comment ""
+
          time_remaining=$(($update_interval - $time_interval))
          hours_left=$(($time_remaining / 3600))
          minutes_left=$(($time_remaining % 3600 / 60))
          comment "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
-         comment ""
+
          comment "     --- No database download was performed at this time ---"
-         comment ""
+
          comment "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
          log "INFO - Next MalwarePatrol download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
    fi
@@ -1323,11 +1307,11 @@ fi
 # Check for user added signature database updates #
 ###################################################
 if [ -n "$add_dbs" ] ; then
-   comment ""
+   
    comment "======================================================================"
    comment "User Added Signature Database File Update(s)"
    comment "======================================================================"
-   comment ""
+   
    for db_url in $add_dbs ; do
       base_url=`echo $db_url | cut -d "/" -f3`
       db_file=`basename $db_url`
@@ -1355,7 +1339,7 @@ if [ -n "$add_dbs" ] ; then
    db_file=""
    for db_file in `ls $add_dir`; do
       if ! cmp -s $add_dir/$db_file $clam_dbs/$db_file ; then
-         comment ""
+
          comment "Testing updated database file: $db_file"
          clamscan --quiet -d "$add_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
          if [ "$?" = "0" ]
@@ -1381,7 +1365,7 @@ if [ -n "$add_dbs" ] ; then
       fi
    done
    if [ "$add_update" != "1" ] ; then
-      comment ""
+      
       comment "No User-Defined database file updates found"
       log "INFO - No User-Defined database file updates found"
    fi
@@ -1394,7 +1378,7 @@ if [ -s "$clam_dbs/local.ign" -a -s "$config_dir/monitor-ign.txt" ] ; then
    cd "$clam_dbs"
    cp -f local.ign "$config_dir/local.ign"
    cp -f "$config_dir/monitor-ign.txt" "$config_dir/monitor-ign-old.txt"
-   comment ""
+   
    comment "======================================================================"
    for entry in `cat "$config_dir/monitor-ign-old.txt" 2>/dev/null` ; do
       sig_file=`echo "$entry" | tr -d "\r" | awk -F ":" '{print $1}'`
@@ -1412,7 +1396,7 @@ if [ -s "$clam_dbs/local.ign" -a -s "$config_dir/monitor-ign.txt" ] ; then
                perl -i -ne "print unless /$sig_ign_old/" "$config_dir/monitor-ign.txt"
                echo "$sig_mon_new" >> "$config_dir/monitor-ign.txt"
                perl -p -i -e "s/$sig_ign_old/$sig_ign_new/" "$config_dir/local.ign"
-               comment ""
+      
                comment "$sig_name_old hexadecimal signature is unchanged, however signature name and/or line placement"
                comment "in $sig_file has changed to $sig_name_new - updated local.ign to reflect this change."
                log "INFO - $sig_name_old hexadecimal signature is unchanged, however signature name and/or line placement"
@@ -1421,7 +1405,7 @@ if [ -s "$clam_dbs/local.ign" -a -s "$config_dir/monitor-ign.txt" ] ; then
             fi
          else
             perl -i -ne "print unless /$sig_ign_old/" "$config_dir/monitor-ign.txt" "$config_dir/local.ign"
-            comment ""
+   
             comment "$sig_name_old signature has been removed from $sig_file, entry removed from local.ign."
             log "INFO - $sig_name_old signature has been removed from $sig_file, entry removed from local.ign."
             ign_updated=1
@@ -1457,7 +1441,7 @@ if [ -s "$clam_dbs/my-whitelist.ign2" -a -s "$config_dir/tracker.txt" ] ; then
    ign2_updated=0
    cd "$clam_dbs"
    cp -f my-whitelist.ign2 "$config_dir/my-whitelist.ign2"
-   comment ""
+   
    comment "======================================================================"
    for entry in `cat "$config_dir/tracker.txt" 2>/dev/null` ; do
       sig_file=`echo "$entry" | cut -d ":" -f1`
@@ -1466,7 +1450,7 @@ if [ -s "$clam_dbs/my-whitelist.ign2" -a -s "$config_dir/tracker.txt" ] ; then
       if ! grep -F "$sig_full" "$sig_file" > /dev/null 2>&1 ; then
          perl -i -ne "print unless /$sig_name$/" "$config_dir/my-whitelist.ign2"
          perl -i -ne "print unless /:$sig_name:/" "$config_dir/tracker.txt"
-         comment ""
+
          comment "$sig_name signature no longer exists in"
          comment "$sig_file, whitelist entry removed from my-whitelist.ign2."
          log "INFO - $sig_name signature no longer exists in"
@@ -1474,7 +1458,7 @@ if [ -s "$clam_dbs/my-whitelist.ign2" -a -s "$config_dir/tracker.txt" ] ; then
          ign2_updated=1
       fi
    done
-   comment ""
+   
    comment "======================================================================"
    if [ "$ign2_updated" = "1" ]
       then
@@ -1508,13 +1492,13 @@ if [ -n "$ham_dir" ] ; then
          mv -f "$config_dir/whitelist.tmp" "$config_dir/whitelist.hex"
          rm -f "$config_dir/whitelist.txt"
          rm -f "$test_dir"/*.*
-         echo ""
+
          echo "***********************************************************************"
          echo "* Signature(s) triggered on HAM directory scan - signature(s) removed *"
          echo "***********************************************************************"
          log "WARNING - Signature(s) triggered on HAM directory scan - signature(s) removed"
       else
-         comment ""
+
          comment "================================================="
          comment "= No signatures triggered on HAM directory scan ="
          comment "================================================="
@@ -1548,47 +1532,47 @@ fi
 # set to "yes", and neither $reload_opt nor $do_clamd_reload are null.
 if [ "$reload_dbs" = "yes" -a -z "$reload_opt" ]
    then
-      echo ""
+      
       echo "********************************************************************************************"
       echo "* Check the script's configuration file, 'reload_dbs' enabled but no 'reload_opt' selected *"
       echo "********************************************************************************************"
       log "WARNING - Check the script's configuration file, 'reload_dbs' enabled but no 'reload_opt' selected"
    elif [ "$reload_dbs" = "yes" -a "$do_clamd_reload" = "1" -a -n "$reload_opt" ] ; then
-      comment ""
+      
       comment "================================================="
       comment "= Update(s) detected, reloaded ClamAV databases ="
       comment "================================================="
       log "INFO - Update(s) detected, reloaded ClamAV databases"
       $reload_opt
    elif [ "$reload_dbs" = "yes" -a "$do_clamd_reload" = "2" -a -n "$reload_opt" ] ; then
-      comment ""
+      
       comment "==========================================================="
       comment "= Database removal(s) detected, reloaded ClamAV databases ="
       comment "==========================================================="
       log "INFO - Database removal(s) detected, reloaded ClamAV databases"
       $reload_opt
    elif [ "$reload_dbs" = "yes" -a "$do_clamd_reload" = "3" -a -n "$reload_opt" ] ; then
-      comment ""
+      
       comment "==========================================================="
       comment "= File 'local.ign' has changed, reloaded ClamAV databases ="
       comment "==========================================================="
       log "INFO - File 'local.ign' has changed, reloaded ClamAV databases"
       $reload_opt
    elif [ "$reload_dbs" = "yes" -a "$do_clamd_reload" = "4" -a -n "$reload_opt" ] ; then
-      comment ""
+      
       comment "==================================================================="
       comment "= File 'my-whitelist.ign2' has changed, reloaded ClamAV databases ="
       comment "==================================================================="
       log "INFO - File 'my-whitelist.ign2' has changed, reloaded ClamAV databases"
       $reload_opt
    elif [ "$reload_dbs" = "yes" -a -z "$do_clamd_reload" ] ; then
-      comment ""
+      
       comment "==========================================================="
       comment "= No updates detected, ClamAV databases were not reloaded ="
       comment "==========================================================="
       log "INFO - No updates detected, ClamAV databases were not reloaded"
    else
-      comment ""
+      
       comment "==============================================================="
       comment "= Database reload has been disabled in the configuration file ="
       comment "==============================================================="
