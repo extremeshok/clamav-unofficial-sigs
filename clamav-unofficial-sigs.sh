@@ -1397,10 +1397,10 @@ if [ -s "$clam_dbs/local.ign" -a -s "$config_dir/monitor-ign.txt" ] ; then
       sig_file=`echo "$entry" | tr -d "\r" | awk -F ":" '{print $1}'`
       sig_hex=`echo "$entry" | tr -d "\r" | awk -F ":" '{print $NF}'`
       sig_name_old=`echo "$entry" | tr -d "\r" | awk -F ":" '{print $3}'`
-      sig_ign_old=`grep "$sig_name_old" "$config_dir/local.ign"`
+      sig_ign_old=`grep ":$sig_name_old" "$config_dir/local.ign"`
       sig_old=`echo "$entry" | tr -d "\r" | cut -d ":" -f3-`
-      sig_new=`grep -hwF "$sig_hex" "$sig_file" | tr -d "\r" 2>/dev/null`
-      sig_mon_new=`grep -HwF -n "$sig_hex" "$sig_file" | tr -d "\r"`
+      sig_new=`grep -hwF ":$sig_hex" "$sig_file" | tr -d "\r" 2>/dev/null`
+      sig_mon_new=`grep -HwF -n ":$sig_hex" "$sig_file" | tr -d "\r"`
       if [ -n "$sig_new" ]
          then
             if [ "$sig_old" != "$sig_new" -o "$entry" != "$sig_mon_new" ] ; then
