@@ -58,8 +58,8 @@ log () {
    test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
 }
 
-version="4.4.2"
-required_config_version="4.5"
+version="4.4.3"
+required_config_version="4.6"
 version_date="14 May 2015"
 
 output_ver="`basename $0` $version ($version_date)"
@@ -640,7 +640,7 @@ chmod 0700 "$gpg_dir"
 
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$gpg_dir/publickey.gpg" ] ; then
-   if ! curl -s -S $curl_proxy --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o $gpg_dir/publickey.gpg
+   if ! curl -s -S $curl_proxy $curl_insecure $curl_insecure --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o $gpg_dir/publickey.gpg
       then
 
          echo "Could not download Sanesecurity public GPG key"
@@ -808,6 +808,11 @@ echo "$gpg_dir/ss-keyring.gpg*" >> "$purge"
 echo "$gpg_dir/trustdb.gpg" >> "$purge"
 echo "$log_file_path/$log_file_name*" >> "$purge"
 echo "$purge" >> "$purge"
+
+# Silence rsync output and only report errors - useful if script is run via cron.
+if [ "$silence_ssl" = "yes" ] ; then
+  curl_insecure="--insecure"
+fi
 
 # Silence rsync output and only report errors - useful if script is run via cron.
 if [ "$rsync_silence" = "yes" ] ; then
@@ -1105,7 +1110,7 @@ if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
            comment "======================================================================"
            log "INFO - Checking for SecuriteInfo updates..."
            securiteinfo_updates="0"
-           for download_db_file in $securiteinfo_dbs ; do
+           for db_file in $securiteinfo_dbs ; do
               if [ "$loop" = "1" ]; then
                     comment "---"      
               fi
@@ -1118,8 +1123,8 @@ if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
                  else
                     z_opt=""
               fi
-              if curl $curl_proxy $curl_output_level --connect-timeout "$curl_connect_timeout" \
-                 --max-time "$curl_max_time" -L -R $z_opt -o $securiteinfo_dir/$db_file "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
+              if curl $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" \
+                 --max-time "$curl_max_time" -L -R $z_opt -o "$securiteinfo_dir/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
                  then
                     loop="1"
                     if ! cmp -s $securiteinfo_dir/$db_file $clam_dbs/$db_file ; then
@@ -1252,7 +1257,7 @@ if [ -n "$linuxmalwaredetect_dbs" ] ; then
        else
         z_opt=""
       fi
-      if curl $curl_proxy $curl_output_level --connect-timeout "$curl_connect_timeout" \
+      if curl $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" \
        --max-time "$curl_max_time" -L -R $z_opt -o $linuxmalwaredetect_dir/$db_file "$linuxmalwaredetect_url/$linuxmalwaredetect_authorisation_signature/$db_file"
        then
         loop="1"
@@ -1376,7 +1381,7 @@ if [ "$malwarepatrol_receipt_code" != "YOUR-RECEIPT-NUMBER" ] ; then
             comment "======================================================================"
    
 
-            if curl $curl_proxy $curl_output_level -R --connect-timeout "$curl_connect_timeout" \
+            if curl $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" \
                --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
                then
                   if ! cmp -s $malwarepatrol_dir/$malwarepatrol_db $clam_dbs/$malwarepatrol_db 

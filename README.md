@@ -29,7 +29,13 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ### Please consider a donation to http://sanesecurity.com
 
-## Version 4.4.2 (updated 2015-05-14)
+## Version 4.4.3 (updated 2015-05-14)
+ - eXtremeSHOK.com Maintenance
+ - Bugfix for SecuriteInfo not downloading by Colin Waring
+ - Default will now silence ssl errors caused by ssl certificate errors
+ - Config updated to 4.6 due to new varible: silence_ssl
+
+## Version 4.4.2
  - eXtremeSHOK.com Maintenance
  - Improved config error checking
  - Config updated to 4.5, due to invalid default dbs-si value
