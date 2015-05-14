@@ -29,7 +29,12 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ### Please consider a donation to http://sanesecurity.com
 
-## Version 4.4.1 (updated 2015-05-14)
+## Version 4.4.2 (updated 2015-05-14)
+ - eXtremeSHOK.com Maintenance
+ - Improved config error checking
+ - Config updated to 4.5, due to invalid default dbs-si value
+
+## Version 4.4.1
  - eXtremeSHOK.com Maintenance
  - Added error checking to detect if the config could be broken.
 

@@ -58,8 +58,8 @@ log () {
    test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
 }
 
-version="4.4.1"
-required_config_version="4.4"
+version="4.4.2"
+required_config_version="4.5"
 version_date="14 May 2015"
 
 output_ver="`basename $0` $version ($version_date)"
@@ -544,17 +544,28 @@ if [ "$1" = -c ] ;
 fi
 
 
-################################################################################
+## CONFIG LOADING AND ERROR CHECKING ##############################################
+
 #config stripping
 clean_config=`sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
 
-#config error checking
+### config error checking
+# check "" are an even number
 config_check="${clean_config//[^\"]}"
 if [ $(( ${#config_check} % 2)) -eq 1 ]; then 
   echo "*** Your configuration has errors, every \" requires a closing \" ***"     
   log "ALERT - SCRIPT HALTED, configuration has errors, every \" requires a closing \""
   exit 1
 fi
+
+# check there is an = for every set of "" #optional whitespace \s* between = and "
+config_check_vars=`echo "$clean_config" | grep -o '=\s*\"' | wc -l`
+if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ]; then 
+  echo "*** Your configuration has errors, every = requires a pair of \"\" ***"     
+  log "ALERT - SCRIPT HALTED, configuration has errors, every = requires a pair of \"\""
+  exit 1
+fi
+exit
 
 #config loading
 for i in "${clean_config[@]}"
