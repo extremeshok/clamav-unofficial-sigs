@@ -58,7 +58,7 @@ log () {
    test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
 }
 
-version="4.4.0"
+version="4.4.1"
 required_config_version="4.4"
 version_date="14 May 2015"
 
@@ -543,13 +543,26 @@ if [ "$1" = -c ] ;
       config_source="$default_config"
 fi
 
+
+################################################################################
+#config stripping
 clean_config=`sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
 
+#config error checking
+config_check="${clean_config//[^\"]}"
+if [ $(( ${#config_check} % 2)) -eq 1 ]; then 
+  echo "*** Your configuration has errors, every \" requires a closing \" ***"     
+  log "ALERT - SCRIPT HALTED, configuration has errors, every \" requires a closing \""
+  exit 1
+fi
+
+#config loading
 for i in "${clean_config[@]}"
 do
   eval $(echo ${i} | sed -e 's/[[:space:]]*$//')
 done
 
+#config version validation
 if [ "$configuration_version" != "$required_config_version" ]; then
       echo "*** Your configuration version is not compatible with this version ***"     
       log "ALERT - SCRIPT HALTED, user configuration is not compatible with this version"

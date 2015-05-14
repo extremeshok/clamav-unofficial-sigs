@@ -29,7 +29,11 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ### Please consider a donation to http://sanesecurity.com
 
-## Version 4.4.0 (updated 2015-05-14)
+## Version 4.4.1 (updated 2015-05-14)
+ - eXtremeSHOK.com Maintenance
+ - Added error checking to detect if the config could be broken.
+
+## Version 4.4.0
  - eXtremeSHOK.com Maintenance
  - Code refactoring: 
  - Added full support for Linux Malware Detect clamav databases

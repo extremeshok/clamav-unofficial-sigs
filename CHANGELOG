@@ -14,6 +14,10 @@
 #
 ##################
 
+## Version 4.4.1 (updated 2015-05-14)
+ - eXtremeSHOK.com Maintenance
+ - Added error checking to detect if the config could be broken.
+
 ## Version 4.4.0 (updated 2015-05-14)
  - eXtremeSHOK.com Maintenance
  - Code refactoring: 
