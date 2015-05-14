@@ -33,7 +33,9 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - eXtremeSHOK.com Maintenance
  - Improved config error checking
  - Config updated to 4.5, due to invalid default dbs-si value
-
+ - Fix debug varible being present
+ - Bug fix for ubuntu 14.04 with sed being aliased
+ 
 ## Version 4.4.1
  - eXtremeSHOK.com Maintenance
  - Added error checking to detect if the config could be broken.

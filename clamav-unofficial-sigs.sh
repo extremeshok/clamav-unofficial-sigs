@@ -271,7 +271,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
             target type is used and full file scanning is enabled (see ClamAV signatures.pdf for details).
 
           - Line numbering will be done automatically by the script.
-          " | sed 's/^          //g'
+          " | command sed 's/^          //g'
           echo -n "Do you wish to continue? (y/n): "
           read reply
           if [ "$reply" = "y" -o "$reply" = "Y" ]
@@ -288,7 +288,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
              
                       echo -n "Enter signature prefix: "
                       read prefix
-                      path_file=`echo "$source" | cut -d "." -f-1 | sed 's/$/.ndb/'`
+                      path_file=`echo "$source" | cut -d "." -f-1 | command sed 's/$/.ndb/'`
                       db_file=`basename $path_file`
                       rm -f "$path_file"
                       total=`wc -l "$source" | cut -d " " -f1`
@@ -298,11 +298,11 @@ while getopts 'c:defg:himrs:tvw' option ; do
                          line_prefix=`echo "$line" | awk -F ':' '{print $1}'`
                          if [ "$line_prefix" = "-" ]
                             then
-                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
                             elif [ "$line_prefix" = "=" ] ; then
-                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
                             else
-                               echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+                               echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
                          fi
                          printf "Hexadecimal encoding $source_file line: $line_num of $total\r"
                          line_num=$(($line_num + 1))
@@ -547,7 +547,7 @@ fi
 ## CONFIG LOADING AND ERROR CHECKING ##############################################
 
 #config stripping
-clean_config=`sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
+clean_config=`command sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
 
 ### config error checking
 # check "" are an even number
@@ -565,12 +565,11 @@ if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ]; then
   log "ALERT - SCRIPT HALTED, configuration has errors, every = requires a pair of \"\""
   exit 1
 fi
-exit
 
 #config loading
 for i in "${clean_config[@]}"
 do
-  eval $(echo ${i} | sed -e 's/[[:space:]]*$//')
+  eval $(echo ${i} | command sed -e 's/[[:space:]]*$//')
 done
 
 #config version validation
@@ -601,7 +600,7 @@ if [ -n "$ham_dir" -a -d "$work_dir" -a ! -d "$test_dir" ] ; then
          mkdir -p "$test_dir"
          cp -f "$work_dir"/*/*.ndb "$test_dir"
          clamscan --infected --no-summary -d "$test_dir" "$ham_dir"/* | \
-         sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "$config_dir/whitelist.txt"
+         command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "$config_dir/whitelist.txt"
          grep -h -f "$config_dir/whitelist.txt" "$test_dir"/* | \
          cut -d "*" -f2 | sort | uniq > "$config_dir/whitelist.hex"
          cd "$test_dir"
@@ -974,7 +973,7 @@ if [ -n "$sanesecurity_dbs" ] ; then
    comment "======================================================================"
    sanesecurity_mirror_ips=`dig +ignore +short $sanesecurity_url`
    for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
-      sanesecurity_mirror_name=`dig +short -x $sanesecurity_mirror_ip | sed 's/\.$//'`
+      sanesecurity_mirror_name=`dig +short -x $sanesecurity_mirror_ip | command sed 's/\.$//'`
       sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
       
       comment "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
@@ -1029,7 +1028,7 @@ if [ -n "$sanesecurity_dbs" ] ; then
                         else
                            grep -h -v -f "$config_dir/whitelist.hex" "$sanesecurity_dir/$db_file" > "$test_dir/$db_file"
                            clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | \
-                           sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
+                           command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
                            grep -h -f "$config_dir/whitelist.txt" "$test_dir/$db_file" | \
                            cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
                            grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
@@ -1156,7 +1155,7 @@ if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
                              else
                                 grep -h -v -f "$config_dir/whitelist.hex" "$securiteinfo_dir/$db_file" > "$test_dir/$db_file"
                                 clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | \
-                                sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
+                                command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
                                 grep -h -f "$config_dir/whitelist.txt" "$test_dir/$db_file" | \
                                 cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
                                 grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
@@ -1290,7 +1289,7 @@ if [ -n "$linuxmalwaredetect_dbs" ] ; then
              else
               grep -h -v -f "$config_dir/whitelist.hex" "$linuxmalwaredetect_dir/$db_file" > "$test_dir/$db_file"
               clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | \
-              sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
+              command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
               grep -h -f "$config_dir/whitelist.txt" "$test_dir/$db_file" | \
               cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
               grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
@@ -1409,7 +1408,7 @@ if [ "$malwarepatrol_receipt_code" != "YOUR-RECEIPT-NUMBER" ] ; then
                               else
                                  grep -h -v -f "$config_dir/whitelist.hex" "$malwarepatrol_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
                                  clamscan --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | \
-                                 sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
+                                 command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
                                  grep -h -f "$config_dir/whitelist.txt" "$test_dir/$malwarepatrol_db" | \
                                  cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
                                  grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
