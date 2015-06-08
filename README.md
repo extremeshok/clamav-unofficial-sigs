@@ -29,6 +29,11 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ### Please consider a donation to http://sanesecurity.com
 
+## Version 4.4.4 (updated 2015-06-08)
+ - eXtremeSHOK.com Maintenance
+ - Committed patch-1 by SecuriteInfo (clean up of SecuriteInfo databases)
+ - Fixed double $surl_insecure
+
 ## Version 4.4.3 (updated 2015-05-14)
  - eXtremeSHOK.com Maintenance
  - Bugfix for SecuriteInfo not downloading by Colin Waring
