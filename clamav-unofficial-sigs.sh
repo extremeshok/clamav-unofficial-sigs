@@ -59,7 +59,7 @@ log () {
 }
 
 version="4.4.3"
-required_config_version="4.6"
+required_config_version="4.7"
 version_date="14 May 2015"
 
 output_ver="`basename $0` $version ($version_date)"
