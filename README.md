@@ -6,6 +6,10 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Description
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
 
+## Yara Rule Support (as of June 2015)
+Requires clamav 0.99 or above : http://yararules.com/
+Current limitations of clamav support : http://blog.clamav.net/search/label/yara
+
 ### MalwarePatrol Free/Delayed list support (as of May 2015)
 Usage of MalwarePatrol 2015 free clamav signatures : https://www.malwarepatrol.net
  - 1. Sign up for a free account : https://www.malwarepatrol.net/signup-free.shtml
@@ -29,6 +33,15 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ### Please consider a donation to http://sanesecurity.com
+
+## Version 4.5.0 (updated 2015-06-23)
+ - eXtremeSHOK.com Maintenance
+ - Initial YARA rule support for sanesecurity
+ - Added Yara-Rules project Database
+ - Added config option to quickly enable/disable an entire database
+ - Config updated to 4.7 due to changes
+ - Note: Yara rules require clamav 0.99+
+ - Bugfix removed unused linuxmalwaredetect_authorisation_signature varible from script
 
 ## Version 4.4.5 (updated 2015-06-23)
  - eXtremeSHOK.com Maintenance

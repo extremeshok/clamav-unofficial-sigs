@@ -14,6 +14,15 @@
 #
 ##################
 
+## Version 4.5.0 (updated 2015-06-23)
+ - eXtremeSHOK.com Maintenance
+ - Initial YARA rule support for sanesecurity
+ - Added Yara-Rules project Database
+ - Added config option to quickly enable/disable an entire database
+ - Config updated to 4.7 due to changes
+ - Note: Yara rules require clamav 0.99+
+ - Bugfix removed unused linuxmalwaredetect_authorisation_signature varible from script
+
 ## Version 4.4.5 (updated 2015-06-23)
  - eXtremeSHOK.com Maintenance
  - Updated SecuriteInfo setup instructions 
