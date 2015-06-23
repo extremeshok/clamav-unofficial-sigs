@@ -12,15 +12,16 @@ Usage of MalwarePatrol 2015 free clamav signatures : https://www.malwarepatrol.n
  - 2. You will recieve an email containing your password/receipt number
  - 3. Enter the receipt number into the config malwarepatrol_receipt_code: replacing YOUR-RECEIPT-NUMBER with your receipt number from the email
 
-### SecuriteInfo Free/Delayed list support (as of May 2015)
+### SecuriteInfo Free/Delayed list support (as of June 2015)
 Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
  - 1. Sign up for a free account : https://www.securiteinfo.com/clients/customers/signup
  - 2. You will recieve an email to activate your account and then a followup email with your login name
  - 3. Login and navigate to your customer account : https://www.securiteinfo.com/clients/customers/account
- - 4. Click on the Installation tab
- - 5. You will need to get your unique identifier from one of the download links for manual setup, you will need your 128 character authorisation signature.
-   eg. https://www.securiteinfo.com/get/signatures/bb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnhbb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnh/securiteinfo.hdb
-   Your 128 character authorisation signature would be : bb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnhbb9ktrbv30cagin7hajfa5ft6dwpvljsv7b7yob9igpv5175dew05rirq3r5kgnh
+ - 4. Click on the Setup tab
+ - 5. You will need to get your unique identifier from one of the download links, they are individual for every user
+ - 5.1. The 128 character string is after the http://www.securiteinfo.com/get/signatures/ 
+ - 5.2. Example https://www.securiteinfo.com/get/signatures/your_unique_and_very_long_random_string_of_characters/securiteinfo.hdb
+   Your 128 character authorisation signature would be : your_unique_and_very_long_random_string_of_characters
  - 6. Enter the authorisation signature into the config securiteinfo_authorisation_signature: replacing YOUR-SIGNATURE-NUMBER with your authorisation signature from the link
 
 ### Linux Malware Detect support (as of May 2015)
@@ -28,6 +29,10 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ### Please consider a donation to http://sanesecurity.com
+
+## Version 4.4.5 (updated 2015-06-23)
+ - eXtremeSHOK.com Maintenance
+ - Updated SecuriteInfo setup instructions 
 
 ## Version 4.4.4 (updated 2015-06-08)
  - eXtremeSHOK.com Maintenance
