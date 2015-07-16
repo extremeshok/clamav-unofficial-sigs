@@ -33,6 +33,11 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ### Please consider a donation to http://sanesecurity.com
+## Version 4.5.1 (updated 2015-07-16)
+ - eXtremeSHOK.com Maintenance
+ - Beta YARA rule support for sanesecurity
+ - Config updated to 4.8 due to changes
+ - Bugfix "securiteinfo_enabled" should be "$securiteinfo_enabled"
 
 ## Version 4.5.0 (updated 2015-06-23)
  - eXtremeSHOK.com Maintenance

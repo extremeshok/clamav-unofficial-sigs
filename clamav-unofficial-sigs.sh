@@ -58,9 +58,9 @@ log () {
    test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
 }
 
-version="4.4.3"
-required_config_version="4.7"
-version_date="14 May 2015"
+version="4.5.1"
+required_config_version="4.8"
+version_date="16 July 2015"
 
 output_ver="`basename $0` $version ($version_date)"
 
@@ -1090,7 +1090,7 @@ fi
 ##############################################################################################################################################
 # Check for updated SecuriteInfo database files every set number of  hours as defined in the "USER CONFIGURATION" section of this script #
 ##############################################################################################################################################
-if [ "securiteinfo_enabled" == "yes" ] ; then
+if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
     if [ -n "$securiteinfo_dbs" ] ; then
        rm -f "$securiteinfo_dir/*.gz"
