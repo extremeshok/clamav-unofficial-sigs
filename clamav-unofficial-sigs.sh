@@ -58,8 +58,8 @@ log () {
    test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
 }
 
-version="4.5.1"
-required_config_version="4.8"
+version="4.5.2"
+required_config_version="4.9"
 version_date="16 July 2015"
 
 output_ver="`basename $0` $version ($version_date)"
