@@ -58,9 +58,9 @@ log () {
    test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
 }
 
-version="4.5.2"
-required_config_version="4.9"
-version_date="07 August 2015"
+version="4.5.3"
+minimum_required_config_version="50"
+version_date="12 August 2015"
 
 output_ver="`basename $0` $version ($version_date)"
 
@@ -573,7 +573,7 @@ do
 done
 
 #config version validation
-if [ "$configuration_version" != "$required_config_version" ]; then
+if [ "$config_version" -lt "$minimum_required_config_version" ]; then
       echo "*** Your configuration version is not compatible with this version ***"     
       log "ALERT - SCRIPT HALTED, user configuration is not compatible with this version"
    exit 1

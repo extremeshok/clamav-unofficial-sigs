@@ -34,6 +34,14 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ### Please consider a donation to http://sanesecurity.com
 
+## Version 4.5.3 (updated 2015-08-12)
+ - eXtremeSHOK.com Maintenance
+ - hbadmacro.ndb rule support for sanesecurity
+ - Sanesecurity_sigtest.yara rule support for sanesecurity
+ - Sanesecurity_spam.yara rule support for sanesecurity
+ - Changed required_config_version to minimum_required_config_version
+ - Script now supports a minimum config version to allow for out of sync config and script versions
+
 ## Version 4.5.2 (updated 2015-08-07)
  - eXtremeSHOK.com Maintenance
  - hackingteam.hsb rule support for sanesecurity
