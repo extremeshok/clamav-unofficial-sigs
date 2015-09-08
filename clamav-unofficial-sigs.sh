@@ -1227,7 +1227,7 @@ fi
 ##############################################################################################################################################
 # Check for updated linuxmalwaredetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
 ##############################################################################################################################################
-if [ "linuxmalwaredetect_enabled" == "yes" ] ; then
+if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
    rm -f "$linuxmalwaredetect_dir/*.gz"
    if [ -s "$config_dir/last-linuxmalwaredetect-update.txt" ]
