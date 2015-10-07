@@ -8,6 +8,8 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Description
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
 
+#### Try our custom spamassasin plugin: https://github.com/extremeshok/spamassassin-extremeshok_fromreplyto
+
 ### Yara Rule Support (as of June 2015)
 Requires clamav 0.99 or above : http://yararules.com 
 Current limitations of clamav support : http://blog.clamav.net/search/label/yara
@@ -34,9 +36,18 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
 Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/projects/linux-malware-detect/
  - Enabled by default, no configuration required
 
-### Please consider a donation to http://sanesecurity.com
+## Change Log
 
-## Version 4.5.3 (updated 2015-08-12)
+### Version 4.6 (updated 2015-10-07)
+ - eXtremeSHOK.com Maintenance 
+ - Code Refactoring
+ - Removed custom config forced to use the same filename as the default config
+ - Change file checks from exists to exists and is readable
+ - Removed legacy config checks
+ - Full support for custom config files for all tasks
+ - Removed function: no_default_config
+
+### Version 4.5.3 (updated 2015-08-12)
  - eXtremeSHOK.com Maintenance
  - badmacro.ndb rule support for sanesecurity
  - Sanesecurity_sigtest.yara rule support for sanesecurity
@@ -44,17 +55,17 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Changed required_config_version to minimum_required_config_version
  - Script now supports a minimum config version to allow for out of sync config and script versions
 
-## Version 4.5.2 (updated 2015-08-07)
+### Version 4.5.2 (updated 2015-08-07)
  - eXtremeSHOK.com Maintenance
  - hackingteam.hsb rule support for sanesecurity
 
-## Version 4.5.1 (updated 2015-07-16)
+### Version 4.5.1 (updated 2015-07-16)
  - eXtremeSHOK.com Maintenance
  - Beta YARA rule support for sanesecurity
  - Config updated to 4.8 due to changes
  - Bugfix "securiteinfo_enabled" should be "$securiteinfo_enabled"
 
-## Version 4.5.0 (updated 2015-06-23)
+### Version 4.5.0 (updated 2015-06-23)
  - eXtremeSHOK.com Maintenance
  - Initial YARA rule support for sanesecurity
  - Added Yara-Rules project Database
@@ -63,22 +74,22 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Note: Yara rules require clamav 0.99+
  - Bugfix removed unused linuxmalwaredetect_authorisation_signature varible from script
 
-## Version 4.4.5
+### Version 4.4.5
  - eXtremeSHOK.com Maintenance
  - Updated SecuriteInfo setup instructions 
 
-## Version 4.4.4
+### Version 4.4.4
  - eXtremeSHOK.com Maintenance
  - Committed patch-1 by SecuriteInfo (clean up of SecuriteInfo databases)
  - Fixed double $surl_insecure
 
-## Version 4.4.3
+### Version 4.4.3
  - eXtremeSHOK.com Maintenance
  - Bugfix for SecuriteInfo not downloading by Colin Waring
  - Default will now silence ssl errors caused by ssl certificate errors
  - Config updated to 4.6 due to new varible: silence_ssl
 
-## Version 4.4.2
+### Version 4.4.2
  - eXtremeSHOK.com Maintenance
  - Improved config error checking
  - Config updated to 4.5, due to invalid default dbs-si value
@@ -86,17 +97,17 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Bug fix for ubuntu 14.04 with sed being aliased
  - Explicitly set bash as the shell
 
-## Version 4.4.1
+### Version 4.4.1
  - eXtremeSHOK.com Maintenance
  - Added error checking to detect if the config could be broken.
 
-## Version 4.4.0
+### Version 4.4.0
  - eXtremeSHOK.com Maintenance
  - Code refactoring: 
  - Added full support for Linux Malware Detect clamav databases
  - Config updated to 4.4
 
-## Version 4.3.0
+### Version 4.3.0
  - eXtremeSHOK.com Maintenance
  - Code refactoring: group and move functions to top of script
  - Complete rewrite of securiteinfo support, full support for Free/Delayed clamav by securiteinfo.com ;-P
@@ -104,7 +115,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Config updated to 4.3
  - Restructured Config
 
-## Version 4.2.0
+### Version 4.2.0
  - eXtremeSHOK.com Maintenance
  - Replace annoying si_ , mbl_,  ss_  with actual names ie. securiteinfo_ malwarepatrol_ sanesecurity_
  - Complete rewrite of malwarepatrol support, full support for Free/Delayed clamav ;-P
@@ -113,27 +124,27 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Code refactoring: remove empty commands: echo "" and comment ""
  - Config version detection and enforcing
 
-## Version 4.1.0
-   - eXtremeSHOK.com Maintenance
-   - Fix on default enable of foxhole medium and High false positive sources
-   - grammatical corrections to some comments and log output
-   - sig-boundary patch by Alan Stern
-   - create intermediate monitor-ign-old.txt to prevent reading and writing of local.ign by Alan Stern
+### Version 4.1.0
+ - eXtremeSHOK.com Maintenance
+ - Fix on default enable of foxhole medium and High false positive sources
+ - grammatical corrections to some comments and log output
+ - sig-boundary patch by Alan Stern
+ - create intermediate monitor-ign-old.txt to prevent reading and writing of local.ign by Alan Stern
 
-## Version 4.0.0
-   - eXtremeSHOK.com Maintenance
-   - Enabled all low false positive sources by default
-   - Added all Sanesecurity database files
-   - Disabled all med/high false positive sources by default
-   - Set default configs to work out of the box on a centos system
-   - Silence cron job
-   - Set correct paths throughout the script
-   - Updated Installation Instructions
-   - Updated Paths for removal
-   - Updated Default locations to reflect installation instructions
-   - Fix: correctly remove comments and blanklines from config before eval
-   - Remove: invalid config values (eg. EXPORT path)
-   - Fix: correctly check if rsync was successful
+### Version 4.0.0
+ - eXtremeSHOK.com Maintenance
+ - Enabled all low false positive sources by default
+ - Added all Sanesecurity database files
+ - Disabled all med/high false positive sources by default
+ - Set default configs to work out of the box on a centos system
+ - Silence cron job
+ - Set correct paths throughout the script
+ - Updated Installation Instructions
+ - Updated Paths for removal
+ - Updated Default locations to reflect installation instructions
+ - Fix: correctly remove comments and blanklines from config before eval
+ - Remove: invalid config values (eg. EXPORT path)
+ - Fix: correctly check if rsync was successful
 
 ## ORIGINAL README CONTENTS
 The clamav-unofficial-sigs script and accompanying files are provided by Bill Landry
@@ -200,6 +211,6 @@ Script (clamav-unofficial-sigs.sh) features & capabilities:
 - Script logging can be enabled/disabled in the configuration file.
 - Includes cron, manual, and logrotate files.
 
-Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
+### Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 
 Original Script can be found at: http://sourceforge.net/projects/unofficial-sigs

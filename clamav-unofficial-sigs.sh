@@ -33,14 +33,6 @@ default_config="/etc/clamav-unofficial-sigs.conf"
 
 ################################################################################
 
-# Function to handle general response if script cannot find the config file in /etc.
-no_default_config () {
-  if [ ! -s "$default_config" ] ; then
-     echo "Cannot find your configuration file - $default_config"
-     exit
-  fi
-}
-
 # Function to support user config settings for applying file and directory access permissions.
 perms () {
    if [ -n "$clam_user" -a -n "$clam_group" ] ; then
@@ -58,9 +50,11 @@ log () {
    test "$enable_logging" = "yes" && echo `date "+%b %d %T"` "${@:-}" >> "$log_file_path/$log_file_name"
 }
 
-version="4.5.3"
+
+
+version="4.6"
 minimum_required_config_version="50"
-version_date="12 August 2015"
+version_date="7 October 2015"
 
 output_ver="`basename $0` $version ($version_date)"
 
@@ -123,12 +117,28 @@ echo " Version: v$version ($version_date)"
 echo " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 echo "======================================================================"
 
+# Use the Default or Custom config
+config_source="$default_config"
+
+while getopts ":a" opt; do
+  case $opt in
+    c)
+      config_source="$OPTARG"
+      ;;
+  esac
+done
+
+if [ ! -r "$config_source" ] ; then #exists and readable
+  echo "ERROR: Config file does not exist / not readable at: $config_source"
+  echo "$usage"
+  exit
+fi
+
+
 # Take input from the commandline and process.
-while getopts 'c:defg:himrs:tvw' option ; do
+while getopts 'defg:himrs:tvw' option ; do
    case $option in
-      c)  conf_file="$OPTARG"
-          ;;
-      d)  no_default_config
+      d)  echo ""
           echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
           echo "a hexadecimal encoded data string and press enter (do not include '.UNOFFICIAL'"
           echo "in the signature name nor add quote marks to any input string):"
@@ -155,7 +165,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
           fi
           exit
           ;;
-      e)  no_default_config
+      e)  echo ""
           echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
           echo "any quotes around the string unless you want them included in the hexadecimal encoded output:"
           read input
@@ -163,7 +173,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
           echo "$input" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg'
           exit
           ;;
-      f)  no_default_config
+      f)  echo ""
           echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
           echo "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
           echo "around the string unless you want them included in the hexadecimal encoded output:"
@@ -172,9 +182,9 @@ while getopts 'c:defg:himrs:tvw' option ; do
           echo "$input" | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg'
           exit
           ;;
-      g)  no_default_config
+      g)  echo ""
           db_file=`echo "$OPTARG" | awk -F '/' '{print $NF}'`
-          if [ -s "$sanesecurity_dir/$db_file" ]
+          if [ -r "$sanesecurity_dir/$db_file" ]
              then
                 echo "GPG signature testing database file: $sanesecurity_dir/$db_file"
        
@@ -193,7 +203,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
       h)  echo "$usage"
           exit
           ;;
-      i)  no_default_config
+      i)  echo ""
           echo "*** SCRIPT VERSION ***"
           echo "`basename $0` $version ($version_date)"
           echo "*** SYSTEM INFORMATION ***"
@@ -232,7 +242,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
  
           exit
           ;;
-      m)  no_default_config
+      m)  echo ""
           echo "
           The '-m' script flag provides a way to create a ClamAV hexadecimal signature database (*.ndb) file
           from a list of data strings stored in a clear-text ascii file, with one data string entry per line.
@@ -279,7 +289,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
        
                 echo -n "Enter the source file as /path/filename: "
                 read source
-                if [ -s "$source" ]
+                if [ -r "$source" ]
                    then
                       source_file=`basename "$source"`
              
@@ -354,7 +364,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
  
           exit
           ;;
-      r)  no_default_config
+      r)  echo ""
           if [ -n "$pkg_mgr" -a -n "$pkg_rm" ]
              then
                 echo "  This script (clamav-unofficial-sigs) was installed on the system"
@@ -367,7 +377,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
                 read response
                 if [ "$response" = "y" -o "$response" = "Y" ]
                    then
-                      if [ -s "$config_dir/purge.txt" ] 
+                      if [ -r "$config_dir/purge.txt" ] 
                          then
                    
                             for file in `cat $config_dir/purge.txt` ; do
@@ -375,17 +385,17 @@ while getopts 'c:defg:himrs:tvw' option ; do
                                echo "     Removed file: $file"
                             done
                             cron_file="/etc/cron.d/clamav-unofficial-sigs-cron"
-                            if [ -s "$cron_file" ] ; then
+                            if [ -r "$cron_file" ] ; then
                                rm -f "$cron_file"
                                echo "     Removed file: $cron_file"
                             fi
                             log_rotate_file="/etc/logrotate.d/clamav-unofficial-sigs-logrotate"
-                            if [ -s "$log_rotate_file" ] ; then
+                            if [ -r "$log_rotate_file" ] ; then
                                rm -f "$log_rotate_file"
                                echo "     Removed file: $log_rotate_file"
                             fi
                             man_file="/usr/share/man/man8/clamav-unofficial-sigs.8"
-                            if [ -s "$man_file" ] ; then
+                            if [ -r "$man_file" ] ; then
                                rm -f "$man_file"
                                echo "     Removed file: $man_file"
                             fi
@@ -407,10 +417,10 @@ while getopts 'c:defg:himrs:tvw' option ; do
           fi
           exit
           ;;
-      s)  no_default_config
+      s)  echo ""
           input=`echo "$OPTARG" | awk -F '/' '{print $NF}'`
           db_file=`find $work_dir -name $input`
-          if [ -s "$db_file" ]
+          if [ -r "$db_file" ]
              then
                 echo "Clamscan integrity testing: $db_file"
        
@@ -427,10 +437,10 @@ while getopts 'c:defg:himrs:tvw' option ; do
  
           exit
           ;;
-      t)  no_default_config
+      t)  echo ""
           if [ -n "$ham_dir" ]
              then
-                if [ -s "$config_dir/whitelist.hex" ]
+                if [ -r "$config_dir/whitelist.hex" ]
                    then
                       echo "The following third-party signatures triggered hits during the HAM Directory scan:"
              
@@ -447,7 +457,7 @@ while getopts 'c:defg:himrs:tvw' option ; do
       v)  echo "$output_ver"
           exit
           ;;
-      w)  no_default_config
+      w)  echo ""
           echo "Input a third-party signature name that you wish to whitelist due to false-positives"
           echo "and press enter (do not include '.UNOFFICIAL' in the signature name nor add quote"
           echo "marks to the input string):"
@@ -508,40 +518,6 @@ while getopts 'c:defg:himrs:tvw' option ; do
           ;;
    esac
 done
-
-# Handle '-c' config file location issues.
-if [ "$1" = -c ] ;
-   then
-      if [ ! -s "$conf_file" ] ; then
-
-         echo "   Config file does not exist at: $2"
-         echo "   Check the config file path and try again..."
-         echo "$usage"
-         exit
-      fi
-      if [ "`basename "$conf_file"`" != "`basename "$default_config"`" ] ; then
-
-         echo "   Invalid config file: $2"
-         echo "   Config file must be named: `basename $default_config`"
-         echo "$usage"
-         exit
-      fi
-      config_source="$conf_file"
-   else
-      if [ $# -ne 0 ] ; then
-
-         echo "   Invalid option: $1"
-         echo "$usage"
-         exit
-      fi
-      if [ ! -s "$default_config" ] ; then
-
-         echo "   Cannot find default config file at: $default_config"
-         echo "$usage"
-         exit
-      fi
-      config_source="$default_config"
-fi
 
 
 ## CONFIG LOADING AND ERROR CHECKING ##############################################
@@ -614,7 +590,7 @@ if [ -n "$ham_dir" -a -d "$work_dir" -a ! -d "$test_dir" ] ; then
                fi
             fi
          done
-         if [ -s "$config_dir/whitelist.hex" ]
+         if [ -r "$config_dir/whitelist.hex" ]
             then
                echo "*** Initial HAM directory scan whitelist file created in $config_dir ***"
       
@@ -775,7 +751,7 @@ if [ ! -s "$previous_dbs" ] ; then
    cp -f "$current_dbs" "$previous_dbs" 2>/dev/null
 fi
 diff "$current_dbs" "$previous_dbs" 2>/dev/null | grep '>' | awk '{print $2}' > "$db_changes"
-if [ -s "$db_changes" ] ; then
+if [ -r "$db_changes" ] ; then
    if grep -vq "bak" $db_changes 2>/dev/null ; then
       do_clamd_reload=2
    fi
@@ -1094,7 +1070,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
     if [ -n "$securiteinfo_dbs" ] ; then
        rm -f "$securiteinfo_dir/*.gz"
-       if [ -s "$config_dir/last-si-update.txt" ]
+       if [ -r "$config_dir/last-si-update.txt" ]
           then
              last_securiteinfo_update=`cat $config_dir/last-si-update.txt`
           else
@@ -1120,7 +1096,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
                 comment "Checking for updated SecuriteInfo database file: $db_file"
                 
                 securiteinfo_db_update="0"
-                if [ -s "$securiteinfo_dir/$db_file" ]
+                if [ -r "$securiteinfo_dir/$db_file" ]
                    then
                       z_opt="-z $securiteinfo_dir/$db_file"
                    else
@@ -1230,7 +1206,7 @@ fi
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
    rm -f "$linuxmalwaredetect_dir/*.gz"
-   if [ -s "$config_dir/last-linuxmalwaredetect-update.txt" ]
+   if [ -r "$config_dir/last-linuxmalwaredetect-update.txt" ]
     then
        last_linuxmalwaredetect_update=`cat $config_dir/last-linuxmalwaredetect-update.txt`
     else
@@ -1256,7 +1232,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
         comment "Checking for updated linuxmalwaredetect database file: $db_file"
    
         linuxmalwaredetect_db_update="0"
-        if [ -s "$linuxmalwaredetect_dir/$db_file" ]
+        if [ -r "$linuxmalwaredetect_dir/$db_file" ]
          then
           z_opt="-z $linuxmalwaredetect_dir/$db_file"
          else
@@ -1366,7 +1342,7 @@ fi
 if [ "$malwarepatrol_enabled" == "yes" ] ; then
   if [ "$malwarepatrol_receipt_code" != "YOUR-RECEIPT-NUMBER" ] ; then
     if [ -n "$malwarepatrol_db" ] ; then
-     if [ -s "$config_dir/last-mbl-update.txt" ]
+     if [ -r "$config_dir/last-mbl-update.txt" ]
         then
            last_malwarepatrol_update=`cat $config_dir/last-mbl-update.txt`
         else
@@ -1480,7 +1456,7 @@ fi
 if [ "yararules_enabled" == "yes" ] ; then
   if [ -n "$yararules_dbs" ] ; then
    rm -f "$yararules_dir/*.gz"
-   if [ -s "$config_dir/last-yararules-update.txt" ]
+   if [ -r "$config_dir/last-yararules-update.txt" ]
     then
        last_yararules_update=`cat $config_dir/last-yararules-update.txt`
     else
@@ -1506,7 +1482,7 @@ if [ "yararules_enabled" == "yes" ] ; then
         comment "Checking for updated yararules database file: $db_file"
    
         yararules_db_update="0"
-        if [ -s "$yararules_dir/$db_file" ]
+        if [ -r "$yararules_dir/$db_file" ]
          then
           z_opt="-z $yararules_dir/$db_file"
          else
@@ -1630,7 +1606,7 @@ if [ -n "$add_dbs" ] ; then
                log "WARNING - Failed rsync connection to $base_url - SKIPPED $db_file update"
             fi
          else
-             if [ -s "$add_dir/$db_file" ]
+             if [ -r "$add_dir/$db_file" ]
                 then
                    z_opt="-z $add_dir/$db_file"
                 else
@@ -1683,7 +1659,7 @@ fi
 ###################################################
 # Check to see if the local.ign file exists, and if it does, check to see if any of the script
 # added bypass entries can be removed due to offending signature modifications or removals.
-if [ -s "$clam_dbs/local.ign" -a -s "$config_dir/monitor-ign.txt" ] ; then
+if [ -r "$clam_dbs/local.ign" -a -s "$config_dir/monitor-ign.txt" ] ; then
    ign_updated=0
    cd "$clam_dbs"
    cp -f local.ign "$config_dir/local.ign"
@@ -1747,7 +1723,7 @@ fi
 
 # Check to see if my-whitelist.ign2 file exists, and if it does, check to see if any of the script
 # added whitelist entries can be removed due to offending signature modifications or removals.
-if [ -s "$clam_dbs/my-whitelist.ign2" -a -s "$config_dir/tracker.txt" ] ; then
+if [ -r "$clam_dbs/my-whitelist.ign2" -a -s "$config_dir/tracker.txt" ] ; then
    ign2_updated=0
    cd "$clam_dbs"
    cp -f my-whitelist.ign2 "$config_dir/my-whitelist.ign2"
@@ -1796,7 +1772,7 @@ fi
 
 # Check for non-matching whitelist.hex signatures and remove them from the whitelist file (signature modified or removed).
 if [ -n "$ham_dir" ] ; then
-   if [ -s "$config_dir/whitelist.hex" ]
+   if [ -r "$config_dir/whitelist.hex" ]
       then
          grep -h -f "$config_dir/whitelist.hex" "$work_dir"/*/*.ndb | cut -d "*" -f2 | tr -d "\r" | sort | uniq > "$config_dir/whitelist.tmp"
          mv -f "$config_dir/whitelist.tmp" "$config_dir/whitelist.hex"
