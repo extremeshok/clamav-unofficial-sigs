@@ -51,92 +51,130 @@ log () {
 }
 
 
-
-version="4.6"
+version="4.6.1"
 minimum_required_config_version="50"
-version_date="7 October 2015"
+version_date="15 October 2015"
 
-output_ver="`basename $0` $version ($version_date)"
+#Set fonts. #echo "${BOLD}-a${NORM}"
+BOLD=`tput bold`
+REV=`tput smso`
+NORM=`tput sgr0`
 
-usage="
-ClamAV Unofficial Signature Databases Update Script - v$version ($version_date)
 
-   Usage: `basename $0` [OPTION] [PATH|FILE]
+#function for help and usage
+help_and_usage () {
 
-        -c      Direct script to use a specific configuration file
-                e.g.: '-c /path/to/`basename "$default_config"`'.
+  echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
 
-        -d      Decode a third-party signature either by signature name
-                (e.g: Sanesecurity.Junk.15248) or hexadecimal string.
-                This flag will 'NOT' decode image signatures.
+  echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tDirect script to use a specific configuration file\n\t\teg: '-c /path/to/`basename $default_config`'\n\t\tOptional if the default config is available\n\t\tDefault: $default_config"
 
-        -e      Hexadecimal encode an entire input string that can be
-                used in any '*.ndb' signature database file.
+  echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
 
-        -f      Hexadecimal encode a formatted input string containing
-                signature spacing fields '{}, (), *', without encoding 
-                the spacing fields, so that the encoded signature can
-                be used in any '*.ndb' signature database file.
+  echo -e "\n${BOLD}-v${NORM}, ${BOLD}--version${NORM}\tOutput script version and date information"
 
-        -g      GPG verify a specific Sanesecurity database file
-                e.g.: '-g filename.ext' (do not include file path).
+  echo -e "\n${BOLD}-d${NORM}\tDecode a third-party signature either by signature name\n\t(eg: Sanesecurity.Junk.15248) or hexadecimal string.\n\tThis flag will 'NOT' decode image signatures"
 
-        -h      Display this script's help and usage information.
+  echo -e "\n${BOLD}-e${NORM}\tHexadecimal encode an entire input string that can\n\tbe used in any '*.ndb' signature database file"
 
-        -i      Output system and configuration information for
-                viewing or possible debugging purposes.
+  echo -e "\n${BOLD}-f${NORM}\tHexadecimal encode a formatted input string containing\n\tsignature spacing fields '{}, (), *', without encoding\n\tthe spacing fields, so that the encoded signature\n\tcan be used in any '*.ndb' signature database file"
 
-        -m      Make a signature database from an ascii file containing
-                data strings, with one data string per line.  Additional
-                information is provided when using this flag.
+  echo -e "\n${BOLD}-g${NORM}\tGPG verify a specific Sanesecurity database file\n\teg: '-g filename.ext' (do not include file path)"
 
-        -r      Remove the clamav-unofficial-sigs script and all of
-                its associated files and databases from the system.
 
-        -s      Clamscan integrity test a specific database file
-                e.g.: '-s filename.ext' (do not include file path).
+  echo -e "\n${BOLD}-i${NORM}\tOutput system and configuration information for\n\tviewing or possible debugging purposes"
 
-        -t      If HAM directory scanning is enabled in the script's
-                configuration file, then output names of any third-party
-                signatures that triggered during the HAM directory scan.
+  echo -e "\n${BOLD}-m${NORM}\tMake a signature database from an ascii file containing\n\tdata strings, with one data string per line.  Additional\n\tinformation is provided when using this flag"
 
-        -v      Output script version and date information.
+  echo -e "\n${BOLD}-r${NORM}\tRemove the clamav-unofficial-sigs script and all of\n\tits associated files and databases from the system"
 
-        -w      Adds a signature whitelist entry in the newer ClamAV IGN2
-                format to 'my-whitelist.ign2' in order to temporarily resolve
-                a false-positive issue with a specific third-party signature.
-                Script added whitelist entries will automatically be removed
-                if the original signature is either modified or removed from
-                the third-party signature database.
+  echo -e "\n${BOLD}-s${NORM}\tClamscan integrity test a specific database file\n\teg: '-s filename.ext' (do not include file path)"
 
-Alternative to using '-c': Place config file in /etc ($default_config)
-"
+  echo -e "\n${BOLD}-t${NORM}\tIf HAM directory scanning is enabled in the script's\n\tconfiguration file, then output names of any third-party\n\tsignatures that triggered during the HAM directory scan"
+
+
+  echo -e "\n${BOLD}-w${NORM}\tAdds a signature whitelist entry in the newer ClamAV IGN2\n\tformat to 'my-whitelist.ign2' in order to temporarily resolve\n\ta false-positive issue with a specific third-party signature.\n\tScript added whitelist entries will automatically be removed\n\tif the original signature is either modified or removed from\n\tthe third-party signature database"
+
+  echo -e "\nMail suggestions and bug reports to ${BOLD}<admin@extremeshok.com>${NORM}"
+
+}
+
 echo "======================================================================"
 echo " eXtremeSHOk.com ClamAV Unofficial Signature Updater"
 echo " Version: v$version ($version_date)"
 echo " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 echo "======================================================================"
 
-# Use the Default or Custom config
-config_source="$default_config"
 
-while getopts ":a" opt; do
-  case $opt in
-    c)
-      config_source="$OPTARG"
-      ;;
+# Use the Default Config bt default
+config_source=$default_config
+
+# Generic command line options
+while true; do
+  case "$1" in
+    -c | --config ) config_source="$2"; shift 2; break ;;
+    -h | --help ) help_and_usage; exit; break ;;
+    -v | --version ) exit; break ;;
+    * ) break ;;
   esac
 done
 
+## CONFIG LOADING AND ERROR CHECKING ##############################################
+
 if [ ! -r "$config_source" ] ; then #exists and readable
-  echo "ERROR: Config file does not exist / not readable at: $config_source"
-  echo "$usage"
-  exit
+  echo "*** ERROR: Config file does not exist / not readable at: $config_source"
+  exit 1
+fi
+
+#config stripping
+echo "Loading config: $config_source"
+clean_config=`command sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
+
+### config error checking
+# check "" are an even number
+config_check="${clean_config//[^\"]}"
+if [ $(( ${#config_check} % 2)) -eq 1 ]; then 
+  echo "*** Your configuration has errors, every \" requires a closing \" ***"     
+  log "ALERT - SCRIPT HALTED, configuration has errors, every \" requires a closing \""
+  exit 1
+fi
+
+# check there is an = for every set of "" #optional whitespace \s* between = and "
+config_check_vars=`echo "$clean_config" | grep -o '=\s*\"' | wc -l`
+if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ]; then 
+  echo "*** Your configuration has errors, every = requires a pair of \"\" ***"     
+  log "ALERT - SCRIPT HALTED, configuration has errors, every = requires a pair of \"\""
+  exit 1
+fi
+
+#config loading
+for i in "${clean_config[@]}"
+do
+  eval $(echo ${i} | command sed -e 's/[[:space:]]*$//')
+done
+
+#config version validation
+if [ "$config_version" -lt "$minimum_required_config_version" ]; then
+      echo "*** Your configuration version is not compatible with this version ***"     
+      log "ALERT - SCRIPT HALTED, user configuration is not compatible with this version"
+   exit 1
+fi
+
+################################################################################
+
+# Check to see if the script's "USER CONFIGURATION FILE" has been completed.
+if [ "$user_configuration_complete" != "yes" ]; then
+      
+      echo "              *** SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED ***"
+      echo "   Please review the script configuration file: `basename $default_config`."
+      echo "       Once the user configuration has been completed, rerun the script."
+      
+      log "ALERT - SCRIPT HALTED, user configuration not completed"
+   exit 1
 fi
 
 
 # Take input from the commandline and process.
-while getopts 'defg:himrs:tvw' option ; do
+while getopts 'defg:imrs:tw' option ; do
    case $option in
       d)  echo ""
           echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
@@ -198,9 +236,6 @@ while getopts 'defg:himrs:tvw' option ; do
                 echo "$sanesecurity_dbs"
                 echo "Check the file name and try again..."
           fi
-          exit
-          ;;
-      h)  echo "$usage"
           exit
           ;;
       i)  echo ""
@@ -412,7 +447,7 @@ while getopts 'defg:himrs:tvw' option ; do
                    
                       fi
                    else
-                      echo "$usage"
+                      help_and_usage
                 fi
           fi
           exit
@@ -452,9 +487,6 @@ while getopts 'defg:himrs:tvw' option ; do
                 echo "Ham directory scanning is not currently enabled in the script's configuration file."
           fi
  
-          exit
-          ;;
-      v)  echo "$output_ver"
           exit
           ;;
       w)  echo ""
@@ -513,60 +545,11 @@ while getopts 'defg:himrs:tvw' option ; do
  
           exit
           ;;
-      *)  echo "$usage"
+      *)  help_and_usage
           exit
           ;;
    esac
 done
-
-
-## CONFIG LOADING AND ERROR CHECKING ##############################################
-
-#config stripping
-clean_config=`command sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
-
-### config error checking
-# check "" are an even number
-config_check="${clean_config//[^\"]}"
-if [ $(( ${#config_check} % 2)) -eq 1 ]; then 
-  echo "*** Your configuration has errors, every \" requires a closing \" ***"     
-  log "ALERT - SCRIPT HALTED, configuration has errors, every \" requires a closing \""
-  exit 1
-fi
-
-# check there is an = for every set of "" #optional whitespace \s* between = and "
-config_check_vars=`echo "$clean_config" | grep -o '=\s*\"' | wc -l`
-if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ]; then 
-  echo "*** Your configuration has errors, every = requires a pair of \"\" ***"     
-  log "ALERT - SCRIPT HALTED, configuration has errors, every = requires a pair of \"\""
-  exit 1
-fi
-
-#config loading
-for i in "${clean_config[@]}"
-do
-  eval $(echo ${i} | command sed -e 's/[[:space:]]*$//')
-done
-
-#config version validation
-if [ "$config_version" -lt "$minimum_required_config_version" ]; then
-      echo "*** Your configuration version is not compatible with this version ***"     
-      log "ALERT - SCRIPT HALTED, user configuration is not compatible with this version"
-   exit 1
-fi
-
-################################################################################
-
-# Check to see if the script's "USER CONFIGURATION FILE" has been completed.
-if [ "$user_configuration_complete" != "yes" ]; then
-      
-      echo "              *** SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED ***"
-      echo "   Please review the script configuration file: `basename $default_config`."
-      echo "       Once the user configuration has been completed, rerun the script."
-      
-      log "ALERT - SCRIPT HALTED, user configuration not completed"
-   exit 1
-fi
 
 # If "ham_dir" variable is set, then create initial whitelist files (skipped if first-time script run).
 test_dir="$work_dir/test"

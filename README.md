@@ -38,6 +38,15 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## Change Log
 
+### Version 4.6.1 (updated 2015-10-15)
+ - eXtremeSHOK.com Maintenance 
+ - Code Refactoring
+ - Added generic options (--help --version --config)
+ - Correctly handle generic options before the main case selector
+ - Sanitise the config before the main case selector (option)
+ - Rewrite and formatting of the usage options
+ - Removed the version information code as this is always printed
+
 ### Version 4.6 (updated 2015-10-07)
  - eXtremeSHOK.com Maintenance 
  - Code Refactoring
