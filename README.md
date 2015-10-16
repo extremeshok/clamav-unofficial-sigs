@@ -37,8 +37,16 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
+### Version 4.7 (updated 2015-10-16)
+ - eXtremeSHOK.com Maintenance 
+ - Code Refactoring
+ - Complete rewrite of the main case selector (program options)
+ - Added long options (--decode-sig, --encode-string, --encode-formatted, --gpg-verify, --information, --make-database, --remove-script, --test-database, --output-triggered)
+ - Replaced clamd-status.sh with --check-clamav
+ - Removed CHANGELOG, changelog has been replaced by this part of the readme and the git commit log.
+ - Config updated to 51 due to changes
 
-### Version 4.6.1 (updated 2015-10-15)
+### Version 4.6.1
  - eXtremeSHOK.com Maintenance 
  - Code Refactoring
  - Added generic options (--help --version --config)
@@ -47,7 +55,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Rewrite and formatting of the usage options
  - Removed the version information code as this is always printed
 
-### Version 4.6 (updated 2015-10-07)
+### Version 4.6
  - eXtremeSHOK.com Maintenance 
  - Code Refactoring
  - Removed custom config forced to use the same filename as the default config
@@ -56,7 +64,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Full support for custom config files for all tasks
  - Removed function: no_default_config
 
-### Version 4.5.3 (updated 2015-08-12)
+### Version 4.5.3
  - eXtremeSHOK.com Maintenance
  - badmacro.ndb rule support for sanesecurity
  - Sanesecurity_sigtest.yara rule support for sanesecurity
@@ -64,17 +72,17 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Changed required_config_version to minimum_required_config_version
  - Script now supports a minimum config version to allow for out of sync config and script versions
 
-### Version 4.5.2 (updated 2015-08-07)
+### Version 4.5.2
  - eXtremeSHOK.com Maintenance
  - hackingteam.hsb rule support for sanesecurity
 
-### Version 4.5.1 (updated 2015-07-16)
+### Version 4.5.1
  - eXtremeSHOK.com Maintenance
  - Beta YARA rule support for sanesecurity
  - Config updated to 4.8 due to changes
  - Bugfix "securiteinfo_enabled" should be "$securiteinfo_enabled"
 
-### Version 4.5.0 (updated 2015-06-23)
+### Version 4.5.0
  - eXtremeSHOK.com Maintenance
  - Initial YARA rule support for sanesecurity
  - Added Yara-Rules project Database
@@ -155,70 +163,60 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Remove: invalid config values (eg. EXPORT path)
  - Fix: correctly check if rsync was successful
 
-## ORIGINAL README CONTENTS
-The clamav-unofficial-sigs script and accompanying files are provided by Bill Landry
-(unofficialsigs@gmail.com) under general BSD licensing guidelines.
+## USAGE
 
-The clamav-unofficial-sigs.tar.gz package contains script and configuration files that
-provide the capability to download, test, and update the 3rd-party signature databases
-provided by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
+Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
-Files contained in the clamav-unofficial-sigs.tar.gz package:
+-c, --config    Direct script to use a specific configuration file
+        eg: '-c /path/to/clamav-unofficial-sigs.conf'
+        Optional if the default config is available
+        Default: /etc/clamav-unofficial-sigs.conf
 
-1.  README - This file.  Contains basic information about script features and capabilities.
+-h, --help      Display this script's help and usage information
 
-2.  CHANGELOG - This file contains the changes that have been made between script updates.
+-v, --version   Output script version and date information
 
-3.  LICENSE - Open-Source license to allow packaging/porting and redistribution of scripts.
+-d, --decode-sig        Decode a third-party signature either by signature name
+        (eg: Sanesecurity.Junk.15248) or hexadecimal string.
+        This flag will 'NOT' decode image signatures
 
-4.  INSTALL - Contains detailed instructions for configuring and using scripts.
+-e, --encode-string     Hexadecimal encode an entire input string that can
+        be used in any '*.ndb' signature database file
 
-5.  clamav-unofficial-sigs.conf - This file contains all of the user configurable variable
-    setting for running the "clamav-unofficial-sigs.sh" shell script.
+-f, --encode-formatted  Hexadecimal encode a formatted input string containing
+        signature spacing fields '{}, (), *', without encoding
+        the spacing fields, so that the encoded signature
+        can be used in any '*.ndb' signature database file
 
-6.  clamav-unofficial-sigs.sh - This file contains the shell scripting code necessary for
-    checking for updated 3rd party clamav signature databases, downloading of databases,
-    testing for valid GPG signatures and clamscan for database integrity, and finally
-    implementation of updated databases.
+-g, --gpg-verify        GPG verify a specific Sanesecurity database file
+        eg: '-g filename.ext' (do not include file path)
 
-7.  clamav-unofficial-sigs.8 - This is the script's manual page.
+-i, --information       Output system and configuration information for
+        viewing or possible debugging purposes
 
-8.  clamav-unofficial-sigs-cron - This is the script's cron file used to support automated
-    script execution at specified time intervals.
+-m, --make-database     Make a signature database from an ascii file containing
+        data strings, with one data string per line.  Additional
+        information is provided when using this flag
 
-9.  clamav-unofficial-sigs-logrotate - This is the script's logrotate file, used to rotate
-    and compress log files at a specified time-interval and to keep the log archives for a
-    specified time-frame.
+-r, --remove-script     Remove the clamav-unofficial-sigs script and all of
+        its associated files and databases from the system
 
-10. clamd-status.sh - A stand-alone script that can be used to run status checks against
-    clamd, and can be configured to attempt to start a non-running or crashed daemon.
+-s, --test-database     Clamscan integrity test a specific database file
+        eg: '-s filename.ext' (do not include file path)
 
-Script (clamav-unofficial-sigs.sh) features & capabilities:
+-t, --output-triggered  If HAM directory scanning is enabled in the script's
+        configuration file, then output names of any third-party
+        signatures that triggered during the HAM directory scan
 
-- Checks for updated unofficial clamav signature database files, detection and download.
-- GPG signature verify and clamscan integrity test updated signature databases and implement.
-- Download time randomization - this help to distribute the load more evenly for the database
-  host mirror sites.
-- Create signature bypass entries for temporarily resolving false-positive issues with third-
-  party signatures.
-- Ability to report which mirror site a download came from (good to know if there are issues).
-- Reports if a downloaded database is actually different than the running copy.
-- Status check to determine if clamd is running, and if enabled, ability to attemtp to start
-  if detected not running.
-- Ability to control script output, which is good when run via cron.
-- Ability to create a backup copy of a running database before replacing it.
-- Currently provides support for six different unofficial clamav database providers:
-  Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
-- Ability to choose which database files to download and use from each provider.
-- Coded to be portable across as many different OS platforms and utility versions as possible.
-- Separate user configuration file, which will allow users to setup their configuration and not
-  have to redo the configuration with each new script update.
-- The script can hexadecimal encode (for usage) and decode (for viewing) virus signatures.
-- Ability to create a hexadecimal signature database file from a clear text ascii file.
-- Ability to enable scanning of a local HAM (non-spam) directory for false-positive hits from
-  third-party signatures and removal of errant signatures from databases before implementing.
-- Script logging can be enabled/disabled in the configuration file.
-- Includes cron, manual, and logrotate files.
+-w, --whitelist Adds a signature whitelist entry in the newer ClamAV IGN2
+        format to 'my-whitelist.ign2' in order to temporarily resolve
+        a false-positive issue with a specific third-party signature.
+        Script added whitelist entries will automatically be removed
+        if the original signature is either modified or removed from
+        the third-party signature database
+
+--check-clamav  If ClamD status check is enabled and the socket path is correctly specified
+        then test to see if clamd is running or not
 
 ### Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 

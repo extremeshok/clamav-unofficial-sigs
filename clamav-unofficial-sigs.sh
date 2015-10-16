@@ -51,9 +51,9 @@ log () {
 }
 
 
-version="4.6.1"
-minimum_required_config_version="50"
-version_date="15 October 2015"
+version="4.7"
+minimum_required_config_version="51"
+version_date="16 October 2015"
 
 #Set fonts. #echo "${BOLD}-a${NORM}"
 BOLD=`tput bold`
@@ -66,40 +66,40 @@ help_and_usage () {
 
   echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
 
-  echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tDirect script to use a specific configuration file\n\t\teg: '-c /path/to/`basename $default_config`'\n\t\tOptional if the default config is available\n\t\tDefault: $default_config"
+  echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tDirect script to use a specific configuration file\n\teg: '-c /path/to/`basename $default_config`'\n\tOptional if the default config is available\n\tDefault: $default_config"
 
   echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
 
   echo -e "\n${BOLD}-v${NORM}, ${BOLD}--version${NORM}\tOutput script version and date information"
 
-  echo -e "\n${BOLD}-d${NORM}\tDecode a third-party signature either by signature name\n\t(eg: Sanesecurity.Junk.15248) or hexadecimal string.\n\tThis flag will 'NOT' decode image signatures"
+  echo -e "\n${BOLD}-d${NORM}, ${BOLD}--decode-sig${NORM}\tDecode a third-party signature either by signature name\n\t(eg: Sanesecurity.Junk.15248) or hexadecimal string.\n\tThis flag will 'NOT' decode image signatures"
 
-  echo -e "\n${BOLD}-e${NORM}\tHexadecimal encode an entire input string that can\n\tbe used in any '*.ndb' signature database file"
+  echo -e "\n${BOLD}-e${NORM}, ${BOLD}--encode-string${NORM}\tHexadecimal encode an entire input string that can\n\tbe used in any '*.ndb' signature database file"
 
-  echo -e "\n${BOLD}-f${NORM}\tHexadecimal encode a formatted input string containing\n\tsignature spacing fields '{}, (), *', without encoding\n\tthe spacing fields, so that the encoded signature\n\tcan be used in any '*.ndb' signature database file"
+  echo -e "\n${BOLD}-f${NORM}, ${BOLD}--encode-formatted${NORM}\tHexadecimal encode a formatted input string containing\n\tsignature spacing fields '{}, (), *', without encoding\n\tthe spacing fields, so that the encoded signature\n\tcan be used in any '*.ndb' signature database file"
 
-  echo -e "\n${BOLD}-g${NORM}\tGPG verify a specific Sanesecurity database file\n\teg: '-g filename.ext' (do not include file path)"
+  echo -e "\n${BOLD}-g${NORM}, ${BOLD}--gpg-verify${NORM}\tGPG verify a specific Sanesecurity database file\n\teg: '-g filename.ext' (do not include file path)"
 
+  echo -e "\n${BOLD}-i${NORM}, ${BOLD}--information${NORM}\tOutput system and configuration information for\n\tviewing or possible debugging purposes"
 
-  echo -e "\n${BOLD}-i${NORM}\tOutput system and configuration information for\n\tviewing or possible debugging purposes"
+  echo -e "\n${BOLD}-m${NORM}, ${BOLD}--make-database${NORM}\tMake a signature database from an ascii file containing\n\tdata strings, with one data string per line.  Additional\n\tinformation is provided when using this flag"
 
-  echo -e "\n${BOLD}-m${NORM}\tMake a signature database from an ascii file containing\n\tdata strings, with one data string per line.  Additional\n\tinformation is provided when using this flag"
+  echo -e "\n${BOLD}-r${NORM}, ${BOLD}--remove-script${NORM}\tRemove the clamav-unofficial-sigs script and all of\n\tits associated files and databases from the system"
 
-  echo -e "\n${BOLD}-r${NORM}\tRemove the clamav-unofficial-sigs script and all of\n\tits associated files and databases from the system"
+  echo -e "\n${BOLD}-s${NORM}, ${BOLD}--test-database${NORM}\tClamscan integrity test a specific database file\n\teg: '-s filename.ext' (do not include file path)"
 
-  echo -e "\n${BOLD}-s${NORM}\tClamscan integrity test a specific database file\n\teg: '-s filename.ext' (do not include file path)"
+  echo -e "\n${BOLD}-t${NORM}, ${BOLD}--output-triggered${NORM}\tIf HAM directory scanning is enabled in the script's\n\tconfiguration file, then output names of any third-party\n\tsignatures that triggered during the HAM directory scan"
 
-  echo -e "\n${BOLD}-t${NORM}\tIf HAM directory scanning is enabled in the script's\n\tconfiguration file, then output names of any third-party\n\tsignatures that triggered during the HAM directory scan"
+  echo -e "\n${BOLD}-w${NORM}, ${BOLD}--whitelist${NORM}\tAdds a signature whitelist entry in the newer ClamAV IGN2\n\tformat to 'my-whitelist.ign2' in order to temporarily resolve\n\ta false-positive issue with a specific third-party signature.\n\tScript added whitelist entries will automatically be removed\n\tif the original signature is either modified or removed from\n\tthe third-party signature database" 
 
-
-  echo -e "\n${BOLD}-w${NORM}\tAdds a signature whitelist entry in the newer ClamAV IGN2\n\tformat to 'my-whitelist.ign2' in order to temporarily resolve\n\ta false-positive issue with a specific third-party signature.\n\tScript added whitelist entries will automatically be removed\n\tif the original signature is either modified or removed from\n\tthe third-party signature database"
+  echo -e "\n${BOLD}--check-clamav${NORM}\tIf ClamD status check is enabled and the socket path is correctly specified\n\tthen test to see if clamd is running or not"
 
   echo -e "\nMail suggestions and bug reports to ${BOLD}<admin@extremeshok.com>${NORM}"
 
 }
 
 echo "======================================================================"
-echo " eXtremeSHOk.com ClamAV Unofficial Signature Updater"
+echo " eXtremeSHOK.com ClamAV Unofficial Signature Updater"
 echo " Version: v$version ($version_date)"
 echo " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 echo "======================================================================"
@@ -173,382 +173,524 @@ if [ "$user_configuration_complete" != "yes" ]; then
 fi
 
 
-# Take input from the commandline and process.
-while getopts 'defg:imrs:tw' option ; do
-   case $option in
-      d)  echo ""
-          echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
-          echo "a hexadecimal encoded data string and press enter (do not include '.UNOFFICIAL'"
-          echo "in the signature name nor add quote marks to any input string):"
-          read input
-          input=`echo "$input" | tr -d "'" | tr -d '"'`
-          if `echo "$input" | grep "\." > /dev/null`
-             then
-                cd "$clam_dbs"
-                sig=`grep "$input:" *.ndb`
-                if [ -n "$sig" ]
-                   then
-                      db_file=`echo "$sig" | cut -d ':' -f1`
-                      echo "$input found in: $db_file"
-                      echo "$input signature decodes to:"
-                      echo "$sig" | cut -d ":" -f5 | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
-                   else
-                      echo "Signature '$input' could not be found."
-                      echo "This script will only decode ClamAV 'UNOFFICIAL' third-Party,"
-                      echo "non-image based, signatures as found in the *.ndb databases."
-                fi
-            else
-               echo "Here is the decoded hexadecimal input string:"
-               echo "$input" | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
-          fi
-          exit
-          ;;
-      e)  echo ""
-          echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
-          echo "any quotes around the string unless you want them included in the hexadecimal encoded output:"
-          read input
-          echo "Here is the hexadecimal encoded input string:"
-          echo "$input" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg'
-          exit
-          ;;
-      f)  echo ""
-          echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
-          echo "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
-          echo "around the string unless you want them included in the hexadecimal encoded output:"
-          read input
-          echo "Here is the hexadecimal encoded input string:"
-          echo "$input" | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg'
-          exit
-          ;;
-      g)  echo ""
-          db_file=`echo "$OPTARG" | awk -F '/' '{print $NF}'`
-          if [ -r "$sanesecurity_dir/$db_file" ]
-             then
-                echo "GPG signature testing database file: $sanesecurity_dir/$db_file"
-       
-                if ! gpg --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file
-                   then
-                     gpg --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file
-                fi
-             else
-                echo "File '$db_file' cannot be found or is not a Sanesecurity database file."
-                echo "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
-                echo "$sanesecurity_dbs"
-                echo "Check the file name and try again..."
-          fi
-          exit
-          ;;
-      i)  echo ""
-          echo "*** SCRIPT VERSION ***"
-          echo "`basename $0` $version ($version_date)"
-          echo "*** SYSTEM INFORMATION ***"
-          uname=`which uname`
-          $uname -a
-          echo "*** CLAMSCAN LOCATION & VERSION ***"
-          clamscan=`which clamscan`
-          echo "$clamscan"
-          $clamscan --version | head -1
-          echo "*** RSYNC LOCATION & VERSION ***"
-          rsync=`which rsync`
-          echo "$rsync"
-          $rsync --version | head -1
-          echo "*** CURL LOCATION & VERSION ***"
-          curl=`which curl`
-          echo "$curl"
-          $curl --version | head -1
- 
-          echo "*** GPG LOCATION & VERSION ***"
-          gpg=`which gpg`
-          echo "$gpg"
-          $gpg --version | head -1
- 
-          echo "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
-          ls -ld $work_dir
- 
-          ls -lR $work_dir | grep -v total
- 
-          echo "*** CLAMAV DIRECTORY INFORMATION ***"
-          ls -ld $clam_dbs
-          echo "---"
-          ls -l $clam_dbs | grep -v total
- 
-          echo "*** SCRIPT CONFIGURATION SETTINGS ***"
-          egrep -v "^#|^$" $default_config
- 
-          exit
-          ;;
-      m)  echo ""
-          echo "
-          The '-m' script flag provides a way to create a ClamAV hexadecimal signature database (*.ndb) file
-          from a list of data strings stored in a clear-text ascii file, with one data string entry per line.
+#decode a third-party signature either by signature name
+decode_third_party_signature_by_signature_name (){
+  echo ""
+  echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
+  echo "a hexadecimal encoded data string and press enter (do not include '.UNOFFICIAL'"
+  echo "in the signature name nor add quote marks to any input string):"
+  read input
+  input=`echo "$input" | tr -d "'" | tr -d '"'`
+  if `echo "$input" | grep "\." > /dev/null`
+     then
+        cd "$clam_dbs"
+        sig=`grep "$input:" *.ndb`
+        if [ -n "$sig" ]
+           then
+              db_file=`echo "$sig" | cut -d ':' -f1`
+              echo "$input found in: $db_file"
+              echo "$input signature decodes to:"
+              echo "$sig" | cut -d ":" -f5 | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
+           else
+              echo "Signature '$input' could not be found."
+              echo "This script will only decode ClamAV 'UNOFFICIAL' third-Party,"
+              echo "non-image based, signatures as found in the *.ndb databases."
+        fi
+    else
+       echo "Here is the decoded hexadecimal input string:"
+       echo "$input" | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
+  fi
+}
 
-          - Hexadecimal encoding can be either 'full' or 'formatted' on a per line basis:
+#Hexadecimal encode an entire input string
+hexadecimal_encode_entire_input_string (){
+  echo ""
+  echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
+  echo "any quotes around the string unless you want them included in the hexadecimal encoded output:"
+  read input
+  echo "Here is the hexadecimal encoded input string:"
+  echo "$input" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg'
+}
 
-            Full line encoding should be used if there are no formatted spacing entries [{}, (), *]
-            included on the line.  Prefix unformatted lines with: '-:' (no quote marks).
+#Hexadecimal encode a formatted input string
+hexadecimal_encode_formatted_input_string (){
+  echo ""
+  echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
+  echo "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
+  echo "around the string unless you want them included in the hexadecimal encoded output:"
+  read input
+  echo "Here is the hexadecimal encoded input string:"
+  echo "$input" | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg'
+}
 
-            Example:
+#GPG verify a specific Sanesecurity database file
+gpg_verify_specific_sanesecurity_database_file () {
+  echo ""
+  db_file=`echo "$OPTARG" | awk -F '/' '{print $NF}'`
+  if [ -r "$sanesecurity_dir/$db_file" ]
+     then
+        echo "GPG signature testing database file: $sanesecurity_dir/$db_file"
 
-               -:This signature contains no formatted spacing fields
+        if ! gpg --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file
+           then
+             gpg --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file
+        fi
+     else
+        echo "File '$db_file' cannot be found or is not a Sanesecurity database file."
+        echo "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
+        echo "$sanesecurity_dbs"
+        echo "Check the file name and try again..."
+  fi
+}
 
-            Encodes to:
+#Output system and configuration information
+output_system_configuration_information () {
+  echo ""
+  echo "*** SCRIPT VERSION ***"
+  echo "`basename $0` $version ($version_date)"
+  echo "*** SYSTEM INFORMATION ***"
+  uname=`which uname`
+  $uname -a
+  echo "*** CLAMSCAN LOCATION & VERSION ***"
+  clamscan=`which clamscan`
+  echo "$clamscan"
+  $clamscan --version | head -1
+  echo "*** RSYNC LOCATION & VERSION ***"
+  rsync=`which rsync`
+  echo "$rsync"
+  $rsync --version | head -1
+  echo "*** CURL LOCATION & VERSION ***"
+  curl=`which curl`
+  echo "$curl"
+  $curl --version | head -1
 
-            54686973207369676e617475726520636f6e7461696e73206e6f20666f726d61747465642073706163696e67206669656c6473
+  echo "*** GPG LOCATION & VERSION ***"
+  gpg=`which gpg`
+  echo "$gpg"
+  $gpg --version | head -1
 
-            Formatted line encoding should be used if there are user added spacing entries [{}, (), *]
-            included on the line.  Prefix formatted lines with '=:' (no quote marks).
+  echo "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
+  ls -ld $work_dir
 
-            Example:
+  ls -lR $work_dir | grep -v total
 
-               =:This signature{-10}contains several(25|26|27)formatted spacing*fields
+  echo "*** CLAMAV DIRECTORY INFORMATION ***"
+  ls -ld $clam_dbs
+  echo "---"
+  ls -l $clam_dbs | grep -v total
 
-            Encodes to:
+  echo "*** SCRIPT CONFIGURATION SETTINGS ***"
+  egrep -v "^#|^$" $default_config
+}
 
-            54686973207369676e6174757265{-10}636f6e7461696e73207365766572616c(25|26|27)666f726d61747465642073706163696e67*6669656c6473
+#Make a signature database from an ascii file
+make_signature_database_from_ascii_file () {
+  echo ""
+  echo "
+  The '-m' script flag provides a way to create a ClamAV hexadecimal signature database (*.ndb) file
+  from a list of data strings stored in a clear-text ascii file, with one data string entry per line.
 
-            Use 'full' encoding if you want to encode everything on the line [including {}, (), *] and 'formatted'
-            encoding if you want to encode everything on the line except the formatted character spacing fields.
+  - Hexadecimal encoding can be either 'full' or 'formatted' on a per line basis:
 
-            The prefixes ('-:' and '=:') will be stripped from the line before hexadecimal encoding is done.
-            If no prefix is found at the beginning of the line, full line encoding will be done (default).
+    Full line encoding should be used if there are no formatted spacing entries [{}, (), *]
+    included on the line.  Prefix unformatted lines with: '-:' (no quote marks).
 
-          - It is assumed that the signatures will be created for email scanning purposes, thus the '4'
-            target type is used and full file scanning is enabled (see ClamAV signatures.pdf for details).
+    Example:
 
-          - Line numbering will be done automatically by the script.
-          " | command sed 's/^          //g'
-          echo -n "Do you wish to continue? (y/n): "
-          read reply
-          if [ "$reply" = "y" -o "$reply" = "Y" ]
-             then
-       
-                echo -n "Enter the source file as /path/filename: "
-                read source
-                if [ -r "$source" ]
-                   then
-                      source_file=`basename "$source"`
-             
-                      echo "What signature prefix would you like to use?  For example: 'Phish.Domains'"
-                      echo "will create signatures that looks like: 'Phish.Domains.1:4:*:HexSigHere'"
-             
-                      echo -n "Enter signature prefix: "
-                      read prefix
-                      path_file=`echo "$source" | cut -d "." -f-1 | command sed 's/$/.ndb/'`
-                      db_file=`basename $path_file`
-                      rm -f "$path_file"
-                      total=`wc -l "$source" | cut -d " " -f1`
-                      line_num=1
-             
-                      cat "$source" | while read line ; do
-                         line_prefix=`echo "$line" | awk -F ':' '{print $1}'`
-                         if [ "$line_prefix" = "-" ]
-                            then
-                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
-                            elif [ "$line_prefix" = "=" ] ; then
-                               echo "$line" | cut -d ":" -f2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
-                            else
-                               echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
-                         fi
-                         printf "Hexadecimal encoding $source_file line: $line_num of $total\r"
-                         line_num=$(($line_num + 1))
-                      done
-                   else
-             
-                      echo "Source file not found, exiting..."
-             
-                      exit
-                fi
-       
-       
-                echo "Signature database file created at: $path_file"
-                if clamscan --quiet -d "$path_file" "$config_dir/scan-test.txt" 2>/dev/null
-                   then
-             
-                      echo "Clamscan reports database integrity tested good."
-             
-                      echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases? (y/n): "
-                      read reply
-                      if [ "$reply" = "y" -o "$reply" = "Y" ]
-                         then
-                            if ! cmp -s "$path_file" "$clam_dbs/$db_file"
-                               then
-                                  if rsync -pcqt "$path_file" "$clam_dbs"
-                                     then
-                                        perms chown $clam_user:$clam_group "$clam_dbs/$db_file"
-                                        chmod 0644 "$clam_dbs/$db_file"
-                                        $reload_opt
-                               
-                                        echo "Signature database '$db_file' was successfully implemented and ClamD databases reloaded."
-                                     else
-                               
-                                        echo "Failed to add/update '$db_file', ClamD database not reloaded."
-                                  fi
-                               else
-                         
-                                  echo "Database '$db_file' has not changed - skipping"
-                            fi
-                         else
-                   
-                            echo "No action taken."
-                      fi
-                   else
-             
-                      echo "Clamscan reports that '$db_file' signature database integrity tested bad."
-                fi
-          fi
- 
-          exit
-          ;;
-      r)  echo ""
-          if [ -n "$pkg_mgr" -a -n "$pkg_rm" ]
-             then
-                echo "  This script (clamav-unofficial-sigs) was installed on the system"
-                echo "  via '$pkg_mgr', use '$pkg_rm' to remove the script"
-                echo "  and all of its associated files and databases from the system."
-       
-             else
-                echo "  Are you sure you want to remove the clamav-unofficial-sigs script and all of its"
-                echo -n "  associated files, third-party databases, and work directories from the system? (y/n): "
-                read response
-                if [ "$response" = "y" -o "$response" = "Y" ]
-                   then
-                      if [ -r "$config_dir/purge.txt" ] 
-                         then
-                   
-                            for file in `cat $config_dir/purge.txt` ; do
-                               rm -f -- "$file"
-                               echo "     Removed file: $file"
-                            done
-                            cron_file="/etc/cron.d/clamav-unofficial-sigs-cron"
-                            if [ -r "$cron_file" ] ; then
-                               rm -f "$cron_file"
-                               echo "     Removed file: $cron_file"
-                            fi
-                            log_rotate_file="/etc/logrotate.d/clamav-unofficial-sigs-logrotate"
-                            if [ -r "$log_rotate_file" ] ; then
-                               rm -f "$log_rotate_file"
-                               echo "     Removed file: $log_rotate_file"
-                            fi
-                            man_file="/usr/share/man/man8/clamav-unofficial-sigs.8"
-                            if [ -r "$man_file" ] ; then
-                               rm -f "$man_file"
-                               echo "     Removed file: $man_file"
-                            fi
-                            rm -f -- "$default_config" && echo "     Removed file: $default_config"
-                            rm -f -- "$0" && echo "     Removed file: $0"
-                            rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
-                   
-                            echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
-                            echo "  databases, and work directories have been successfully removed from the system."
-                   
-                         else
-                            echo "  Cannot locate 'purge.txt' file in $config_dir."
-                            echo "  Files and signature database will need to be removed manually."
-                   
-                      fi
-                   else
-                      help_and_usage
-                fi
-          fi
-          exit
-          ;;
-      s)  echo ""
-          input=`echo "$OPTARG" | awk -F '/' '{print $NF}'`
-          db_file=`find $work_dir -name $input`
-          if [ -r "$db_file" ]
-             then
-                echo "Clamscan integrity testing: $db_file"
-       
-                if clamscan --quiet -d "$db_file" "$config_dir/scan-test.txt" ; then
-                   echo "Clamscan reports that '$input' database integrity tested GOOD"
-                fi
-             else
-                echo "File '$input' cannot be found."
-                echo "Here is a list of third-party databases that can be clamscan integrity tested:"
-       
-                echo "Sanesecurity $sanesecurity_dbs""SecuriteInfo $securiteinfo_dbs""MalwarePatrol $malwarepatrol_dbs"
-                echo "Check the file name and try again..."
-          fi
- 
-          exit
-          ;;
-      t)  echo ""
-          if [ -n "$ham_dir" ]
-             then
-                if [ -r "$config_dir/whitelist.hex" ]
-                   then
-                      echo "The following third-party signatures triggered hits during the HAM Directory scan:"
-             
-                      grep -h -f "$config_dir/whitelist.hex" "$work_dir"/*/*.ndb | cut -d ":" -f1
-                   else
-                      echo "No third-party signatures have triggered hits during the HAM Directory scan."
-                fi
-             else
-                echo "Ham directory scanning is not currently enabled in the script's configuration file."
-          fi
- 
-          exit
-          ;;
-      w)  echo ""
-          echo "Input a third-party signature name that you wish to whitelist due to false-positives"
-          echo "and press enter (do not include '.UNOFFICIAL' in the signature name nor add quote"
-          echo "marks to the input string):"
- 
-          read input
-          if [ -n "$input" ]
-             then
-                cd "$clam_dbs"
-                input=`echo "$input" | tr -d "'" | tr -d '"'`
-                sig_full=`grep -H "$input:" *.ndb`
-                sig_name=`echo "$sig_full" | cut -d ":" -f2`
-                if [ -n "$sig_name" ]
-                   then
-                      if ! grep "$sig_name" my-whitelist.ign2 > /dev/null 2>&1
-                         then
-                            cp -f my-whitelist.ign2 "$config_dir" 2>/dev/null
-                            echo "$sig_name" >> "$config_dir/my-whitelist.ign2"
-                            echo "$sig_full" >> "$config_dir/tracker.txt"
-                            if clamscan --quiet -d "$config_dir/my-whitelist.ign2" "$config_dir/scan-test.txt"
-                               then
-                                  if rsync -pcqt $config_dir/my-whitelist.ign2 $clam_dbs
-                                     then
-                                        perms chown $clam_user:$clam_group my-whitelist.ign2
-                                        chmod 0644 my-whitelist.ign2 "$config_dir/monitor-ign.txt"
-                                        $reload_opt
-                               
-                                        echo "Signature '$input' has been added to my-whitelist.ign2 and"
-                                        echo "all databases have been reloaded.  The script will track any changes"
-                                        echo "to the offending signature and will automatically remove it if the"
-                                        echo "signature is modified or removed from the third-party database."
-                                     else
-                               
-                                        echo "Failed to successfully update my-whitelist.ign2 file - SKIPPING."
-                                  fi
-                               else
-                         
-                                  echo "Clamscan reports my-whitelist.ign2 database integrity is bad - SKIPPING."
-                            fi
-                         else
-                   
-                            echo "Signature '$input' already exists in my-whitelist.ign2 - no action taken."
-                      fi
-                   else
-             
-                      echo "Signature '$input' could not be found."
-             
-                      echo "This script will only create a whitelise entry in my-whitelist.ign2 for ClamAV"
-                      echo "'UNOFFICIAL' third-Party signatures as found in the *.ndb databases."
-                fi
-             else
-                echo "No input detected - no action taken."
-          fi
- 
-          exit
-          ;;
-      *)  help_and_usage
-          exit
-          ;;
-   esac
+       -:This signature contains no formatted spacing fields
+
+    Encodes to:
+
+    54686973207369676e617475726520636f6e7461696e73206e6f20666f726d61747465642073706163696e67206669656c6473
+
+    Formatted line encoding should be used if there are user added spacing entries [{}, (), *]
+    included on the line.  Prefix formatted lines with '=:' (no quote marks).
+
+    Example:
+
+       =:This signature{-10}contains several(25|26|27)formatted spacing*fields
+
+    Encodes to:
+
+    54686973207369676e6174757265{-10}636f6e7461696e73207365766572616c(25|26|27)666f726d61747465642073706163696e67*6669656c6473
+
+    Use 'full' encoding if you want to encode everything on the line [including {}, (), *] and 'formatted'
+    encoding if you want to encode everything on the line except the formatted character spacing fields.
+
+    The prefixes ('-:' and '=:') will be stripped from the line before hexadecimal encoding is done.
+    If no prefix is found at the beginning of the line, full line encoding will be done (default).
+
+  - It is assumed that the signatures will be created for email scanning purposes, thus the '4'
+    target type is used and full file scanning is enabled (see ClamAV signatures.pdf for details).
+
+  - Line numbering will be done automatically by the script.
+  " | command sed 's/^          //g'
+  echo -n "Do you wish to continue? (y/n): "
+  read reply
+  if [ "$reply" = "y" -o "$reply" = "Y" ]
+     then
+
+        echo -n "Enter the source file as /path/filename: "
+        read source
+        if [ -r "$source" ]
+           then
+              source_file=`basename "$source"`
+     
+              echo "What signature prefix would you like to use?  For example: 'Phish.Domains'"
+              echo "will create signatures that looks like: 'Phish.Domains.1:4:*:HexSigHere'"
+     
+              echo -n "Enter signature prefix: "
+              read prefix
+              path_file=`echo "$source" | cut -d "." -f-1 | command sed 's/$/.ndb/'`
+              db_file=`basename $path_file`
+              rm -f "$path_file"
+              total=`wc -l "$source" | cut -d " " -f1`
+              line_num=1
+     
+              cat "$source" | while read line ; do
+                 line_prefix=`echo "$line" | awk -F ':' '{print $1}'`
+                 if [ "$line_prefix" = "-" ]
+                    then
+                       echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+                    elif [ "$line_prefix" = "=" ] ; then
+                       echo "$line" | cut -d ":" -f2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+                    else
+                       echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+                 fi
+                 printf "Hexadecimal encoding $source_file line: $line_num of $total\r"
+                 line_num=$(($line_num + 1))
+              done
+           else
+     
+              echo "Source file not found, exiting..."
+     
+              exit
+        fi
+
+
+        echo "Signature database file created at: $path_file"
+        if clamscan --quiet -d "$path_file" "$config_dir/scan-test.txt" 2>/dev/null
+           then
+     
+              echo "Clamscan reports database integrity tested good."
+     
+              echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases? (y/n): "
+              read reply
+              if [ "$reply" = "y" -o "$reply" = "Y" ]
+                 then
+                    if ! cmp -s "$path_file" "$clam_dbs/$db_file"
+                       then
+                          if rsync -pcqt "$path_file" "$clam_dbs"
+                             then
+                                perms chown $clam_user:$clam_group "$clam_dbs/$db_file"
+                                chmod 0644 "$clam_dbs/$db_file"
+                                $reload_opt
+                       
+                                echo "Signature database '$db_file' was successfully implemented and ClamD databases reloaded."
+                             else
+                       
+                                echo "Failed to add/update '$db_file', ClamD database not reloaded."
+                          fi
+                       else
+                 
+                          echo "Database '$db_file' has not changed - skipping"
+                    fi
+                 else
+           
+                    echo "No action taken."
+              fi
+           else
+     
+              echo "Clamscan reports that '$db_file' signature database integrity tested bad."
+        fi
+  fi
+}
+
+#Remove the clamav-unofficial-sigs script
+remove_script () {
+  echo ""
+  if [ -n "$pkg_mgr" -a -n "$pkg_rm" ]
+     then
+        echo "  This script (clamav-unofficial-sigs) was installed on the system"
+        echo "  via '$pkg_mgr', use '$pkg_rm' to remove the script"
+        echo "  and all of its associated files and databases from the system."
+
+     else
+        echo "  Are you sure you want to remove the clamav-unofficial-sigs script and all of its"
+        echo -n "  associated files, third-party databases, and work directories from the system? (y/n): "
+        read response
+        if [ "$response" = "y" -o "$response" = "Y" ]
+           then
+              if [ -r "$config_dir/purge.txt" ] 
+                 then
+           
+                    for file in `cat $config_dir/purge.txt` ; do
+                       rm -f -- "$file"
+                       echo "     Removed file: $file"
+                    done
+                    cron_file="/etc/cron.d/clamav-unofficial-sigs-cron"
+                    if [ -r "$cron_file" ] ; then
+                       rm -f "$cron_file"
+                       echo "     Removed file: $cron_file"
+                    fi
+                    log_rotate_file="/etc/logrotate.d/clamav-unofficial-sigs-logrotate"
+                    if [ -r "$log_rotate_file" ] ; then
+                       rm -f "$log_rotate_file"
+                       echo "     Removed file: $log_rotate_file"
+                    fi
+                    man_file="/usr/share/man/man8/clamav-unofficial-sigs.8"
+                    if [ -r "$man_file" ] ; then
+                       rm -f "$man_file"
+                       echo "     Removed file: $man_file"
+                    fi
+                    rm -f -- "$default_config" && echo "     Removed file: $default_config"
+                    rm -f -- "$0" && echo "     Removed file: $0"
+                    rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
+           
+                    echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
+                    echo "  databases, and work directories have been successfully removed from the system."
+           
+                 else
+                    echo "  Cannot locate 'purge.txt' file in $config_dir."
+                    echo "  Files and signature database will need to be removed manually."
+           
+              fi
+           else
+              help_and_usage
+        fi
+  fi
+}
+
+#Clamscan integrity test a specific database file
+clamscan_integrity_test_specific_database_file (){
+  echo ""
+  input=`echo "$OPTARG" | awk -F '/' '{print $NF}'`
+  db_file=`find $work_dir -name $input`
+  if [ -r "$db_file" ]
+     then
+        echo "Clamscan integrity testing: $db_file"
+
+        if clamscan --quiet -d "$db_file" "$config_dir/scan-test.txt" ; then
+           echo "Clamscan reports that '$input' database integrity tested GOOD"
+        fi
+     else
+        echo "File '$input' cannot be found."
+        echo "Here is a list of third-party databases that can be clamscan integrity tested:"
+
+        echo "Sanesecurity $sanesecurity_dbs""SecuriteInfo $securiteinfo_dbs""MalwarePatrol $malwarepatrol_dbs"
+        echo "Check the file name and try again..."
+  fi 
+}
+#output names of any third-party signatures that triggered during the HAM directory scan
+output_signatures_triggered_during_ham_directory_scan () {
+echo ""
+  if [ -n "$ham_dir" ]
+     then
+        if [ -r "$config_dir/whitelist.hex" ]
+           then
+              echo "The following third-party signatures triggered hits during the HAM Directory scan:"
+     
+              grep -h -f "$config_dir/whitelist.hex" "$work_dir"/*/*.ndb | cut -d ":" -f1
+           else
+              echo "No third-party signatures have triggered hits during the HAM Directory scan."
+        fi
+     else
+        echo "Ham directory scanning is not currently enabled in the script's configuration file."
+  fi
+}
+
+#Adds a signature whitelist entry in the newer ClamAV IGN2 format
+add_signature_whitelist_entry () {
+  echo ""
+  echo "Input a third-party signature name that you wish to whitelist due to false-positives"
+  echo "and press enter (do not include '.UNOFFICIAL' in the signature name nor add quote"
+  echo "marks to the input string):"
+                    
+  read input
+  if [ -n "$input" ]
+     then
+        cd "$clam_dbs"
+        input=`echo "$input" | tr -d "'" | tr -d '"'`
+        sig_full=`grep -H "$input:" *.ndb`
+        sig_name=`echo "$sig_full" | cut -d ":" -f2`
+        if [ -n "$sig_name" ]
+           then
+              if ! grep "$sig_name" my-whitelist.ign2 > /dev/null 2>&1
+                 then
+                    cp -f my-whitelist.ign2 "$config_dir" 2>/dev/null
+                    echo "$sig_name" >> "$config_dir/my-whitelist.ign2"
+                    echo "$sig_full" >> "$config_dir/tracker.txt"
+                    if clamscan --quiet -d "$config_dir/my-whitelist.ign2" "$config_dir/scan-test.txt"
+                       then
+                          if rsync -pcqt $config_dir/my-whitelist.ign2 $clam_dbs
+                             then
+                                perms chown $clam_user:$clam_group my-whitelist.ign2
+                                chmod 0644 my-whitelist.ign2 "$config_dir/monitor-ign.txt"
+                                $reload_opt
+                       
+                                echo "Signature '$input' has been added to my-whitelist.ign2 and"
+                                echo "all databases have been reloaded.  The script will track any changes"
+                                echo "to the offending signature and will automatically remove it if the"
+                                echo "signature is modified or removed from the third-party database."
+                             else
+                       
+                                echo "Failed to successfully update my-whitelist.ign2 file - SKIPPING."
+                          fi
+                       else
+                 
+                          echo "Clamscan reports my-whitelist.ign2 database integrity is bad - SKIPPING."
+                    fi
+                 else
+           
+                    echo "Signature '$input' already exists in my-whitelist.ign2 - no action taken."
+              fi
+           else
+     
+              echo "Signature '$input' could not be found."
+     
+              echo "This script will only create a whitelise entry in my-whitelist.ign2 for ClamAV"
+              echo "'UNOFFICIAL' third-Party signatures as found in the *.ndb databases."
+        fi
+     else
+        echo "No input detected - no action taken."
+  fi
+}
+
+
+# If ClamD status check is enabled ("clamd_socket" variable is uncommented
+# and the socket path is correctly specified in "User Edit" section above),
+# then test to see if clamd is running or not.
+function check_clamav () {
+  if [ -n "$clamd_socket" ] ; then
+    if [ -S "$clamd_socket" ] ; then
+     if [ "`perl -e 'use IO::Socket::UNIX; print $IO::Socket::UNIX::VERSION,"\n"' 2>/dev/null`" ]
+        then
+           io_socket1=1
+           if [ "`perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null`" = "PONG" ] ; then
+              io_socket2=1
+              comment "===================="
+              comment "= ClamD is running ="
+              comment "===================="
+              log "INFO - ClamD is running"
+           fi
+        else
+           socat="`which socat 2>/dev/null`"
+           if [ -n "$socat" -a -x "$socat" ] ; then
+              socket_cat1=1
+              if [ "`(echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null`" = "PONG" ] ; then
+                 socket_cat2=1
+                 comment "===================="
+                 comment "= ClamD is running ="
+                 comment "===================="
+                 log "INFO - ClamD is running"
+              fi
+           fi
+     fi
+     if [ -z "$io_socket1" -a -z "$socket_cat1" ]
+        then
+
+           echo "                         --- WARNING ---"
+           echo "   It appears that neither 'SOcket CAT' (socat) nor the perl module"
+           echo "   'IO::Socket::UNIX' are installed on the system.  In order to run"
+           echo "   the ClamD socket test to determine whether ClamD is running or"
+           echo "   or not, either 'socat' or 'IO::Socket::UNIX' must be installed."
+
+           echo "   You can silence this warning by either installing 'socat' or the"
+           echo "   'IO::Socket::UNIX' perl module, or by simply commenting out the"
+           echo "   'clamd_socket' variable in the clamav-unofficial-sigs.conf file."
+           log "WARNING - Neither socat nor IO::Socket::UNIX perl module found, cannot test whether ClamD is running"
+        else
+           if [ -z "$io_socket2" -a -z "$socket_cat2" ] ; then
+     
+              echo "     *************************"
+              echo "     *     !!! ALERT !!!     *"
+              echo "     * CLAMD IS NOT RUNNING! *"
+              echo "     *************************"
+     
+              log "ALERT - ClamD is not running"
+              if [ -n "$start_clamd" ] ; then
+                 echo "    Attempting to start ClamD..."
+        
+                 if [ -n "$io_socket1" ]
+                    then
+                       $clamd_stop > /dev/null && sleep 5
+                       $clamd_start > /dev/null && sleep 5
+                       if [ "`perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null`" = "PONG" ]
+                          then
+                             echo "=================================="
+                             echo "= ClamD was successfully started ="
+                             echo "=================================="
+                             log "NOTICE - ClamD was successfuly started"
+                          else
+                             echo "     *************************"
+                             echo "     *     !!! PANIC !!!     *"
+                             echo "     * CLAMD FAILED TO START *"
+                             echo "     *************************"
+                    
+                             echo "Check to confirm that the clamd start process defined for"
+                             echo "the 'start_clamd' variable in the 'USER EDIT SECTION' is"
+                             echo "set correctly for your particular distro.  If it is, then"
+                             echo "check your logs to determine why clamd failed to start."
+                    
+                             log "CRITICAL - ClamD failed to start"
+                          exit 1
+                       fi
+                    else
+                       if [ -n "$socket_cat1" ] ; then
+                          $clamd_stop > /dev/null && sleep 5
+                          $clamd_start > /dev/null && sleep 5
+                          if [ "`(echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null`" = "PONG" ]
+                             then
+                                echo "=================================="
+                                echo "= ClamD was successfully started ="
+                                echo "=================================="
+                                log "NOTICE - ClamD was successfuly started"
+                             else
+                                echo "     *************************"
+                                echo "     *     !!! PANIC !!!     *"
+                                echo "     * CLAMD FAILED TO START *"
+                                echo "     *************************"
+                       
+                                echo "Check to confirm that the clamd start process defined for"
+                                echo "the 'start_clamd' variable in the 'USER EDIT SECTION' is"
+                                echo "set correctly for your particular distro.  If it is, then"
+                                echo "check your logs to determine why clamd failed to start."
+                       
+                                log "CRITICAL - ClamD failed to start"
+                             exit 1
+                          fi
+                       fi
+                 fi
+              fi
+           fi
+      fi
+    else
+      echo "$clamd_socket is not a usable socket"
+    fi
+  else
+    echo "clamd_socket is not defined in the configuration file"
+  fi
+}
+
+
+
+############### PROGRAM #########################
+# Main options
+while true; do
+  case "$1" in
+    -d | --decode-sig ) decode_third_party_signature_by_signature_name; exit; break ;;
+    -e | --encode-string ) hexadecimal_encode_entire_input_string; exit; break ;;
+    -f | --encode-formatted ) hexadecimal_encode_formatted_input_string; exit; break ;;
+    -g | --gpg-verify ) gpg_verify_specific_sanesecurity_database_file; exit; break ;;
+    -i | --information ) output_system_configuration_information; exit; break ;;
+    -m | --make-database ) make_signature_database_from_ascii_file; exit; break ;;
+    -r | --remove-script ) make_signature_database_from_ascii_file; exit; break ;;
+    -s | --test-database ) clamscan_integrity_test_specific_database_file; exit; break ;;
+    -t | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
+    -w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
+    --check-clamav ) check_clamav; exit; break ;;
+    * ) break ;;
+  esac
 done
 
 # If "ham_dir" variable is set, then create initial whitelist files (skipped if first-time script run).
@@ -793,112 +935,7 @@ if [ "$curl_silence" = "yes" ] ; then
    curl_output_level="-s -S"
 fi
 
-# If ClamD status check is enabled ("clamd_socket" variable is uncommented
-# and the socket path is correctly specified in "User Edit" section above),
-# then test to see if clamd is running or not.
-if [ -n "$clamd_socket" ] ; then
-   if [ "`perl -e 'use IO::Socket::UNIX; print $IO::Socket::UNIX::VERSION,"\n"' 2>/dev/null`" ]
-      then
-         io_socket1=1
-         if [ "`perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null`" = "PONG" ] ; then
-            io_socket2=1
-            comment "===================="
-            comment "= ClamD is running ="
-            comment "===================="
-            log "INFO - ClamD is running"
-         fi
-      else
-         socat="`which socat 2>/dev/null`"
-         if [ -n "$socat" -a -x "$socat" ] ; then
-            socket_cat1=1
-            if [ "`(echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null`" = "PONG" ] ; then
-               socket_cat2=1
-               comment "===================="
-               comment "= ClamD is running ="
-               comment "===================="
-               log "INFO - ClamD is running"
-            fi
-         fi
-   fi
-   if [ -z "$io_socket1" -a -z "$socket_cat1" ]
-      then
-
-         echo "                         --- WARNING ---"
-         echo "   It appears that neither 'SOcket CAT' (socat) nor the perl module"
-         echo "   'IO::Socket::UNIX' are installed on the system.  In order to run"
-         echo "   the ClamD socket test to determine whether ClamD is running or"
-         echo "   or not, either 'socat' or 'IO::Socket::UNIX' must be installed."
-
-         echo "   You can silence this warning by either installing 'socat' or the"
-         echo "   'IO::Socket::UNIX' perl module, or by simply commenting out the"
-         echo "   'clamd_socket' variable in the clamav-unofficial-sigs.conf file."
-         log "WARNING - Neither socat nor IO::Socket::UNIX perl module found, cannot test whether ClamD is running"
-      else
-         if [ -z "$io_socket2" -a -z "$socket_cat2" ] ; then
-   
-            echo "     *************************"
-            echo "     *     !!! ALERT !!!     *"
-            echo "     * CLAMD IS NOT RUNNING! *"
-            echo "     *************************"
-   
-            log "ALERT - ClamD is not running"
-            if [ -n "$start_clamd" ] ; then
-               echo "    Attempting to start ClamD..."
-      
-               if [ -n "$io_socket1" ]
-                  then
-                     rm -f -- "$clamd_pid" "$clamd_lock" "$clamd_socket" 2>/dev/null
-                     $start_clamd > /dev/null && sleep 5
-                     if [ "`perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null`" = "PONG" ]
-                        then
-                           echo "=================================="
-                           echo "= ClamD was successfully started ="
-                           echo "=================================="
-                           log "NOTICE - ClamD was successfuly started"
-                        else
-                           echo "     *************************"
-                           echo "     *     !!! PANIC !!!     *"
-                           echo "     * CLAMD FAILED TO START *"
-                           echo "     *************************"
-                  
-                           echo "Check to confirm that the clamd start process defined for"
-                           echo "the 'start_clamd' variable in the 'USER EDIT SECTION' is"
-                           echo "set correctly for your particular distro.  If it is, then"
-                           echo "check your logs to determine why clamd failed to start."
-                  
-                           log "CRITICAL - ClamD failed to start"
-                        exit 1
-                     fi
-                  else
-                     if [ -n "$socket_cat1" ] ; then
-                        rm -f -- "$clamd_pid" "$clamd_lock" "$clamd_socket" 2>/dev/null
-                        $start_clamd > /dev/null && sleep 5
-                        if [ "`(echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null`" = "PONG" ]
-                           then
-                              echo "=================================="
-                              echo "= ClamD was successfully started ="
-                              echo "=================================="
-                              log "NOTICE - ClamD was successfuly started"
-                           else
-                              echo "     *************************"
-                              echo "     *     !!! PANIC !!!     *"
-                              echo "     * CLAMD FAILED TO START *"
-                              echo "     *************************"
-                     
-                              echo "Check to confirm that the clamd start process defined for"
-                              echo "the 'start_clamd' variable in the 'USER EDIT SECTION' is"
-                              echo "set correctly for your particular distro.  If it is, then"
-                              echo "check your logs to determine why clamd failed to start."
-                     
-                              log "CRITICAL - ClamD failed to start"
-                           exit 1
-                        fi
-                     fi
-               fi
-            fi
-         fi
-   fi
-fi
+#check_clamav
 
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.

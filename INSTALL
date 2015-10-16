@@ -2,11 +2,18 @@
 GENERAL INFORMATION:
 ====================
 
-The clamav-unofficial-sigs script and accompanying files are provided by Bill Landry
-(unofficialsigs@gmail.com) under general BSD licensing guidelines.
+This is property of eXtremeSHOK.com
+You are free to use, modify and distribute, however you may not remove this notice.
+Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
+Script provide by Bill Landry (unofficialsigs@gmail.com).
 
-The two files needed to download, test and update third-party ClamAV database files
-provided by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc., are the script itself
+## Description
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party 
+signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, 
+Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
+
+The two files needed to download, test and update third-party ClamAV database files are the script itself
 (clamav-unofficial-sig.sh), and the user configuration file (clamav-unofficial-sigs.conf).
 
 Since the user configuration section has been separated from the script itself, the script now
@@ -34,7 +41,7 @@ Uncompress/Unpackage the tarball:
    tar -zxf clamav-unofficial-sigs.tar.gz
 
 Move into the package directory:
-   cd clamav-unofficial-sigs-(version)
+   cd clamav-unofficial-sigs
 
 Make sure script files are executable and have the appropriate UID/GID set:
    chmod 755 *.sh
@@ -74,43 +81,56 @@ To run manually:
 SCRIPT FLAGS USAGE:
 ===================
 
-To create a bypass signature for temporarily resolving a false-positive issue with a third-party signature:
-   /usr/local/bin/clamav-unofficial-sigs.sh -b
+Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
-To direct the script to use an alternate configuration file other than the one in /etc:
-   /usr/local/bin/clamav-unofficial-sigs.sh -c /path/to/clamav-unofficial-sigs.conf
+-c, --config    Direct script to use a specific configuration file
+        eg: '-c /path/to/clamav-unofficial-sigs.conf'
+        Optional if the default config is available
+        Default: /etc/clamav-unofficial-sigs.conf
 
-To decode a hexadecimal encoded string or specific third-party signature and determine what database it is in:
-   /usr/local/bin/clamav-unofficial-sigs.sh -d
+-h, --help      Display this script's help and usage information
 
-To encode an entire data string in hexadecimal for signature use in any '*.ndb' file:
-   /usr/local/bin/clamav-unofficial-sigs.sh -e
+-v, --version   Output script version and date information
 
-To encode a formatted data string that contains field spacers '{}, (), *' in hexadecimal, without encoding the
-   field spacers, for signature use in any '*.ndb' file:
-   /usr/local/bin/clamav-unofficial-sigs.sh -f
+-d, --decode-sig        Decode a third-party signature either by signature name
+        (eg: Sanesecurity.Junk.15248) or hexadecimal string.
+        This flag will 'NOT' decode image signatures
 
-To GPG Signature test a specific Sanesecurity database file:
-   /usr/local/bin/clamav-unofficial-sigs.sh -g filename  (e.g., -g junk.ndb)
+-e, --encode-string     Hexadecimal encode an entire input string that can
+        be used in any '*.ndb' signature database file
 
-To view Help and Usage instructions:
-   /usr/local/bin/clamav-unofficial-sigs.sh -h
+-f, --encode-formatted  Hexadecimal encode a formatted input string containing
+        signature spacing fields '{}, (), *', without encoding
+        the spacing fields, so that the encoded signature
+        can be used in any '*.ndb' signature database file
 
-To output script configuration and system information:
-   /usr/local/bin/clamav-unofficial-sigs.sh -i
+-g, --gpg-verify        GPG verify a specific Sanesecurity database file
+        eg: '-g filename.ext' (do not include file path)
 
-To make a hexadecimal signature database file (*.ndb) from a clear text ascii file:
-   /usr/local/bin/clamav-unofficial-sigs.sh -m
+-i, --information       Output system and configuration information for
+        viewing or possible debugging purposes
 
-To completely remove the script and all of its associated files, databases and work directories:
-   /usr/local/bin/clamav-unofficial-sigs.sh -r
+-m, --make-database     Make a signature database from an ascii file containing
+        data strings, with one data string per line.  Additional
+        information is provided when using this flag
 
-To clamscan integrity test a specific database file:
-   /usr/local/bin/clamav-unofficial-sigs.sh -s filename  (e.g., -s junk.ndb)
+-r, --remove-script     Remove the clamav-unofficial-sigs script and all of
+        its associated files and databases from the system
 
-To output third-party signature names that triggered during local HAM directory scanning,
-   if enabled in the configuration file:
-   /usr/local/bin/clamav-unofficial-sigs.sh -t
+-s, --test-database     Clamscan integrity test a specific database file
+        eg: '-s filename.ext' (do not include file path)
 
-To check version:
-   /usr/local/bin/clamav-unofficial-sigs.sh -v
+-t, --output-triggered  If HAM directory scanning is enabled in the script's
+        configuration file, then output names of any third-party
+        signatures that triggered during the HAM directory scan
+
+-w, --whitelist Adds a signature whitelist entry in the newer ClamAV IGN2
+        format to 'my-whitelist.ign2' in order to temporarily resolve
+        a false-positive issue with a specific third-party signature.
+        Script added whitelist entries will automatically be removed
+        if the original signature is either modified or removed from
+        the third-party signature database
+
+--check-clamav  If ClamD status check is enabled and the socket path is correctly specified
+        then test to see if clamd is running or not
+
