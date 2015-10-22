@@ -55,10 +55,12 @@ version="4.7"
 minimum_required_config_version="51"
 version_date="16 October 2015"
 
-#Set fonts. #echo "${BOLD}-a${NORM}"
-BOLD=`tput bold`
-REV=`tput smso`
-NORM=`tput sgr0`
+if [ -t 1 ]; then
+  #Set fonts. #echo "${BOLD}-a${NORM}"
+  BOLD=`tput bold`
+  REV=`tput smso`
+  NORM=`tput sgr0`
+fi
 
 
 #function for help and usage
