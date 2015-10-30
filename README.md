@@ -12,6 +12,7 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 #### SELinux cron permission fix
 WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
+
 ```setsebool -P antivirus_can_scan_system true```
 
 ### Yara Rule Support (as of June 2015)
