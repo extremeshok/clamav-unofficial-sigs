@@ -11,8 +11,8 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 #### Try our custom spamassasin plugin: https://github.com/extremeshok/spamassassin-extremeshok_fromreplyto
 
 #### SELinux cron permission fix
-Error: WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
-Fix: ```setsebool -P antivirus_can_scan_system true```
+WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
+```setsebool -P antivirus_can_scan_system true```
 
 ### Yara Rule Support (as of June 2015)
 Requires clamav 0.99 or above : http://yararules.com 
