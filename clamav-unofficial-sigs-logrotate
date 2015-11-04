@@ -20,5 +20,5 @@
      missingok
      notifempty
      compress
-     create 0600 root root
+     create 0644 clam clam
 }
