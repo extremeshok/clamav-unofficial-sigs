@@ -24,6 +24,7 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 > WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
 
 **Run the following command to allow clamav selinux support**
+
 ```setsebool -P antivirus_can_scan_system true```
 
 ### Yara Rule Support (as of June 2015)
