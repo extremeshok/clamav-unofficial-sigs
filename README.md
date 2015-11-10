@@ -29,6 +29,7 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 ### Yara Rule Support (as of June 2015)
 Requires clamav 0.99 or above : http://yararules.com 
+
 Current limitations of clamav support : http://blog.clamav.net/search/label/yara
 
 ### MalwarePatrol Free/Delayed list support (as of May 2015)
@@ -199,7 +200,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         Optional if the default config is available
         Default: /etc/clamav-unofficial-sigs.conf
 
---force         Force all databases to be downloaded, could cause ip to be blocked"
+--force         Force all databases to be downloaded, could cause ip to be blocked
 
 -h, --help      Display this script's help and usage information
 

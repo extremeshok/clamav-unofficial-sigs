@@ -88,7 +88,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         Optional if the default config is available
         Default: /etc/clamav-unofficial-sigs.conf
 	
---force         Force all databases to be downloaded, could cause ip to be blocked"
+--force         Force all databases to be downloaded, could cause ip to be blocked
 
 -h, --help      Display this script's help and usage information
 
