@@ -10,12 +10,15 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 #### Try our custom spamassasin plugin: https://github.com/extremeshok/spamassassin-extremeshok_fromreplyto
 
-### Install
-Download the files to /usr/local/clamav-unofficial-sigs/
-move clamav-unofficial-sigs.conf into /etc/
-move clamav-unofficial-sigs-cron into /etc/cron.d/
-move clamav-unofficial-sigs-logrotate into /etc/logrotate.d/
-move clamav-unofficial-sigs.8 into /usr/share/man/man8/
+### Quick Install Guide
+* Download the files to /tmp/
+* move clamav-unofficial-sigs.sh to /usr/local/bin/
+* set 755 permissions on  /usr/local/bin/clamav-unofficial-sigs.sh
+* move clamav-unofficial-sigs.conf into /etc/ 
+* move clamav-unofficial-sigs-cron into /etc/cron.d/
+* move clamav-unofficial-sigs-logrotate into /etc/logrotate.d/
+* move clamav-unofficial-sigs.8 into /usr/share/man/man8/
+* set your config options in /etc/clamav-unofficial-sigs.conf
 
 #### SELinux cron permission fix
 > WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
