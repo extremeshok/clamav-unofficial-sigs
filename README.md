@@ -10,9 +10,17 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 #### Try our custom spamassasin plugin: https://github.com/extremeshok/spamassassin-extremeshok_fromreplyto
 
-#### SELinux cron permission fix
-WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
+### Install
+Download the files to /usr/local/clamav-unofficial-sigs/
+move clamav-unofficial-sigs.conf into /etc/
+move clamav-unofficial-sigs-cron into /etc/cron.d/
+move clamav-unofficial-sigs-logrotate into /etc/logrotate.d/
+move clamav-unofficial-sigs.8 into /usr/share/man/man8/
 
+#### SELinux cron permission fix
+> WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
+
+**Run the following command to allow clamav selinux support**
 ```setsebool -P antivirus_can_scan_system true```
 
 ### Yara Rule Support (as of June 2015)
@@ -42,7 +50,17 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 4.7 (updated 2015-10-16)
+### Version 4.8 (updated 2015-11-11)
+ - eXtremeSHOK.com Maintenance 
+ - Added long option (--force) to Force all databases to be downloaded, could cause ip to be blocked"
+ - added config option:  malwarepatrol_free="yes", set to "no" to enable commercial subscription url
+ - added support for commercial malwarepatrol subscription
+ - Grammar fix in config
+ - SELINUX cronjob fix added to readme
+ - Corrects tput warning when used without TERM (like in cron)
+ - Config updated to 52 due to changes
+
+### Version 4.7
  - eXtremeSHOK.com Maintenance 
  - Code Refactoring
  - Complete rewrite of the main case selector (program options)
@@ -176,6 +194,8 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         eg: '-c /path/to/clamav-unofficial-sigs.conf'
         Optional if the default config is available
         Default: /etc/clamav-unofficial-sigs.conf
+
+--force         Force all databases to be downloaded, could cause ip to be blocked"
 
 -h, --help      Display this script's help and usage information
 

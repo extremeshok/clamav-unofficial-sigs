@@ -51,9 +51,9 @@ log () {
 }
 
 
-version="4.7"
-minimum_required_config_version="51"
-version_date="16 October 2015"
+version="4.8"
+minimum_required_config_version="52"
+version_date="11 November 2015"
 
 if [ -t 1 ]; then
   #Set fonts. #echo "${BOLD}-a${NORM}"
@@ -69,6 +69,8 @@ help_and_usage () {
   echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
 
   echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tDirect script to use a specific configuration file\n\teg: '-c /path/to/`basename $default_config`'\n\tOptional if the default config is available\n\tDefault: $default_config"
+
+  echo -e "\n${BOLD}--force${NORM}\t\tForce all databases to be downloaded, could cause ip to be blocked"
 
   echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
 
@@ -110,10 +112,14 @@ echo "======================================================================"
 # Use the Default Config bt default
 config_source=$default_config
 
+#default disable forced updates
+forced_updates="no"
+
 # Generic command line options
 while true; do
   case "$1" in
     -c | --config ) config_source="$2"; shift 2; break ;;
+    --force ) force_updates="yes"; shift 1; break ;;
     -h | --help ) help_and_usage; exit; break ;;
     -v | --version ) exit; break ;;
     * ) break ;;
@@ -143,7 +149,7 @@ fi
 # check there is an = for every set of "" #optional whitespace \s* between = and "
 config_check_vars=`echo "$clean_config" | grep -o '=\s*\"' | wc -l`
 if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ]; then 
-  echo "*** Your configuration has errors, every = requires a pair of \"\" ***"     
+  echo "*** ERROR: Your configuration has errors, every = requires a pair of \"\" ***"     
   log "ALERT - SCRIPT HALTED, configuration has errors, every = requires a pair of \"\""
   exit 1
 fi
@@ -156,7 +162,7 @@ done
 
 #config version validation
 if [ "$config_version" -lt "$minimum_required_config_version" ]; then
-      echo "*** Your configuration version is not compatible with this version ***"     
+      echo "*** ERROR: Your configuration version is not compatible with this version ***"     
       log "ALERT - SCRIPT HALTED, user configuration is not compatible with this version"
    exit 1
 fi
@@ -174,6 +180,15 @@ if [ "$user_configuration_complete" != "yes" ]; then
    exit 1
 fi
 
+# Reset the update timers to force a full update.
+if [ "$force_updates" == "yes" ]; then
+  echo "Force Updates: enabled"     
+  log "Force Updates: enabled"
+  securiteinfo_update_hours="0"
+  linuxmalwaredetect_update_hours="0"
+  malwarepatrol_update_hours="0"
+  yararules_update_hours="0"
+fi
 
 #decode a third-party signature either by signature name
 decode_third_party_signature_by_signature_name (){
@@ -1364,8 +1379,7 @@ fi
 if [ "$malwarepatrol_enabled" == "yes" ] ; then
   if [ "$malwarepatrol_receipt_code" != "YOUR-RECEIPT-NUMBER" ] ; then
     if [ -n "$malwarepatrol_db" ] ; then
-     if [ -r "$config_dir/last-mbl-update.txt" ]
-        then
+     if [ -r "$config_dir/last-mbl-update.txt" ]; then
            last_malwarepatrol_update=`cat $config_dir/last-mbl-update.txt`
         else
            last_malwarepatrol_update="0"
@@ -1384,7 +1398,12 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               comment "======================================================================"
               comment "MalwarePatrol $db_file Database File Update"
               comment "======================================================================"
-     
+              
+              if [ "$malwarepatrol_free" == "yes" ] ; then
+                malwarepatrol_url=$malwarepatrol_free_url
+              else
+                malwarepatrol_url=$malwarepatrol_subscription_url
+              fi
 
               if curl $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" \
                  --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
