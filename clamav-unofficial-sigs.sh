@@ -544,7 +544,7 @@ add_signature_whitelist_entry () {
                                 perms chown $clam_user:$clam_group my-whitelist.ign2
 
                                 if [ ! -s "$config_dir/monitor-ign.txt" ]; then 
-                                  # Create "scan-test.txt" file for clamscan database integrity testing.
+                                  # Create "monitor-ign.txt" file for clamscan database integrity testing.
                                   echo "This is the monitor ignore file..." > "$config_dir/monitor-ign.txt"
                                 fi
 
