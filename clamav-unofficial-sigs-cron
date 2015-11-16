@@ -22,4 +22,4 @@
 # 60 - 600 seconds.  Adjust the cron start time, user account to run the
 # script under, and path information shown below to meet your own needs.
 
-45 * * * * root /bin/bash /usr/local/bin/clamav-unofficial-sigs.sh  > / dev/null
+45 * * * * root /bin/bash /usr/local/bin/clamav-unofficial-sigs.sh  > /dev/null
