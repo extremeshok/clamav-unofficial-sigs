@@ -135,7 +135,12 @@ fi
 
 #config stripping
 echo "Loading config: $config_source"
-clean_config=`command sed -e 's/#.*$//' -e '/^\s*$/d' "$config_source"`
+
+# delete lines beginning with #
+# delete from '# ' or ' #' to end of the line
+# delete both trailing and leading whitespace
+# delete all empty lines
+clean_config=`command sed -e '/^#.*/d' -e 's/\([[:space:]]#\|#[[:space:]]\).*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_source"`
 
 ### config error checking
 # check "" are an even number
