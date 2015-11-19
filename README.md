@@ -55,7 +55,20 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 4.8 (updated 2015-11-11)
+### Version 4.9 (updated 2015-11-19)
+ - eXtremeSHOK.com Maintenance 
+ - Code Refactoring
+ - New function clamscan_reload_dbs, will first try and reload the clam database, if reload fails will restart clamd
+ - Added Function xshok_pretty_echo_and_log, far easier and cleaner way to output and log information
+ - Removed functions comment, log
+ - Removed config option reload_opt
+ - Added config option clamd_restart_opt
+ - Added support for # characters in config values, ie malwarepatrol subscription key contains a #
+ - Minor formatting and code consitency changes
+ - 10% Smaller script size
+ - Config updated to 53 due to changes
+
+### Version 4.8
  - eXtremeSHOK.com Maintenance 
  - Added long option (--force) to Force all databases to be downloaded, could cause ip to be blocked"
  - added config option:  malwarepatrol_free="yes", set to "no" to enable commercial subscription url
