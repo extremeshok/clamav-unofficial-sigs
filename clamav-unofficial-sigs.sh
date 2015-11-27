@@ -83,9 +83,9 @@ fi
 }
 
 #Script Info
-version="4.9"
+version="4.9.1"
 minimum_required_config_version="53"
-version_date="19 November 2015"
+version_date="27 November 2015"
 
 #Initialise 
 do_clamd_reload="0"

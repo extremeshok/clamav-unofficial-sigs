@@ -55,7 +55,12 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 4.9 (updated 2015-11-19)
+### Version 4.9.1 (updated 2015-11-27)
+ - eXtremeSHOK.com Maintenance 
+ - OS X compatibility fix by stewardle
+ - missing $ in $yararules_enabled
+
+### Version 4.9
  - eXtremeSHOK.com Maintenance 
  - Code Refactoring
  - New function clamscan_reload_dbs, will first try and reload the clam database, if reload fails will restart clamd
