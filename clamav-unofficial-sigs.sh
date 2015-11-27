@@ -1406,7 +1406,7 @@ fi
 ##############################################################################################################################################
 # Check for updated yararules database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
 ##############################################################################################################################################
-if [ "yararules_enabled" == "yes" ] ; then
+if [ "$yararules_enabled" == "yes" ] ; then
   if [ -n "$yararules_dbs" ] ; then
    rm -f "$yararules_dir/*.gz"
    if [ -r "$config_dir/last-yararules-update.txt" ] ; then
