@@ -55,7 +55,12 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 4.9.1 (updated 2015-11-27)
+### Version 4.9.2 (updated 2015-12-02)
+ - eXtremeSHOK.com Maintenance 
+ - Added function xshok_check_s2 to prevent possible errors with -c and no configfile path
+ - minor code refactoring
+
+### Version 4.9.1
  - eXtremeSHOK.com Maintenance 
  - OS X compatibility fix by stewardle
  - missing $ in $yararules_enabled
