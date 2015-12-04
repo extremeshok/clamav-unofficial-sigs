@@ -782,7 +782,7 @@ fi
 
 # Check to see if the working directories have been created.
 # If not, create them.  Otherwise, ignore and proceed with script.
-mkdir -p "$work_dir" "$securiteinfo_dir" "$malwarepatrol_dir" "$linuxmalwaredetect_dir" "$sanesecurity_dir" "$config_dir" "$gpg_dir" "$add_dir"
+mkdir -p "$work_dir" "$securiteinfo_dir" "$malwarepatrol_dir" "$linuxmalwaredetect_dir" "$sanesecurity_dir" "$yararules_dir" "$config_dir" "$gpg_dir" "$add_dir"
 
 # Set secured access permissions to the GPG directory
 chmod 0700 "$gpg_dir"
