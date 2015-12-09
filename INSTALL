@@ -52,7 +52,7 @@ Configure:
    IMPORTANT CONFIGURATION CONSIDERATIONS:
    - Make sure that the PATH statement correctly defines the location of your binary files.  These
      include: find, sed, awk, cut, grep, tail, chown, chmod, cmp, diff, dig, host, gzip, ls, cp, mv,
-     test, gpg, xargs, sleep, urandom, chksum, rsync, curl, socat, etc.  It has been reported that
+     test, gpg, xargs, sleep, urandom, cksum, rsync, curl, socat, etc.  It has been reported that
      on Sun systems, the GNU utilities should be used rather than the default Sun versions.
    - System shell setting:  Based on user feedback, it has been reported that "sh" works best for
      BSD variants, "ksh" for Sun Solaris, and "bash" for Linux variants.  If you experience problems
