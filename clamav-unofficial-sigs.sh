@@ -1433,7 +1433,7 @@ if [ "$yararules_enabled" == "yes" ] ; then
  if [ "$time_interval" -ge $(($update_interval - 600)) ] ; then
   echo "$current_time" > "$config_dir"/last-yararules-update.txt
 
-  cxshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
+  xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
   xshok_pretty_echo_and_log "Checking for yararules updates..."
   yararules_updates="0"
   for db_file in $yararules_dbs ; do
