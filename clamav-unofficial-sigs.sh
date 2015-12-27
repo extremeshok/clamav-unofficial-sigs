@@ -1522,7 +1522,7 @@ else
  time_remaining=$(($update_interval - $time_interval))
  hours_left=$(($time_remaining / 3600))
  minutes_left=$(($time_remaining % 3600 / 60))
- xshok_pretty_echo_and_log "$yararules_update_hours hours have not yet elapsed since the last linux malware detect update check"
+ xshok_pretty_echo_and_log "$yararules_update_hours hours have not yet elapsed since the last yararules database update check"
  xshok_pretty_echo_and_log "No update check was performed at this time" "-"
  xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
 fi
