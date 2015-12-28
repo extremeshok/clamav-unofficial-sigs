@@ -44,6 +44,7 @@ if [ "$1" = "-cu" ] || [ "$1" = "--cleanup" ]; then
     rm -f /etc/logrotate.d/clamav-unofficial-sigs-logrotate >/dev/null
     rm -f /etc/clamav/clamav-unofficial-sigs.conf >/dev/null
     rm -f /etc/clamav-unofficial-sigs.conf >/dev/null
+    exit 0
 fi
 
 if [ "$1" = "-do" ] || [ "$1" = "--download-only" ]; then 
@@ -59,6 +60,7 @@ if [ "$1" = "-do" ] || [ "$1" = "--download-only" ]; then
     fi
     unzip -j -qq -o /tmp/clamav-sigs/clamav-unofficial-sigs-${DATE_NOW}.zip -d /tmp/clamav-sigs/
     echo "you can find you files in /tmp/clamav-sigs/" 
+    exit 0
 fi
 
 ######### FUNCTIONS ANY_OS START, which should work for any os.
