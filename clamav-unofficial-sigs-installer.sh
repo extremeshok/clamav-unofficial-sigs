@@ -398,7 +398,7 @@ import_old_settings_in_new_config_file() {
 }
 
 create_logrotate_per_os() {
-if [ ${ID} = "debian"]||[ ${ID} = "ubuntu"]; then 
+if [ ${ID} = "debian" ]||[ ${ID} = "ubuntu" ]; then 
     CLAMAV_USER=clamav
     CLAMAV_GROUP=amd
     CLAMAV_LOGRIGHTS=0640
