@@ -10,18 +10,21 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 ### In addition to the original master
 This fork provides an installer script, which is tested on debian Jessie and Wheezy.
-New Linux distributions are easy to integrate. ( which is a ToDo ).
-To use the installer script get it here : 
+New Linux distributions are easy to integrate. ( which is a ToDo )
+
+To use the installer script get it here :
 wget https://raw.githubusercontent.com/thctlo/clamav-unofficial-sigs/master/clamav-unofficial-sigs-installer.sh
 chmod +x clamav-unofficial-sigs-installer.sh
 and run in : ./clamav-unofficial-sigs-installer.sh
 It wil get the original clamav-unofficial-sigs set from extremeshok, this installer script, installs the files for you.
 But more in a "Debian" preffered setup.
+
 For Debian Jessie and Wheezy
     * It imports old settings from previous installes and creates a backup of the previous version.
     * It set the user/group/right for logrotate to clamav/adm/640 and log file to folder /var/log/clamav
     * It set the conf file to /etc/clamav and corrects files where needed to the new path
     * It puts the clamav-unofficial-sigs.sh in /usr/local/sbin
+
 For other Linux Distros, not included yet, but should be easy to integrate.
 Some parts are done but this is not finished yet.
 
