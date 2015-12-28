@@ -21,10 +21,12 @@ It wil get the original clamav-unofficial-sigs set from extremeshok, this instal
 But more in a "Debian" preffered setup.
 
 For Debian Jessie and Wheezy
-* It imports old settings from previous installes and creates a backup of the previous version.
+
 * It set the user/group/right for logrotate to clamav/adm/640 and log file to folder /var/log/clamav
 * It set the conf file to /etc/clamav and corrects files where needed to the new path
 * It puts the clamav-unofficial-sigs.sh in /usr/local/sbin
+* It imports old settings from previous installes and creates a backup of the previous version.
+* !! databases are taken from the new config file, this is not (yet) include in the settings import.
 
 For other Linux Distros, not included yet, but should be easy to integrate.
 Some parts are done but this is not finished yet.
