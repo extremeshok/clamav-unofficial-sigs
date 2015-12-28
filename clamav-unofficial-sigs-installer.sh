@@ -196,6 +196,9 @@ get_latest_clamav_unofficial_sigs_github_zip() {
 	    unzip -j -qq -o /tmp/clamav-sigs/clamav-unofficial-sigs-${DATE_NOW}.zip -d /tmp/clamav-sigs/
 	fi
     else
+	if [ ! -f /tmp/clamav-sigs/clamav-unofficial-sigs.sh ]; then 
+	    unzip -j -qq -o /tmp/clamav-sigs/clamav-unofficial-sigs-${DATE_NOW}.zip -d /tmp/clamav-sigs/
+	fi
 	echo " "
 	echo "Clamav-unofficial-sigs is already downloaded today, to re-download the file."
 	echo "Remove the download file first : /tmp/clamav-sigs/clamav-unofficial-sigs-${DATE_NOW}.zip"
