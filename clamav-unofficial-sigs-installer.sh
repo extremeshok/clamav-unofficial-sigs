@@ -20,8 +20,16 @@
 
 # load date first
 DATE_NOW="$(date +%Y-%m-%d)"
+run_as_root_or_sudo() {
+# make sure this is being run by root
+    if ! [[ $EUID -eq 0 ]]; then
+	echo "This script should be run using sudo or by root."
+	exit 1
+    fi
+}
 
 if [ -n "$1" ] && [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    run_as_root_or_sudo
     echo " "
     echo "This script will the latest clamav-unofficial-sigs from extremeshok github."
     echo "It wil extract it and install it, and ask for some things"
@@ -36,9 +44,12 @@ if [ -n "$1" ] && [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     exit 0
 fi
 
-
-
 if [ "$1" = "-cu" ] || [ "$1" = "--cleanup" ]; then 
+    run_as_root_or_sudo
+    if ! [[ $EUID -eq 0 ]]; then
+	echo "This script should be run using sudo or by root."
+	exit 1
+    fi
     echo "Cleaning up all files.."
     rm -rf /tmp/clamav-sigs
     rm -f /usr/local/bin/clamav-unofficial-sigs.sh >/dev/null
@@ -52,6 +63,7 @@ if [ "$1" = "-cu" ] || [ "$1" = "--cleanup" ]; then
 fi
 
 if [ "$1" = "-do" ] || [ "$1" = "--download-only" ]; then 
+    run_as_root_or_sudo
     if [ ! -d /tmp/clamav-sigs ]; then 
 	mkdir -p /tmp/clamav-sigs
     fi
@@ -67,17 +79,7 @@ if [ "$1" = "-do" ] || [ "$1" = "--download-only" ]; then
     exit 0
 fi
 
-
 ######### FUNCTIONS ANY_OS START, which should work for any os.
-
-run_as_root_or_sudo() {
-# make sure this is being run by root
-    if ! [[ $EUID -eq 0 ]]; then
-	echo "This script should be run using sudo or by root."
-	exit 1
-    fi
-}
-
 message_os_detected() {
 	echo " "
 	echo "Detected OS: $PRETTY_NAME"
