@@ -1,12 +1,11 @@
 #!/bin/bash
 ##
-## Version      : 1.0
-## release d.d. : 01-02-2015
+## Version      : 1.0.1
+## release d.d. : 28-12-2015
 ## Author       : L. van Belle
 ## E-mail       : louis@van-belle.nl
 ## Copyright    : Free as free can be, copy it, change it if needed.
-## Sidenote     : if you change things, please inform me
-## ChangeLog    : first release
+## ChangeLog    : few small bugfixed in transfering serureitinfo
 ## -------------------------------------------------------------------
 ## This script downloads the latest clamav-unofficial-sigs for you from github.
 ## It config the script and/or updates the old version. 
@@ -202,7 +201,7 @@ get_latest_clamav_unofficial_sigs_github_zip() {
 	echo " "
 	echo "Clamav-unofficial-sigs is already downloaded today, to re-download the file."
 	echo "Remove the download file first : /tmp/clamav-sigs/clamav-unofficial-sigs-${DATE_NOW}.zip"
-	echo "Or start the script with --fd (--force-download)"
+	echo "Or start the script with -fd (--force-download)"
 	echo "The script will continue....."
 	echo " "
     fi
@@ -321,7 +320,7 @@ detect_securite_info_signature() {
     else
 	if [ "${securiteinfo_authorisation_signature}" != "YOUR-SIGNATURE-NUMBER" ]; then 
 	    echo "Detected previous securiteinfo_authorisation_signature, transerring this one to the new configfile."
-	    sed -i "s/securiteinfo_authorisation_signature=\"YOUR-SIGNATURE-NUMBER\"/securiteinfo_authorisation_signaturee=\"${securiteinfo_authorisation_signature}\"/g" /etc/clamav/clamav-unofficial-sigs.conf
+	    sed -i "s/securiteinfo_authorisation_signature=\"YOUR-SIGNATURE-NUMBER\"/securiteinfo_authorisation_signature=\"${securiteinfo_authorisation_signature}\"/g" /etc/clamav/clamav-unofficial-sigs.conf
 	fi
     fi
 }
