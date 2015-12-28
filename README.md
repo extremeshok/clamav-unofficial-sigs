@@ -13,9 +13,10 @@ This fork provides an installer script, which is tested on debian Jessie and Whe
 New Linux distributions are easy to integrate. ( which is a ToDo )
 
 To use the installer script get it here :
-wget https://raw.githubusercontent.com/thctlo/clamav-unofficial-sigs/master/clamav-unofficial-sigs-installer.sh
-chmod +x clamav-unofficial-sigs-installer.sh
-and run in : ./clamav-unofficial-sigs-installer.sh
+* wget https://raw.githubusercontent.com/thctlo/clamav-unofficial-sigs/master/clamav-unofficial-sigs-installer.sh
+* chmod +x clamav-unofficial-sigs-installer.sh
+* and run in : ./clamav-unofficial-sigs-installer.sh
+
 It wil get the original clamav-unofficial-sigs set from extremeshok, this installer script, installs the files for you.
 But more in a "Debian" preffered setup.
 
