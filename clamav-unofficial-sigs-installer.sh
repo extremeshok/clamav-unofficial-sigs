@@ -5,7 +5,7 @@
 ## Author       : L. van Belle
 ## E-mail       : louis@van-belle.nl
 ## Copyright    : Free as free can be, copy it, change it if needed.
-## ChangeLog    : added cleanup option
+## ChangeLog    : added download only option
 ## -------------------------------------------------------------------
 ## This script downloads the latest clamav-unofficial-sigs for you from github.
 ## It config the script and/or updates the old version. 
@@ -18,6 +18,8 @@
 ## Test it and see the output in the end. 
 ## If it updates an old version it adapts all settings EXECPT the dbs 
 
+# load date first
+DATE_NOW="$(date +%Y-%m-%d)"
 
 if [ -n "$1" ] && [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo " "
@@ -34,9 +36,11 @@ if [ -n "$1" ] && [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     exit 0
 fi
 
+
+
 if [ "$1" = "-cu" ] || [ "$1" = "--cleanup" ]; then 
-    echo -n "Cleaning up all files."
-    rm -f /tmp/clamav-sigs/*
+    echo "Cleaning up all files.."
+    rm -rf /tmp/clamav-sigs
     rm -f /usr/local/bin/clamav-unofficial-sigs.sh >/dev/null
     rm -f /usr/local/sbin/clamav-unofficial-sigs.sh >/dev/null
     rm -f /usr/share/man/man8/clamav-unofficial-sigs.8 >/dev/null
@@ -63,8 +67,8 @@ if [ "$1" = "-do" ] || [ "$1" = "--download-only" ]; then
     exit 0
 fi
 
+
 ######### FUNCTIONS ANY_OS START, which should work for any os.
-DATE_NOW="$(date +%Y-%m-%d)"
 
 run_as_root_or_sudo() {
 # make sure this is being run by root
