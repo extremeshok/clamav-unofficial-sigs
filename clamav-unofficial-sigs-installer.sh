@@ -1,11 +1,11 @@
 #!/bin/bash
 ##
-## Version      : 1.0.1
+## Version      : 1.0.2
 ## release d.d. : 28-12-2015
 ## Author       : L. van Belle
 ## E-mail       : louis@van-belle.nl
 ## Copyright    : Free as free can be, copy it, change it if needed.
-## ChangeLog    : few small bugfixed in transfering serureitinfo
+## ChangeLog    : added cleanup option
 ## -------------------------------------------------------------------
 ## This script downloads the latest clamav-unofficial-sigs for you from github.
 ## It config the script and/or updates the old version. 
@@ -28,12 +28,42 @@ if [ -n "$1" ] && [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo  "usage:"
     echo  " '$0 -h or --help' will print this message."
     echo  " '$0 -fd or --force-download' force the download of the latest clamav-unofficial-sigs from github."
+    echo  " '$0 -cu or --cleanup' to cleanup all files for clamav-unofficial-sigs, installed and downloaded."
+    echo  " '$0 -do or --download-only' to only download the latest extremeshok/clamav-unofficial-sigs from github."
     echo
     exit 0
 fi
 
+if [ "$1" = "-cu" ] || [ "$1" = "--cleanup" ]; then 
+    echo -n "Cleaning up all files."
+    rm -f /tmp/clamav-sigs/*
+    rm -f /usr/local/bin/clamav-unofficial-sigs.sh >/dev/null
+    rm -f /usr/local/sbin/clamav-unofficial-sigs.sh >/dev/null
+    rm -f /usr/share/man/man8/clamav-unofficial-sigs.8 >/dev/null
+    rm -f /etc/cron.d/clamav-unofficial-sigs-cron >/dev/null
+    rm -f /etc/logrotate.d/clamav-unofficial-sigs-logrotate >/dev/null
+    rm -f /etc/clamav/clamav-unofficial-sigs.conf >/dev/null
+    rm -f /etc/clamav-unofficial-sigs.conf >/dev/null
+fi
+
+if [ "$1" = "-do" ] || [ "$1" = "--download-only" ]; then 
+    if [ ! -d /tmp/clamav-sigs ]; then 
+	mkdir -p /tmp/clamav-sigs
+    fi
+    echo "Please wait a sec, downloading the latest version of clamav-unofficial-sigs"
+    wget -q --no-check-certificate https://github.com/extremeshok/clamav-unofficial-sigs/archive/master.zip \
+        -O /tmp/clamav-sigs/clamav-unofficial-sigs-${DATE_NOW}.zip 
+    if [ -z $(which unzip) ]; then 
+	echo "Missing unzip, please install first. " 
+	exit 1 
+    fi
+    unzip -j -qq -o /tmp/clamav-sigs/clamav-unofficial-sigs-${DATE_NOW}.zip -d /tmp/clamav-sigs/
+    echo "you can find you files in /tmp/clamav-sigs/" 
+fi
 
 ######### FUNCTIONS ANY_OS START, which should work for any os.
+DATE_NOW="$(date +%Y-%m-%d)"
+
 run_as_root_or_sudo() {
 # make sure this is being run by root
     if ! [[ $EUID -eq 0 ]]; then
@@ -552,7 +582,7 @@ configure_for_os_debian() {
 ############################################################################################################
 ######### CODE BEGIN, If done correct, its not needed to change anything below here.
 ############################################################################################################
-DATE_NOW="$(date +%Y-%m-%d)"
+
 
 run_as_root_or_sudo
 detect_and_get_os_variables
