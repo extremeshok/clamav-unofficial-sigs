@@ -409,6 +409,7 @@ else
     echo "You might want to check the user/group and rights in /etc/logrotate.d/clamav-unofficial-sigs-logrotate"
 fi
 
+if [ ! -e /etc/logrotate.d/clamav-unofficial-sigs-logrotate ]; then 
 cat << EOF >> /etc/logrotate.d/clamav-unofficial-sigs-logrotate
 /var/log/clamav/clamav-unofficial-sigs.log {
      weekly
@@ -419,9 +420,15 @@ cat << EOF >> /etc/logrotate.d/clamav-unofficial-sigs-logrotate
      create ${CLAMAV_LOGRIGHTS} ${CLAMAV_USER} ${CLAMAV_GROUP}
 }
 EOF
+else
+    echo "/etc/logrotate.d/clamav-unofficial-sigs-logrotate already exist"
+    echo "Please check your user/group/right in this file"
+    echo "we want ${CLAMAV_USER}/${CLAMAV_GROUP}/${CLAMAV_LOGRIGHTS}"
+fi
 }
 
 create_cron_per_os() {
+if [ ! -e /etc/logrotate.d/clamav-unofficial-sigs-logrotate ]; then 
 cat << EOF >> /etc/logrotate.d/clamav-unofficial-sigs-logrotate
 # The script is set to run hourly, at 45 minutes past the hour, and the
 # script itself is set to randomize the actual execution time between
@@ -430,6 +437,10 @@ cat << EOF >> /etc/logrotate.d/clamav-unofficial-sigs-logrotate
 
 45 * * * * root /bin/bash /usr/local/sbin/clamav-unofficial-sigs.sh  > /dev/null
 EOF
+else
+    echo "/etc/logrotate.d/clamav-unofficial-sigs-logrotate already exist"
+    echo "Please check if the path the file clamav-unofficial-sigs.sh is correct"
+fi
 }
 
 
