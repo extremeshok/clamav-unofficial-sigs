@@ -89,6 +89,13 @@ message_defaults_per_os() {
     echo "Change-ing config file to ${ID} standards."
 }
 
+check_packages_depends() {
+    if [ -z $(which unzip) ]; then 
+	echo "Missing unzip, please install first. " 
+	exit 1 
+    fi
+}
+
 
 clamav_unofficial_sigs_base() {
     # always update the needed files
@@ -387,6 +394,42 @@ import_old_settings_in_new_config_file() {
 
 }
 
+create_logrotate_per_os() {
+if [ ${ID} = "debian"]||[ ${ID} = "ubuntu"]; then 
+    CLAMAV_USER=clamav
+    CLAMAV_GROUP=amd
+    CLAMAV_LOGRIGHTS=0640
+else 
+    CLAMAV_USER=clam
+    CLAMAV_GROUP=clam
+    CLAMAV_LOGRIGHTS=0644
+    echo "You might want to check the user/group and rights in /etc/logrotate.d/clamav-unofficial-sigs-logrotate"
+fi
+
+cat << EOF >> /etc/logrotate.d/clamav-unofficial-sigs-logrotate
+/var/log/clamav/clamav-unofficial-sigs.log {
+     weekly
+     rotate 4
+     missingok
+     notifempty
+     compress
+     create ${CLAMAV_LOGRIGHTS} ${CLAMAV_USER} ${CLAMAV_GROUP}
+}
+EOF
+}
+
+create_cron_per_os() {
+cat << EOF >> /etc/logrotate.d/clamav-unofficial-sigs-logrotate
+# The script is set to run hourly, at 45 minutes past the hour, and the
+# script itself is set to randomize the actual execution time between
+# 60 - 600 seconds.  Adjust the cron start time, user account to run the
+# script under, and path information shown below to meet your own needs.
+
+45 * * * * root /bin/bash /usr/local/sbin/clamav-unofficial-sigs.sh  > /dev/null
+EOF
+}
+
+
 ######### FUNCTIONS ANY_OS END, which should work for any os.
 
 ############################################################################################################
@@ -500,12 +543,15 @@ DATE_NOW="$(date +%Y-%m-%d)"
 
 run_as_root_or_sudo
 detect_and_get_os_variables
+check_packages_depends
 
 detect_etc_clamav
 get_latest_clamav_unofficial_sigs_github_zip
 
 ## Per OS install/updates
 configure_for_os_${ID}
+create_logrotate_per_os
+create_cron_per_os
 
 ## make sure its config is set to yes.
 user_config_done_yes
