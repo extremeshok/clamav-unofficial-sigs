@@ -8,6 +8,10 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Description
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
 
+## In addition to the original master
+This fork provides an installer script, which is tested on debian Jessie and Wheezy. 
+New Linux distributions are easy to integrate. ( which is a ToDo ) 
+
 #### Try our custom spamassasin plugin: https://github.com/extremeshok/spamassassin-extremeshok_fromreplyto
 
 ### Quick Install Guide
