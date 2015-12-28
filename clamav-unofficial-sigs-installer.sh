@@ -428,7 +428,7 @@ fi
 }
 
 create_cron_per_os() {
-if [ ! -e /etc/logrotate.d/clamav-unofficial-sigs-logrotate ]; then 
+if [ ! -e /etc/cron.d/clamav-unofficial-sigs-cron ]; then 
 cat << EOF >> /etc/logrotate.d/clamav-unofficial-sigs-logrotate
 # The script is set to run hourly, at 45 minutes past the hour, and the
 # script itself is set to randomize the actual execution time between
