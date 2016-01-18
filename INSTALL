@@ -47,6 +47,7 @@ Uncompress/Unpackage the archive:
 
 Install:
    mkdir -p /usr/local/bin/
+   mkdir -p /var/log/clamav-unofficial-sigs/
    cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.sh /usr/local/sbin/clamav-unofficial-sigs.sh
    chmod +x /usr/local/sbin/clamav-unofficial-sigs.sh
    cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.conf /etc/clamav-unofficial-sigs.conf
