@@ -35,7 +35,10 @@ all files, databases, and work directories from the system if the '-r' (remove s
 
 
 Make sure you do not have the package installed via yum/apt
-  yum purge clamav-unofficial-sigs
+  Debian/Ubuntu:
+    apt-get purge clamav-unofficial-sigs
+  RHEL/CentOS:
+    yum purge clamav-unofficial-sigs
 
 Uncompress/Unpackage the tarball:
    tar -zxf clamav-unofficial-sigs.tar.gz
