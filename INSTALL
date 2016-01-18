@@ -33,26 +33,32 @@ INSTALLATION INSTRUCTIONS:
 WARNING:  Renaming any of the files included in the tarball may cause the script to fail to remove
 all files, databases, and work directories from the system if the '-r' (remove script) flag is used.
 
-
 Make sure you do not have the package installed via yum/apt
   Debian/Ubuntu:
     apt-get purge clamav-unofficial-sigs
   RHEL/CentOS:
     yum purge clamav-unofficial-sigs
+    
+Download the latest archive
+  wget -q --no-check-certificate https://github.com/extremeshok/clamav-unofficial-sigs/archive/master.zip -O /tmp/clamav-unofficial-sigs.zip 
 
-Uncompress/Unpackage the tarball:
-   tar -zxf clamav-unofficial-sigs.tar.gz
+Uncompress/Unpackage the archive:
+   unzip -j -qq -o /tmp/clamav-unofficial-sigs.zip -d /tmp/clamav-unofficial-sigs/
 
-Move into the package directory:
-   cd clamav-unofficial-sigs
-
-Make sure script files are executable and have the appropriate UID/GID set:
-   chmod 755 *.sh
-   chown <user>:<group> *.sh
+Install:
+   mkdir -p /usr/local/bin/
+   cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.sh /usr/local/sbin/clamav-unofficial-sigs.sh
+   chmod +x /usr/local/sbin/clamav-unofficial-sigs.sh
+   cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.conf /etc/clamav-unofficial-sigs.conf
+   cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
+   cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
+   cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs-logrotate /etc/logrotate.d/clamav-unofficial-sigs-logrotate   
 
 Configure:
-   Edit the clamav-unofficial-sigs.conf file
-   IMPORTANT CONFIGURATION CONSIDERATIONS:
+   Edit the /etc/clamav-unofficial-sigs.conf file
+   Edit the /etc/logrotate.d/clamav-unofficial-sigs-logrotate file
+   
+IMPORTANT CONFIGURATION CONSIDERATIONS:
    - Make sure that the PATH statement correctly defines the location of your binary files.  These
      include: find, sed, awk, cut, grep, tail, chown, chmod, cmp, diff, dig, host, gzip, ls, cp, mv,
      test, gpg, xargs, sleep, urandom, cksum, rsync, curl, socat, etc.  It has been reported that
@@ -62,13 +68,6 @@ Configure:
      running the script, please try editing the top line of the script file and changing "sh" to
      either "ksh" or "bash" before reporting a problem.
    - Adjust configuration settings to meet your system requirements.
-
-Install:
-   cp -f clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
-   cp -f clamav-unofficial-sigs.conf /etc/clamav-unofficial-sigs.conf
-   cp -f clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
-   cp -f clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
-   cp -f clamav-unofficial-sigs-logrotate /etc/logrotate.d/clamav-unofficial-sigs-logrotate
 
 ==================
 USAGE INFORMATION:
