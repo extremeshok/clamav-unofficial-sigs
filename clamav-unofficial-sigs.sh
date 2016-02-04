@@ -1132,8 +1132,8 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
            then
            xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good" ; true
          else
-          xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING" ; false
-          rm -f "$securiteinfo_dir/$db_file"
+          xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
+          rm -f "$securiteinfo_dir/$db_file" ; false
         fi && \
         (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
         if rsync -pcqt $securiteinfo_dir/$db_file $clam_dbs
@@ -1158,8 +1158,8 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
        then
        xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good" ; true
      else
-      xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING" ; false
-      rm -f "$securiteinfo_dir/$db_file"
+      xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
+      rm -f "$securiteinfo_dir/$db_file" ; false
     fi && \
     (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
     if rsync -pcqt $test_dir/$db_file $clam_dbs
@@ -1246,8 +1246,8 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
          then
          xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good" ; true
        else
-        xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING" ; false
-        rm -f "$linuxmalwaredetect_dir/$db_file"
+        xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING"
+        rm -f "$linuxmalwaredetect_dir/$db_file" ; false
       fi && \
       (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
       if rsync -pcqt $linuxmalwaredetect_dir/$db_file $clam_dbs
@@ -1272,8 +1272,8 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
      then
      xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good" ; true
    else
-    xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING" ; false
-    rm -f "$linuxmalwaredetect_dir/$db_file"
+    xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING"
+    rm -f "$linuxmalwaredetect_dir/$db_file" ; false
   fi && \
   (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
   if rsync -pcqt $test_dir/$db_file $clam_dbs
@@ -1462,8 +1462,8 @@ if [ "$yararules_enabled" == "yes" ] ; then
          then
          xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good" ; true
        else
-        xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD - SKIPPING" ; false
-        rm -f "$yararules_dir/$db_file"
+        xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD - SKIPPING"
+        rm -f "$yararules_dir/$db_file" ; false
       fi && \
       (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
       if rsync -pcqt $yararules_dir/$db_file $clam_dbs
@@ -1488,8 +1488,8 @@ if [ "$yararules_enabled" == "yes" ] ; then
      then
      xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good" ; true
    else
-    xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD - SKIPPING" ; false
-    rm -f "$yararules_dir/$db_file"
+    xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD - SKIPPING"
+    rm -f "$yararules_dir/$db_file" ; false
   fi && \
   (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
   if rsync -pcqt $test_dir/$db_file $clam_dbs
