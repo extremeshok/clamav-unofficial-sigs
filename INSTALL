@@ -49,7 +49,7 @@ Install:
    mkdir -p /usr/local/bin/
    mkdir -p /var/log/clamav-unofficial-sigs/
    cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
-   chmod +x /usr/local/sbin/clamav-unofficial-sigs.sh
+   chmod +x /usr/local/bin/clamav-unofficial-sigs.sh
    cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.conf /etc/clamav-unofficial-sigs.conf
    cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
    cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs-cron /etc/cron.d/clamav-unofficial-sigs-cron
