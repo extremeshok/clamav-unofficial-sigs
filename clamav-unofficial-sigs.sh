@@ -1437,6 +1437,11 @@ if [ "$yararules_enabled" == "yes" ] ; then
   xshok_pretty_echo_and_log "Checking for yararules updates..."
   yararules_updates="0"
   for db_file in $yararules_dbs ; do
+   if echo $db_file|grep -q "/"; then
+    yr_dir="/"`echo $db_file | cut -d"/" -f1`
+    db_file=`echo $db_file | cut -d"/" -f2`
+   else yr_dir=""
+   fi
     if [ "$loop" = "1" ] ; then
       xshok_pretty_echo_and_log "---"      
     fi
@@ -1449,7 +1454,7 @@ if [ "$yararules_enabled" == "yes" ] ; then
     z_opt=""
   fi
   if curl $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" \
-   --max-time "$curl_max_time" -L -R $z_opt -o $yararules_dir/$db_file "$yararules_url/$db_file"
+   --max-time "$curl_max_time" -L -R $z_opt -o $yararules_dir/$db_file "$yararules_url$yr_dir/$db_file"
    then
    loop="1"
    if ! cmp -s $yararules_dir/$db_file $clam_dbs/$db_file ; then
