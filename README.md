@@ -76,6 +76,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Fixes for not removing dirs by @msapiro 
  - Updates by to account for changed names and addition of sub-directories for Yara-Rules by @msapiro
  - Use MD5 with MalwarePatrol by @olivier2557
+ - Suppress the header and config loading message if running via cron
  - minor code refactoring
 
 ### Version 4.9.2 (updated 2015-12-02)
