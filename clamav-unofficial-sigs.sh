@@ -144,7 +144,7 @@ help_and_usage () {
 
 #Script Info
 version="5.0.0"
-minimum_required_config_version="53"
+minimum_required_config_version="55"
 version_date="XXX XXXXXX 2016"
 
 #Initialise 
@@ -755,6 +755,26 @@ while true; do
 esac
 done
 
+# Set the variables for MalwarePatrol
+if [ "$malwarepatrol_free" == "yes" ] ; then
+  malwarepatrol_product_code="8"
+  malwarepatrol_list="clamav_basic"
+else
+  if [ -z $malwarepatrol_list ] ; then
+    malwarepatrol_list="clamav_basic"
+  fi
+  if [ -z $malwarepatrol_product_code ] ; then
+    # Not sure, it may be better to return an error.
+    malwarepatrol_product_code=8
+  fi
+fi
+if [ $malwarepatrol_list == "clamav_basic" ] ; then
+  malwarepatrol_db="malwarepatrol.db"
+else
+  malwarepatrol_db="malwarepatrol.ndb"
+fi
+malwarepatrol_url="$malwarepatrol_url?product=$malwarepatrol_product_code&list=$malwarepatrol_list"
+
 # If "ham_dir" variable is set, then create initial whitelist files (skipped if first-time script run).
 test_dir="$work_dir/test"
 if [ -n "$ham_dir" -a -d "$work_dir" -a ! -d "$test_dir" ] ; then
@@ -1327,100 +1347,146 @@ fi
 ##########################################################################################################################################
 if [ "$malwarepatrol_enabled" == "yes" ] ; then
   if [ "$malwarepatrol_receipt_code" != "YOUR-RECEIPT-NUMBER" ] ; then
-    if [ -n "$malwarepatrol_db" ] ; then
-     if [ -r "$config_dir/last-mbl-update.txt" ] ; then
-       last_malwarepatrol_update=`cat $config_dir/last-mbl-update.txt`
-     else
-       last_malwarepatrol_update="0"
-     fi
-     db_file=""
-     update_interval=$(($malwarepatrol_update_hours * 3600))
-     time_interval=$(($current_time - $last_malwarepatrol_update))
-     if [ "$time_interval" -ge $(($update_interval - 600)) ] ; then
-      echo "$current_time" > "$config_dir"/last-mbl-update.txt
-      xshok_pretty_echo_and_log "Checking for MalwarePatrol updates..."
-              # Delete the old MBL (mbl.db) database file if it exists and start using the newer
-              # format (mbl.ndb) database file instead.
-              # test -e $clam_dbs/$malwarepatrol_db -o -e $clam_dbs/$malwarepatrol_db-bak && rm -f -- "$clam_dbs/mbl.d*"
+	if [ -n "$malwarepatrol_db" ] ; then
+	    if [ -r "$config_dir/last-mbl-update.txt" ] ; then
+		last_malwarepatrol_update=`cat $config_dir/last-mbl-update.txt`
+	    else
+		last_malwarepatrol_update="0"
+	    fi
+	    db_file=""
+	    update_interval=$(($malwarepatrol_update_hours * 3600))
+	    time_interval=$(($current_time - $last_malwarepatrol_update))
+	    if [ "$time_interval" -ge $(($update_interval - 600)) ] ; then
+		echo "$current_time" > "$config_dir"/last-mbl-update.txt
+		xshok_pretty_echo_and_log "Checking for MalwarePatrol updates..."
+		# Delete the old MBL (mbl.db) database file if it exists and start using the newer
+		# format (mbl.ndb) database file instead.
+		# test -e $clam_dbs/$malwarepatrol_db -o -e $clam_dbs/$malwarepatrol_db-bak && rm -f -- "$clam_dbs/mbl.d*"
+		
+		# remove the .db is th new format if ndb and
+		# symetrically
+		if [ "$malwarepatrol_db" == "malwarepatrol.db" -a \
+					 -f "$clam_dbs/malwarepatrol.ndb" ] ; then
+		    rm "$clam_dbs/malwarepatrol.ndb";
+		fi
+		
+		if [ "$malwarepatrol_db" == "malwarepatrol.ndb" -a \
+					 -f "$clam_dbs/malwarepatrol.db" ] ; then
+		    rm "$clam_dbs/malwarepatrol.db";
+		fi
+		
+		xshok_pretty_echo_and_log "MalwarePatrol $db_file Database File Update" "="
+		
+		malwarepatrol_reloaded=0
+		if [ "$malwarepatrol_free" == "yes" ] ; then
+		    if curl $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" \
+			    --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+		    then
+			if ! cmp -s $malwarepatrol_dir/$malwarepatrol_db $clam_dbs/$malwarepatrol_db 
+			then
+			    if [ "$?" = "0" ] ; then
+				malwarepatrol_reloaded=1
+			    else
+				malwarepatrol_reloaded=2
+			    fi
+			fi
+		    else # curl failed
+			malwarepatrol_reloaded=-1
+		    fi # if culr
 
-              xshok_pretty_echo_and_log "MalwarePatrol $db_file Database File Update" "="
-              
-              if [ "$malwarepatrol_free" == "yes" ] ; then
-                malwarepatrol_url=$malwarepatrol_free_url
-              else
-                malwarepatrol_url=$malwarepatrol_subscription_url
-              fi
-
-              if curl $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" \
-               --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
-               then
-               if ! cmp -s $malwarepatrol_dir/$malwarepatrol_db $clam_dbs/$malwarepatrol_db 
-                 then
-                 if [ "$?" = "0" ] ; then
-
-                   xshok_pretty_echo_and_log "Testing updated MalwarePatrol database file: $malwarepatrol_db"
-                   if clamscan --quiet -d "$malwarepatrol_dir/$malwarepatrol_db" "$config_dir/scan-test.txt" 2>/dev/null
+		else # The not free branch
+		    if curl $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" \
+			    --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db.md5 "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
+		    then
+			if [ -f $clam_dbs/$malwarepatrol_db ] ; then
+			    malwarepatrol_md5=`openssl md5 -r $clam_dbs/$malwarepatrol_db | cut -d" " -f1`
+			fi
+			malwarepatrol_md5_new=`cat $malwarepatrol_dir/$malwarepatrol_db.md5`
+			if [ -n "$malwarepatrol_md5_new" -a \
+				"$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ;
+			then
+			    if curl $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" \
+				    --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+			    then
+				malwarepatrol_reloaded=1
+			    else # curl DB fail
+				malwarepatrol_reloaded=-1
+			    fi # curl DB
+			fi # MD5 not equal
+		    else # curl MD5 fail
+			malwarepatrol_reloaded=-1
+		    fi # curl md5
+		fi # if free
+		
+		case "$malwarepatrol_reloaded" in 
+		    1) # database was updated, need test and reload 
+		    xshok_pretty_echo_and_log "Testing updated MalwarePatrol database file: $malwarepatrol_db"
+                    if clamscan --quiet -d "$malwarepatrol_dir/$malwarepatrol_db" "$config_dir/scan-test.txt" 2>/dev/null
                     then
-                    xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good" ; true
-                  else
-                   xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING" ; false
-                 fi && \
-                 (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && \
-                 if rsync -pcqt $malwarepatrol_dir/$malwarepatrol_db $clam_dbs
-                  then
-                  perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
-                  xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
-                  malwarepatrol_update=1
-                  do_clamd_reload=1
-                else
-                 xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
-               fi
-             else
-               grep -h -v -f "$config_dir/whitelist.hex" "$malwarepatrol_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
-               clamscan --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | \
-               command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
-               grep -h -f "$config_dir/whitelist.txt" "$test_dir/$malwarepatrol_db" | \
-               cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
-               grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
-               mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
-               if clamscan --quiet -d "$test_dir/$malwarepatrol_db" "$config_dir/scan-test.txt" 2>/dev/null
-                then
-                xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good" ; true
-              else
-               xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING" ; false
-             fi && \
-             (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && \
-             if rsync -pcqt $test_dir/$malwarepatrol_db $clam_dbs
-              then
-              perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
-              xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
-              malwarepatrol_update=1
-              do_clamd_reload=1
-            else
-             xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
-           fi
-         fi
-       else
-
-        xshok_pretty_echo_and_log "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
-      fi
-    else
-      xshok_pretty_echo_and_log "WARNING - Failed curl connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
-    fi
-  else
-
-   xshok_pretty_echo_and_log "MalwarePatrol Database File Update" "="
-
-   time_remaining=$(($update_interval - $time_interval))
-   hours_left=$(($time_remaining / 3600))
-   minutes_left=$(($time_remaining % 3600 / 60))
-   xshok_pretty_echo_and_log "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
-   xshok_pretty_echo_and_log "No database download was performed at this time" "-"
-   xshok_pretty_echo_and_log "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+			xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good" ; true
+                    else
+			xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING" ; false
+                    fi && \
+			(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && \
+			if rsync -pcqt $malwarepatrol_dir/$malwarepatrol_db $clam_dbs
+			then
+			    perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
+			    xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
+			    malwarepatrol_update=1
+			    do_clamd_reload=1
+			else
+			    xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
+			fi
+		    ;; # The strange case when $? != 0 in the original
+		    2)
+		    grep -h -v -f "$config_dir/whitelist.hex" "$malwarepatrol_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
+		    clamscan --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | \
+			command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$config_dir/whitelist.txt"
+		    grep -h -f "$config_dir/whitelist.txt" "$test_dir/$malwarepatrol_db" | \
+			cut -d "*" -f2 | sort | uniq >> "$config_dir/whitelist.hex"
+		    grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
+		    mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
+		    if clamscan --quiet -d "$test_dir/$malwarepatrol_db" "$config_dir/scan-test.txt" 2>/dev/null
+                    then
+			xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good" ; true
+		    else
+			xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING" ; false
+		    fi && \
+			(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && \
+			if rsync -pcqt $test_dir/$malwarepatrol_db $clam_dbs
+			then
+			    perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
+			    xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
+			    malwarepatrol_update=1
+			    do_clamd_reload=1
+			else
+			    xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
+			fi
+		    ;;
+		    0) # The database did not update
+		    xshok_pretty_echo_and_log "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
+		    ;;
+		    -1) # Curl failed
+		    xshok_pretty_echo_and_log "WARNING - Failed curl connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
+		    ;;
+		esac
+						
+	    else
+		
+		xshok_pretty_echo_and_log "MalwarePatrol Database File Update" "="
+		
+		time_remaining=$(($update_interval - $time_interval))
+		hours_left=$(($time_remaining / 3600))
+		minutes_left=$(($time_remaining % 3600 / 60))
+		xshok_pretty_echo_and_log "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
+		xshok_pretty_echo_and_log "No database download was performed at this time" "-"
+		xshok_pretty_echo_and_log "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+	    fi
+	fi
+  fi
  fi
-fi
-fi
-fi
+## MEOW POSSIBLY MISSING OR EXTRA fi....
+
 
 ##############################################################################################################################################
 # Check for updated yararules database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
