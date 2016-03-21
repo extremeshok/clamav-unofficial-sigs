@@ -3,15 +3,6 @@
 # WILL BE MERGED INTO MAINLINE ONCE DONE
 ##############
 
-## TODO
-* selinux detection
-* selinux fixes
-* md5 checks
-* silence output when under cron
-* code refactoring
-* user config
-* reworked install and uninstall
-
 # clamav-unofficial-sigs
 ClamAV Unofficial Signatures Updater
 
@@ -68,7 +59,25 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
 Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/projects/linux-malware-detect/
  - Enabled by default, no configuration required
 
+## TODO
+* selinux detection
+* selinux fixes
+* silence output when under cron
+* code refactoring
+* user config
+* reworked install and uninstall
+
+
 ## Change Log
+### Version 5.0.0 (updated 2016-XX-XX)
+ - eXtremeSHOK.com Maintenance 
+ - Added porcupine.hsb : Sha256 Hashes of VBS and JSE malware Database from sanesecurity
+ - Fix for missing $ for clamd_pid an incorrect variable definition
+ - Fixes for not removing dirs by @msapiro 
+ - Updates by to account for changed names and addition of sub-directories for Yara-Rules by @msapiro
+ - Use MD5 with MalwarePatrol by @olivier2557
+ - minor code refactoring
+
 ### Version 4.9.2 (updated 2015-12-02)
  - eXtremeSHOK.com Maintenance 
  - Added function xshok_check_s2 to prevent possible errors with -c and no configfile path
