@@ -1,3 +1,17 @@
+# DO NOT USE THIS BRANCH
+# CURRENTLY UNDER ACTIVE DEVELOPMENT
+# WILL BE MERGED INTO MAINLINE ONCE DONE
+##############
+
+## TODO
+* selinux detection
+* selinux fixes
+* md5 checks
+* silence output when under cron
+* code refactoring
+* user config
+* reworked install and uninstall
+
 # clamav-unofficial-sigs
 ClamAV Unofficial Signatures Updater
 
