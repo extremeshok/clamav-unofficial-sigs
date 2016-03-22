@@ -86,6 +86,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added support for the user defined config override file: clamav-unofficial-sigs.conf.override
  - Added systemd files by @falon
  - Added config option remove_bad_database,  a database with a BAD integrity check will be removed
+ - Fixed broken whitelisting of malwarepatrol signatures
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)

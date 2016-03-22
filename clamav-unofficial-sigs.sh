@@ -615,7 +615,7 @@ add_signature_whitelist_entry () {
 	if [ -n "$input" ] ; then
 		cd "$clam_dbs"
 		input=`echo "$input" | tr -d "'" | tr -d '"'`
-		sig_full=`grep -H "$input:" *.ndb`
+		sig_full=`grep -H "$input" *.*db`
 		sig_name=`echo "$sig_full" | cut -d ":" -f2`
 		if [ -n "$sig_name" ] ; then
 			if ! grep "$sig_name" my-whitelist.ign2 > /dev/null 2>&1
@@ -630,40 +630,40 @@ add_signature_whitelist_entry () {
 						perms chown $clam_user:$clam_group my-whitelist.ign2
 
 						if [ ! -s "$config_dir/monitor-ign.txt" ] ; then 
-                                  # Create "monitor-ign.txt" file for clamscan database integrity testing.
-                                  echo "This is the monitor ignore file..." > "$config_dir/monitor-ign.txt"
-                                fi
+              # Create "monitor-ign.txt" file for clamscan database integrity testing.
+              echo "This is the monitor ignore file..." > "$config_dir/monitor-ign.txt"
+            fi
 
-                                chmod 0644 my-whitelist.ign2 "$config_dir/monitor-ign.txt"
-                                clamscan_reload_dbs
+            chmod 0644 my-whitelist.ign2 "$config_dir/monitor-ign.txt"
+            clamscan_reload_dbs
 
-                                echo "Signature '$input' has been added to my-whitelist.ign2 and"
-                                echo "all databases have been reloaded.  The script will track any changes"
-                                echo "to the offending signature and will automatically remove it if the"
-                                echo "signature is modified or removed from the third-party database."
-                              else
+            echo "Signature '$input' has been added to my-whitelist.ign2 and"
+            echo "all databases have been reloaded.  The script will track any changes"
+            echo "to the offending signature and will automatically remove it if the"
+            echo "signature is modified or removed from the third-party database."
+          else
 
-                              	echo "Failed to successfully update my-whitelist.ign2 file - SKIPPING."
-                              fi
-                            else
+          	echo "Failed to successfully update my-whitelist.ign2 file - SKIPPING."
+          fi
+        else
 
-                            	echo "Clamscan reports my-whitelist.ign2 database integrity is bad - SKIPPING."
-                            fi
-                          else
+        	echo "Clamscan reports my-whitelist.ign2 database integrity is bad - SKIPPING."
+        fi
+      else
 
-                          	echo "Signature '$input' already exists in my-whitelist.ign2 - no action taken."
-                          fi
-                        else
+      	echo "Signature '$input' already exists in my-whitelist.ign2 - no action taken."
+      fi
+    else
 
-                        	echo "Signature '$input' could not be found."
+    	echo "Signature '$input' could not be found."
 
-                        	echo "This script will only create a whitelise entry in my-whitelist.ign2 for ClamAV"
-                        	echo "'UNOFFICIAL' third-Party signatures as found in the *.ndb databases."
-                        fi
-                      else
-                      	echo "No input detected - no action taken."
-                      fi
-                    }
+    	echo "This script will only create a whitelise entry in my-whitelist.ign2 for ClamAV"
+    	echo "'UNOFFICIAL' third-Party signatures as found in the *.ndb *.hdb *.db databases."
+    fi
+  else
+  	echo "No input detected - no action taken."
+  fi
+}
 
 
 #Clamscan reload database
@@ -1088,18 +1088,22 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
       				--verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
       			fi
       			if [ "$?" = "0" ] ; then
-      				test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database" ; true
+      				test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
+      				true
       			else
-      				xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING" ; false
+      				xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING" 
+      				false
       			fi
       			if [ "$?" = "0" ] ; then
       				db_ext=`echo $db_file | cut -d "." -f2`
       				if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
       					if clamscan --quiet -d "$sanesecurity_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
       						then
-      						xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good" ; true
+      						xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
+      						true
       					else
-      						xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD - SKIPPING" ; false
+      						xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD - SKIPPING"
+      						false
       					fi && \
       					(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
       					if rsync -pcqt $sanesecurity_dir/$db_file $clam_dbs
@@ -1109,7 +1113,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
       						sanesecurity_update=1
       						do_clamd_reload=1
       					else
-      						xshok_pretty_echo_and_log "Failed to successfully update Sanesecurity production database file: $db_file - SKIPPING" ; false
+      						xshok_pretty_echo_and_log "Failed to successfully update Sanesecurity production database file: $db_file - SKIPPING"
+      						false
       					fi
       				else
       					grep -h -v -f "$config_dir/whitelist.hex" "$sanesecurity_dir/$db_file" > "$test_dir/$db_file"
@@ -1121,9 +1126,11 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
       					mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
       					if clamscan --quiet -d "$test_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
       						then
-      						xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good" ; true
+      						xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
+      						true
       					else
-      						xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD - SKIPPING" ; false
+      						xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD - SKIPPING"
+      						false
       					fi && \
       					(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
       					if rsync -pcqt $test_dir/$db_file $clam_dbs
@@ -1204,10 +1211,12 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 									then
 									if clamscan --quiet -d "$securiteinfo_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
 										then
-										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good" ; true
+										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
+										true
 									else
 										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
-										rm -f "$securiteinfo_dir/$db_file" ; false
+										rm -f "$securiteinfo_dir/$db_file"
+										false
 									fi && \
 									(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
 									if rsync -pcqt $securiteinfo_dir/$db_file $clam_dbs
@@ -1230,10 +1239,12 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 									mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
 									if clamscan --quiet -d "$test_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
 										then
-										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good" ; true
+										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
+										true
 									else
 										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
-										rm -f "$securiteinfo_dir/$db_file" ; false
+										rm -f "$securiteinfo_dir/$db_file"
+										false
 									fi && \
 									(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
 									if rsync -pcqt $test_dir/$db_file $clam_dbs
@@ -1318,10 +1329,12 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
 								if clamscan --quiet -d "$linuxmalwaredetect_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
 									then
-									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good" ; true
+									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
+									true
 								else
 									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING"
-									rm -f "$linuxmalwaredetect_dir/$db_file" ; false
+									rm -f "$linuxmalwaredetect_dir/$db_file"
+									false
 								fi && \
 								(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
 								if rsync -pcqt $linuxmalwaredetect_dir/$db_file $clam_dbs
@@ -1344,10 +1357,12 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 								mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
 								if clamscan --quiet -d "$test_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
 									then
-									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good" ; true
+									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
+									true
 								else
 									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING"
-									rm -f "$linuxmalwaredetect_dir/$db_file" ; false
+									rm -f "$linuxmalwaredetect_dir/$db_file"
+									false
 								fi && \
 								(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
 								if rsync -pcqt $test_dir/$db_file $clam_dbs
@@ -1470,9 +1485,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 xshok_pretty_echo_and_log "Testing updated MalwarePatrol database file: $malwarepatrol_db"
 if clamscan --quiet -d "$malwarepatrol_dir/$malwarepatrol_db" "$config_dir/scan-test.txt" 2>/dev/null
 	then
-	xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good" ; true
+	xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
+	true
 else
-	xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING" ; false
+	xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING"
+	false
 fi && \
 (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && \
 if rsync -pcqt $malwarepatrol_dir/$malwarepatrol_db $clam_dbs
@@ -1495,10 +1512,12 @@ grep -h -v -f "$config_dir/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test
 mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
 if clamscan --quiet -d "$test_dir/$malwarepatrol_db" "$config_dir/scan-test.txt" 2>/dev/null
 	then
-	xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good" ; true
+	xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
+	true
 else
-	xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING" ; false
-fi && \
+	xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING"
+	false
+fi && 
 (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && \
 if rsync -pcqt $test_dir/$malwarepatrol_db $clam_dbs
 	then
@@ -1585,10 +1604,12 @@ if [ "$yararules_enabled" == "yes" ] ; then
 							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
 								if clamscan --quiet -d "$yararules_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
 									then
-									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good" ; true
+									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good"
+									true
 								else
 									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD - SKIPPING"
-									rm -f "$yararules_dir/$db_file" ; false
+									rm -f "$yararules_dir/$db_file"
+									false
 								fi && \
 								(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
 								if rsync -pcqt $yararules_dir/$db_file $clam_dbs
@@ -1611,10 +1632,12 @@ if [ "$yararules_enabled" == "yes" ] ; then
 								mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
 								if clamscan --quiet -d "$test_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
 									then
-									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good" ; true
+									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good"
+									true
 								else
 									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD - SKIPPING"
-									rm -f "$yararules_dir/$db_file" ; false
+									rm -f "$yararules_dir/$db_file"
+									false
 								fi && \
 								(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
 								if rsync -pcqt $test_dir/$db_file $clam_dbs
@@ -1689,9 +1712,11 @@ if [ -n "$add_dbs" ] ; then
 			xshok_pretty_echo_and_log "Testing updated database file: $db_file"
 			clamscan --quiet -d "$add_dir/$db_file" "$config_dir/scan-test.txt" 2>/dev/null
 			if [ "$?" = "0" ] ; then
-				xshok_pretty_echo_and_log "Clamscan reports $db_file database integrity tested good" ; true
+				xshok_pretty_echo_and_log "Clamscan reports $db_file database integrity tested good"
+				true
 			else
-				xshok_pretty_echo_and_log "Clamscan reports User Added $db_file database integrity tested BAD - SKIPPING" ; false
+				xshok_pretty_echo_and_log "Clamscan reports User Added $db_file database integrity tested BAD - SKIPPING"
+				false
 			fi && \
 			(test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && \
 			if rsync -pcqt $add_dir/$db_file $clam_dbs
