@@ -93,6 +93,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Version command option -v replaced with -V 
  - Added command option -v (--verbose) to force verbose output
  - Removed config options: silence_ssl, curl_silence, rsync_silence, gpg_silence, comment_silence
+ - Added ignore_ssl option to supress ssl errors and warnings, ie operate in insecure mode.
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)

@@ -163,7 +163,7 @@ if [ -t 1 ] ; then
 	xshok_pretty_echo_and_log "" "#" "80"
 	xshok_pretty_echo_and_log " eXtremeSHOK.com ClamAV Unofficial Signature Updater"
 	xshok_pretty_echo_and_log " Version: v$version ($version_date)"
-	xshok_pretty_echo_and_log " Required configuration version: v$minimum_required_config_version+"
+	xshok_pretty_echo_and_log " Required Configuration Version: v$minimum_required_config_version"
 	xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 	xshok_pretty_echo_and_log "" "#" "80"
 	#verbose
@@ -1035,8 +1035,8 @@ echo "$gpg_dir/trustdb.gpg" >> "$purge"
 echo "$log_file_path/$log_file_name*" >> "$purge"
 echo "$purge" >> "$purge"
 
-# Silence rsync output and only report errors - useful if script is run via cron.
-if [ "$silence_ssl" = "yes" ] ; then
+# Ignore SSL errors
+if [ "$ignore_ssl" = "yes" ] ; then
 	curl_insecure="--insecure"
 fi
 
