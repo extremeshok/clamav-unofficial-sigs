@@ -1047,7 +1047,7 @@ fi
 if [ "$curl_silence" = "yes" ] ; then
 	curl_output_level="-s -S"
 else
-	curl_output_level="-#"
+	curl_output_level=""
 fi
 
 #check_clamav
