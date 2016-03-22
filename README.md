@@ -83,7 +83,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added porcupine.hsb : Sha256 Hashes of VBS and JSE malware Database from sanesecurity
  - Fix for missing $ for clamd_pid an incorrect variable definition
  - Fixes for not removing dirs by @msapiro 
- - Updates by to account for changed names and addition of sub-directories for Yara-Rules by @msapiro
+ - Updates to account for changed names and addition of sub-directories for Yara-Rules by @msapiro
  - Use MD5 with MalwarePatrol by @olivier2557
  - Suppress the header and config loading message if running via cron
  - Added support for the user defined config override file: clamav-unofficial-sigs.conf.override
