@@ -32,11 +32,13 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 Create the file /etc/clamav-unofficial-sigs.override.conf and specify your own config options which will aways overridde the default config file options.
 This is to allow certain settings to survive updates/changes of the main config file
 
+#### Check if signature are being loaded
+**Run the following command to display which signatures are being loaded by clamav
+```clamscan --debug 2>&1 /dev/null | grep "loaded"```
+
 #### SELinux cron permission fix
 > WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
-
 **Run the following command to allow clamav selinux support**
-
 ```setsebool -P antivirus_can_scan_system true```
 
 ### Yara Rule Support (as of June 2015)
