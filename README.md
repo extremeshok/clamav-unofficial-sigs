@@ -90,10 +90,13 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added systemd files by @falon
  - Added config option remove_bad_database,  a database with a BAD integrity check will be removed
  - Fixed broken whitelisting of malwarepatrol signatures
- - Version command option -v replaced with -V 
+ - Replaced Version command option -v with -V 
  - Added command option -v (--verbose) to force verbose output
  - Removed config options: silence_ssl, curl_silence, rsync_silence, gpg_silence, comment_silence
  - Added ignore_ssl option to supress ssl errors and warnings, ie operate in insecure mode.
+ - Replaced test-database command option -s with -t
+ - Replaced output-triggered command option -t with -o
+ 
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)
@@ -297,10 +300,10 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 -r, --remove-script     Remove the clamav-unofficial-sigs script and all of
         its associated files and databases from the system
 
--s, --test-database     Clamscan integrity test a specific database file
+-t, --test-database     Clamscan integrity test a specific database file
         eg: '-s filename.ext' (do not include file path)
 
--t, --output-triggered  If HAM directory scanning is enabled in the script's
+-o, --output-triggered  If HAM directory scanning is enabled in the script's
         configuration file, then output names of any third-party
         signatures that triggered during the HAM directory scan
 

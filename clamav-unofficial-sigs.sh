@@ -116,6 +116,8 @@ help_and_usage () {
 
   echo -e "\n${BOLD}-V${NORM}, ${BOLD}--version${NORM}\tOutput script version and date information"
 
+  echo -e "\n${BOLD}-v${NORM}, ${BOLD}--verbose${NORM}\tBe verbose, enabled when not run under cron"
+
   echo -e "\n${BOLD}-d${NORM}, ${BOLD}--decode-sig${NORM}\tDecode a third-party signature either by signature name\n\t(eg: Sanesecurity.Junk.15248) or hexadecimal string.\n\tThis flag will 'NOT' decode image signatures"
 
   echo -e "\n${BOLD}-e${NORM}, ${BOLD}--encode-string${NORM}\tHexadecimal encode an entire input string that can\n\tbe used in any '*.ndb' signature database file"
@@ -130,9 +132,9 @@ help_and_usage () {
 
   echo -e "\n${BOLD}-r${NORM}, ${BOLD}--remove-script${NORM}\tRemove the clamav-unofficial-sigs script and all of\n\tits associated files and databases from the system"
 
-  echo -e "\n${BOLD}-s${NORM}, ${BOLD}--test-database${NORM}\tClamscan integrity test a specific database file\n\teg: '-s filename.ext' (do not include file path)"
+  echo -e "\n${BOLD}-t${NORM}, ${BOLD}--test-database${NORM}\tClamscan integrity test a specific database file\n\teg: '-s filename.ext' (do not include file path)"
 
-  echo -e "\n${BOLD}-t${NORM}, ${BOLD}--output-triggered${NORM}\tIf HAM directory scanning is enabled in the script's\n\tconfiguration file, then output names of any third-party\n\tsignatures that triggered during the HAM directory scan"
+  echo -e "\n${BOLD}-o${NORM}, ${BOLD}--output-triggered${NORM}\tIf HAM directory scanning is enabled in the script's\n\tconfiguration file, then output names of any third-party\n\tsignatures that triggered during the HAM directory scan"
 
   echo -e "\n${BOLD}-w${NORM}, ${BOLD}--whitelist${NORM}\tAdds a signature whitelist entry in the newer ClamAV IGN2\n\tformat to 'my-whitelist.ign2' in order to temporarily resolve\n\ta false-positive issue with a specific third-party signature.\n\tScript added whitelist entries will automatically be removed\n\tif the original signature is either modified or removed from\n\tthe third-party signature database" 
 
@@ -817,8 +819,8 @@ while true; do
 -i | --information ) output_system_configuration_information; exit; break ;;
 -m | --make-database ) make_signature_database_from_ascii_file; exit; break ;;
 -r | --remove-script ) make_signature_database_from_ascii_file; exit; break ;;
--s | --test-database ) clamscan_integrity_test_specific_database_file; exit; break ;;
--t | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
+-t | --test-database ) clamscan_integrity_test_specific_database_file; exit; break ;;
+-o | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
 -w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
 --check-clamav ) check_clamav; exit; break ;;
 * ) break ;;
