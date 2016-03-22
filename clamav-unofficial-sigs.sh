@@ -55,31 +55,31 @@ function perms () {
 # pretty_echo_and_log "" "/\" "7"
 # /\/\/\/\/\/\
 function xshok_pretty_echo_and_log () { #"string" "repeating" "count"
-# handle comments
-if [ "$comment_silence" = "no" ] ; then
-	if [ "${#@}" = "1" ] ; then
-		echo "$1"
-	else
-		myvar=""
-		if [ -n "$3" ] ; then
-			mycount="$3"
+	# handle comments
+	if [ "$comment_silence" = "no" ] ; then
+		if [ "${#@}" = "1" ] ; then
+			echo "$1"
 		else
-			mycount="${#1}"
-		fi
-		for (( n = 0; n < $mycount; n++ )) ; do 
-			myvar="$myvar$2"
-		done
-		if [ "$1" != "" ] ; then
-			echo -e "$myvar\n$1\n$myvar"
-		else  
-			echo -e "$myvar"
+			myvar=""
+			if [ -n "$3" ] ; then
+				mycount="$3"
+			else
+				mycount="${#1}"
+			fi
+			for (( n = 0; n < $mycount; n++ )) ; do 
+				myvar="$myvar$2"
+			done
+			if [ "$1" != "" ] ; then
+				echo -e "$myvar\n$1\n$myvar"
+			else  
+				echo -e "$myvar"
+			fi
 		fi
 	fi
-fi
-# handle logging
-if [ "$enable_logging" = "yes" ] ; then
-	echo `date "+%b %d %T"` "$1" >> "$log_file_path/$log_file_name"
-fi
+	# handle logging
+	if [ "$enable_logging" = "yes" ] ; then
+		echo `date "+%b %d %T"` "$1" >> "$log_file_path/$log_file_name"
+	fi
 }
 
 # function to check if the $2 value is not null and does not start with -
@@ -95,31 +95,13 @@ function xshok_check_s2 () {
 	fi
 }
 
-#Detect if terminal
-if [ -t 1 ] ; then
-	#Set fonts
-	##Usage: echo "${BOLD}-a${NORM}"
-	BOLD=`tput bold`
-	REV=`tput smso`
-	NORM=`tput sgr0`
-	#Verbose
-	force_verbose="yes"
-else
-	#Null Fonts
-	BOLD=''
-	REV=''
-	NORM=''
-	#silence
-	force_verbose="no"
-fi
-
 #function for help and usage
 function help_and_usage () {
 	echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
 
 	echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tDirect script to use a specific configuration file\n\teg: '-c /path/to/`basename $default_config`'\n\tOptional if the default config is available\n\tDefault: $default_config"
 
-	echo -e "\n${BOLD}--force${NORM}\t\tForce all databases to be downloaded, could cause ip to be blocked"
+	echo -e "\n${BOLD}-F${BOLD}--force${NORM}\t\tForce all databases to be downloaded, could cause ip to be blocked"
 
 	echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
 
@@ -164,22 +146,36 @@ version_date="XXX XXXXXX 2016"
 do_clamd_reload="0"
 comment_silence="no"
 enable_logging="no"
+forced_updates="no"
 
 # Use the Default Config by default
 config_source=$default_config
 
-#default disable forced updates
-forced_updates="no"
+#Detect if terminal
+if [ -t 1 ] ; then
+	#Set fonts
+	##Usage: echo "${BOLD}-a${NORM}"
+	BOLD=`tput bold`
+	REV=`tput smso`
+	NORM=`tput sgr0`
+	#Verbose
+	force_verbose="yes"
+else
+	#Null Fonts
+	BOLD=''
+	REV=''
+	NORM=''
+	#silence
+	force_verbose="no"
+fi
 
 # Generic command line options
 while true ; do
 	case "$1" in
 		-c | --config ) xshok_check_s2 $2; config_source="$2"; shift 2; break ;;
-		--force ) force_updates="yes"; shift 1; break ;;
+		-F | --force ) force_updates="yes"; shift 1; break ;;
 		-v | --verbose ) force_verbose="yes"; shift 1; break ;;
 		-s | --silence ) force_verbose="no"; shift 1; break ;;
-		-h | --help ) help_and_usage; exit; break ;;
-		-V | --version ) exit; break ;;
 		* ) break ;;
 	esac
 done
@@ -205,6 +201,16 @@ xshok_pretty_echo_and_log " Version: v$version ($version_date)"
 xshok_pretty_echo_and_log " Required Configuration Version: v$minimum_required_config_version"
 xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 xshok_pretty_echo_and_log "" "#" "80"
+
+# Generic command line options
+while true ; do
+	case "$1" in
+		-h | --help ) help_and_usage; exit; break ;;
+		-V | --version ) exit; break ;;
+		* ) break ;;
+	esac
+done
+
 
 ## CONFIG LOADING AND ERROR CHECKING ##############################################
 
@@ -601,6 +607,7 @@ clamscan_integrity_test_specific_database_file (){
 		echo "Check the file name and try again..."
 	fi 
 }
+
 #output names of any third-party signatures that triggered during the HAM directory scan
 output_signatures_triggered_during_ham_directory_scan () {
 	echo ""
@@ -674,7 +681,6 @@ add_signature_whitelist_entry () {
 		echo "No input detected - no action taken."
 	fi
 }
-
 
 #Clamscan reload database
 clamscan_reload_dbs (){

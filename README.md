@@ -99,6 +99,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added command option -s (--silence) to force silenced output 
  - Default verbose for terminal and silence for cron
  - Added RHEL/Centos 7 config settings
+ - Added short option (-F) to Force all databases to be downloaded, could cause ip to be blocked"
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)
@@ -269,7 +270,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         Optional if the default config is available
         Default: /etc/clamav-unofficial-sigs.conf
 
---force         Force all databases to be downloaded, could cause ip to be blocked
+-F, --force         Force all databases to be downloaded, could cause ip to be blocked
 
 -h, --help      Display this script's help and usage information
 
