@@ -24,9 +24,14 @@
 # Values provided here are just examples, feel free to use any values from the main config file.
 
 
-#clam_user="clam"
-#clam_group="clam"
+#clam_user="clamav"
+#clam_group="clamav"
+
 #clam_dbs="/var/lib/clamav"
+
+#clamd_restart_opt="service clamav-daemon restart"
+#clamd_socket="/var/run/clamav/clamd.ctl"
+
 
 #malwarepatrol_receipt_code="YOUR-RECEIPT-NUMBER"
 #malwarepatrol_product_code="7"; # or empty for free users

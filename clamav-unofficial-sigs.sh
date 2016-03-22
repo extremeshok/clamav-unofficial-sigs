@@ -228,7 +228,7 @@ done
 config_source_override="$config_source.override"
 
 if [ -r "$config_source_override" ] ; then #exists and readable
-	xshok_pretty_echo_and_log "Processing Config Override file"
+	xshok_pretty_echo_and_log "Config Override Found"
 	if [ -t 1 ] ; then
 		xshok_pretty_echo_and_log "Loading config override: $config_source_override" "="
 	fi
