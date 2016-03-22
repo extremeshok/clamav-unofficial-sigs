@@ -34,11 +34,14 @@ This is to allow certain settings to survive updates/changes of the main config 
 
 #### Check if signature are being loaded
 **Run the following command to display which signatures are being loaded by clamav
+
 ```clamscan --debug 2>&1 /dev/null | grep "loaded"```
 
 #### SELinux cron permission fix
 > WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
+
 **Run the following command to allow clamav selinux support**
+
 ```setsebool -P antivirus_can_scan_system true```
 
 ### Yara Rule Support (as of June 2015)
@@ -70,7 +73,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## TODO
 * selinux detection
-* selinux fixes
+* selinux fixes (https://github.com/frankf-cgn/clamav-unofficial-sigs/commit/fb07a777d24617b92522cba2a0528fab408c7849)
 * reworked install and uninstall
 * remove_bad_database .. add code
 
