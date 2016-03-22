@@ -152,7 +152,7 @@ do_clamd_reload="0"
 comment_silence="no"
 enable_logging="no"
 
-# Use the Default Config bt default
+# Use the Default Config by default
 config_source=$default_config
 
 #default disable forced updates
@@ -220,6 +220,53 @@ for i in "${clean_config[@]}"
 do
 	eval $(echo ${i} | command sed -e 's/[[:space:]]*$//')
 done
+
+
+####### Config Override Handling
+
+## CONFIG OVERRIDE LOADING AND ERROR CHECKING ##############################################
+config_source_override="$config_source.override"
+
+if [ -r "$config_source_override" ] ; then #exists and readable
+	xshok_pretty_echo_and_log "Processing Config Override file"
+	if [ -t 1 ] ; then
+		xshok_pretty_echo_and_log "Loading config override: $config_source_override" "="
+	fi
+	#config stripping
+	#Display the banner if via a termial
+
+	# delete lines beginning with #
+	# delete from ' #' to end of the line
+	# delete from '# ' to end of the line
+	# delete both trailing and leading whitespace
+	# delete all empty lines
+
+	clean_config=`command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_source_override"`
+
+	### config error checking
+	# check "" are an even number
+	config_check="${clean_config//[^\"]}"
+	if [ $(( ${#config_check} % 2)) -eq 1 ] ; then 
+		xshok_pretty_echo_and_log "ERROR: Your configuration override has errors, every \" requires a closing \"" "="     
+		exit 1
+	fi
+
+	# check there is an = for every set of "" #optional whitespace \s* between = and "
+	config_check_vars=`echo "$clean_config" | grep -o '=\s*\"' | wc -l`
+	if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ] ; then 
+		xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\"" "="    
+		exit 1
+	fi
+
+	#config loading
+	for i in "${clean_config[@]}"
+	do
+		eval $(echo ${i} | command sed -e 's/[[:space:]]*$//')
+	done
+
+fi
+
+
 
 #config version validation
 if [ "$config_version" -lt "$minimum_required_config_version" ] ; then

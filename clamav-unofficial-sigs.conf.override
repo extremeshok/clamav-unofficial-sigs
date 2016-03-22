@@ -1,0 +1,40 @@
+# This file contains overridden configuration settings for clamav-unofficial-sigs.sh
+###################
+# This is property of eXtremeSHOK.com
+# You are free to use, modify and distribute, however you may not remove this notice.
+# Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+##################
+#
+# Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
+# 
+# Originially based on: 
+# Script provide by Bill Landry (unofficialsigs@gmail.com).
+#
+# License: BSD (Berkeley Software Distribution)
+#
+##################
+#
+# NOT COMPATIBLE WITH VERSION 3.XX CONFIG 
+#
+################################################################################
+
+# Values in this file will always override those in the default config file.
+# This is useful to specify your authorisation/receipt codes and to always force certain options.
+# Please note, it is your responsibility to manage the contents of this file.
+# Values provided here are just examples, feel free to use any values from the main config file.
+
+
+#clam_user="clam"
+#clam_group="clam"
+#clam_dbs="/var/lib/clamav"
+
+#malwarepatrol_receipt_code="YOUR-RECEIPT-NUMBER"
+#malwarepatrol_product_code="7"; # or empty for free users
+#malwarepatrol_list="clamav_ext"; # or empty for free users
+#malwarepatrol_free="yes"
+
+#securiteinfo_authorisation_signature="YOUR-SIGNATURE-NUMBER"
+
+#user_configuration_complete="yes"
+
+# https://eXtremeSHOK.com ##############################################################

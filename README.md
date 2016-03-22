@@ -25,6 +25,10 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 * move clamav-unofficial-sigs.8 into /usr/share/man/man8/
 * set your config options in /etc/clamav-unofficial-sigs.conf
 
+### Advanced Config Overwrites
+Create the file /etc/clamav-unofficial-sigs.override.conf and specify your own config options which will aways overridde the default config file options.
+This is to allow certain settings to survive updates/changes of the main config file
+
 #### SELinux cron permission fix
 > WARNING - Clamscan reports ________ database integrity tested BAD - SKIPPING
 
@@ -62,11 +66,8 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 ## TODO
 * selinux detection
 * selinux fixes
-* silence output when under cron
 * code refactoring
-* user config
 * reworked install and uninstall
-
 
 ## Change Log
 ### Version 5.0.0 (updated 2016-XX-XX)
@@ -77,6 +78,8 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Updates by to account for changed names and addition of sub-directories for Yara-Rules by @msapiro
  - Use MD5 with MalwarePatrol by @olivier2557
  - Suppress the header and config loading message if running via cron
+ - Added support for the user defined config override file: clamav-unofficial-sigs.conf.override
+ - Reindent all code
  - minor code refactoring
 
 ### Version 4.9.2 (updated 2015-12-02)
