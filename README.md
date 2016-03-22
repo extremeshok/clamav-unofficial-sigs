@@ -29,8 +29,8 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 * Copy all files in the systemd folder to /etc/systemd
 
 ### Advanced Config Overwrites
-Create the file /etc/clamav-unofficial-sigs.override.conf and specify your own config options which will aways overridde the default config file options.
-This is to allow certain settings to survive updates/changes of the main config file
+Create the file /etc/clamav-unofficial-sigs.conf.override and specify your own config options which will aways overridde the default config file options.
+This is to allow certain settings to survive updates/changes of the main config file.
 
 #### Check if signature are being loaded
 **Run the following command to display which signatures are being loaded by clamav
@@ -75,7 +75,6 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 * selinux detection
 * selinux fixes (https://github.com/frankf-cgn/clamav-unofficial-sigs/commit/fb07a777d24617b92522cba2a0528fab408c7849)
 * reworked install and uninstall
-* remove_bad_database .. add code
 
 ## Change Log
 ### Version 5.0.0 (updated 2016-XX-XX)
@@ -100,6 +99,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Default verbose for terminal and silence for cron
  - Added RHEL/Centos 7 config settings
  - Added short option (-F) to Force all databases to be downloaded, could cause ip to be blocked"
+ - Fixed removal of failed databases, disbale with option "remove_bad_database"
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)

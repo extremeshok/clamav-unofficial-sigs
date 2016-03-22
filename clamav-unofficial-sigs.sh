@@ -1105,8 +1105,12 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 									xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
 									true
 								else
-									xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD - SKIPPING"
-									##remove_bad_database
+									xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
+									if [ "$remove_bad_database" == "yes"]
+										if rm -f "$sanesecurity_dir/$db_file" ; then
+											xshok_pretty_echo_and_log "Removed invalid database: $sanesecurity_dir/$db_file"
+										fi
+									fi
 									false
 								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $sanesecurity_dir/$db_file $clam_dbs ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
@@ -1127,8 +1131,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 								xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
 								true
 							else
-								xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD - SKIPPING"
-								##remove_bad_database
+								xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
+								##DO NOT KILL THIS DB
 								false
 							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs ; then
 							perms chown $clam_user:$clam_group $clam_dbs/$db_file
@@ -1208,9 +1212,12 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
 										true
 									else
-										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
-										rm -f "$securiteinfo_dir/$db_file"
-										##remove_bad_database
+										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD"
+										if [ "$remove_bad_database" == "yes"]
+											if rm -f "$securiteinfo_dir/$db_file" ; then
+												xshok_pretty_echo_and_log "Removed invalid database: $securiteinfo_dir/$db_file"
+											fi
+										fi
 										false
 									fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $securiteinfo_dir/$db_file $clam_dbs ; then
 									perms chown $clam_user:$clam_group $clam_dbs/$db_file
@@ -1232,9 +1239,13 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 									xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
 									true
 								else
-									xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD - SKIPPING"
+									xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD"
 									rm -f "$securiteinfo_dir/$db_file"
-									##remove_bad_database
+									if [ "$remove_bad_database" == "yes"]
+										if rm -f "$securiteinfo_dir/$db_file" ; then
+											xshok_pretty_echo_and_log "Removed invalid database: $securiteinfo_dir/$db_file"
+										fi
+									fi
 									false
 								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
@@ -1318,9 +1329,12 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
 									true
 								else
-									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING"
-									rm -f "$linuxmalwaredetect_dir/$db_file"
-									##remove_bad_database
+									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD"
+									if [ "$remove_bad_database" == "yes"]
+										if rm -f "$linuxmalwaredetect_dir/$db_file" ; then
+											xshok_pretty_echo_and_log "Removed invalid database: $linuxmalwaredetect_dir/$db_file"
+										fi
+									fi
 									false
 								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $linuxmalwaredetect_dir/$db_file $clam_dbs ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
@@ -1341,9 +1355,12 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 								xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
 								true
 							else
-								xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD - SKIPPING"
-								rm -f "$linuxmalwaredetect_dir/$db_file"
-								##remove_bad_database
+								xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD"
+								if [ "$remove_bad_database" == "yes"]
+									if rm -f "$linuxmalwaredetect_dir/$db_file" ; then
+										xshok_pretty_echo_and_log "Removed invalid database: $linuxmalwaredetect_dir/$db_file"
+									fi
+								fi
 								false
 							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs ;	then
 							perms chown $clam_user:$clam_group $clam_dbs/$db_file
@@ -1455,8 +1472,12 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 						xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
 						true
 					else
-						xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING"
-						##remove_bad_database
+						xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
+						if [ "$remove_bad_database" == "yes"]
+							if rm -f "$malwarepatrol_dir/$malwarepatrol_db" ; then
+								xshok_pretty_echo_and_log "Removed invalid database: $malwarepatrol_dir/$malwarepatrol_db"
+							fi
+						fi
 						false
 					fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if rsync -pcqt $malwarepatrol_dir/$malwarepatrol_db $clam_dbs ;	then
 					perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
@@ -1477,8 +1498,12 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 					xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
 					true
 				else
-					xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD - SKIPPING"
-					##remove_bad_database
+					xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
+					if [ "$remove_bad_database" == "yes"]
+						if rm -f "$test_dir/$malwarepatrol_db" ; then
+							xshok_pretty_echo_and_log "Removed invalid database: $test_dir/$malwarepatrol_db"
+						fi
+					fi
 					false
 				fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$malwarepatrol_db $clam_dbs ; then
 				perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
@@ -1565,9 +1590,12 @@ if [ "$yararules_enabled" == "yes" ] ; then
 									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good"
 									true
 								else
-									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD - SKIPPING"
-									rm -f "$yararules_dir/$db_file"
-									##remove_bad_database
+									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD"
+									if [ "$remove_bad_database" == "yes"]
+										if rm -f "$yararules_dir/$db_file" ; then
+											xshok_pretty_echo_and_log "Removed invalid database: $yararules_dir/$db_file"
+										fi
+									fi
 									false
 								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $yararules_dir/$db_file $clam_dbs ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
@@ -1588,9 +1616,12 @@ if [ "$yararules_enabled" == "yes" ] ; then
 								xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good"
 								true
 							else
-								xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD - SKIPPING"
-								rm -f "$yararules_dir/$db_file"
-								##remove_bad_database
+								xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD"
+								if [ "$remove_bad_database" == "yes"]
+									if rm -f "$yararules_dir/$db_file" ; then
+										xshok_pretty_echo_and_log "Removed invalid database: $yararules_dir/$db_file"
+									fi
+								fi
 								false
 							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs ; then
 							perms chown $clam_user:$clam_group $clam_dbs/$db_file
@@ -1664,8 +1695,12 @@ if [ -n "$add_dbs" ] ; then
 				xshok_pretty_echo_and_log "Clamscan reports $db_file database integrity tested good"
 				true
 			else
-				xshok_pretty_echo_and_log "Clamscan reports User Added $db_file database integrity tested BAD - SKIPPING"
-				##remove_bad_database
+				xshok_pretty_echo_and_log "Clamscan reports User Added $db_file database integrity tested BAD"
+				if [ "$remove_bad_database" == "yes"]
+					if rm -f "$add_dir/$db_file" ; then
+						xshok_pretty_echo_and_log "Removed invalid database: $add_dir/$db_file"
+					fi
+				fi
 				false
 			fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $add_dir/$db_file $clam_dbs ; then
 			perms chown $clam_user:$clam_group $clam_dbs/$db_file
