@@ -118,6 +118,8 @@ help_and_usage () {
 
   echo -e "\n${BOLD}-v${NORM}, ${BOLD}--verbose${NORM}\tBe verbose, enabled when not run under cron"
 
+  echo -e "\n${BOLD}-s${NORM}, ${BOLD}--silence${NORM}\tOnly output error messages, enabled when run under cron"
+
   echo -e "\n${BOLD}-d${NORM}, ${BOLD}--decode-sig${NORM}\tDecode a third-party signature either by signature name\n\t(eg: Sanesecurity.Junk.15248) or hexadecimal string.\n\tThis flag will 'NOT' decode image signatures"
 
   echo -e "\n${BOLD}-e${NORM}, ${BOLD}--encode-string${NORM}\tHexadecimal encode an entire input string that can\n\tbe used in any '*.ndb' signature database file"
@@ -181,6 +183,7 @@ while true; do
 		-c | --config ) xshok_check_s2 $2; config_source="$2"; shift 2; break ;;
 --force ) force_updates="yes"; shift 1; break ;;
 -v | --verbose ) force_verbose="yes"; shift 1; break ;;
+-s | --silence ) force_verbose="no"; shift 1; break ;;
 -h | --help ) help_and_usage; exit; break ;;
 -V | --version ) exit; break ;;
 * ) break ;;

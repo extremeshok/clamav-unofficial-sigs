@@ -96,7 +96,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added ignore_ssl option to supress ssl errors and warnings, ie operate in insecure mode.
  - Replaced test-database command option -s with -t
  - Replaced output-triggered command option -t with -o
- 
+ - Added command option -s (--silence) to force silenced output 
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)
@@ -274,6 +274,8 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 -V, --version   Output script version and date information
 
 -v, --verbose   Be verbose, enabled when not run under cron
+
+-s, --silence   Only output error messages, enabled when run under cron
 
 -d, --decode-sig        Decode a third-party signature either by signature name
         (eg: Sanesecurity.Junk.15248) or hexadecimal string.
