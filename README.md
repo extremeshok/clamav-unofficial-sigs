@@ -100,6 +100,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added RHEL/Centos 7 config settings
  - Added short option (-F) to Force all databases to be downloaded, could cause ip to be blocked"
  - Fixed removal of failed databases, disbale with option "remove_bad_database"
+ - Removed config options: clamd_start, clamd_stop
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)

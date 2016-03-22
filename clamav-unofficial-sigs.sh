@@ -765,11 +765,10 @@ function check_clamav () {
 				if [ -z "$io_socket2" -a -z "$socket_cat2" ] ; then
 
 					xshok_pretty_echo_and_log "ALERT: CLAMD IS NOT RUNNING!" "="
-					if [ -n "$start_clamd" ] ; then
+					if [ -n "$clamd_restart_opt" ] ; then
 						xshok_pretty_echo_and_log "Attempting to start ClamD..." "-"
 						if [ -n "$io_socket1" ] ; then
-							$clamd_stop > /dev/null && sleep 5
-							$clamd_start > /dev/null && sleep 5
+							$clamd_restart_opt > /dev/null && sleep 5
 							if [ "`perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null`" = "PONG" ] ; then
 								xshok_pretty_echo_and_log "ClamD was successfully started" "="
 							else
@@ -778,8 +777,7 @@ function check_clamav () {
 							fi
 						else
 							if [ -n "$socket_cat1" ] ; then
-								$clamd_stop > /dev/null && sleep 5
-								$clamd_start > /dev/null && sleep 5
+								$clamd_restart_opt > /dev/null && sleep 5
 								if [ "`(echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null`" = "PONG" ] ; then
 									xshok_pretty_echo_and_log "ClamD was successfully started" "="
 								else
