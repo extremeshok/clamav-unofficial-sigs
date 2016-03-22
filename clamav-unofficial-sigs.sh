@@ -1106,7 +1106,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 									true
 								else
 									xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
-									if [ "$remove_bad_database" == "yes"]
+									if [ "$remove_bad_database" == "yes"] ; then
 										if rm -f "$sanesecurity_dir/$db_file" ; then
 											xshok_pretty_echo_and_log "Removed invalid database: $sanesecurity_dir/$db_file"
 										fi
@@ -1213,7 +1213,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 										true
 									else
 										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD"
-										if [ "$remove_bad_database" == "yes"]
+										if [ "$remove_bad_database" == "yes"] ; then
 											if rm -f "$securiteinfo_dir/$db_file" ; then
 												xshok_pretty_echo_and_log "Removed invalid database: $securiteinfo_dir/$db_file"
 											fi
@@ -1241,7 +1241,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 								else
 									xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD"
 									rm -f "$securiteinfo_dir/$db_file"
-									if [ "$remove_bad_database" == "yes"]
+									if [ "$remove_bad_database" == "yes"] ; then
 										if rm -f "$securiteinfo_dir/$db_file" ; then
 											xshok_pretty_echo_and_log "Removed invalid database: $securiteinfo_dir/$db_file"
 										fi
@@ -1330,7 +1330,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 									true
 								else
 									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD"
-									if [ "$remove_bad_database" == "yes"]
+									if [ "$remove_bad_database" == "yes"] ; then
 										if rm -f "$linuxmalwaredetect_dir/$db_file" ; then
 											xshok_pretty_echo_and_log "Removed invalid database: $linuxmalwaredetect_dir/$db_file"
 										fi
@@ -1356,7 +1356,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 								true
 							else
 								xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD"
-								if [ "$remove_bad_database" == "yes"]
+								if [ "$remove_bad_database" == "yes"] ; then
 									if rm -f "$linuxmalwaredetect_dir/$db_file" ; then
 										xshok_pretty_echo_and_log "Removed invalid database: $linuxmalwaredetect_dir/$db_file"
 									fi
@@ -1473,7 +1473,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 						true
 					else
 						xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
-						if [ "$remove_bad_database" == "yes"]
+						if [ "$remove_bad_database" == "yes"] ; then
 							if rm -f "$malwarepatrol_dir/$malwarepatrol_db" ; then
 								xshok_pretty_echo_and_log "Removed invalid database: $malwarepatrol_dir/$malwarepatrol_db"
 							fi
@@ -1499,7 +1499,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 					true
 				else
 					xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
-					if [ "$remove_bad_database" == "yes"]
+					if [ "$remove_bad_database" == "yes"] ; then
 						if rm -f "$test_dir/$malwarepatrol_db" ; then
 							xshok_pretty_echo_and_log "Removed invalid database: $test_dir/$malwarepatrol_db"
 						fi
@@ -1591,7 +1591,7 @@ if [ "$yararules_enabled" == "yes" ] ; then
 									true
 								else
 									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD"
-									if [ "$remove_bad_database" == "yes"]
+									if [ "$remove_bad_database" == "yes"] ; then
 										if rm -f "$yararules_dir/$db_file" ; then
 											xshok_pretty_echo_and_log "Removed invalid database: $yararules_dir/$db_file"
 										fi
@@ -1617,7 +1617,7 @@ if [ "$yararules_enabled" == "yes" ] ; then
 								true
 							else
 								xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD"
-								if [ "$remove_bad_database" == "yes"]
+								if [ "$remove_bad_database" == "yes"] ; then
 									if rm -f "$yararules_dir/$db_file" ; then
 										xshok_pretty_echo_and_log "Removed invalid database: $yararules_dir/$db_file"
 									fi
@@ -1696,7 +1696,7 @@ if [ -n "$add_dbs" ] ; then
 				true
 			else
 				xshok_pretty_echo_and_log "Clamscan reports User Added $db_file database integrity tested BAD"
-				if [ "$remove_bad_database" == "yes"]
+				if [ "$remove_bad_database" == "yes"] ; then
 					if rm -f "$add_dir/$db_file" ; then
 						xshok_pretty_echo_and_log "Removed invalid database: $add_dir/$db_file"
 					fi
