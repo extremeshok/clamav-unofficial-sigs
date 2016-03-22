@@ -163,6 +163,7 @@ if [ -t 1 ] ; then
 	xshok_pretty_echo_and_log "" "#" "80"
 	xshok_pretty_echo_and_log " eXtremeSHOK.com ClamAV Unofficial Signature Updater"
 	xshok_pretty_echo_and_log " Version: v$version ($version_date)"
+	xshok_pretty_echo_and_log " Required configuration version: v$minimum_required_config_version+"
 	xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 	xshok_pretty_echo_and_log "" "#" "80"
 	#verbose
