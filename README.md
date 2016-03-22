@@ -71,8 +71,8 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 ## TODO
 * selinux detection
 * selinux fixes
-* code refactoring
 * reworked install and uninstall
+* remove_bad_database .. add code
 
 ## Change Log
 ### Version 5.0.0 (updated 2016-XX-XX)
@@ -84,9 +84,9 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Use MD5 with MalwarePatrol by @olivier2557
  - Suppress the header and config loading message if running via cron
  - Added support for the user defined config override file: clamav-unofficial-sigs.conf.override
- - Reindent all code
  - Added systemd files by @falon
- - minor code refactoring
+ - Added config option remove_bad_database,  a database with a BAD integrity check will be removed
+ - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)
  - eXtremeSHOK.com Maintenance 
