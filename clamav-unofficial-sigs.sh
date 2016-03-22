@@ -34,7 +34,7 @@ default_config="/etc/clamav-unofficial-sigs.conf"
 ################################################################################
 
 # Function to support user config settings for applying file and directory access permissions.
-perms () {
+function perms () {
 	if [ -n "$clam_user" -a -n "$clam_group" ] ; then
 		"${@:-}"
 	fi
@@ -54,7 +54,7 @@ perms () {
 # ========
 # pretty_echo_and_log "" "/\" "7"
 # /\/\/\/\/\/\
-xshok_pretty_echo_and_log () { #"string" "repeating" "count"
+function xshok_pretty_echo_and_log () { #"string" "repeating" "count"
   # handle comments
   if [ "$comment_silence" = "no" ] ; then
   	if [ "${#@}" = "1" ] ; then
@@ -95,17 +95,27 @@ function xshok_check_s2 () {
 	fi
 }
 
+
+#Detect if terminal
+if [ -t 1 ] ; then
+ 	#Set fonts
+ 	##Usage: echo "${BOLD}-a${NORM}"
+ 	BOLD=`tput bold`
+ 	REV=`tput smso`
+ 	NORM=`tput sgr0`
+	#Verbose
+	force_verbose="yes"
+else
+	#Null Fonts
+	BOLD=''
+ 	REV=''
+ 	NORM=''
+	#silence
+	force_verbose="no"
+fi
+
 #function for help and usage
-help_and_usage () {
-
-  #Set fonts if runnign via a termial
-  ##echo "${BOLD}-a${NORM}"
-  if [ -t 1 ] ; then
-  	BOLD=`tput bold`
-  	REV=`tput smso`
-  	NORM=`tput sgr0`
-  fi
-
+function help_and_usage () {
   echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
 
   echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tDirect script to use a specific configuration file\n\teg: '-c /path/to/`basename $default_config`'\n\tOptional if the default config is available\n\tDefault: $default_config"
@@ -162,21 +172,6 @@ config_source=$default_config
 #default disable forced updates
 forced_updates="no"
 
-#Display the banner if via a termial
-if [ -t 1 ] ; then
-	xshok_pretty_echo_and_log "" "#" "80"
-	xshok_pretty_echo_and_log " eXtremeSHOK.com ClamAV Unofficial Signature Updater"
-	xshok_pretty_echo_and_log " Version: v$version ($version_date)"
-	xshok_pretty_echo_and_log " Required Configuration Version: v$minimum_required_config_version"
-	xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
-	xshok_pretty_echo_and_log "" "#" "80"
-	#verbose
-	force_verbose="yes"
-else
-	#silence
-	force_verbose="no"
-fi
-
 # Generic command line options
 while true; do
 	case "$1" in
@@ -205,7 +200,12 @@ else
 	comment_silence="yes"
 fi
 
-
+	xshok_pretty_echo_and_log "" "#" "80"
+	xshok_pretty_echo_and_log " eXtremeSHOK.com ClamAV Unofficial Signature Updater"
+	xshok_pretty_echo_and_log " Version: v$version ($version_date)"
+	xshok_pretty_echo_and_log " Required Configuration Version: v$minimum_required_config_version"
+	xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
+	xshok_pretty_echo_and_log "" "#" "80"
 
 ## CONFIG LOADING AND ERROR CHECKING ##############################################
 
@@ -215,10 +215,7 @@ if [ ! -r "$config_source" ] ; then #exists and readable
 fi
 
 #config stripping
-#Display the banner if via a termial
-if [ -t 1 ] ; then
-	xshok_pretty_echo_and_log "Loading config: $config_source" "="
-fi
+xshok_pretty_echo_and_log "Loading config: $config_source" "="
 
 # delete lines beginning with #
 # delete from ' #' to end of the line
@@ -256,10 +253,7 @@ done
 config_source_override="$config_source.override"
 
 if [ -r "$config_source_override" ] ; then #exists and readable
-	xshok_pretty_echo_and_log "Processing Config Override file"
-	if [ -t 1 ] ; then
-		xshok_pretty_echo_and_log "Loading config override: $config_source_override" "="
-	fi
+	xshok_pretty_echo_and_log "Loading config override: $config_source_override" "="
 	#config stripping
 	#Display the banner if via a termial
 

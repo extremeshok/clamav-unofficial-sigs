@@ -97,6 +97,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Replaced test-database command option -s with -t
  - Replaced output-triggered command option -t with -o
  - Added command option -s (--silence) to force silenced output 
+ - Default verbose for terminal and silence for cron
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)
