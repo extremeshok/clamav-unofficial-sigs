@@ -90,6 +90,9 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added systemd files by @falon
  - Added config option remove_bad_database,  a database with a BAD integrity check will be removed
  - Fixed broken whitelisting of malwarepatrol signatures
+ - Version command option -v replaced with -V 
+ - Added command option -v (--verbose) to force verbose output
+ - Removed config options: silence_ssl, curl_silence, rsync_silence, gpg_silence, comment_silence
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)
@@ -264,7 +267,9 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 -h, --help      Display this script's help and usage information
 
--v, --version   Output script version and date information
+-V, --version   Output script version and date information
+
+-v, --verbose   Be verbose, enabled when not run under cron
 
 -d, --decode-sig        Decode a third-party signature either by signature name
         (eg: Sanesecurity.Junk.15248) or hexadecimal string.

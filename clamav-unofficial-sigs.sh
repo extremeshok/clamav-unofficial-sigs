@@ -114,7 +114,7 @@ help_and_usage () {
 
   echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
 
-  echo -e "\n${BOLD}-v${NORM}, ${BOLD}--version${NORM}\tOutput script version and date information"
+  echo -e "\n${BOLD}-V${NORM}, ${BOLD}--version${NORM}\tOutput script version and date information"
 
   echo -e "\n${BOLD}-d${NORM}, ${BOLD}--decode-sig${NORM}\tDecode a third-party signature either by signature name\n\t(eg: Sanesecurity.Junk.15248) or hexadecimal string.\n\tThis flag will 'NOT' decode image signatures"
 
@@ -165,6 +165,11 @@ if [ -t 1 ] ; then
 	xshok_pretty_echo_and_log " Version: v$version ($version_date)"
 	xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 	xshok_pretty_echo_and_log "" "#" "80"
+	#verbose
+	force_verbose="yes"
+else
+	#silence
+	force_verbose="no"
 fi
 
 # Generic command line options
@@ -172,11 +177,28 @@ while true; do
 	case "$1" in
 		-c | --config ) xshok_check_s2 $2; config_source="$2"; shift 2; break ;;
 --force ) force_updates="yes"; shift 1; break ;;
+-v | --verbose ) force_verbose="yes"; shift 1; break ;;
 -h | --help ) help_and_usage; exit; break ;;
--v | --version ) exit; break ;;
+-V | --version ) exit; break ;;
 * ) break ;;
 esac
 done
+
+#Set the verbosity
+if [ "$force_verbose" == "yes" ] ; then
+	#verbose
+	curl_silence="no"
+	rsync_silence="no"
+	gpg_silence="no"
+	comment_silence="no"
+else
+	#silence
+	curl_silence="yes"
+	rsync_silence="yes"
+	gpg_silence="yes"
+	comment_silence="yes"
+fi
+
 
 
 ## CONFIG LOADING AND ERROR CHECKING ##############################################
@@ -228,7 +250,7 @@ done
 config_source_override="$config_source.override"
 
 if [ -r "$config_source_override" ] ; then #exists and readable
-	xshok_pretty_echo_and_log "Config Override Found"
+	xshok_pretty_echo_and_log "Processing Config Override file"
 	if [ -t 1 ] ; then
 		xshok_pretty_echo_and_log "Loading config override: $config_source_override" "="
 	fi
@@ -900,23 +922,17 @@ fi
 if [ "$enable_random" = "yes" ] ; then
 	if [ -n "$RANDOM" ] ; then
 		sleep_time=$(($RANDOM * $(($max_sleep_time - $min_sleep_time)) / 32767 + $min_sleep_time))
-else
-	sleep_time=0
-	while [ "$sleep_time" -lt "$min_sleep_time" -o "$sleep_time" -gt "$max_sleep_time" ] ; do
-		sleep_time=`head -1 /dev/urandom | cksum | awk '{print $2}'`
-	done
-fi
-if [ ! -t 0 ] ; then
-	xshok_pretty_echo_and_log "`date` - Pausing database file updates for $sleep_time seconds..."
-	sleep $sleep_time
-	xshok_pretty_echo_and_log "`date` - Pause complete, checking for new database files..."
-else
-	curl_silence="no"
-	rsync_silence="no"
-	gpg_silence="no"
-	comment_silence="no"
-	xshok_pretty_echo_and_log "Script was run manually"
-fi
+	else
+		sleep_time=0
+		while [ "$sleep_time" -lt "$min_sleep_time" -o "$sleep_time" -gt "$max_sleep_time" ] ; do
+			sleep_time=`head -1 /dev/urandom | cksum | awk '{print $2}'`
+		done
+	fi
+	if [ ! -t 0 ] ; then
+		xshok_pretty_echo_and_log "`date` - Pausing database file updates for $sleep_time seconds..."
+		sleep $sleep_time
+		xshok_pretty_echo_and_log "`date` - Pause complete, checking for new database files..."
+	fi
 fi
 
 # Create "scan-test.txt" file for clamscan database integrity testing.
@@ -1041,6 +1057,8 @@ fi
 # Silence curl output and only report errors - useful if script is run via cron.
 if [ "$curl_silence" = "yes" ] ; then
 	curl_output_level="-s -S"
+else
+	curl_output_level="-#"
 fi
 
 #check_clamav
