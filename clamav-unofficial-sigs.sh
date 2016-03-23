@@ -138,7 +138,7 @@ function help_and_usage () {
 #Script Info
 version="5.0.0"
 minimum_required_config_version="55"
-version_date="XXX XXXXXX 2016"
+version_date="23 March 2016"
 
 #default config files
 config_dir="/etc/clamav-unofficial-sigs"

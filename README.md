@@ -1,8 +1,3 @@
-# DO NOT USE THIS BRANCH
-# CURRENTLY UNDER ACTIVE DEVELOPMENT
-# WILL BE MERGED INTO MAINLINE ONCE DONE
-##############
-
 # clamav-unofficial-sigs
 ClamAV Unofficial Signatures Updater
 
@@ -79,7 +74,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.0.0 (updated 2016-XX-XX)
+### Version 5.0.0 (updated 2016-03-23)
  - eXtremeSHOK.com Maintenance 
  - Added porcupine.hsb : Sha256 Hashes of VBS and JSE malware Database from sanesecurity
  - Fix for missing $ for clamd_pid an incorrect variable definition
