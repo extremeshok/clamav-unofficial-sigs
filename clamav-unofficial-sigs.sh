@@ -31,6 +31,12 @@
 
 ################################################################################
 
+# Detect to make sure the entire script is avilable, fail if the script is missing contents
+if [ ! "` tail -1 "$0" | head -1 | cut -c1-7 `" == "exit \$?" ] ; then
+	echo "FATAL ERROR: Script is incomplete, please redownload"
+	exit 1
+fi
+
 # Function to support user config settings for applying file and directory access permissions.
 function perms () {
 	if [ -n "$clam_user" -a -n "$clam_group" ] ; then
@@ -1887,5 +1893,5 @@ xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav
 
 xshok_pretty_echo_and_log "      Powered By https://eXtremeSHOK.com      " "#"
 
-# And lastly we exit
+# And lastly we exit, Note: the exit is always on the 2nd last line
 exit $?
