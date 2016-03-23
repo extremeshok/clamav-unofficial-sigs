@@ -78,12 +78,15 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 
 	# handle logging
 	if [ "$logging_enabled" = "yes" ] ; then
+		if [ ! -e "$log_file_path/$log_file_name" ] ; then
+		    touch "$log_file_path/$log_file_name" 2>/dev/null
+		fi
 		if [ ! -w "$log_file_path/$log_file_name" ] ; then
 			echo "Warning: Logging Disabled, as file not writable: $log_file_path/$log_file_name"
 			logging_enabled="no"
 		else
 			echo `date "+%b %d %T"` "$1" >> "$log_file_path/$log_file_name"
-		fi
+		fi 
 	fi
 }
 
