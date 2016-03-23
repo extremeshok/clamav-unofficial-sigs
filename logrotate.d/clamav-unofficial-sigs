@@ -20,7 +20,7 @@
      missingok
      notifempty
      compress
-# Redhat / CentOS
+# Redhat / CentOS 6
      create 0644 clam clam
 # Debian / Ubuntu
 #     create 0644 clamav clamav
