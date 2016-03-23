@@ -80,7 +80,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Disable logging if the log file is not writable.
  - Do not attempt to log before a config is loaded
 
-### Version 5.0.0 (updated 2016-03-23)
+### Version 5.0.0
  - eXtremeSHOK.com Maintenance 
  - Added porcupine.hsb : Sha256 Hashes of VBS and JSE malware Database from sanesecurity
  - Fix for missing $ for clamd_pid an incorrect variable definition
@@ -109,7 +109,13 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added selinux_fixes config option, this will run restorecon on the database files
  - minor code refactoring and reindenting
 
-### Version 4.9.2 (updated 2015-12-02)
+### Version 4.9.3
+ - eXtremeSHOK.com Maintenance 
+ - Various Bug Fixes
+ - Last release of 4.x.x base
+ - minor code refactoring
+
+### Version 4.9.2
  - eXtremeSHOK.com Maintenance 
  - Added function xshok_check_s2 to prevent possible errors with -c and no configfile path
  - minor code refactoring
