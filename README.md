@@ -23,16 +23,18 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * Copy the contents of cron.d/ into /etc/cron.d/
 * Copy the contents of logrotate.d/ into /etc/logrotate.d/
 * Copy clamav-unofficial-sigs.8 into /usr/share/man/man8/
+* Make the directory /var/log/clamav-unofficial-sigs/
 * Set your config options in the configs /etc/clamav-unofficial-sigs/*.conf
 
 ### Systemd
 * Copy the contents of systemd/ into to /etc/systemd/
 
 ### Advanced Config Overrides
-Configs are loaded in the following order if they exist.
-master.conf -> os.conf -> user.conf or your-specified-config.config
-A minimum of 1 config is required.
-A specified config on the command line (-c | --config) will override the loading of the default configs
+* Default configs are loaded in the following order if they exist:
+* master.conf -> os.conf -> user.conf or your-specified.config
+* user.conf will override os.conf and master.conf, os.conf will override master.conf
+* A minimum of 1 config is required.
+* Specifying a config on the command line (-c | --config) will override the loading of the default configs
 
 #### Check if signature are being loaded
 **Run the following command to display which signatures are being loaded by clamav
@@ -74,6 +76,10 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
+### Version 5.0.1 (updated 2016-03-24)
+ - Disable logging if the log file is not writable.
+ - Do not attempt to log before a config is loaded
+
 ### Version 5.0.0 (updated 2016-03-23)
  - eXtremeSHOK.com Maintenance 
  - Added porcupine.hsb : Sha256 Hashes of VBS and JSE malware Database from sanesecurity

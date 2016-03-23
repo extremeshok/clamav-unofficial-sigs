@@ -52,7 +52,8 @@ function perms () {
 # ========
 # pretty_echo_and_log "" "/\" "7"
 # /\/\/\/\/\/\
-function xshok_pretty_echo_and_log () { #"string" "repeating" "count"
+#type: e = error, w= warning ""
+function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 	# handle comments
 	if [ "$comment_silence" = "no" ] ; then
 		if [ "${#@}" = "1" ] ; then
@@ -74,9 +75,15 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count"
 			fi
 		fi
 	fi
+
 	# handle logging
-	if [ "$enable_logging" = "yes" ] ; then
-		echo `date "+%b %d %T"` "$1" >> "$log_file_path/$log_file_name"
+	if [ "$logging_enabled" = "yes" ] ; then
+		if [ ! -w "$log_file_path/$log_file_name" ] ; then
+			echo "Warning: Logging Disabled, as file not writable: $log_file_path/$log_file_name"
+			logging_enabled="no"
+		else
+			echo `date "+%b %d %T"` "$1" >> "$log_file_path/$log_file_name"
+		fi
 	fi
 }
 
@@ -136,9 +143,9 @@ function help_and_usage () {
 }
 
 #Script Info
-version="5.0.0"
+version="5.0.1"
 minimum_required_config_version="55"
-version_date="23 March 2016"
+version_date="24 March 2016"
 
 #default config files
 config_dir="/etc/clamav-unofficial-sigs"
@@ -150,6 +157,7 @@ do_clamd_reload="0"
 comment_silence="no"
 enable_logging="no"
 forced_updates="no"
+logging_enabled="no"
 custom_config="no"
 we_have_a_config="0"
 
@@ -254,6 +262,8 @@ for config_file in "${config_files[@]}" ; do
 	fi
 done
 
+
+
 ## Make sure we have a readable config file
 if [ "$we_have_a_config" == "0" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
@@ -272,6 +282,7 @@ if [ "$user_configuration_complete" != "yes" ] ; then
 	xshok_pretty_echo_and_log "Please review the script configuration files."
 	exit 1
 fi
+
 
 ################################################################################
 
