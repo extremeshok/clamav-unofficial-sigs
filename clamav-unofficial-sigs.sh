@@ -220,7 +220,7 @@ if [ "$custom_config" != "no" ] ; then
 fi
 
 for config_file in "${config_files[@]}" ; do
-	if [ ! -r "$config_file" ] ; then #exists and readable
+	if [ -r "$config_file" ] ; then #exists and readable
 		we_have_a_config="1"
 		#config stripping
 		xshok_pretty_echo_and_log "Loading config: $config_file" "="
@@ -255,7 +255,7 @@ for config_file in "${config_files[@]}" ; do
 done
 
 ## Make sure we have a readable config file
-if [ "$we_have_a_config" != "0" ] ; then
+if [ "$we_have_a_config" == "0" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
 	exit 1
 fi

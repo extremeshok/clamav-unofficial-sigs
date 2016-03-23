@@ -17,20 +17,23 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 ### Quick Install Guide
 * Download the files to /tmp/
-* move clamav-unofficial-sigs.sh to /usr/local/bin/
-* set 755 permissions on  /usr/local/bin/clamav-unofficial-sigs.sh
-* move clamav-unofficial-sigs.conf into /etc/ 
-* move clamav-unofficial-sigs-cron into /etc/cron.d/
-* move clamav-unofficial-sigs-logrotate into /etc/logrotate.d/
-* move clamav-unofficial-sigs.8 into /usr/share/man/man8/
-* set your config options in /etc/clamav-unofficial-sigs.conf
+* Copy clamav-unofficial-sigs.sh to /usr/local/bin/
+* Set 755 permissions on  /usr/local/bin/clamav-unofficial-sigs.sh
+* Make the directory /etc/clamav-unofficial-sigs/
+* Copy the contents of config/ into /etc/clamav-unofficial-sigs/
+* Copy the contents of cron.d/ into /etc/cron.d/
+* Copy the contents of logrotate.d/ into /etc/logrotate.d/
+* Copy clamav-unofficial-sigs.8 into /usr/share/man/man8/
+* Set your config options in the configs /etc/clamav-unofficial-sigs/*.conf
 
 ### Systemd
-* Copy all files in the systemd folder to /etc/systemd
+* Copy the contents of systemd/ into to /etc/systemd/
 
 ### Advanced Config Overrides
+Configs are loaded in the following order if they exist.
 master.conf -> os.conf -> user.conf or your-specified-config.config
-This is to allow certain settings to survive updates/changes of the main config file and to allow for specific os.conf files to ease initial setup
+A minimum of 1 config is required.
+A specified config on the command line (-c | --config) will override the loading of the default configs
 
 #### Check if signature are being loaded
 **Run the following command to display which signatures are being loaded by clamav
@@ -85,7 +88,6 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Updates to account for changed names and addition of sub-directories for Yara-Rules by @msapiro
  - Use MD5 with MalwarePatrol by @olivier2557
  - Suppress the header and config loading message if running via cron
- - Added support for the user defined config override file: clamav-unofficial-sigs.conf.override
  - Added systemd files by @falon
  - Added config option remove_bad_database,  a database with a BAD integrity check will be removed
  - Fixed broken whitelisting of malwarepatrol signatures
@@ -101,6 +103,9 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added short option (-F) to Force all databases to be downloaded, could cause ip to be blocked"
  - Fixed removal of failed databases, disbale with option "remove_bad_database"
  - Removed config options: clamd_start, clamd_stop
+ - Full rewrite of the config handling, master.conf -> os.conf -> user.conf or your-specified.config
+ - Configs loaded from the /etc/clamav-unofficial-sigs dir
+ - Added various os.conf files to ease setup
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)
