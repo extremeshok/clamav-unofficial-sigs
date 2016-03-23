@@ -1869,6 +1869,7 @@ fi
 # Reload all clamd databases  
 clamscan_reload_dbs
 
+xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
 
 xshok_pretty_echo_and_log "      Powered By https://eXtremeSHOK.com      " "#"
 

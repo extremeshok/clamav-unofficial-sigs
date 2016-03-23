@@ -15,6 +15,10 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 #### Try our custom spamassasin plugin: https://github.com/extremeshok/spamassassin-extremeshok_fromreplyto
 
+### Support / Suggestions / Comments
+Please post them on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
+
+
 ### Quick Install Guide
 * Download the files to /tmp/
 * Copy clamav-unofficial-sigs.sh to /usr/local/bin/
@@ -73,11 +77,6 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
 ### Linux Malware Detect support (as of May 2015)
 Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/projects/linux-malware-detect/
  - Enabled by default, no configuration required
-
-## TODO
-* selinux detection
-* selinux fixes (https://github.com/frankf-cgn/clamav-unofficial-sigs/commit/fb07a777d24617b92522cba2a0528fab408c7849)
-* reworked install and uninstall
 
 ## Change Log
 ### Version 5.0.0 (updated 2016-XX-XX)
