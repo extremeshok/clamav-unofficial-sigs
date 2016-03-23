@@ -28,9 +28,9 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 ### Systemd
 * Copy all files in the systemd folder to /etc/systemd
 
-### Advanced Config Overwrites
-Create the file /etc/clamav-unofficial-sigs.conf.override and specify your own config options which will aways overridde the default config file options.
-This is to allow certain settings to survive updates/changes of the main config file.
+### Advanced Config Overrides
+master.conf -> os.conf -> user.conf or your-specified-config.config
+This is to allow certain settings to survive updates/changes of the main config file and to allow for specific os.conf files to ease initial setup
 
 #### Check if signature are being loaded
 **Run the following command to display which signatures are being loaded by clamav
