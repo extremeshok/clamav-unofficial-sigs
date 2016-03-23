@@ -260,18 +260,11 @@ if [ "$we_have_a_config" != "0" ] ; then
 	exit 1
 fi
 
-## CONFIG OVERRIDE LOADING AND ERROR CHECKING ##############################################
-config_source_override="$config_source.override"
-
-if [ -r "$config_source_override" ] ; then #exists and readable
-fi
-
 #config version validation
 if [ "$config_version" -lt "$minimum_required_config_version" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Your config version $config_version is not compatible with the min required version $minimum_required_config_version" "="
 	exit 1
 fi
-
 
 # Check to see if the script's "USER CONFIGURATION FILE" has been completed.
 if [ "$user_configuration_complete" != "yes" ] ; then
