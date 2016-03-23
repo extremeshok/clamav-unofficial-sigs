@@ -261,7 +261,7 @@ if [ "$we_have_a_config" != "0" ] ; then
 fi
 
 #config version validation
-if [ "$config_version" -lt "$minimum_required_config_version" ] ; then
+if [ $config_version -lt $minimum_required_config_version ] ; then
 	xshok_pretty_echo_and_log "ERROR: Your config version $config_version is not compatible with the min required version $minimum_required_config_version" "="
 	exit 1
 fi
@@ -269,7 +269,7 @@ fi
 # Check to see if the script's "USER CONFIGURATION FILE" has been completed.
 if [ "$user_configuration_complete" != "yes" ] ; then
 	xshok_pretty_echo_and_log "WARNING: SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED" "*"
-	xshok_pretty_echo_and_log "Please review the script configuration file: `basename $default_config`."
+	xshok_pretty_echo_and_log "Please review the script configuration files."
 	exit 1
 fi
 
