@@ -106,6 +106,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Full rewrite of the config handling, master.conf -> os.conf -> user.conf or your-specified.config
  - Configs loaded from the /etc/clamav-unofficial-sigs dir
  - Added various os.conf files to ease setup
+ - Added selinux_fixes config option, this will run restorecon on the database files
  - minor code refactoring and reindenting
 
 ### Version 4.9.2 (updated 2015-12-02)

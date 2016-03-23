@@ -482,6 +482,9 @@ make_signature_database_from_ascii_file () {
 					if rsync -pcqt "$path_file" "$clam_dbs" ; then
 						perms chown $clam_user:$clam_group "$clam_dbs/$db_file"
 						chmod 0644 "$clam_dbs/$db_file"
+						if [ "$selinux_fixes" == "yes" ] ; then
+							restorecon "$clam_dbs/$db_file"
+						fi
 						$clamd_restart_opt
 
 						echo "Signature database '$db_file' was successfully implemented and ClamD databases reloaded."
@@ -620,6 +623,9 @@ add_signature_whitelist_entry () {
 						fi
 
 						chmod 0644 my-whitelist.ign2 "$work_dir_configs/monitor-ign.txt"
+						if [ "$selinux_fixes" == "yes" ] ; then
+							restorecon "$clam_dbs/local.ign"
+						fi
 						clamscan_reload_dbs
 
 						echo "Signature '$input' has been added to my-whitelist.ign2 and"
@@ -819,6 +825,9 @@ if [ -n "$ham_dir" -a -d "$work_dir" -a ! -d "$test_dir" ] ; then
 			if clamscan --quiet -d "$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
 				if rsync -pcqt $db_file $clam_dbs ; then
 					perms chown $clam_user:$clam_group $clam_dbs/$db_file
+					if [ "$selinux_fixes" == "yes" ] ; then
+						restorecon "$clam_dbs/$db_file"
+					fi
 					do_clamd_reload=1
 				fi
 			fi
@@ -1080,6 +1089,9 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 									false
 								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $sanesecurity_dir/$db_file $clam_dbs ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
+								if [ "$selinux_fixes" == "yes" ] ; then
+									restorecon "$clam_dbs/$db_file"
+								fi
 								xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
 								sanesecurity_update=1
 								do_clamd_reload=1
@@ -1102,6 +1114,9 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 								false
 							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs ; then
 							perms chown $clam_user:$clam_group $clam_dbs/$db_file
+							if [ "$selinux_fixes" == "yes" ] ; then
+								restorecon "$clam_dbs/$db_file"
+							fi
 							xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
 							sanesecurity_update=1
 							do_clamd_reload=1
@@ -1187,6 +1202,9 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 										false
 									fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $securiteinfo_dir/$db_file $clam_dbs ; then
 									perms chown $clam_user:$clam_group $clam_dbs/$db_file
+									if [ "$selinux_fixes" == "yes" ] ; then
+										restorecon "$clam_dbs/$db_file"
+									fi
 									xshok_pretty_echo_and_log "Successfully updated SecuriteInfo production database file: $db_file"
 									securiteinfo_updates=1
 									securiteinfo_db_update=1
@@ -1215,6 +1233,9 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 									false
 								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
+								if [ "$selinux_fixes" == "yes" ] ; then
+									restorecon "$clam_dbs/$db_file"
+								fi
 								xshok_pretty_echo_and_log "Successfully updated SecuriteInfo production database file: $db_file"
 								securiteinfo_updates=1
 								securiteinfo_db_update=1
@@ -1304,6 +1325,9 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 									false
 								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $linuxmalwaredetect_dir/$db_file $clam_dbs ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
+								if [ "$selinux_fixes" == "yes" ] ; then
+									restorecon "$clam_dbs/local.ign"
+								fi
 								xshok_pretty_echo_and_log "Successfully updated linuxmalwaredetect production database file: $db_file"
 								linuxmalwaredetect_updates=1
 								linuxmalwaredetect_db_update=1
@@ -1330,6 +1354,9 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 								false
 							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs ;	then
 							perms chown $clam_user:$clam_group $clam_dbs/$db_file
+							if [ "$selinux_fixes" == "yes" ] ; then
+								restorecon "$clam_dbs/$db_file"
+							fi
 							xshok_pretty_echo_and_log "Successfully updated linuxmalwaredetect production database file: $db_file"
 							linuxmalwaredetect_updates=1
 							linuxmalwaredetect_db_update=1
@@ -1447,6 +1474,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 						false
 					fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if rsync -pcqt $malwarepatrol_dir/$malwarepatrol_db $clam_dbs ;	then
 					perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
+					if [ "$selinux_fixes" == "yes" ] ; then
+						restorecon "$clam_dbs/$malwarepatrol_db"
+					fi
 					xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
 					malwarepatrol_update=1
 					do_clamd_reload=1
@@ -1473,6 +1503,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 					false
 				fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$malwarepatrol_db $clam_dbs ; then
 				perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
+				if [ "$selinux_fixes" == "yes" ] ; then
+					restorecon "$clam_dbs/$malwarepatrol_db"
+				fi
 				xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
 				malwarepatrol_update=1
 				do_clamd_reload=1
@@ -1565,6 +1598,9 @@ if [ "$yararules_enabled" == "yes" ] ; then
 									false
 								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $yararules_dir/$db_file $clam_dbs ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
+								if [ "$selinux_fixes" == "yes" ] ; then
+									restorecon "$clam_dbs/$db_file"
+								fi
 								xshok_pretty_echo_and_log "Successfully updated yararules production database file: $db_file"
 								yararules_updates=1
 								yararules_db_update=1
@@ -1591,6 +1627,9 @@ if [ "$yararules_enabled" == "yes" ] ; then
 								false
 							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs ; then
 							perms chown $clam_user:$clam_group $clam_dbs/$db_file
+							if [ "$selinux_fixes" == "yes" ] ; then
+								restorecon "$clam_dbs/$db_file"
+							fi
 							xshok_pretty_echo_and_log "Successfully updated yararules production database file: $db_file"
 							yararules_updates=1
 							yararules_db_update=1
@@ -1670,6 +1709,9 @@ if [ -n "$add_dbs" ] ; then
 				false
 			fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $add_dir/$db_file $clam_dbs ; then
 			perms chown $clam_user:$clam_group $clam_dbs/$db_file
+			if [ "$selinux_fixes" == "yes" ] ; then
+				restorecon "$clam_dbs/$db_file"
+			fi
 			xshok_pretty_echo_and_log "Successfully updated User-Added production database file: $db_file"
 			add_update=1
 			do_clamd_reload=1
@@ -1728,6 +1770,9 @@ if [ -r "$clam_dbs/local.ign" -a -s "$work_dir_configs/monitor-ign.txt" ] ; then
 				then
 				perms chown $clam_user:$clam_group "$clam_dbs/local.ign"
 				chmod 0644 "$clam_dbs/local.ign" "$work_dir_configs/monitor-ign.txt"
+				if [ "$selinux_fixes" == "yes" ] ; then
+					restorecon "$clam_dbs/local.ign"
+				fi
 				do_clamd_reload=3
 			else
 				xshok_pretty_echo_and_log "Failed to successfully update local.ign file - SKIPPING"
@@ -1770,6 +1815,10 @@ if [ -r "$clam_dbs/my-whitelist.ign2" -a -s "$work_dir_configs/tracker.txt" ] ; 
 				then
 				perms chown $clam_user:$clam_group "$clam_dbs/my-whitelist.ign2"
 				chmod 0644 "$clam_dbs/my-whitelist.ign2" "$work_dir_configs/tracker.txt"
+				if [ "$selinux_fixes" == "yes" ] ; then
+					restorecon "$clam_dbs/my-whitelist.ign2"
+					restorecon "$work_dir_configs/tracker.txt"
+				fi
 				do_clamd_reload=4
 			else
 				xshok_pretty_echo_and_log "Failed to successfully update my-whitelist.ign2 file - SKIPPING"
