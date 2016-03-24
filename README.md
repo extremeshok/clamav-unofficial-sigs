@@ -76,9 +76,10 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.0.2 (updated 2016-XX-XX)
+### Version 5.0.2 (updated 2016-03-24)
  - eXtremeSHOK.com Maintenance 
  - Detect if the entire script is available/complete
+ - Fix for Missing space between "]
 
 ### Version 5.0.1
  - eXtremeSHOK.com Maintenance 
