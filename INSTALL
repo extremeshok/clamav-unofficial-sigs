@@ -54,7 +54,8 @@ Uncompress/Unpackage the archive:
 * Copy the contents of cron.d/ into /etc/cron.d/
 * Copy the contents of logrotate.d/ into /etc/logrotate.d/
 * Copy clamav-unofficial-sigs.8 into /usr/share/man/man8/
-* Set your config options in the configs /etc/clamav-unofficial-sigs/*.conf
+* Rename the your os.your-distro.conf to os.conf, where your-distro is your distribution
+* Set your user config options in the configs /etc/clamav-unofficial-sigs/user.conf
 
 
 Install:
@@ -72,6 +73,7 @@ Install Systemd configs:
    cp -f /tmp/clamav-unofficial-sigs/systemd/*.* /etc/systemd/  
 
 Configure:
+   Rename the /etc/clamav-unofficial-sigs/os.your-distro.conf to os.conf
    Edit the /etc/clamav-unofficial-sigs/master.conf, os.conf , user.conf files
    Edit the /etc/logrotate.d/clamav-unofficial-sigs file
    Edit the /etc/cron.d/clamav-unofficial-sigs file
