@@ -24,7 +24,8 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * Copy the contents of logrotate.d/ into /etc/logrotate.d/
 * Copy clamav-unofficial-sigs.8 into /usr/share/man/man8/
 * Make the directory /var/log/clamav-unofficial-sigs/
-* Set your config options in the configs /etc/clamav-unofficial-sigs/*.conf
+* Rename the your os.your-distro.conf to os.conf, where your-distro is your distribution
+* Set your user config options in the configs /etc/clamav-unofficial-sigs/user.conf
 
 ### Systemd
 * Copy the contents of systemd/ into to /etc/systemd/
@@ -76,7 +77,12 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.0.2 (updated 2016-03-24)
+### Version 5.0.3 (updated 2016-03-27)
+ - eXtremeSHOK.com Maintenance 
+ - Added OS configs: OpenSUSE, Archlinux, Gentoo, Raspbian, FreeBSD
+ - Fixed config option enable_logging -> logging_enabled
+
+### Version 5.0.2
  - eXtremeSHOK.com Maintenance 
  - Detect if the entire script is available/complete
  - Fix for Missing space between "]
