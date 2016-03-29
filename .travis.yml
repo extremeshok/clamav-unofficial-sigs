@@ -13,5 +13,6 @@ before_install:
 #install:
 #  - sh -e .travis/ci-setup.sh
 
-#script:
+script:
+  - sh -e .travis/ci-force.sh
 #  - sh -e .travis/ci-runtest.sh
