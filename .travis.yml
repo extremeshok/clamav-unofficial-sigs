@@ -1,0 +1,17 @@
+#language: shell
+
+cache:
+  directories:
+    - $HOME/.m2/repository
+ 
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install clamav-daemon -qq
+  - sudo freshclam
+  - sudo service clamav-daemon start
+
+#install:
+#  - sh -e .travis/ci-setup.sh
+
+#script:
+#  - sh -e .travis/ci-runtest.sh

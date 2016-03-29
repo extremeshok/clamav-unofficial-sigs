@@ -693,7 +693,12 @@ clamscan_reload_dbs (){
 				xshok_pretty_echo_and_log "Update(s) detected, reloading ClamAV databases" "="
 			fi
 
-			myresult=`clamdscan --reload 2>&1`
+			if [ -z "$clamd_reload_opt" ] ; then    
+				myresult=`clamdscan --reload 2>&1`
+			else
+				myresult=`$clamd_reload_opt 2>&1`
+			fi
+
 			if [[ "$myresult" =~ "ERROR" ]] ; then
 				xshok_pretty_echo_and_log "ERROR: Failed to reload, trying again" "-"
 				if [ -r "$clamd_pid" ] ; then
