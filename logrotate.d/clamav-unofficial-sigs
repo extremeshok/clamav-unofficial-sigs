@@ -20,8 +20,19 @@
      missingok
      notifempty
      compress
-# Redhat / CentOS 6
-     create 0644 clam clam
-# Debian / Ubuntu
+
+# UNCOMMENT the specific line for your OS
+
+## Debian / Ubuntu / Archlinux / Freebsd / Gentoo / Slackware / Raspbian
 #     create 0644 clamav clamav
+
+## Redhat / CentOS 6
+#     create 0644 clam clam
+
+## Redhat / CentOS 7
+#    create 0644 clamupdate clamupdate
+
+## OpenSUSE
+#    create 0644 vscan vscan
+
 }
