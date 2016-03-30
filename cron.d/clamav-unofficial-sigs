@@ -1,7 +1,18 @@
 # ClamAV Unofficial Signature Databases Update Cron File
+###################
+# This is property of eXtremeSHOK.com
+# You are free to use, modify and distribute, however you may not remove this notice.
+# Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+##################
+# 
+# Originially based on: 
+# Script provide by Bill Landry (unofficialsigs@gmail.com).
 #
-# Author: Bill Landry <unofficialsigs@gmail.com>
+# Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 #
+# License: BSD (Berkeley Software Distribution)
+#
+##################
 # This cron file will execute the clamav-unofficial-sigs.sh script that
 # currently supports updating third-party signature databases provided
 # by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
@@ -11,4 +22,4 @@
 # 60 - 600 seconds.  Adjust the cron start time, user account to run the
 # script under, and path information shown below to meet your own needs.
 
-45 * * * * root /usr/local/bin/clamav-unofficial-sigs.sh -c /usr/local/etc/clamav-unofficial-sigs.conf
+45 * * * * root /bin/bash /usr/local/bin/clamav-unofficial-sigs.sh  > /dev/null

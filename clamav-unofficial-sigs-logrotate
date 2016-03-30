@@ -1,8 +1,0 @@
-/var/log/clamav-unofficial-sigs.log {
-     weekly
-     rotate 4
-     missingok
-     notifempty
-     compress
-     create 0600 root root
-}
