@@ -472,7 +472,7 @@ cat << EOF >> /etc/logrotate.d/clamav-unofficial-sigs-logrotate
 # 60 - 600 seconds.  Adjust the cron start time, user account to run the
 # script under, and path information shown below to meet your own needs.
 
-45 * * * * root /bin/bash /usr/local/sbin/clamav-unofficial-sigs.sh  > /dev/null
+45 * * * * root /bin/bash /usr/local/sbin/clamav-unofficial-sigs.sh  2&>/devnull > /dev/null
 EOF
 else
     echo "/etc/logrotate.d/clamav-unofficial-sigs-logrotate already exist"
