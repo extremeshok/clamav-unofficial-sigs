@@ -801,7 +801,7 @@ while true; do
 		-g | --gpg-verify ) gpg_verify_specific_sanesecurity_database_file; exit; break ;;
 		-i | --information ) output_system_configuration_information; exit; break ;;
 		-m | --make-database ) make_signature_database_from_ascii_file; exit; break ;;
-		-r | --remove-script ) make_signature_database_from_ascii_file; exit; break ;;
+		-r | --remove-script ) remove_script; exit; break ;;
 		-t | --test-database ) clamscan_integrity_test_specific_database_file; exit; break ;;
 		-o | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
 		-w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
