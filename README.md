@@ -1,4 +1,4 @@
-# clamav-unofficial-sigs
+# clamav-unofficial-sigs [![Build Status](https://travis-ci.org/extremeshok/clamav-unofficial-sigs.svg?branch=master)](https://travis-ci.org/extremeshok/clamav-unofficial-sigs)
 ClamAV Unofficial Signatures Updater
 
 Github fork of the sourceforge hosted and non maintained utility.
