@@ -1190,10 +1190,10 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 		else
 			break
 		fi
-		fi
 	else
 		xshok_pretty_echo_and_log "Connection to $sanesecurity_mirror_site_info failed - Trying next mirror site..."
 	fi
+fi
 done
 if [ "$sanesecurity_rsync_success" != "1" ] ; then
 	xshok_pretty_echo_and_log "Access to all Sanesecurity mirror sites failed - Check for connectivity issues"
