@@ -1105,7 +1105,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 		if [ ${#sanesecurity_dbs[@]} -gt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed sanesecurity_dbs config is invalid or not defined - SKIPPING"
 		else
-
+		
 		db_file=""
 		xshok_pretty_echo_and_log "Sanesecurity Database & GPG Signature File Updates" "="
 		sanesecurity_mirror_ips=`dig +ignore +short $sanesecurity_url`
@@ -1193,13 +1193,13 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 	else
 		xshok_pretty_echo_and_log "Connection to $sanesecurity_mirror_site_info failed - Trying next mirror site..."
 	fi
-fi
 done
-if [ "$sanesecurity_rsync_success" != "1" ] ; then
-	xshok_pretty_echo_and_log "Access to all Sanesecurity mirror sites failed - Check for connectivity issues"
-	xshok_pretty_echo_and_log "or signature database name(s) misspelled in the script's configuration file."
-fi
-fi
+			if [ "$sanesecurity_rsync_success" != "1" ] ; then
+				xshok_pretty_echo_and_log "Access to all Sanesecurity mirror sites failed - Check for connectivity issues"
+				xshok_pretty_echo_and_log "or signature database name(s) misspelled in the script's configuration file."
+			fi
+		fi
+	fi
 fi
 
 ##############################################################################################################################################
