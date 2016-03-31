@@ -110,6 +110,24 @@ function xshok_check_s2 () {
 	fi
 }
 
+# function to count array elements and output the total element count
+# Usage:
+# array=("one" "two" "three")
+# xshok_array_count $array
+# 3
+function xshok_array_count () {
+	k_array=$@
+	if [ -n "$k_array" ] ; then
+		i="0"
+		for k  in $k_array ; do
+			let i=$i+1;
+		done
+		echo "$i"
+	else
+		echo "0"
+	fi
+}
+
 #function for help and usage
 function help_and_usage () {
 	echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
