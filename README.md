@@ -310,10 +310,11 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
--c, --config    Direct script to use a specific configuration file
-        eg: '-c /path/to/clamav-unofficial-sigs.conf'
-        Optional if the default config is available
-        Default: /etc/clamav-unofficial-sigs.conf
+-c, --config    Use a specific configuration file or directory
+        eg: '-c /your/dir' or ' -c /your/file.name'
+        Note: If a directory is specified the directory must contain atleast
+        master.conf, os.conf or user.conf.
+        Default Directory: /etc/clamav-unofficial-sigs.conf
 
 -F, --force         Force all databases to be downloaded, could cause ip to be blocked
 

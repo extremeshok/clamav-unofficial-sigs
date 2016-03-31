@@ -114,9 +114,9 @@ function xshok_check_s2 () {
 function help_and_usage () {
 	echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
 
-	echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tUse a specific configuration file or directory\n\teg: '-c /your/dir' or ' -c /your/file.name' \n\tNote: If a directory is specified the directory must contain atleast master.conf, os.conf or user.conf."
+	echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tUse a specific configuration file or directory\n\teg: '-c /your/dir' or ' -c /your/file.name' \n\tNote: If a directory is specified the directory must contain atleast: \n\tmaster.conf, os.conf or user.conf\n\tDefault Directory: $config_dir"
 
-	echo -e "\n${BOLD}-F${BOLD}--force${NORM}\t\tForce all databases to be downloaded, could cause ip to be blocked"
+	echo -e "\n${BOLD}-F${BOLD}, --force${NORM}\t\tForce all databases to be downloaded, could cause ip to be blocked"
 
 	echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
 
