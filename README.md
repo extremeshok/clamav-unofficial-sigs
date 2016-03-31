@@ -314,7 +314,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         eg: '-c /your/dir' or ' -c /your/file.name'
         Note: If a directory is specified the directory must contain atleast
         master.conf, os.conf or user.conf.
-        Default Directory: /etc/clamav-unofficial-sigs.conf
+        Default Directory: /etc/clamav-unofficial-sigs
 
 -F, --force         Force all databases to be downloaded, could cause ip to be blocked
 
