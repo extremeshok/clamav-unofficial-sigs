@@ -111,6 +111,7 @@ function xshok_check_s2 () {
 }
 
 # function to count array elements and output the total element count
+# required due to compound array assignment
 # Usage:
 # array=("one" "two" "three")
 # xshok_array_count $array
@@ -179,7 +180,6 @@ version_date="31 March 2016"
 config_dir="/etc/clamav-unofficial-sigs"
 config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
 
-
 #Initialise 
 config_version="0"
 do_clamd_reload="0"
@@ -189,6 +189,13 @@ forced_updates="no"
 logging_enabled="no"
 custom_config="no"
 we_have_a_config="0"
+
+#Default Binaries & Commands
+clamd_reload_opt="clamdscan --reload"  
+clamscan_bin=`which clamscan`
+rsync_bin=`which rsync`
+curl_bin=`which curl`
+gpg_bin=`which gpg`
 
 #Detect if terminal
 if [ -t 1 ] ; then
@@ -337,6 +344,35 @@ work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
 gpg_dir=$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')
 add_dir=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
 
+### SANITY checks
+#Check default Binaries & Commands are defined
+if [ "$clamd_reload_opt" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt" "="
+	exit 1
+fi
+if [ "$clamscan_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found" "="
+	exit 1
+fi
+if [ "$rsync_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found" "="
+	exit 1
+fi
+if [ "$curl_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: curl binary (curl_bin) not found" "="
+	exit 1
+fi
+if [ "$gpg_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
+	exit 1
+fi
+#Check default directories are defined
+if [ "$work_dir" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not defined" "="
+	exit 1
+fi
+
+
 ################################################################################
 
 # Reset the update timers to force a full update.
@@ -404,8 +440,8 @@ gpg_verify_specific_sanesecurity_database_file () {
 	if [ -r "$sanesecurity_dir/$db_file" ] ; then
 		xshok_pretty_echo_and_log "GPG signature testing database file: $sanesecurity_dir/$db_file"
 
-		if ! gpg --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
-			gpg --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
+		if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
+			$gpg_bin --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
 		fi
 	else
 		xshok_pretty_echo_and_log "File '$db_file' cannot be found or is not a Sanesecurity database file."
@@ -420,25 +456,19 @@ output_system_configuration_information () {
 	echo "*** SCRIPT VERSION ***"
 	echo "`basename $0` $version ($version_date)"
 	echo "*** SYSTEM INFORMATION ***"
-	uname=`which uname`
-	$uname -a
+	$uname_bin -a
 	echo "*** CLAMSCAN LOCATION & VERSION ***"
-	clamscan=`which clamscan`
-	echo "$clamscan"
-	$clamscan --version | head -1
+	echo "$clamscan_bin"
+	$clamscan_bin --version | head -1
 	echo "*** RSYNC LOCATION & VERSION ***"
-	rsync=`which rsync`
-	echo "$rsync"
-	$rsync --version | head -1
+	echo "$rsync_bin"
+	$rsync_bin --version | head -1
 	echo "*** CURL LOCATION & VERSION ***"
-	curl=`which curl`
-	echo "$curl"
-	$curl --version | head -1
-
+	echo "$curl_bin"
+	$curl_bin --version | head -1
 	echo "*** GPG LOCATION & VERSION ***"
-	gpg=`which gpg`
-	echo "$gpg"
-	$gpg --version | head -1
+	echo "$gpg_bin"
+	$gpg_bin --version | head -1
 
 	echo "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
 	ls -ld $work_dir
@@ -544,7 +574,7 @@ make_signature_database_from_ascii_file () {
 
 
 		echo "Signature database file created at: $path_file"
-		if clamscan --quiet -d "$path_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
+		if $clamscan_bin --quiet -d "$path_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
 
 			echo "Clamscan reports database integrity tested good."
 
@@ -552,7 +582,7 @@ make_signature_database_from_ascii_file () {
 			read reply
 			if [ "$reply" = "y" -o "$reply" = "Y" ] ; then
 				if ! cmp -s "$path_file" "$clam_dbs/$db_file" ; then
-					if rsync -pcqt "$path_file" "$clam_dbs" ; then
+					if $rsync_bin -pcqt "$path_file" "$clam_dbs" ; then
 						perms chown $clam_user:$clam_group "$clam_dbs/$db_file"
 						chmod 0644 "$clam_dbs/$db_file"
 						if [ "$selinux_fixes" == "yes" ] ; then
@@ -642,7 +672,7 @@ clamscan_integrity_test_specific_database_file (){
 	if [ -r "$db_file" ] ; then
 		echo "Clamscan integrity testing: $db_file"
 
-		if clamscan --quiet -d "$db_file" "$work_dir_configs/scan-test.txt" ; then
+		if $clamscan_bin --quiet -d "$db_file" "$work_dir_configs/scan-test.txt" ; then
 			echo "Clamscan reports that '$input' database integrity tested GOOD"
 		fi
 	else
@@ -688,8 +718,8 @@ add_signature_whitelist_entry () {
 				cp -f my-whitelist.ign2 "$work_dir_configs" 2>/dev/null
 				echo "$sig_name" >> "$work_dir_configs/my-whitelist.ign2"
 				echo "$sig_full" >> "$work_dir_configs/tracker.txt"
-				if clamscan --quiet -d "$work_dir_configs/my-whitelist.ign2" "$work_dir_configs/scan-test.txt" ; then
-					if rsync -pcqt $work_dir_configs/my-whitelist.ign2 $clam_dbs ; then
+				if $clamscan_bin --quiet -d "$work_dir_configs/my-whitelist.ign2" "$work_dir_configs/scan-test.txt" ; then
+					if $rsync_bin -pcqt $work_dir_configs/my-whitelist.ign2 $clam_dbs ; then
 						perms chown $clam_user:$clam_group my-whitelist.ign2
 
 						if [ ! -s "$work_dir_configs/monitor-ign.txt" ] ; then 
@@ -748,13 +778,7 @@ clamscan_reload_dbs (){
 				xshok_pretty_echo_and_log "Update(s) detected, reloading ClamAV databases" "="
 			fi
 
-			if [ -z "$clamd_reload_opt" ] ; then    
-				myresult=`clamdscan --reload 2>&1`
-			else
-				myresult=`$clamd_reload_opt 2>&1`
-			fi
-
-			if [[ "$myresult" =~ "ERROR" ]] ; then
+			if [[ `$clamd_reload_opt 2>&1` =~ "ERROR" ]] ; then
 				xshok_pretty_echo_and_log "ERROR: Failed to reload, trying again" "-"
 				if [ -r "$clamd_pid" ] ; then
 					mypid=`cat $clamd_pid`
@@ -896,14 +920,14 @@ if [ -n "$ham_dir" -a -d "$work_dir" -a ! -d "$test_dir" ] ; then
 	if [ -d "$ham_dir" ] ; then
 		mkdir -p "$test_dir"
 		cp -f "$work_dir"/*/*.ndb "$test_dir"
-		clamscan --infected --no-summary -d "$test_dir" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "$work_dir_configs/whitelist.txt"
+		$clamscan_bin --infected --no-summary -d "$test_dir" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "$work_dir_configs/whitelist.txt"
 		grep -h -f "$work_dir_configs/whitelist.txt" "$test_dir"/* | cut -d "*" -f2 | sort | uniq > "$work_dir_configs/whitelist.hex"
 		cd "$test_dir"
 		for db_file in `ls`; do
 			grep -h -v -f "$work_dir_configs/whitelist.hex" "$db_file" > "$db_file-tmp"
 			mv -f "$db_file-tmp" "$db_file"
-			if clamscan --quiet -d "$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
-				if rsync -pcqt $db_file $clam_dbs ; then
+			if $clamscan_bin --quiet -d "$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
+				if $rsync_bin -pcqt $db_file $clam_dbs ; then
 					perms chown $clam_user:$clam_group $clam_dbs/$db_file
 					if [ "$selinux_fixes" == "yes" ] ; then
 						restorecon "$clam_dbs/$db_file"
@@ -932,14 +956,14 @@ chmod 0700 "$gpg_dir"
 
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$gpg_dir/publickey.gpg" ] ; then
-	if ! curl -s -S $curl_proxy $curl_insecure --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o $gpg_dir/publickey.gpg 2>/dev/null ; then
+	if ! $curl_bin -s -S $curl_proxy $curl_insecure --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o $gpg_dir/publickey.gpg 2>/dev/null ; then
 		xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
 		exit 1
 	else
 
 		xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully downloaded"
 		rm -f -- "$gpg_dir/ss-keyring.gp*"
-		if ! gpg -q --no-options --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --import $gpg_dir/publickey.gpg 2>/dev/null ; then
+		if ! $gpg_bin -q --no-options --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --import $gpg_dir/publickey.gpg 2>/dev/null ; then
 			xshok_pretty_echo_and_log "ALERT: could not import Sanesecurity public GPG key to custom keyring" "*"
 			exit 1
 		else
@@ -952,7 +976,7 @@ fi
 # If custom keyring is missing, try to re-import Sanesecurity public GPG key.
 if [ ! -s "$gpg_dir/ss-keyring.gpg" ] ; then
 	rm -f -- "$gpg_dir/ss-keyring.gp*"
-	if ! gpg -q --no-options --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --import $gpg_dir/publickey.gpg 2>/dev/null ; then
+	if ! $gpg_bin -q --no-options --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --import $gpg_dir/publickey.gpg 2>/dev/null ; then
 		xshok_pretty_echo_and_log "ALERT: Custom keyring MISSING or CORRUPT!  Could not import Sanesecurity public GPG key to custom keyring" "*"
 		exit 1
 	else
@@ -1089,12 +1113,12 @@ if [ "$rsync_silence" = "yes" ] ; then
 fi
 
 # If the local rsync client supports the '--no-motd' flag, then enable it.
-if rsync --help | grep 'no-motd' > /dev/null ; then
+if $rsync_bin --help | grep 'no-motd' > /dev/null ; then
 	no_motd="--no-motd"
 fi
 
 # If the local rsync client supports the '--contimeout' flag, then enable it.
-if rsync --help | grep 'contimeout' > /dev/null ; then
+if $rsync_bin --help | grep 'contimeout' > /dev/null ; then
 	connect_timeout="--contimeout=$rsync_connect_timeout"
 fi
 
@@ -1155,15 +1179,15 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 			fi
 			sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
 			xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
-			rsync $rsync_output_level $no_motd --files-from=$sanesecurity_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$sanesecurity_mirror_ip/sanesecurity $sanesecurity_dir 2>/dev/null
+			$rsync_bin $rsync_output_level $no_motd --files-from=$sanesecurity_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$sanesecurity_mirror_ip/sanesecurity $sanesecurity_dir 2>/dev/null
 			if [ "$?" -eq "0" ] ; then #the correct way
 				sanesecurity_rsync_success="1"
 				for db_file in $sanesecurity_dbs ; do
 					if ! cmp -s $sanesecurity_dir/$db_file $clam_dbs/$db_file ; then
 
 						xshok_pretty_echo_and_log "Testing updated Sanesecurity database file: $db_file"
-						if ! gpg --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
-							gpg --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
+						if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
+							$gpg_bin --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
 						fi
 						if [ "$?" = "0" ] ; then
 							test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
@@ -1175,7 +1199,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 						if [ "$?" = "0" ] ; then
 							db_ext=`echo $db_file | cut -d "." -f2`
 							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
-								if clamscan --quiet -d "$sanesecurity_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
+								if $clamscan_bin --quiet -d "$sanesecurity_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
 									xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
 									true
 								else
@@ -1186,7 +1210,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $sanesecurity_dir/$db_file $clam_dbs 2>/dev/null ; then
+								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $sanesecurity_dir/$db_file $clam_dbs 2>/dev/null ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/$db_file"
@@ -1200,18 +1224,18 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 							fi
 						else
 							grep -h -v -f "$work_dir_configs/whitelist.hex" "$sanesecurity_dir/$db_file" > "$test_dir/$db_file"
-							clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
+							$clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
 							grep -h -f "$work_dir_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f2 | sort | uniq >> "$work_dir_configs/whitelist.hex"
 							grep -h -v -f "$work_dir_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
 							mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-							if clamscan --quiet -d "$test_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
+							if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
 								xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
 								true
 							else
 								xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
 								##DO NOT KILL THIS DB
 								false
-							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
+							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
 							perms chown $clam_user:$clam_group $clam_dbs/$db_file
 							if [ "$selinux_fixes" == "yes" ] ; then
 								restorecon "$clam_dbs/$db_file"
@@ -1281,7 +1305,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 					else
 						z_opt=""
 					fi
-					if curl $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o "$securiteinfo_dir/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file" 2>/dev/null ;	then
+					if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o "$securiteinfo_dir/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file" 2>/dev/null ;	then
 						loop="1"
 						if ! cmp -s $securiteinfo_dir/$db_file $clam_dbs/$db_file ; then
 							if [ "$?" = "0" ] ; then
@@ -1290,7 +1314,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 								xshok_pretty_echo_and_log "Testing updated SecuriteInfo database file: $db_file"
 								if [ -z "$ham_dir" -o "$db_ext" != "ndb" ]
 									then
-									if clamscan --quiet -d "$securiteinfo_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
+									if $clamscan_bin --quiet -d "$securiteinfo_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
 										then
 										xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
 										true
@@ -1302,7 +1326,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 											fi
 										fi
 										false
-									fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $securiteinfo_dir/$db_file $clam_dbs 2>/dev/null ; then
+									fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $securiteinfo_dir/$db_file $clam_dbs 2>/dev/null ; then
 									perms chown $clam_user:$clam_group $clam_dbs/$db_file
 									if [ "$selinux_fixes" == "yes" ] ; then
 										restorecon "$clam_dbs/$db_file"
@@ -1316,11 +1340,11 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 								fi
 							else
 								grep -h -v -f "$work_dir_configs/whitelist.hex" "$securiteinfo_dir/$db_file" > "$test_dir/$db_file"
-								clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
+								$clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
 								grep -h -f "$work_dir_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f2 | sort | uniq >> "$work_dir_configs/whitelist.hex"
 								grep -h -v -f "$work_dir_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
 								mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-								if clamscan --quiet -d "$test_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
+								if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
 									then
 									xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
 									true
@@ -1333,7 +1357,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
+								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/$db_file"
@@ -1405,7 +1429,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 				else
 					z_opt=""
 				fi
-				if curl $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $linuxmalwaredetect_dir/$db_file "$linuxmalwaredetect_url/$db_file" 2>/dev/null ; then
+				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $linuxmalwaredetect_dir/$db_file "$linuxmalwaredetect_url/$db_file" 2>/dev/null ; then
 					loop="1"
 					if ! cmp -s $linuxmalwaredetect_dir/$db_file $clam_dbs/$db_file ; then
 						if [ "$?" = "0" ] ; then
@@ -1413,7 +1437,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 
 							xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
 							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
-								if clamscan --quiet -d "$linuxmalwaredetect_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
+								if $clamscan_bin --quiet -d "$linuxmalwaredetect_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
 									then
 									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
 									true
@@ -1425,7 +1449,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $linuxmalwaredetect_dir/$db_file $clam_dbs 2>/dev/null ; then
+								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $linuxmalwaredetect_dir/$db_file $clam_dbs 2>/dev/null ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/local.ign"
@@ -1439,11 +1463,11 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 							fi
 						else
 							grep -h -v -f "$work_dir_configs/whitelist.hex" "$linuxmalwaredetect_dir/$db_file" > "$test_dir/$db_file"
-							clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
+							$clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
 							grep -h -f "$work_dir_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f2 | sort | uniq >> "$work_dir_configs/whitelist.hex"
 							grep -h -v -f "$work_dir_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
 							mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-							if clamscan --quiet -d "$test_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
+							if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
 								xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
 								true
 							else
@@ -1454,7 +1478,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 									fi
 								fi
 								false
-							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ;	then
+							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ;	then
 							perms chown $clam_user:$clam_group $clam_dbs/$db_file
 							if [ "$selinux_fixes" == "yes" ] ; then
 								restorecon "$clam_dbs/$db_file"
@@ -1530,7 +1554,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
 				malwarepatrol_reloaded=0
 				if [ "$malwarepatrol_free" == "yes" ] ; then
-					if curl $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
+					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
 						if ! cmp -s $malwarepatrol_dir/$malwarepatrol_db $clam_dbs/$malwarepatrol_db ; then
 							if [ "$?" = "0" ] ; then
 								malwarepatrol_reloaded=1
@@ -1543,13 +1567,13 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 					fi # if culr
 
 				else # The not free branch
-					if curl $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db.md5 "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1" 2>/dev/null ;	then
+					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db.md5 "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1" 2>/dev/null ;	then
 						if [ -f $clam_dbs/$malwarepatrol_db ] ; then
 							malwarepatrol_md5=`openssl md5 -r $clam_dbs/$malwarepatrol_db | cut -d" " -f1`
 						fi
 						malwarepatrol_md5_new=`cat $malwarepatrol_dir/$malwarepatrol_db.md5`
 						if [ -n "$malwarepatrol_md5_new" -a "$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ; then
-							if curl $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
+							if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
 								malwarepatrol_reloaded=1
 							else # curl DB fail
 								malwarepatrol_reloaded=-1
@@ -1563,7 +1587,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 				case "$malwarepatrol_reloaded" in 
 					1) # database was updated, need test and reload 
 					xshok_pretty_echo_and_log "Testing updated MalwarePatrol database file: $malwarepatrol_db"
-					if clamscan --quiet -d "$malwarepatrol_dir/$malwarepatrol_db" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
+					if $clamscan_bin --quiet -d "$malwarepatrol_dir/$malwarepatrol_db" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
 						xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
 						true
 					else
@@ -1574,7 +1598,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							fi
 						fi
 						false
-					fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if rsync -pcqt $malwarepatrol_dir/$malwarepatrol_db $clam_dbs 2>/dev/null ;	then
+					fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $malwarepatrol_dir/$malwarepatrol_db $clam_dbs 2>/dev/null ;	then
 					perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
 					if [ "$selinux_fixes" == "yes" ] ; then
 						restorecon "$clam_dbs/$malwarepatrol_db"
@@ -1588,11 +1612,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 				;; # The strange case when $? != 0 in the original
 				2)
 				grep -h -v -f "$work_dir_configs/whitelist.hex" "$malwarepatrol_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
-				clamscan --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
+				$clamscan_bin --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
 				grep -h -f "$work_dir_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "*" -f2 | sort | uniq >> "$work_dir_configs/whitelist.hex"
 				grep -h -v -f "$work_dir_configs/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
 				mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
-				if clamscan --quiet -d "$test_dir/$malwarepatrol_db" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
+				if $clamscan_bin --quiet -d "$test_dir/$malwarepatrol_db" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
 					xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
 					true
 				else
@@ -1603,7 +1627,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 						fi
 					fi
 					false
-				fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$malwarepatrol_db $clam_dbs 2>/dev/null ; then
+				fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$malwarepatrol_db $clam_dbs 2>/dev/null ; then
 				perms chown $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
 				if [ "$selinux_fixes" == "yes" ] ; then
 					restorecon "$clam_dbs/$malwarepatrol_db"
@@ -1678,7 +1702,7 @@ if [ "$yararules_enabled" == "yes" ] ; then
 				else
 					z_opt=""
 				fi
-				if curl $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $yararules_dir/$db_file "$yararules_url$yr_dir/$db_file" 2>/dev/null ; then
+				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $yararules_dir/$db_file "$yararules_url$yr_dir/$db_file" 2>/dev/null ; then
 					loop="1"
 					if ! cmp -s $yararules_dir/$db_file $clam_dbs/$db_file ; then
 						if [ "$?" = "0" ] ; then
@@ -1686,7 +1710,7 @@ if [ "$yararules_enabled" == "yes" ] ; then
 
 							xshok_pretty_echo_and_log "Testing updated yararules database file: $db_file"
 							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
-								if clamscan --quiet -d "$yararules_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
+								if $clamscan_bin --quiet -d "$yararules_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
 									then
 									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good"
 									true
@@ -1698,7 +1722,7 @@ if [ "$yararules_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $yararules_dir/$db_file $clam_dbs 2>/dev/null ; then
+								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $yararules_dir/$db_file $clam_dbs 2>/dev/null ; then
 								perms chown $clam_user:$clam_group $clam_dbs/$db_file
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/$db_file"
@@ -1712,11 +1736,11 @@ if [ "$yararules_enabled" == "yes" ] ; then
 							fi
 						else
 							grep -h -v -f "$work_dir_configs/whitelist.hex" "$yararules_dir/$db_file" > "$test_dir/$db_file"
-							clamscan --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
+							$clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
 							grep -h -f "$work_dir_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f2 | sort | uniq >> "$work_dir_configs/whitelist.hex"
 							grep -h -v -f "$work_dir_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
 							mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-							if clamscan --quiet -d "$test_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
+							if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
 								xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good"
 								true
 							else
@@ -1727,7 +1751,7 @@ if [ "$yararules_enabled" == "yes" ] ; then
 									fi
 								fi
 								false
-							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
+							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
 							perms chown $clam_user:$clam_group $clam_dbs/$db_file
 							if [ "$selinux_fixes" == "yes" ] ; then
 								restorecon "$clam_dbs/$db_file"
@@ -1778,7 +1802,7 @@ if [ -n "$add_dbs" ] ; then
 		base_url=`echo $db_url | cut -d "/" -f3`
 		db_file=`basename $db_url`
 		if [ "`echo $db_url | cut -d ":" -f1`" = "rsync" ] ; then
-			if ! rsync $rsync_output_level $no_motd $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt -crtuz --stats --exclude=*.sha256 --exclude=*.sig --exclude=*.gz $db_url $add_dir 2>/dev/null ;  then
+			if ! $rsync_bin $rsync_output_level $no_motd $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt -crtuz --stats --exclude=*.sha256 --exclude=*.sig --exclude=*.gz $db_url $add_dir 2>/dev/null ;  then
 				xshok_pretty_echo_and_log "Failed rsync connection to $base_url - SKIPPED $db_file update"
 			fi
 		else
@@ -1787,7 +1811,7 @@ if [ -n "$add_dbs" ] ; then
 			else
 				z_opt=""
 			fi
-			if ! curl $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $add_dir/$db_file $db_url 2>/dev/null ; then
+			if ! $curl_bin $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $add_dir/$db_file $db_url 2>/dev/null ; then
 				xshok_pretty_echo_and_log "Failed curl connection to $base_url - SKIPPED $db_file update"
 			fi
 		fi
@@ -1797,7 +1821,7 @@ if [ -n "$add_dbs" ] ; then
 		if ! cmp -s $add_dir/$db_file $clam_dbs/$db_file ; then
 
 			xshok_pretty_echo_and_log "Testing updated database file: $db_file"
-			clamscan --quiet -d "$add_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
+			$clamscan_bin --quiet -d "$add_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null
 			if [ "$?" = "0" ] ; then
 				xshok_pretty_echo_and_log "Clamscan reports $db_file database integrity tested good"
 				true
@@ -1809,7 +1833,7 @@ if [ -n "$add_dbs" ] ; then
 					fi
 				fi
 				false
-			fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if rsync -pcqt $add_dir/$db_file $clam_dbs ; then
+			fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $add_dir/$db_file $clam_dbs ; then
 			perms chown $clam_user:$clam_group $clam_dbs/$db_file
 			if [ "$selinux_fixes" == "yes" ] ; then
 				restorecon "$clam_dbs/$db_file"
@@ -1866,9 +1890,9 @@ if [ -r "$clam_dbs/local.ign" -a -s "$work_dir_configs/monitor-ign.txt" ] ; then
 		fi
 	done
 	if [ "$ign_updated" = "1" ] ; then
-		if clamscan --quiet -d "$work_dir_configs/local.ign" "$work_dir_configs/scan-test.txt"
+		if $clamscan_bin --quiet -d "$work_dir_configs/local.ign" "$work_dir_configs/scan-test.txt"
 			then
-			if rsync -pcqt $work_dir_configs/local.ign $clam_dbs
+			if $rsync_bin -pcqt $work_dir_configs/local.ign $clam_dbs
 				then
 				perms chown $clam_user:$clam_group "$clam_dbs/local.ign"
 				chmod 0644 "$clam_dbs/local.ign" "$work_dir_configs/monitor-ign.txt"
@@ -1911,9 +1935,9 @@ if [ -r "$clam_dbs/my-whitelist.ign2" -a -s "$work_dir_configs/tracker.txt" ] ; 
 	xshok_pretty_echo_and_log "" "=" "80"
 	if [ "$ign2_updated" = "1" ]
 		then
-		if clamscan --quiet -d "$work_dir_configs/my-whitelist.ign2" "$work_dir_configs/scan-test.txt"
+		if $clamscan_bin --quiet -d "$work_dir_configs/my-whitelist.ign2" "$work_dir_configs/scan-test.txt"
 			then
-			if rsync -pcqt $work_dir_configs/my-whitelist.ign2 $clam_dbs
+			if $rsync_bin -pcqt $work_dir_configs/my-whitelist.ign2 $clam_dbs
 				then
 				perms chown $clam_user:$clam_group "$clam_dbs/my-whitelist.ign2"
 				chmod 0644 "$clam_dbs/my-whitelist.ign2" "$work_dir_configs/tracker.txt"
