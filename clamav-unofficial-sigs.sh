@@ -152,9 +152,9 @@ function help_and_usage () {
 }
 
 #Script Info
-version="5.0.3"
-minimum_required_config_version="55"
-version_date="27 March 2016"
+version="5.0.X"
+minimum_required_config_version="56"
+version_date="XX XXXXX 2016"
 
 #default config files
 config_dir="/etc/clamav-unofficial-sigs"
@@ -271,8 +271,6 @@ for config_file in "${config_files[@]}" ; do
 	fi
 done
 
-
-
 ## Make sure we have a readable config file
 if [ "$we_have_a_config" == "0" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
@@ -291,6 +289,16 @@ if [ "$user_configuration_complete" != "yes" ] ; then
 	xshok_pretty_echo_and_log "Please review the script configuration files."
 	exit 1
 fi
+
+# Assign the directories
+sanesecurity_dir="$work_dir/$sanesecurity_dir"
+securiteinfo_dir="$work_dir/$securiteinfo_dir"
+linuxmalwaredetect_dir="$work_dir/$linuxmalwaredetect_dir"
+malwarepatrol_dir="$work_dir/$malwarepatrol_dir"
+yararules_dir="$work_dir/$yararules_dir"
+work_dir_configs="$work_dir/$work_dir_configs"
+gpg_dir="$work_dir/$gpg_dir"
+add_dir="$work_dir/$add_dir"
 
 
 ################################################################################
