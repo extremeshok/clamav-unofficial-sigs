@@ -291,16 +291,16 @@ if [ "$user_configuration_complete" != "yes" ] ; then
 fi
 
 # Assign the directories and remove trailing / (removes / and //)
-$work_dir=$(echo "$work_dir" | sed 's:/*$::')
+work_dir=$(echo "$work_dir" | sed 's:/*$::')
 
-$sanesecurity_dir=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
-$securiteinfo_dir=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
-$linuxmalwaredetect_dir=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
-$malwarepatrol_dir=$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')
-$yararules_dir=$(echo "$work_dir/$yararules_dir" | sed 's:/*$::')
-$work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
-$gpg_dir=$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')
-$add_dir=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
+sanesecurity_dir=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
+securiteinfo_dir=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
+linuxmalwaredetect_dir=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
+malwarepatrol_dir=$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')
+yararules_dir=$(echo "$work_dir/$yararules_dir" | sed 's:/*$::')
+work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
+gpg_dir=$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')
+add_dir=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
 
 ################################################################################
 
