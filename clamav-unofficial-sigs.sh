@@ -1102,7 +1102,12 @@ fi
 ################################################################
 if [ "$sanesecurity_enabled" == "yes" ] ; then
 	if [ -n "$sanesecurity_dbs" ] ; then
-		if [ ${#sanesecurity_dbs[@]} -gt "1" ] ; then
+		##if [ ${#sanesecurity_dbs[@]} -lt "1" ] ; then ##will not work due to compound array assignment
+		array_counter="0"
+		for db_file in $sanesecurity_dbs ; do
+			let array_counter=$array_counter+1;
+		done
+		if [ "$array_counter" -lt "1";
 			xshok_pretty_echo_and_log "Failed sanesecurity_dbs config is invalid or not defined - SKIPPING"
 		else
 		
