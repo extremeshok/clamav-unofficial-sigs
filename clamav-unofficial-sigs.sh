@@ -114,7 +114,7 @@ function xshok_check_s2 () {
 function help_and_usage () {
 	echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
 
-	echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tDirect script to use a specific configuration file\n\teg: '-c /path/to/`basename $default_config`'\n\tOptional if the default config is available\n\tDefault: $default_config"
+	echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tUse a specific configuration file or directory\n\teg: '-c /your/dir' or ' -c /your/file.name' \n\tNote: If a directory is specified the directory must contain atleast master.conf, os.conf or user.conf."
 
 	echo -e "\n${BOLD}-F${BOLD}--force${NORM}\t\tForce all databases to be downloaded, could cause ip to be blocked"
 
@@ -235,7 +235,8 @@ done
 ## CONFIG LOADING AND ERROR CHECKING ##############################################
 if [ "$custom_config" != "no" ] ; then
 	if [ -d "$custom_config" ]; then
-		config_dir="$custom_config"
+		# Assign the custom config dir and remove trailing / (removes / and //)
+		config_dir=$(echo "$custom_config" | sed 's:/*$::')
 		config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
 	else
 		config_files=("$custom_config")
@@ -424,7 +425,16 @@ output_system_configuration_information () {
 	ls -l $clam_dbs | grep -v total
 
 	echo "*** SCRIPT CONFIGURATION SETTINGS ***"
-	egrep -v "^#|^$" $default_config
+	if [ "$custom_config" != "no" ] ; then
+		if [ -d "$custom_config" ]; then
+			# Assign the custom config dir and remove trailing / (removes / and //)
+			echo "Custom Configuration Directory: $config_dir"
+		else
+			echo "Custom Configuration File: $custom_config"
+		fi
+	else
+		echo "Configuration Directory: $config_dir"
+	fi
 }
 
 #Make a signature database from an ascii file
@@ -578,8 +588,10 @@ remove_script () {
 					rm -f "$man_file"
 					echo "     Removed file: $man_file"
 				fi
-				rm -f -- "$default_config" && echo "     Removed file: $default_config"
-				rm -f -- "$0" && echo "     Removed file: $0"
+				
+				#rather keep the configs
+				#rm -f -- "$default_config" && echo "     Removed file: $default_config"
+				#rm -f -- "$0" && echo "     Removed file: $0"
 				rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
 
 				echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"

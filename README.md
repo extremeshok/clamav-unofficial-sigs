@@ -77,7 +77,12 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.0.4 (updated 2016-03-31)
+### Version 5.0.X (updated 2016-XX-XX)
+ - eXtremeSHOK.com Maintenance 
+ - Add support for specifying a custom config dir or file with (--config) -c option
+ - Removed default_config
+
+### Version 5.0.4
  - eXtremeSHOK.com Maintenance 
  - Added/Updated OS configs: CentOS 7, FreeBSD, Slackware
  - Added clamd_reload_opt to fix issues with centos7 conf
