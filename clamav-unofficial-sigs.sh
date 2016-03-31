@@ -1102,8 +1102,11 @@ fi
 ################################################################
 if [ "$sanesecurity_enabled" == "yes" ] ; then
 	if [ -n "$sanesecurity_dbs" ] ; then
-		db_file=""
+		if [ ${#sanesecurity_dbs[@]} -gt "1" ] ; then
+			xshok_pretty_echo_and_log "Failed sanesecurity_dbs config is invalid or not defined - SKIPPING"
+		else
 
+		db_file=""
 		xshok_pretty_echo_and_log "Sanesecurity Database & GPG Signature File Updates" "="
 		sanesecurity_mirror_ips=`dig +ignore +short $sanesecurity_url`
 		for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
@@ -1182,11 +1185,11 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 			fi
 		done
 		if [ "$sanesecurity_update" != "1" ] ; then
-
 			xshok_pretty_echo_and_log "No Sanesecurity database file updates found" "-"
 			break
 		else
 			break
+		fi
 		fi
 	else
 		xshok_pretty_echo_and_log "Connection to $sanesecurity_mirror_site_info failed - Trying next mirror site..."
