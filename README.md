@@ -77,7 +77,22 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.0.3 (updated 2016-03-27)
+### Version 5.0.4 (updated 2016-03-31)
+ - eXtremeSHOK.com Maintenance 
+ - Added/Updated OS configs: CentOS 7, FreeBSD, Slackware
+ - Added clamd_reload_opt to fix issues with centos7 conf
+ - Fix --remove-script should call remove_script() function by @IdahoPL
+ - Add OS specific settings to logrotate
+ - Increased default timeout values
+ - Attempt to Silence more output
+ - Create the log_file_path directory before we touch the file.
+ - Updated config file to remove the $work_dir varible from dir names
+ - Remove trailing / from directory names
+ - Initial support for Travis-Ci testing
+ - Fixed config option enable_logging -> logging_enabled
+ - Config updated to 56 due to changes
+
+### Version 5.0.3
  - eXtremeSHOK.com Maintenance 
  - Added OS configs: OpenSUSE, Archlinux, Gentoo, Raspbian, FreeBSD
  - Fixed config option enable_logging -> logging_enabled
