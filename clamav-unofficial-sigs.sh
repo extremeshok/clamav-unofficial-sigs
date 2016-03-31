@@ -1107,7 +1107,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 		for db_file in $sanesecurity_dbs ; do
 			let array_counter=$array_counter+1;
 		done
-		if [ "$array_counter" -lt "1";
+		if [ "$array_counter" -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed sanesecurity_dbs config is invalid or not defined - SKIPPING"
 		else
 		
