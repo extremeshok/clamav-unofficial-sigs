@@ -1,5 +1,9 @@
 #language: shell
 
+#Enable modern build platform
+sudo: required
+dist: trusty
+
 cache:
   directories:
     - $HOME/.m2/repository
