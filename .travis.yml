@@ -8,10 +8,10 @@ before_install:
   - "sudo apt-get update -qq"
   - "sudo apt-get install clamav-daemon -qq"
   - "sudo freshclam"
-  - "sudo service clamav-daemon start"
+#  - "sudo service clamav-daemon start"
 
 install:
-  - "sudo mkdir -p /etc/clamav-unofficial-sigs/"
+  - "sudo mkdir -p /etc/clamav-unofficial-sigs"
   - "sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf"
   - "sudo cp -f confg/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf"
   - "sudo cp -f .travis/tests/user.conf /etc/clamav-unofficial-sigs/user.conf"
