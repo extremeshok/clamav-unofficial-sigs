@@ -4,6 +4,10 @@ cache:
   directories:
     - $HOME/.m2/repository
  
+## freshclam is disabled as it will increase the run time by 20mins
+# reloading of the signatures will always fail, as there are no default signatures
+# todo : cache the default clam signatures
+
 before_install:
   - "sudo apt-get update -qq"
   - "sudo apt-get install clamav-daemon -qq"
