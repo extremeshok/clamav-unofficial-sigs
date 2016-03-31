@@ -290,16 +290,17 @@ if [ "$user_configuration_complete" != "yes" ] ; then
 	exit 1
 fi
 
-# Assign the directories
-sanesecurity_dir="$work_dir/$sanesecurity_dir"
-securiteinfo_dir="$work_dir/$securiteinfo_dir"
-linuxmalwaredetect_dir="$work_dir/$linuxmalwaredetect_dir"
-malwarepatrol_dir="$work_dir/$malwarepatrol_dir"
-yararules_dir="$work_dir/$yararules_dir"
-work_dir_configs="$work_dir/$work_dir_configs"
-gpg_dir="$work_dir/$gpg_dir"
-add_dir="$work_dir/$add_dir"
+# Assign the directories and remove trailing / (removes / and //)
+$work_dir=$(echo "$work_dir" | sed 's:/*$::')
 
+$sanesecurity_dir=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
+$securiteinfo_dir=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
+$linuxmalwaredetect_dir=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
+$malwarepatrol_dir=$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')
+$yararules_dir=$(echo "$work_dir/$yararules_dir" | sed 's:/*$::')
+$work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
+$gpg_dir=$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')
+$add_dir=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
 
 ################################################################################
 
