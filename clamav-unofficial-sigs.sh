@@ -181,6 +181,7 @@ config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.
 
 
 #Initialise 
+config_version="0"
 do_clamd_reload="0"
 comment_silence="no"
 enable_logging="no"
@@ -302,6 +303,13 @@ log_file_path=$(echo "$log_file_path" | sed 's:/*$::')
 ## Make sure we have a readable config file
 if [ "$we_have_a_config" == "0" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
+	exit 1
+fi
+
+#prevent some issues with only a user.conf being loaded
+if [ $config_version  == "0" ] ; then
+	xshok_pretty_echo_and_log "ERROR: Config file is missing important contents of the master.conf" "="
+	xshok_pretty_echo_and_log "Note: Possible fix would be to point the script to the dir with the configs"
 	exit 1
 fi
 
