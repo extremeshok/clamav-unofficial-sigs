@@ -85,6 +85,7 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 	# handle logging
 	if [ "$logging_enabled" = "yes" ] ; then
 		if [ ! -e "$log_file_path/$log_file_name" ] ; then
+				mkdir -p "$log_file_path" 2>/dev/null
 		    touch "$log_file_path/$log_file_name" 2>/dev/null
 		fi
 		if [ ! -w "$log_file_path/$log_file_name" ] ; then
@@ -271,6 +272,9 @@ for config_file in "${config_files[@]}" ; do
 	fi
 done
 
+# Assign the log_file_path earlier and remove trailing / (removes / and //)
+log_file_path=$(echo "$log_file_path" | sed 's:/*$::')
+
 ## Make sure we have a readable config file
 if [ "$we_have_a_config" == "0" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
@@ -292,7 +296,6 @@ fi
 
 # Assign the directories and remove trailing / (removes / and //)
 work_dir=$(echo "$work_dir" | sed 's:/*$::')
-
 sanesecurity_dir=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
 securiteinfo_dir=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
 linuxmalwaredetect_dir=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
