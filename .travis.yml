@@ -4,15 +4,21 @@ cache:
   directories:
     - $HOME/.m2/repository
  
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install clamav-daemon -qq
-  - sudo freshclam
-  - sudo service clamav-daemon start
+## freshclam is disabled as it will increase the run time by 20mins
+# reloading of the signatures will always fail, as there are no default signatures
+# todo : cache the default clam signatures
 
-#install:
-#  - sh -e .travis/ci-setup.sh
+before_install:
+  - "sudo apt-get update -qq"
+  - "sudo apt-get install clamav-daemon -qq"
+#  - "sudo freshclam"
+  - "sudo service clamav-daemon start"
+
+install:
+  - "sudo mkdir -p /etc/clamav-unofficial-sigs"
+  - "sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf"
+  - "sudo cp -f config/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf"
+  - "sudo cp -f .travis/tests/user.conf /etc/clamav-unofficial-sigs/user.conf"
 
 script:
-  - sh -e .travis/ci-force.sh
-#  - sh -e .travis/ci-runtest.sh
+  - sudo sh -e .travis/ci-test.sh
