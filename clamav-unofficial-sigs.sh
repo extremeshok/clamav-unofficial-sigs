@@ -233,7 +233,12 @@ done
 
 ## CONFIG LOADING AND ERROR CHECKING ##############################################
 if [ "$custom_config" != "no" ] ; then
-	config_files=("$custom_config")
+	if [ -d "$custom_config" ]; then
+		config_dir="$custom_config"
+		config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
+	else
+		config_files=("$custom_config")
+	fi
 fi
 
 for config_file in "${config_files[@]}" ; do
