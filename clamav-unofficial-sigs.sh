@@ -1129,11 +1129,8 @@ fi
 if [ "$sanesecurity_enabled" == "yes" ] ; then
 	if [ -n "$sanesecurity_dbs" ] ; then
 		##if [ ${#sanesecurity_dbs[@]} -lt "1" ] ; then ##will not work due to compound array assignment
-		array_counter="0"
-		for db_file in $sanesecurity_dbs ; do
-			let array_counter=$array_counter+1;
-		done
-		if [ "$array_counter" -lt "1" ] ; then
+
+		if [ `xshok_array_count "$sanesecurity_dbs"` -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed sanesecurity_dbs config is invalid or not defined - SKIPPING"
 		else
 		
@@ -1145,6 +1142,9 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 		if [ `xshok_array_count  "$sanesecurity_mirror_ips"` -lt 1 ] ; then
 			sanesecurity_mirror_ips=`host -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p}'`
 		fi
+
+		if [ `xshok_array_count  "$sanesecurity_mirror_ips"` -ge "1" ] ; then
+
 
 		for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
 			sanesecurity_mirror_name=""
@@ -1240,6 +1240,9 @@ done
 				xshok_pretty_echo_and_log "Access to all Sanesecurity mirror sites failed - Check for connectivity issues"
 				xshok_pretty_echo_and_log "or signature database name(s) misspelled in the script's configuration file."
 			fi
+		else
+			xshok_pretty_echo_and_log "No Sanesecurity mirror sites found - Check for dns/connectivity issues"
+		fi
 		fi
 	fi
 fi
