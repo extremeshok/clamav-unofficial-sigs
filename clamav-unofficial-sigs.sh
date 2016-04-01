@@ -83,14 +83,14 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 	fi
 
 	# handle logging
-	if [ "$logging_enabled" = "yes" ] ; then
+	if [ "$enable_log" == "yes" ] ; then
 		if [ ! -e "$log_file_path/$log_file_name" ] ; then
 				mkdir -p "$log_file_path" 2>/dev/null
 		    touch "$log_file_path/$log_file_name" 2>/dev/null
 		fi
 		if [ ! -w "$log_file_path/$log_file_name" ] ; then
 			echo "Warning: Logging Disabled, as file not writable: $log_file_path/$log_file_name"
-			logging_enabled="no"
+			enable_log="no"
 		else
 			echo `date "+%b %d %T"` "$1" >> "$log_file_path/$log_file_name"
 		fi 
@@ -186,7 +186,7 @@ do_clamd_reload="0"
 comment_silence="no"
 enable_logging="no"
 forced_updates="no"
-logging_enabled="no"
+enable_log="no"
 custom_config="no"
 we_have_a_config="0"
 
@@ -306,6 +306,10 @@ done
 
 # Assign the log_file_path earlier and remove trailing / (removes / and //)
 log_file_path=$(echo "$log_file_path" | sed 's:/*$::')
+#Only start logging once all the configs have been loaded
+if [ "$logging_enabled" == "yes" ] ; then
+	enable_log="yes"
+fi
 
 ## Make sure we have a readable config file
 if [ "$we_have_a_config" == "0" ] ; then
