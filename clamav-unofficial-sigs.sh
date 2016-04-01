@@ -132,7 +132,7 @@ function xshok_array_count () {
 #function to check for a new version
 function check_new_version () {
 	latest_version=`curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/dev/clamav-unofficial-sigs.sh 2> /dev/null | grep script_version= | sed 's/.*\"\(.*\)\".*/\1/'`
-	if [ "$latest_version" -gt "$script_version" ] ; then
+	if [ $latest_version -gt $script_version ] ; then
 		xshok_pretty_echo_and_log "New version $latest_version found" "="
 	fi
 }
@@ -326,14 +326,14 @@ if [ "$we_have_a_config" == "0" ] ; then
 fi
 
 #prevent some issues with an incomplete or only a user.conf being loaded
-if [ "$config_version"  == "0" ] ; then
+if [ $config_version  == "0" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Config file is missing important contents of the master.conf" "="
 	xshok_pretty_echo_and_log "Note: Possible fix would be to point the script to the dir with the configs"
 	exit 1
 fi
 
 #config version validation
-if [ "$config_version" -lt "$minimum_required_config_version" ] ; then
+if [ $config_version -lt $minimum_required_config_version ] ; then
 	xshok_pretty_echo_and_log "ERROR: Your config version $config_version is not compatible with the min required version $minimum_required_config_version" "="
 	exit 1
 fi
