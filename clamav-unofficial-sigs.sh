@@ -172,7 +172,7 @@ function help_and_usage () {
 }
 
 #Script Info
-version="5.0.4"
+script_version="5.0.4"
 minimum_required_config_version="56"
 version_date="31 March 2016"
 
@@ -244,7 +244,7 @@ fi
 
 xshok_pretty_echo_and_log "" "#" "80"
 xshok_pretty_echo_and_log " eXtremeSHOK.com ClamAV Unofficial Signature Updater"
-xshok_pretty_echo_and_log " Version: v$version ($version_date)"
+xshok_pretty_echo_and_log " Version: v$script_version ($script_version_date)"
 xshok_pretty_echo_and_log " Required Configuration Version: v$minimum_required_config_version"
 xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 xshok_pretty_echo_and_log "" "#" "80"
@@ -458,7 +458,7 @@ gpg_verify_specific_sanesecurity_database_file () {
 output_system_configuration_information () {
 	echo ""
 	echo "*** SCRIPT VERSION ***"
-	echo "`basename $0` $version ($version_date)"
+	echo "`basename $0` $script_version ($script_version_date)"
 	echo "*** SYSTEM INFORMATION ***"
 	$uname_bin -a
 	echo "*** CLAMSCAN LOCATION & VERSION ***"
