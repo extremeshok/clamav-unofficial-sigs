@@ -2025,9 +2025,7 @@ clamscan_reload_dbs
 
 xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
 
-if [ "$force_verbose" == "yes" ] ; then
-	check_new_version
-fi
+check_new_version
 
 xshok_pretty_echo_and_log "      Powered By https://eXtremeSHOK.com      " "#"
 
