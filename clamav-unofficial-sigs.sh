@@ -132,8 +132,10 @@ function xshok_array_count () {
 #function to check for a new version
 function check_new_version () {
 	latest_version=`curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2`
-	if [ ! "$latest_version" == "$script_version" ] ; then
-		xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
+	if [ "$latest_version" ] ; then
+		if [ ! "$latest_version" == "$script_version" ] ; then
+			xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
+		fi
 	fi
 }
 
@@ -181,7 +183,7 @@ function help_and_usage () {
 
 #Script Info
 script_version="5.0.5"
-script_version_date="XX April 2016"
+script_version_date="01 April 2016"
 minimum_required_config_version="56"
 
 #default config files
@@ -256,9 +258,6 @@ xshok_pretty_echo_and_log " Version: v$script_version ($script_version_date)"
 xshok_pretty_echo_and_log " Required Configuration Version: v$minimum_required_config_version"
 xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 xshok_pretty_echo_and_log "" "#" "80"
-if [ "$force_verbose" == "yes" ] ; then
-	check_new_version
-fi
 
 # Generic command line options
 while true ; do
@@ -2011,6 +2010,10 @@ fi
 clamscan_reload_dbs
 
 xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
+
+if [ "$force_verbose" == "yes" ] ; then
+	check_new_version
+fi
 
 xshok_pretty_echo_and_log "      Powered By https://eXtremeSHOK.com      " "#"
 
