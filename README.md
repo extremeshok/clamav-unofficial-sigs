@@ -77,7 +77,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.0.5 (updated 2016-04-01)
+### Version 5.0.5 (updated 2016-04-02)
  - eXtremeSHOK.com Maintenance 
  - Add support for specifying a custom config dir or file with (--config) -c option
  - Removed default_config
@@ -95,7 +95,8 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added initial centos6 + cpanel os config
  - Bugfix Only start logging once all the configs have been loaded
  - Rename $version to script_version
- - Added script version checking
+ - Default malwarePatrol to the free version
+ - Added script version checks
 
 ### Version 5.0.4
  - eXtremeSHOK.com Maintenance 
