@@ -83,7 +83,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Removed default_config
  - Added travis-ci build testing
  - Updates to the help and usage display
- - Added sanity testing of sanesecurity_dbs
+ - Added sanity testing of sanesecurity_dbs, securiteinfo_dbs, linuxmalwaredetect_dbs, yararules_dbs, add_dbs
  - Added function xshok_array_count
  - Prevent some issues with an incomplete or only a user.conf being loaded
  - Added fallback to host if dig returns no records

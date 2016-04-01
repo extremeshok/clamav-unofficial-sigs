@@ -1291,6 +1291,9 @@ fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
 	if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
 		if [ -n "$securiteinfo_dbs" ] ; then
+			if [ `xshok_array_count "$securiteinfo_dbs"` -lt "1" ] ; then
+				xshok_pretty_echo_and_log "Failed securiteinfo_dbs config is invalid or not defined - SKIPPING"
+			else
 			rm -f "$securiteinfo_dir/*.gz"
 			if [ -r "$work_dir_configs/last-si-update.txt" ] ; then
 				last_securiteinfo_update=`cat $work_dir_configs/last-si-update.txt`
@@ -1409,12 +1412,16 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 fi
 fi
 fi
+fi
 
 ##############################################################################################################################################
 # Check for updated linuxmalwaredetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
 ##############################################################################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 	if [ -n "$linuxmalwaredetect_dbs" ] ; then
+		if [ `xshok_array_count "$linuxmalwaredetect_dbs"` -lt "1" ] ; then
+			xshok_pretty_echo_and_log "Failed linuxmalwaredetect_dbs config is invalid or not defined - SKIPPING"
+		else
 		rm -f "$linuxmalwaredetect_dir/*.gz"
 		if [ -r "$work_dir_configs/last-linuxmalwaredetect-update.txt" ] ; then
 			last_linuxmalwaredetect_update=`cat $work_dir_configs/last-linuxmalwaredetect-update.txt`
@@ -1528,6 +1535,7 @@ else
 	xshok_pretty_echo_and_log "$linuxmalwaredetect_update_hours hours have not yet elapsed since the last linux malware detect update check"
 	xshok_pretty_echo_and_log "No update check was performed at this time" "-"
 	xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+fi
 fi
 fi
 fi
@@ -1683,6 +1691,9 @@ fi
 ##############################################################################################################################################
 if [ "$yararules_enabled" == "yes" ] ; then
 	if [ -n "$yararules_dbs" ] ; then
+		if [ `xshok_array_count "$yararules_dbs"` -lt "1" ] ; then
+			xshok_pretty_echo_and_log "Failed yararules_dbs config is invalid or not defined - SKIPPING"
+		else
 		rm -f "$yararules_dir/*.gz"
 		if [ -r "$work_dir_configs/last-yararules-update.txt" ] ; then
 			last_yararules_update=`cat $work_dir_configs/last-yararules-update.txt`
@@ -1803,13 +1814,15 @@ else
 fi
 fi
 fi
-
+fi
 
 ###################################################
 # Check for user added signature database updates #
 ###################################################
 if [ -n "$add_dbs" ] ; then
-
+		if [ `xshok_array_count "$add_dbs"` -lt "1" ] ; then
+			xshok_pretty_echo_and_log "Failed add_dbs config is invalid or not defined - SKIPPING"
+		else
 	xshok_pretty_echo_and_log "User Added Signature Database File Update(s)" "="
 
 	for db_url in $add_dbs ; do
@@ -1862,6 +1875,7 @@ if [ -n "$add_dbs" ] ; then
 done
 if [ "$add_update" != "1" ] ; then      
 	xshok_pretty_echo_and_log "No User-Defined database file updates found" "-"
+fi
 fi
 fi
 
