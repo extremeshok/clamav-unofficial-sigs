@@ -77,7 +77,28 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.0.4 (updated 2016-03-31)
+### Version 5.0.5 (updated 2016-04-02)
+ - eXtremeSHOK.com Maintenance 
+ - Add support for specifying a custom config dir or file with (--config) -c option
+ - Removed default_config
+ - Added travis-ci build testing
+ - Updates to the help and usage display
+ - Added sanity testing of sanesecurity_dbs, securiteinfo_dbs, linuxmalwaredetect_dbs, yararules_dbs, add_dbs
+ - Added function xshok_array_count
+ - Prevent some issues with an incomplete or only a user.conf being loaded
+ - Added fallback to host if dig returns no records
+ - Check there are Sanesecurity mirror ips before we attempt to rsync
+ - Important binaries have been aliased (clamscan, rsync, curl, gpg) and allow their paths to be overridden
+ - Added sanity checks to make sure the binaries and workdir is defined
+ - Custom Binary Paths added to the config (clamscan_bin, rsync_bin, curl_bin, gpg_bin)
+ - Bump config to 57
+ - Added initial centos6 + cpanel os config
+ - Bugfix Only start logging once all the configs have been loaded
+ - Rename $version to script_version
+ - Default malwarePatrol to the free version
+ - Added script version checks
+
+### Version 5.0.4
  - eXtremeSHOK.com Maintenance 
  - Added/Updated OS configs: CentOS 7, FreeBSD, Slackware
  - Added clamd_reload_opt to fix issues with centos7 conf
@@ -305,10 +326,11 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
--c, --config    Direct script to use a specific configuration file
-        eg: '-c /path/to/clamav-unofficial-sigs.conf'
-        Optional if the default config is available
-        Default: /etc/clamav-unofficial-sigs.conf
+-c, --config    Use a specific configuration file or directory
+        eg: '-c /your/dir' or ' -c /your/file.name'
+        Note: If a directory is specified the directory must contain atleast
+        master.conf, os.conf or user.conf.
+        Default Directory: /etc/clamav-unofficial-sigs
 
 -F, --force         Force all databases to be downloaded, could cause ip to be blocked
 
