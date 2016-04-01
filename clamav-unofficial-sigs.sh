@@ -129,6 +129,14 @@ function xshok_array_count () {
 	fi
 }
 
+#function to check for a new version
+function check_new_version () {
+	latest_version=`curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/dev/clamav-unofficial-sigs.sh 2> /dev/null | grep script_version= | sed 's/.*\"\(.*\)\".*/\1/'`
+	if [ "$latest_version" -gt "$script_version" ] ; then
+		xshok_pretty_echo_and_log "New version $latest_version found" "="
+	fi
+}
+
 #function for help and usage
 function help_and_usage () {
 	echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
@@ -172,9 +180,9 @@ function help_and_usage () {
 }
 
 #Script Info
-script_version="5.0.4"
+script_version="5.0.5"
 minimum_required_config_version="56"
-version_date="31 March 2016"
+version_date="XX April 2016"
 
 #default config files
 config_dir="/etc/clamav-unofficial-sigs"
@@ -253,7 +261,7 @@ xshok_pretty_echo_and_log "" "#" "80"
 while true ; do
 	case "$1" in
 		-h | --help ) help_and_usage; exit; break ;;
-		-V | --version ) exit; break ;;
+		-V | --version ) check_new_version; exit; break ;;
 		* ) break ;;
 	esac
 done
@@ -318,14 +326,14 @@ if [ "$we_have_a_config" == "0" ] ; then
 fi
 
 #prevent some issues with an incomplete or only a user.conf being loaded
-if [ $config_version  == "0" ] ; then
+if [ "$config_version"  == "0" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Config file is missing important contents of the master.conf" "="
 	xshok_pretty_echo_and_log "Note: Possible fix would be to point the script to the dir with the configs"
 	exit 1
 fi
 
 #config version validation
-if [ $config_version -lt $minimum_required_config_version ] ; then
+if [ "$config_version" -lt "$minimum_required_config_version" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Your config version $config_version is not compatible with the min required version $minimum_required_config_version" "="
 	exit 1
 fi
