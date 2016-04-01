@@ -131,9 +131,9 @@ function xshok_array_count () {
 
 #function to check for a new version
 function check_new_version () {
-	latest_version=`curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/dev/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2`
-	if [ "$latest_version" -ne "$script_version" ] ; then
-		xshok_pretty_echo_and_log "New version found: v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "="
+	latest_version=`curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2`
+	if [ ! "$latest_version" == "$script_version" ] ; then
+		xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
 	fi
 }
 
@@ -181,8 +181,8 @@ function help_and_usage () {
 
 #Script Info
 script_version="5.0.5"
+script_version_date="XX April 2016"
 minimum_required_config_version="56"
-version_date="XX April 2016"
 
 #default config files
 config_dir="/etc/clamav-unofficial-sigs"
@@ -256,12 +256,15 @@ xshok_pretty_echo_and_log " Version: v$script_version ($script_version_date)"
 xshok_pretty_echo_and_log " Required Configuration Version: v$minimum_required_config_version"
 xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
 xshok_pretty_echo_and_log "" "#" "80"
+if [ "$force_verbose" == "yes" ] ; then
+	check_new_version
+fi
 
 # Generic command line options
 while true ; do
 	case "$1" in
 		-h | --help ) help_and_usage; exit; break ;;
-		-V | --version ) check_new_version; exit; break ;;
+		-V | --version ) exit; break ;;
 		* ) break ;;
 	esac
 done
