@@ -77,10 +77,25 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.0.X (updated 2016-XX-XX)
+### Version 5.0.5 (updated 2016-04-01)
  - eXtremeSHOK.com Maintenance 
  - Add support for specifying a custom config dir or file with (--config) -c option
  - Removed default_config
+ - Added travis-ci build testing
+ - Updates to the help and usage display
+ - Added sanity testing of sanesecurity_dbs
+ - Added function xshok_array_count
+ - Prevent some issues with an incomplete or only a user.conf being loaded
+ - Added fallback to host if dig returns no records
+ - Check there are Sanesecurity mirror ips before we attempt to rsync
+ - Important binaries have been aliased (clamscan, rsync, curl, gpg) and allow their paths to be overridden
+ - Added sanity checks to make sure the binaries and workdir is defined
+ - Custom Binary Paths added to the config (clamscan_bin, rsync_bin, curl_bin, gpg_bin)
+ - Bump config to 57
+ - Added initial centos6 + cpanel os config
+ - Bugfix Only start logging once all the configs have been loaded
+ - Rename $version to script_version
+ - Added script version checking
 
 ### Version 5.0.4
  - eXtremeSHOK.com Maintenance 
