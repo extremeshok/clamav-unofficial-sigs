@@ -77,7 +77,12 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.0.5 (updated 2016-04-02)
+### Version 5.0.6 (updated 2016-04-04)
+ - eXtremeSHOK.com Maintenance 
+ - Updated winnow databases as per information from Tom @ OITC
+ - Bump config to 58
+
+### Version 5.0.5
  - eXtremeSHOK.com Maintenance 
  - Add support for specifying a custom config dir or file with (--config) -c option
  - Removed default_config
