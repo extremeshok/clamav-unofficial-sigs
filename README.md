@@ -77,6 +77,13 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
+### Version 5.0.X (updated 2016-XX-XX)
+ - eXtremeSHOK.com Maintenance 
+ - Change official URL of SecuriteInfo signatures 
+ - Added a new database (securiteinfoandroid.hdb) for SecuriteInfo 
+ - Bump config to 59
+ - Set minimum config required to 59
+
 ### Version 5.0.6 (updated 2016-04-04)
  - eXtremeSHOK.com Maintenance 
  - Updated winnow databases as per information from Tom @ OITC
