@@ -1283,6 +1283,19 @@ done
 		fi
 		fi
 	fi
+else
+	if [ -n "$sanesecurity_dbs" ] ; then
+		for db_file in $sanesecurity_dbs ; do
+			if [ -r "$sanesecurity_dir/$db_file" ] ; then
+				rm -f "$sanesecurity_dir/$db_file"*
+				do_clamd_reload=1
+			fi
+			if [ -r "$clam_dbs/$db_file" ] ; then
+				rm -f "$clam_dbs/$db_file"
+				do_clamd_reload=1
+			fi
+		done
+	fi
 fi
 
 ##############################################################################################################################################
@@ -1413,6 +1426,20 @@ fi
 fi
 fi
 fi
+else
+	if [ -n "$securiteinfo_dbs" ] ; then
+		for db_file in $securiteinfo_dbs ; do
+			if [ -r "$ecuriteinfo_dir/$db_file" ] ; then
+				rm -f "$securiteinfo_dir/$db_file"
+				do_clamd_reload=1
+			fi
+			if [ -r "$clam_dbs/$db_file" ] ; then
+				rm -f "$clam_dbs/$db_file"
+				do_clamd_reload=1
+			fi
+		done
+	fi
+fi
 
 ##############################################################################################################################################
 # Check for updated linuxmalwaredetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
@@ -1538,6 +1565,19 @@ else
 fi
 fi
 fi
+else
+	if [ -n "$linuxmalwaredetect_dbs" ] ; then
+		for db_file in $linuxmalwaredetect_dbs ; do
+			if [ -r "$linuxmalwaredetect_dir/$db_file" ] ; then
+				rm -f "$linuxmalwaredetect_dir/$db_file"
+				do_clamd_reload=1
+			fi
+			if [ -r "$clam_dbs/$db_file" ] ; then
+				rm -f "$clam_dbs/$db_file"
+				do_clamd_reload=1
+			fi
+		done
+	fi
 fi
 
 
@@ -1682,6 +1722,17 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 	fi
 fi
 fi
+else
+	if [ -n "$malwarepatrol_db" ] ; then
+		if [ -r "$malwarepatrol_dir/$malwarepatrol_db" ] ; then
+			rm -f "$malwarepatrol_dir/$malwarepatrol_db"
+			do_clamd_reload=1
+		fi
+		if [ -r "$clam_dbs/$malwarepatrol_db" ] ; then
+			rm -f "$clam_dbs/$malwarepatrol_db"
+			do_clamd_reload=1
+		fi
+	fi
 fi
 ## MEOW POSSIBLY MISSING OR EXTRA fi....
 
@@ -1814,6 +1865,22 @@ else
 fi
 fi
 fi
+else
+	if [ -n "$yararules_dbs" ] ; then
+		for db_file in $yararules_dbs ; do
+			if echo $db_file|grep -q "/"; then
+				db_file=`echo $db_file | cut -d"/" -f2`
+			fi
+			if [ -r "$yararules_dir/$db_file" ] ; then
+				rm -f "$yararules_dir/$db_file"
+				do_clamd_reload=1
+			fi
+			if [ -r "$clam_dbs/$db_file" ] ; then
+				rm -f "$clam_dbs/$db_file"
+				do_clamd_reload=1
+			fi
+		done
+	fi
 fi
 
 ###################################################
