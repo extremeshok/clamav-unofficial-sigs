@@ -1064,9 +1064,24 @@ if [ -n "$securiteinfo_dbs" ] ; then
 		clamav_files
 	done
 fi
+if [ -n "$linuxmalwaredetect_dbs" ] ; then
+	for db in $linuxmalwaredetect_dbs ; do
+		echo "$linuxmalwaredetect_dir/$db" >> "$current_tmp"
+		clamav_files
+	done
+fi
 if [ -n "$malwarepatrol_db" ] ; then
 	echo "$malwarepatrol_dir/$malwarepatrol_db" >> "$current_tmp"
 	clamav_files
+fi
+if [ -n "$yararules_dbs" ] ; then
+	for db in $yararules_dbs ; do
+		if echo $db|grep -q "/"; then
+			db=`echo $db | cut -d"/" -f2`
+		fi
+		echo "$yararules_dir/$db" >> "$current_tmp"
+		clamav_files
+	done
 fi
 if [ -n "$add_dbs" ] ; then
 	for db in $add_dbs ; do
