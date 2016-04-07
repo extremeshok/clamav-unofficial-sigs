@@ -150,27 +150,57 @@ function install_logrotate (){
 	echo "Not yet..."
 }
 
-
 #generates a cron config and installs it
 function install_cron (){
+	echo ""
+	echo "Generating cron file for install...."
 	
-	#temp config definitions
-	#cron_dir="/etc/cron.d"
-	cron_dir="/tmp"
-	cron_filename="clamav-unofficial-sigs"
-	cron_minute=$[ ( $RANDOM % 59 )  + 1 ];
-	cron_user="root"
-	cron_bash="/bin/bash"
-	cron_script="/usr/local/bin/clamav-unofficial-sigs.sh"
+	#Use defined variblesor attempt to use default varibles
+	if [ ! -n "$cron_dir" ] ; then
+		cron_dir="/etc/cron.d"
+	fi
+	if [ ! -n "$cron_filename" ] ; then
+		cron_filename="clamav-unofficial-sigs"
+	fi	
+	if [ ! -n "$cron_minute" ] ; then
+		cron_minute=$[ ( $RANDOM % 59 )  + 1 ];
+	fi
+	if [ ! -n "$cron_user" ] ; then
+		cron_user="$clam_user";
+	fi
+	if [ ! -n "$cron_bash" ] ; then
+		cron_bash=`which bash`
+	fi	
+	if [ ! -n "$cron_script_full_path" ] ; then
+		#my script filename
+		cron_script_name=$(basename -- "$0")
+		#my script directory
+		cron_script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+		cron_script_dir=$(echo "$cron_script_dir" | sed 's:/*$::')
+		cron_script_full_path="$cron_script_dir/$cron_script_name"
+	fi
+
+	cron_dir=$(echo "$cron_dir" | sed 's:/*$::')
+
+	if [ ! -e "$cron_dir/$cron_filename" ] ; then
+		mkdir -p "$cron_dir" 2>/dev/null
+		touch "$cron_dir/$cron_filename" 2>/dev/null
+	fi
+	if [ ! -w "$cron_dir/$cron_filename" ] ; then
+		echo "ERROR: cron install aborted, as file not writable: $cron_dir/$cron_filename"
+	else
+#Our template..
 	cat << EOF > "$cron_dir/$cron_filename"
-# templated
 # ClamAV Unofficial Signature Databases Update Cron File
 ###################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
 ##################
+# Automatically Generated: $(date)
+##################
+#
 # This cron file will execute the clamav-unofficial-sigs.sh script that
 # currently supports updating third-party signature databases provided
 # by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
@@ -179,9 +209,15 @@ function install_cron (){
 # script itself is set to randomize the actual execution time between
 # 60 - 600 seconds.  To Adjust the cron values, edit your configs and run
 # bash clamav-unofficial-sigs.sh --install-cron to generate a new file.
-$cron_minute * * * * $cron_user $cron_bash $cron_script > /dev/null
+
+$cron_minute * * * * $cron_user $cron_bash $cron_script_full_path > /dev/null
+
+# https://eXtremeSHOK.com ######################################################
+
 EOF
 
+fi 
+	echo "Completed: cron installed, as file: $cron_dir/$cron_filename"
 }
 
 
