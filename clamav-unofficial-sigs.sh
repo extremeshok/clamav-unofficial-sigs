@@ -182,8 +182,8 @@ function help_and_usage () {
 }
 
 #Script Info
-script_version="5.0.6"
-script_version_date="04 April 2016"
+script_version="5.0.X"
+script_version_date="XX April 2016"
 minimum_required_config_version="56"
 
 #default config files
