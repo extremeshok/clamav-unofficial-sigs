@@ -37,6 +37,10 @@ if [ ! "` tail -1 "$0" | head -1 | cut -c1-7 `" == "exit \$?" ] ; then
 	exit 1
 fi
 
+################################################################################
+# HELPER FUNCTIONS
+################################################################################
+
 # Function to support user config settings for applying file and directory access permissions.
 function perms () {
 	if [ -n "$clam_user" -a -n "$clam_group" ] ; then
@@ -137,275 +141,9 @@ function clamav_files () {
 	fi
 }
 
-#function to check for a new version
-function check_new_version () {
-	latest_version=`curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2`
-	if [ "$latest_version" ] ; then
-		if [ ! "$latest_version" == "$script_version" ] ; then
-			xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
-		fi
-	fi
-}
-
-#function for help and usage
-function help_and_usage () {
-	echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
-
-	echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tUse a specific configuration file or directory\n\teg: '-c /your/dir' or ' -c /your/file.name' \n\tNote: If a directory is specified the directory must contain atleast: \n\tmaster.conf, os.conf or user.conf\n\tDefault Directory: $config_dir"
-
-	echo -e "\n${BOLD}-F${BOLD}, --force${NORM}\t\tForce all databases to be downloaded, could cause ip to be blocked"
-
-	echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
-
-	echo -e "\n${BOLD}-V${NORM}, ${BOLD}--version${NORM}\tOutput script version and date information"
-
-	echo -e "\n${BOLD}-v${NORM}, ${BOLD}--verbose${NORM}\tBe verbose, enabled when not run under cron"
-
-	echo -e "\n${BOLD}-s${NORM}, ${BOLD}--silence${NORM}\tOnly output error messages, enabled when run under cron"
-
-	echo -e "\n${BOLD}-d${NORM}, ${BOLD}--decode-sig${NORM}\tDecode a third-party signature either by signature name\n\t(eg: Sanesecurity.Junk.15248) or hexadecimal string.\n\tThis flag will 'NOT' decode image signatures"
-
-	echo -e "\n${BOLD}-e${NORM}, ${BOLD}--encode-string${NORM}\tHexadecimal encode an entire input string that can\n\tbe used in any '*.ndb' signature database file"
-
-	echo -e "\n${BOLD}-f${NORM}, ${BOLD}--encode-formatted${NORM}\tHexadecimal encode a formatted input string containing\n\tsignature spacing fields '{}, (), *', without encoding\n\tthe spacing fields, so that the encoded signature\n\tcan be used in any '*.ndb' signature database file"
-
-	echo -e "\n${BOLD}-g${NORM}, ${BOLD}--gpg-verify${NORM}\tGPG verify a specific Sanesecurity database file\n\teg: '-g filename.ext' (do not include file path)"
-
-	echo -e "\n${BOLD}-i${NORM}, ${BOLD}--information${NORM}\tOutput system and configuration information for\n\tviewing or possible debugging purposes"
-
-	echo -e "\n${BOLD}-m${NORM}, ${BOLD}--make-database${NORM}\tMake a signature database from an ascii file containing\n\tdata strings, with one data string per line.  Additional\n\tinformation is provided when using this flag"
-
-	echo -e "\n${BOLD}-r${NORM}, ${BOLD}--remove-script${NORM}\tRemove the clamav-unofficial-sigs script and all of\n\tits associated files and databases from the system"
-
-	echo -e "\n${BOLD}-t${NORM}, ${BOLD}--test-database${NORM}\tClamscan integrity test a specific database file\n\teg: '-s filename.ext' (do not include file path)"
-
-	echo -e "\n${BOLD}-o${NORM}, ${BOLD}--output-triggered${NORM}\tIf HAM directory scanning is enabled in the script's\n\tconfiguration file, then output names of any third-party\n\tsignatures that triggered during the HAM directory scan"
-
-	echo -e "\n${BOLD}-w${NORM}, ${BOLD}--whitelist${NORM}\tAdds a signature whitelist entry in the newer ClamAV IGN2\n\tformat to 'my-whitelist.ign2' in order to temporarily resolve\n\ta false-positive issue with a specific third-party signature.\n\tScript added whitelist entries will automatically be removed\n\tif the original signature is either modified or removed from\n\tthe third-party signature database" 
-
-	echo -e "\n${BOLD}--check-clamav${NORM}\tIf ClamD status check is enabled and the socket path is correctly specified\n\tthen test to see if clamd is running or not"
-
-	echo -e "\nMail suggestions and bug reports to ${BOLD}<admin@extremeshok.com>${NORM}"
-
-}
-
-#Script Info
-script_version="5.0.X"
-script_version_date="XX April 2016"
-minimum_required_config_version="56"
-
-#default config files
-config_dir="/etc/clamav-unofficial-sigs"
-config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
-
-#Initialise 
-config_version="0"
-do_clamd_reload="0"
-comment_silence="no"
-enable_logging="no"
-forced_updates="no"
-enable_log="no"
-custom_config="no"
-we_have_a_config="0"
-
-#Default Binaries & Commands
-clamd_reload_opt="clamdscan --reload"  
-clamscan_bin=`which clamscan`
-rsync_bin=`which rsync`
-curl_bin=`which curl`
-gpg_bin=`which gpg`
-
-#Detect if terminal
-if [ -t 1 ] ; then
-	#Set fonts
-	##Usage: echo "${BOLD}-a${NORM}"
-	BOLD=`tput bold`
-	REV=`tput smso`
-	NORM=`tput sgr0`
-	#Verbose
-	force_verbose="yes"
-else
-	#Null Fonts
-	BOLD=''
-	REV=''
-	NORM=''
-	#silence
-	force_verbose="no"
-fi
-
-
-# Generic command line options
-while true ; do
-	case "$1" in
-		-c | --config ) xshok_check_s2 $2; custom_config="$2"; shift 2; break ;;
-		-F | --force ) force_updates="yes"; shift 1; break ;;
-		-v | --verbose ) force_verbose="yes"; shift 1; break ;;
-		-s | --silence ) force_verbose="no"; shift 1; break ;;
-		* ) break ;;
-	esac
-done
-
-#Set the verbosity
-if [ "$force_verbose" == "yes" ] ; then
-	#verbose
-	curl_silence="no"
-	rsync_silence="no"
-	gpg_silence="no"
-	comment_silence="no"
-else
-	#silence
-	curl_silence="yes"
-	rsync_silence="yes"
-	gpg_silence="yes"
-	comment_silence="yes"
-fi
-
-xshok_pretty_echo_and_log "" "#" "80"
-xshok_pretty_echo_and_log " eXtremeSHOK.com ClamAV Unofficial Signature Updater"
-xshok_pretty_echo_and_log " Version: v$script_version ($script_version_date)"
-xshok_pretty_echo_and_log " Required Configuration Version: v$minimum_required_config_version"
-xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
-xshok_pretty_echo_and_log "" "#" "80"
-
-# Generic command line options
-while true ; do
-	case "$1" in
-		-h | --help ) help_and_usage; exit; break ;;
-		-V | --version ) exit; break ;;
-		* ) break ;;
-	esac
-done
-
-## CONFIG LOADING AND ERROR CHECKING ##############################################
-if [ "$custom_config" != "no" ] ; then
-	if [ -d "$custom_config" ]; then
-		# Assign the custom config dir and remove trailing / (removes / and //)
-		config_dir=$(echo "$custom_config" | sed 's:/*$::')
-		config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
-	else
-		config_files=("$custom_config")
-	fi
-fi
-
-for config_file in "${config_files[@]}" ; do
-	if [ -r "$config_file" ] ; then #exists and readable
-		we_have_a_config="1"
-		#config stripping
-		xshok_pretty_echo_and_log "Loading config: $config_file" "="
-
-		# delete lines beginning with #
-		# delete from ' #' to end of the line
-		# delete from '# ' to end of the line
-		# delete both trailing and leading whitespace
-		# delete all empty lines
-		clean_config=`command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file"`
-
-		### config error checking
-		# check "" are an even number
-		config_check="${clean_config//[^\"]}"
-		if [ $(( ${#config_check} % 2)) -eq 1 ] ; then 
-			xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every \" requires a closing \"" "="     
-			exit 1
-		fi
-
-		# check there is an = for every set of "" #optional whitespace \s* between = and "
-		config_check_vars=`echo "$clean_config" | grep -o '=\s*\"' | wc -l`
-		if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ] ; then 
-			xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\"" "="    
-			exit 1
-		fi
-
-		#config loading
-		for i in "${clean_config[@]}" ; do
-			eval $(echo ${i} | command sed -e 's/[[:space:]]*$//')
-		done
-	fi
-done
-
-# Assign the log_file_path earlier and remove trailing / (removes / and //)
-log_file_path=$(echo "$log_file_path" | sed 's:/*$::')
-#Only start logging once all the configs have been loaded
-if [ "$logging_enabled" == "yes" ] ; then
-	enable_log="yes"
-fi
-
-## Make sure we have a readable config file
-if [ "$we_have_a_config" == "0" ] ; then
-	xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
-	exit 1
-fi
-
-#prevent some issues with an incomplete or only a user.conf being loaded
-if [ $config_version  == "0" ] ; then
-	xshok_pretty_echo_and_log "ERROR: Config file is missing important contents of the master.conf" "="
-	xshok_pretty_echo_and_log "Note: Possible fix would be to point the script to the dir with the configs"
-	exit 1
-fi
-
-#config version validation
-if [ $config_version -lt $minimum_required_config_version ] ; then
-	xshok_pretty_echo_and_log "ERROR: Your config version $config_version is not compatible with the min required version $minimum_required_config_version" "="
-	exit 1
-fi
-
-# Check to see if the script's "USER CONFIGURATION FILE" has been completed.
-if [ "$user_configuration_complete" != "yes" ] ; then
-	xshok_pretty_echo_and_log "WARNING: SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED" "*"
-	xshok_pretty_echo_and_log "Please review the script configuration files."
-	exit 1
-fi
-
-# Assign the directories and remove trailing / (removes / and //)
-work_dir=$(echo "$work_dir" | sed 's:/*$::')
-sanesecurity_dir=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
-securiteinfo_dir=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
-linuxmalwaredetect_dir=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
-malwarepatrol_dir=$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')
-yararules_dir=$(echo "$work_dir/$yararules_dir" | sed 's:/*$::')
-work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
-gpg_dir=$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')
-add_dir=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
-
-### SANITY checks
-#Check default Binaries & Commands are defined
-if [ "$clamd_reload_opt" == "" ] ; then
-	xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt" "="
-	exit 1
-fi
-if [ "$clamscan_bin" == "" ] ; then
-	xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found" "="
-	exit 1
-fi
-if [ "$rsync_bin" == "" ] ; then
-	xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found" "="
-	exit 1
-fi
-if [ "$curl_bin" == "" ] ; then
-	xshok_pretty_echo_and_log "ERROR: curl binary (curl_bin) not found" "="
-	exit 1
-fi
-if [ "$gpg_bin" == "" ] ; then
-	xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
-	exit 1
-fi
-#Check default directories are defined
-if [ "$work_dir" == "" ] ; then
-	xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not defined" "="
-	exit 1
-fi
-
-
 ################################################################################
-
-# Reset the update timers to force a full update.
-if [ "$force_updates" == "yes" ] ; then
-	xshok_pretty_echo_and_log "Force Updates: enabled"     
-
-	securiteinfo_update_hours="0"
-	linuxmalwaredetect_update_hours="0"
-	malwarepatrol_update_hours="0"
-	yararules_update_hours="0"
-fi
+# ADDITIONAL PROGRAM FUNCTIONS
+################################################################################
 
 #decode a third-party signature either by signature name
 decode_third_party_signature_by_signature_name (){
@@ -897,8 +635,281 @@ function check_clamav () {
 	fi
 }
 
-############### PROGRAM #########################
-# Main options
+#function to check for a new version
+function check_new_version () {
+	latest_version=`curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2`
+	if [ "$latest_version" ] ; then
+		if [ ! "$latest_version" == "$script_version" ] ; then
+			xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
+		fi
+	fi
+}
+
+#function for help and usage
+function help_and_usage () {
+	echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
+
+	echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tUse a specific configuration file or directory\n\teg: '-c /your/dir' or ' -c /your/file.name' \n\tNote: If a directory is specified the directory must contain atleast: \n\tmaster.conf, os.conf or user.conf\n\tDefault Directory: $config_dir"
+
+	echo -e "\n${BOLD}-F${BOLD}, --force${NORM}\t\tForce all databases to be downloaded, could cause ip to be blocked"
+
+	echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
+
+	echo -e "\n${BOLD}-V${NORM}, ${BOLD}--version${NORM}\tOutput script version and date information"
+
+	echo -e "\n${BOLD}-v${NORM}, ${BOLD}--verbose${NORM}\tBe verbose, enabled when not run under cron"
+
+	echo -e "\n${BOLD}-s${NORM}, ${BOLD}--silence${NORM}\tOnly output error messages, enabled when run under cron"
+
+	echo -e "\n${BOLD}-d${NORM}, ${BOLD}--decode-sig${NORM}\tDecode a third-party signature either by signature name\n\t(eg: Sanesecurity.Junk.15248) or hexadecimal string.\n\tThis flag will 'NOT' decode image signatures"
+
+	echo -e "\n${BOLD}-e${NORM}, ${BOLD}--encode-string${NORM}\tHexadecimal encode an entire input string that can\n\tbe used in any '*.ndb' signature database file"
+
+	echo -e "\n${BOLD}-f${NORM}, ${BOLD}--encode-formatted${NORM}\tHexadecimal encode a formatted input string containing\n\tsignature spacing fields '{}, (), *', without encoding\n\tthe spacing fields, so that the encoded signature\n\tcan be used in any '*.ndb' signature database file"
+
+	echo -e "\n${BOLD}-g${NORM}, ${BOLD}--gpg-verify${NORM}\tGPG verify a specific Sanesecurity database file\n\teg: '-g filename.ext' (do not include file path)"
+
+	echo -e "\n${BOLD}-i${NORM}, ${BOLD}--information${NORM}\tOutput system and configuration information for\n\tviewing or possible debugging purposes"
+
+	echo -e "\n${BOLD}-m${NORM}, ${BOLD}--make-database${NORM}\tMake a signature database from an ascii file containing\n\tdata strings, with one data string per line.  Additional\n\tinformation is provided when using this flag"
+
+	echo -e "\n${BOLD}-r${NORM}, ${BOLD}--remove-script${NORM}\tRemove the clamav-unofficial-sigs script and all of\n\tits associated files and databases from the system"
+
+	echo -e "\n${BOLD}-t${NORM}, ${BOLD}--test-database${NORM}\tClamscan integrity test a specific database file\n\teg: '-s filename.ext' (do not include file path)"
+
+	echo -e "\n${BOLD}-o${NORM}, ${BOLD}--output-triggered${NORM}\tIf HAM directory scanning is enabled in the script's\n\tconfiguration file, then output names of any third-party\n\tsignatures that triggered during the HAM directory scan"
+
+	echo -e "\n${BOLD}-w${NORM}, ${BOLD}--whitelist${NORM}\tAdds a signature whitelist entry in the newer ClamAV IGN2\n\tformat to 'my-whitelist.ign2' in order to temporarily resolve\n\ta false-positive issue with a specific third-party signature.\n\tScript added whitelist entries will automatically be removed\n\tif the original signature is either modified or removed from\n\tthe third-party signature database" 
+
+	echo -e "\n${BOLD}--check-clamav${NORM}\tIf ClamD status check is enabled and the socket path is correctly specified\n\tthen test to see if clamd is running or not"
+
+	echo -e "\nMail suggestions and bug reports to ${BOLD}<admin@extremeshok.com>${NORM}"
+
+}
+
+################################################################################
+# MAIN PROGRAM
+################################################################################
+
+#Script Info
+script_version="5.0.X"
+script_version_date="XX April 2016"
+minimum_required_config_version="56"
+
+#default config files
+config_dir="/etc/clamav-unofficial-sigs"
+config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
+
+#Initialise 
+config_version="0"
+do_clamd_reload="0"
+comment_silence="no"
+enable_logging="no"
+forced_updates="no"
+enable_log="no"
+custom_config="no"
+we_have_a_config="0"
+
+#Default Binaries & Commands
+clamd_reload_opt="clamdscan --reload"  
+clamscan_bin=`which clamscan`
+rsync_bin=`which rsync`
+curl_bin=`which curl`
+gpg_bin=`which gpg`
+
+#Detect if terminal
+if [ -t 1 ] ; then
+	#Set fonts
+	##Usage: echo "${BOLD}-a${NORM}"
+	BOLD=`tput bold`
+	REV=`tput smso`
+	NORM=`tput sgr0`
+	#Verbose
+	force_verbose="yes"
+else
+	#Null Fonts
+	BOLD=''
+	REV=''
+	NORM=''
+	#silence
+	force_verbose="no"
+fi
+
+
+# Generic command line options
+while true ; do
+	case "$1" in
+		-c | --config ) xshok_check_s2 $2; custom_config="$2"; shift 2; break ;;
+		-F | --force ) force_updates="yes"; shift 1; break ;;
+		-v | --verbose ) force_verbose="yes"; shift 1; break ;;
+		-s | --silence ) force_verbose="no"; shift 1; break ;;
+		* ) break ;;
+	esac
+done
+
+#Set the verbosity
+if [ "$force_verbose" == "yes" ] ; then
+	#verbose
+	curl_silence="no"
+	rsync_silence="no"
+	gpg_silence="no"
+	comment_silence="no"
+else
+	#silence
+	curl_silence="yes"
+	rsync_silence="yes"
+	gpg_silence="yes"
+	comment_silence="yes"
+fi
+
+xshok_pretty_echo_and_log "" "#" "80"
+xshok_pretty_echo_and_log " eXtremeSHOK.com ClamAV Unofficial Signature Updater"
+xshok_pretty_echo_and_log " Version: v$script_version ($script_version_date)"
+xshok_pretty_echo_and_log " Required Configuration Version: v$minimum_required_config_version"
+xshok_pretty_echo_and_log " Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com"
+xshok_pretty_echo_and_log "" "#" "80"
+
+# Generic command line options
+while true ; do
+	case "$1" in
+		-h | --help ) help_and_usage; exit; break ;;
+		-V | --version ) exit; break ;;
+		* ) break ;;
+	esac
+done
+
+## CONFIG LOADING AND ERROR CHECKING ##############################################
+if [ "$custom_config" != "no" ] ; then
+	if [ -d "$custom_config" ]; then
+		# Assign the custom config dir and remove trailing / (removes / and //)
+		config_dir=$(echo "$custom_config" | sed 's:/*$::')
+		config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
+	else
+		config_files=("$custom_config")
+	fi
+fi
+
+for config_file in "${config_files[@]}" ; do
+	if [ -r "$config_file" ] ; then #exists and readable
+		we_have_a_config="1"
+		#config stripping
+		xshok_pretty_echo_and_log "Loading config: $config_file" "="
+
+		# delete lines beginning with #
+		# delete from ' #' to end of the line
+		# delete from '# ' to end of the line
+		# delete both trailing and leading whitespace
+		# delete all empty lines
+		clean_config=`command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file"`
+
+		### config error checking
+		# check "" are an even number
+		config_check="${clean_config//[^\"]}"
+		if [ $(( ${#config_check} % 2)) -eq 1 ] ; then 
+			xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every \" requires a closing \"" "="     
+			exit 1
+		fi
+
+		# check there is an = for every set of "" #optional whitespace \s* between = and "
+		config_check_vars=`echo "$clean_config" | grep -o '=\s*\"' | wc -l`
+		if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ] ; then 
+			xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\"" "="    
+			exit 1
+		fi
+
+		#config loading
+		for i in "${clean_config[@]}" ; do
+			eval $(echo ${i} | command sed -e 's/[[:space:]]*$//')
+		done
+	fi
+done
+
+# Assign the log_file_path earlier and remove trailing / (removes / and //)
+log_file_path=$(echo "$log_file_path" | sed 's:/*$::')
+#Only start logging once all the configs have been loaded
+if [ "$logging_enabled" == "yes" ] ; then
+	enable_log="yes"
+fi
+
+## Make sure we have a readable config file
+if [ "$we_have_a_config" == "0" ] ; then
+	xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
+	exit 1
+fi
+
+#prevent some issues with an incomplete or only a user.conf being loaded
+if [ $config_version  == "0" ] ; then
+	xshok_pretty_echo_and_log "ERROR: Config file is missing important contents of the master.conf" "="
+	xshok_pretty_echo_and_log "Note: Possible fix would be to point the script to the dir with the configs"
+	exit 1
+fi
+
+#config version validation
+if [ $config_version -lt $minimum_required_config_version ] ; then
+	xshok_pretty_echo_and_log "ERROR: Your config version $config_version is not compatible with the min required version $minimum_required_config_version" "="
+	exit 1
+fi
+
+# Check to see if the script's "USER CONFIGURATION FILE" has been completed.
+if [ "$user_configuration_complete" != "yes" ] ; then
+	xshok_pretty_echo_and_log "WARNING: SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED" "*"
+	xshok_pretty_echo_and_log "Please review the script configuration files."
+	exit 1
+fi
+
+# Assign the directories and remove trailing / (removes / and //)
+work_dir=$(echo "$work_dir" | sed 's:/*$::')
+sanesecurity_dir=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
+securiteinfo_dir=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
+linuxmalwaredetect_dir=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
+malwarepatrol_dir=$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')
+yararules_dir=$(echo "$work_dir/$yararules_dir" | sed 's:/*$::')
+work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
+gpg_dir=$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')
+add_dir=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
+
+### SANITY checks
+#Check default Binaries & Commands are defined
+if [ "$clamd_reload_opt" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt" "="
+	exit 1
+fi
+if [ "$clamscan_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found" "="
+	exit 1
+fi
+if [ "$rsync_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found" "="
+	exit 1
+fi
+if [ "$curl_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: curl binary (curl_bin) not found" "="
+	exit 1
+fi
+if [ "$gpg_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
+	exit 1
+fi
+#Check default directories are defined
+if [ "$work_dir" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not defined" "="
+	exit 1
+fi
+
+# Reset the update timers to force a full update.
+if [ "$force_updates" == "yes" ] ; then
+	xshok_pretty_echo_and_log "Force Updates: enabled"     
+
+	securiteinfo_update_hours="0"
+	linuxmalwaredetect_update_hours="0"
+	malwarepatrol_update_hours="0"
+	yararules_update_hours="0"
+fi
+
+################################################################################
+# MAIN LOGIC
+################################################################################
+
 while true; do
 	case "$1" in
 		-d | --decode-sig ) decode_third_party_signature_by_signature_name; exit; break ;;
