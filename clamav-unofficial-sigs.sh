@@ -1442,6 +1442,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 fi
 fi
 fi
+fi
 else
 	if [ -n "$securiteinfo_dbs" ] ; then
 		for db_file in $securiteinfo_dbs ; do
