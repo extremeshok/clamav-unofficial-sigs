@@ -145,6 +145,46 @@ function clamav_files () {
 # ADDITIONAL PROGRAM FUNCTIONS
 ################################################################################
 
+#generates a logrotate config and installs it
+function install_logrotate (){
+	echo "Not yet..."
+}
+
+
+#generates a cron config and installs it
+function install_cron (){
+	
+	#temp config definitions
+	#cron_dir="/etc/cron.d"
+	cron_dir="/tmp"
+	cron_filename="clamav-unofficial-sigs"
+	cron_minute=$[ ( $RANDOM % 59 )  + 1 ];
+	cron_user="root"
+	cron_bash="/bin/bash"
+	cron_script="/usr/local/bin/clamav-unofficial-sigs.sh"
+
+	cat << EOF > "$cron_dir/$cron_filename"
+# templated
+# ClamAV Unofficial Signature Databases Update Cron File
+###################
+# This is property of eXtremeSHOK.com
+# You are free to use, modify and distribute, however you may not remove this notice.
+# Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+##################
+# This cron file will execute the clamav-unofficial-sigs.sh script that
+# currently supports updating third-party signature databases provided
+# by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
+#
+# The script is set to run hourly, at a random minute past the hour, and the 
+# script itself is set to randomize the actual execution time between
+# 60 - 600 seconds.  To Adjust the cron values, edit your configs and run
+# bash clamav-unofficial-sigs.sh --install-cron to generate a new file.
+$cron_minute * * * * $cron_user $cron_bash $cron_script > /dev/null
+EOF
+
+}
+
+
 #decode a third-party signature either by signature name
 function decode_third_party_signature_by_signature_name (){
 	echo ""
