@@ -155,7 +155,7 @@ function install_cron (){
 	echo ""
 	echo "Generating cron file for install...."
 	
-	#Use defined variblesor attempt to use default varibles
+	#Use defined varibles or attempt to use default varibles
 	if [ ! -n "$cron_dir" ] ; then
 		cron_dir="/etc/cron.d"
 	fi
@@ -758,6 +758,8 @@ function help_and_usage () {
 	echo -e "\n${BOLD}-w${NORM}, ${BOLD}--whitelist${NORM}\tAdds a signature whitelist entry in the newer ClamAV IGN2\n\tformat to 'my-whitelist.ign2' in order to temporarily resolve\n\ta false-positive issue with a specific third-party signature.\n\tScript added whitelist entries will automatically be removed\n\tif the original signature is either modified or removed from\n\tthe third-party signature database" 
 
 	echo -e "\n${BOLD}--check-clamav${NORM}\tIf ClamD status check is enabled and the socket path is correctly specified\n\tthen test to see if clamd is running or not"
+	
+	echo -e "\n${BOLD}--install-cron${NORM}\tInstall and generate the cron file, autodetects the values based on your config files"
 
 	echo -e "\nMail suggestions and bug reports to ${BOLD}<admin@extremeshok.com>${NORM}"
 

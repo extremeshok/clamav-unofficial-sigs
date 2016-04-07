@@ -78,7 +78,7 @@ Configure:
    Edit the /etc/cron.d/clamav-unofficial-sigs file
    
 Cron:
-   After the configsd have been configured
+   After the configs have been configured
    Run:  bash clamav-unofficial-sigs.sh --install-cron
 
 IMPORTANT CONFIGURATION CONSIDERATIONS:
