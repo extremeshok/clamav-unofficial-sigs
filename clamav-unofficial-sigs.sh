@@ -129,6 +129,14 @@ function xshok_array_count () {
 	fi
 }
 
+#function to handle list of database files
+function clamav_files () {
+	echo "$clam_dbs/$db" >> "$current_tmp"
+	if [ "$keep_db_backup" = "yes" ] ; then
+		echo "$clam_dbs/$db-bak" >> "$current_tmp"
+	fi
+}
+
 #function to check for a new version
 function check_new_version () {
 	latest_version=`curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2`
@@ -1045,12 +1053,7 @@ current_dbs="$work_dir_configs/current-dbs.txt"
 previous_dbs="$work_dir_configs/previous-dbs.txt"
 sort "$current_dbs" > "$previous_dbs" 2>/dev/null
 rm -f "$current_dbs"
-clamav_files () {
-	echo "$clam_dbs/$db" >> "$current_tmp"
-	if [ "$keep_db_backup" = "yes" ] ; then
-		echo "$clam_dbs/$db-bak" >> "$current_tmp"
-	fi
-}
+
 if [ -n "$sanesecurity_dbs" ] ; then
 	for db in $sanesecurity_dbs ; do
 		echo "$sanesecurity_dir/$db" >> "$current_tmp"
