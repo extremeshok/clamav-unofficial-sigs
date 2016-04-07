@@ -1444,20 +1444,20 @@ fi
 fi
 fi
 fi
-else
-	if [ -n "$securiteinfo_dbs" ] ; then
-		for db_file in $securiteinfo_dbs ; do
-			if [ -r "$ecuriteinfo_dir/$db_file" ] ; then
-				rm -f "$securiteinfo_dir/$db_file"
-				do_clamd_reload=1
-			fi
-			if [ -r "$clam_dbs/$db_file" ] ; then
-				rm -f "$clam_dbs/$db_file"
-				do_clamd_reload=1
-			fi
-		done
-	fi
-fi
+#else
+#	if [ -n "$securiteinfo_dbs" ] ; then
+# 	for db_file in $securiteinfo_dbs ; do
+#			if [ -r "$ecuriteinfo_dir/$db_file" ] ; then
+#				rm -f "$securiteinfo_dir/$db_file"
+#				do_clamd_reload=1
+#			fi
+#			if [ -r "$clam_dbs/$db_file" ] ; then
+#				rm -f "$clam_dbs/$db_file"
+#				do_clamd_reload=1
+#			fi
+#		done
+#	fi
+#fi
 
 ##############################################################################################################################################
 # Check for updated linuxmalwaredetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
