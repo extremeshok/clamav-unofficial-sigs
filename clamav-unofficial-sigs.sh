@@ -146,7 +146,7 @@ function clamav_files () {
 ################################################################################
 
 #decode a third-party signature either by signature name
-decode_third_party_signature_by_signature_name (){
+function decode_third_party_signature_by_signature_name (){
 	echo ""
 	echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
 	echo "a hexadecimal encoded data string and press enter (do not include '.UNOFFICIAL'"
@@ -173,7 +173,7 @@ decode_third_party_signature_by_signature_name (){
 }
 
 #Hexadecimal encode an entire input string
-hexadecimal_encode_entire_input_string (){
+function hexadecimal_encode_entire_input_string (){
 	echo ""
 	echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
 	echo "any quotes around the string unless you want them included in the hexadecimal encoded output:"
@@ -183,7 +183,7 @@ hexadecimal_encode_entire_input_string (){
 }
 
 #Hexadecimal encode a formatted input string
-hexadecimal_encode_formatted_input_string (){
+function hexadecimal_encode_formatted_input_string (){
 	echo ""
 	echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
 	echo "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
@@ -194,7 +194,7 @@ hexadecimal_encode_formatted_input_string (){
 }
 
 #GPG verify a specific Sanesecurity database file
-gpg_verify_specific_sanesecurity_database_file () {
+function gpg_verify_specific_sanesecurity_database_file () {
 	echo ""
 	db_file=`echo "$OPTARG" | awk -F '/' '{print $NF}'`
 	if [ -r "$sanesecurity_dir/$db_file" ] ; then
@@ -211,7 +211,7 @@ gpg_verify_specific_sanesecurity_database_file () {
 }
 
 #Output system and configuration information
-output_system_configuration_information () {
+function output_system_configuration_information () {
 	echo ""
 	echo "*** SCRIPT VERSION ***"
 	echo "`basename $0` $script_version ($script_version_date)"
@@ -254,7 +254,7 @@ output_system_configuration_information () {
 }
 
 #Make a signature database from an ascii file
-make_signature_database_from_ascii_file () {
+function make_signature_database_from_ascii_file () {
 	echo ""
 	echo "
 	The '-m' script flag provides a way to create a ClamAV hexadecimal signature database (*.ndb) file
@@ -371,7 +371,7 @@ make_signature_database_from_ascii_file () {
 }
 
 #Remove the clamav-unofficial-sigs script
-remove_script () {
+function remove_script () {
 	echo ""
 	if [ -n "$pkg_mgr" -a -n "$pkg_rm" ] ; then
 		echo "  This script (clamav-unofficial-sigs) was installed on the system"
@@ -425,7 +425,7 @@ remove_script () {
 }
 
 #Clamscan integrity test a specific database file
-clamscan_integrity_test_specific_database_file (){
+function clamscan_integrity_test_specific_database_file (){
 	echo ""
 	input=`echo "$OPTARG" | awk -F '/' '{print $NF}'`
 	db_file=`find $work_dir -name $input`
@@ -445,7 +445,7 @@ clamscan_integrity_test_specific_database_file (){
 }
 
 #output names of any third-party signatures that triggered during the HAM directory scan
-output_signatures_triggered_during_ham_directory_scan () {
+function output_signatures_triggered_during_ham_directory_scan () {
 	echo ""
 	if [ -n "$ham_dir" ] ; then
 		if [ -r "$work_dir_configs/whitelist.hex" ] ; then
@@ -461,7 +461,7 @@ output_signatures_triggered_during_ham_directory_scan () {
 }
 
 #Adds a signature whitelist entry in the newer ClamAV IGN2 format
-add_signature_whitelist_entry () {
+function add_signature_whitelist_entry () {
 	echo ""
 	echo "Input a third-party signature name that you wish to whitelist due to false-positives"
 	echo "and press enter (do not include '.UNOFFICIAL' in the signature name nor add quote"
@@ -522,7 +522,7 @@ add_signature_whitelist_entry () {
 }
 
 #Clamscan reload database
-clamscan_reload_dbs (){
+function clamscan_reload_dbs (){
 	# Reload all clamd databases if updates detected and $reload_dbs" is set to "yes"
 	if [ "$reload_dbs" = "yes" ] ; then
 		if [ "$do_clamd_reload" != "0" ] ; then
@@ -923,6 +923,8 @@ while true; do
 		-o | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
 		-w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
 		--check-clamav ) check_clamav; exit; break ;;
+		--install-logrotate ) install_logrotate; exit; break ;;
+		--install-cron ) install_cron; exit; break ;;
 		* ) break ;;
 	esac
 done
