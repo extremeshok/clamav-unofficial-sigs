@@ -1439,25 +1439,24 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 		xshok_pretty_echo_and_log "$securiteinfo_update_hours hours have not yet elapsed since the last SecuriteInfo update check"
 		xshok_pretty_echo_and_log "No update check was performed at this time" "-"
 		xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+fi
+fi
+fi
+else
+	if [ -n "$securiteinfo_dbs" ] ; then
+		for db_file in $securiteinfo_dbs ; do
+			if [ -r "$securiteinfo_dir/$db_file" ] ; then
+				rm -f "$securiteinfo_dir/$db_file"
+				do_clamd_reload=1
+			fi
+			if [ -r "$clam_dbs/$db_file" ] ; then
+				rm -f "$clam_dbs/$db_file"
+				do_clamd_reload=1
+			fi
+		done
 	fi
 fi
-fi
-fi
-fi
-#else
-#	if [ -n "$securiteinfo_dbs" ] ; then
-# 	for db_file in $securiteinfo_dbs ; do
-#			if [ -r "$ecuriteinfo_dir/$db_file" ] ; then
-#				rm -f "$securiteinfo_dir/$db_file"
-#				do_clamd_reload=1
-#			fi
-#			if [ -r "$clam_dbs/$db_file" ] ; then
-#				rm -f "$clam_dbs/$db_file"
-#				do_clamd_reload=1
-#			fi
-#		done
-#	fi
-#fi
+
 
 ##############################################################################################################################################
 # Check for updated linuxmalwaredetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
