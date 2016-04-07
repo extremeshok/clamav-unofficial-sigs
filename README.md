@@ -13,6 +13,7 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 ### Support / Suggestions / Comments
 Please post them on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
 
+### Submit Patches / Pull requests to the "Dev" Branch
 
 ### Quick Install Guide
 * Download the files to /tmp/
