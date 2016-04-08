@@ -78,17 +78,18 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.X.X (updated 2016-04-XX)
+### Version 5.1.0 (updated 2016-04-08)
  - eXtremeSHOK.com Maintenance 
  - Added --install-cron this will automatically generate and install the cron file
  - Added --install-logrotate this will automatically generate and install the logrotate file
- - Change official URL of SecuriteInfo signatures 
+ - Change official URL of SecuriteInfo signatures
  - Added a new database (securiteinfoandroid.hdb) for SecuriteInfo 
  - Remove database files after disabling a database group by @reneschuster
  - Updated Gentoo OS config by @orlitzky
- - Bump config to 59
- - move function clamav_files
- - Set minimum config required to 59
+ - Regroup functiuons
+ - Increase travis-ci code testing
+ - Set minimum config required to 60
+ - Bump config to 60
 
 ### Version 5.0.6 (updated 2016-04-04)
  - eXtremeSHOK.com Maintenance 
