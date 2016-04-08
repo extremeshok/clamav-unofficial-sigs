@@ -21,13 +21,12 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * Set 755 permissions on  /usr/local/bin/clamav-unofficial-sigs.sh
 * Make the directory /etc/clamav-unofficial-sigs/
 * Copy the contents of config/ into /etc/clamav-unofficial-sigs/
-* Copy the contents of logrotate.d/ into /etc/logrotate.d/
 * Copy clamav-unofficial-sigs.8 into /usr/share/man/man8/
 * Make the directory /var/log/clamav-unofficial-sigs/
 * Rename the your os.your-distro.conf to os.conf, where your-distro is your distribution
 * Set your user config options in the configs /etc/clamav-unofficial-sigs/user.conf
 * Run the script with --install-cron to install the cron file
-
+* Run the script with --install-logrotate to install the logrotate file
 
 ### Systemd
 * Copy the contents of systemd/ into to /etc/systemd/
@@ -82,6 +81,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 ### Version 5.X.X (updated 2016-04-XX)
  - eXtremeSHOK.com Maintenance 
  - Added --install-cron this will automatically generate and install the cron file
+ - Added --install-logrotate this will automatically generate and install the logrotate file
  - Change official URL of SecuriteInfo signatures 
  - Added a new database (securiteinfoandroid.hdb) for SecuriteInfo 
  - Remove database files after disabling a database group by @reneschuster

@@ -10,3 +10,27 @@ else
  	echo .. ERROR
   exit 1
 fi
+
+if bash clamav-unofficial-sigs.sh --install-cron ; then
+	if [ -e "/etc/cron.d/clamav-unofficial-sigs" ] ; then
+		echo .. OK	
+	else
+		echo .. ERROR
+  	exit 1
+	fi
+else
+ 	echo .. ERROR
+  exit 1
+fi
+
+if bash clamav-unofficial-sigs.sh --install-logrotate  ; then
+	if [ -e "/etc/logrotate.d/clamav-unofficial-sigs" ] ; then
+		echo .. OK	
+	else
+		echo .. ERROR
+  	exit 1
+	fi
+else
+ 	echo .. ERROR
+  exit 1
+fi
