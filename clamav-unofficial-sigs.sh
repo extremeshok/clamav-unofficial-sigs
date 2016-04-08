@@ -150,9 +150,6 @@ function install_logrotate (){
 	echo ""
 	echo "Generating logrotate file for install...."
 	
-	#testing
-	logrotate_dir="/tmp"
-
 	#Use defined varibles or attempt to use default varibles
 	if [ ! -n "$logrotate_dir" ] ; then
 		logrotate_dir="/etc/logrotate.d"
