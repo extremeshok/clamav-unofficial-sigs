@@ -1474,16 +1474,19 @@ done
 	fi
 else
 	if [ -n "$sanesecurity_dbs" ] ; then
-		for db_file in $sanesecurity_dbs ; do
-			if [ -r "$sanesecurity_dir/$db_file" ] ; then
-				rm -f "$sanesecurity_dir/$db_file"*
-				do_clamd_reload=1
-			fi
-			if [ -r "$clam_dbs/$db_file" ] ; then
-				rm -f "$clam_dbs/$db_file"
-				do_clamd_reload=1
-			fi
-		done
+		if [ "$remove_disabled_databases" == "yes" ] ; then
+			xshok_pretty_echo_and_log "Removing disabled Sanesecurity Database files"
+			for db_file in $sanesecurity_dbs ; do
+				if [ -r "$sanesecurity_dir/$db_file" ] ; then
+					rm -f "$sanesecurity_dir/$db_file"*
+					do_clamd_reload=1
+				fi
+				if [ -r "$clam_dbs/$db_file" ] ; then
+					rm -f "$clam_dbs/$db_file"
+					do_clamd_reload=1
+				fi
+			done
+		fi
 	fi
 fi
 
@@ -1616,16 +1619,19 @@ fi
 fi
 else
 	if [ -n "$securiteinfo_dbs" ] ; then
-		for db_file in $securiteinfo_dbs ; do
-			if [ -r "$securiteinfo_dir/$db_file" ] ; then
-				rm -f "$securiteinfo_dir/$db_file"
-				do_clamd_reload=1
-			fi
-			if [ -r "$clam_dbs/$db_file" ] ; then
-				rm -f "$clam_dbs/$db_file"
-				do_clamd_reload=1
-			fi
-		done
+		if [ "$remove_disabled_databases" == "yes" ] ; then
+			xshok_pretty_echo_and_log "Removing disabled SecuriteInfo Database files"
+			for db_file in $securiteinfo_dbs ; do
+				if [ -r "$securiteinfo_dir/$db_file" ] ; then
+					rm -f "$securiteinfo_dir/$db_file"
+					do_clamd_reload=1
+				fi
+				if [ -r "$clam_dbs/$db_file" ] ; then
+					rm -f "$clam_dbs/$db_file"
+					do_clamd_reload=1
+				fi
+			done
+		fi
 	fi
 fi
 
@@ -1756,16 +1762,19 @@ fi
 fi
 else
 	if [ -n "$linuxmalwaredetect_dbs" ] ; then
-		for db_file in $linuxmalwaredetect_dbs ; do
-			if [ -r "$linuxmalwaredetect_dir/$db_file" ] ; then
-				rm -f "$linuxmalwaredetect_dir/$db_file"
-				do_clamd_reload=1
-			fi
-			if [ -r "$clam_dbs/$db_file" ] ; then
-				rm -f "$clam_dbs/$db_file"
-				do_clamd_reload=1
-			fi
-		done
+		if [ "$remove_disabled_databases" == "yes" ] ; then
+			xshok_pretty_echo_and_log "Removing disabled linuxmalwaredetect Database files"
+			for db_file in $linuxmalwaredetect_dbs ; do
+				if [ -r "$linuxmalwaredetect_dir/$db_file" ] ; then
+					rm -f "$linuxmalwaredetect_dir/$db_file"
+					do_clamd_reload=1
+				fi
+				if [ -r "$clam_dbs/$db_file" ] ; then
+					rm -f "$clam_dbs/$db_file"
+					do_clamd_reload=1
+				fi
+			done
+		fi
 	fi
 fi
 
@@ -1913,13 +1922,16 @@ fi
 fi
 else
 	if [ -n "$malwarepatrol_db" ] ; then
-		if [ -r "$malwarepatrol_dir/$malwarepatrol_db" ] ; then
-			rm -f "$malwarepatrol_dir/$malwarepatrol_db"
-			do_clamd_reload=1
-		fi
-		if [ -r "$clam_dbs/$malwarepatrol_db" ] ; then
-			rm -f "$clam_dbs/$malwarepatrol_db"
-			do_clamd_reload=1
+		if [ "$remove_disabled_databases" == "yes" ] ; then
+			xshok_pretty_echo_and_log "Removing disabled MalwarePatrol Database file"
+			if [ -r "$malwarepatrol_dir/$malwarepatrol_db" ] ; then
+				rm -f "$malwarepatrol_dir/$malwarepatrol_db"
+				do_clamd_reload=1
+			fi
+			if [ -r "$clam_dbs/$malwarepatrol_db" ] ; then
+				rm -f "$clam_dbs/$malwarepatrol_db"
+				do_clamd_reload=1
+			fi
 		fi
 	fi
 fi
@@ -2056,19 +2068,22 @@ fi
 fi
 else
 	if [ -n "$yararules_dbs" ] ; then
-		for db_file in $yararules_dbs ; do
-			if echo $db_file|grep -q "/"; then
-				db_file=`echo $db_file | cut -d"/" -f2`
-			fi
-			if [ -r "$yararules_dir/$db_file" ] ; then
-				rm -f "$yararules_dir/$db_file"
-				do_clamd_reload=1
-			fi
-			if [ -r "$clam_dbs/$db_file" ] ; then
-				rm -f "$clam_dbs/$db_file"
-				do_clamd_reload=1
-			fi
-		done
+		if [ "$remove_disabled_databases" == "yes" ] ; then
+			xshok_pretty_echo_and_log "Removing disabled yararules Database files"
+			for db_file in $yararules_dbs ; do
+				if echo $db_file|grep -q "/"; then
+					db_file=`echo $db_file | cut -d"/" -f2`
+				fi
+				if [ -r "$yararules_dir/$db_file" ] ; then
+					rm -f "$yararules_dir/$db_file"
+					do_clamd_reload=1
+				fi
+				if [ -r "$clam_dbs/$db_file" ] ; then
+					rm -f "$clam_dbs/$db_file"
+					do_clamd_reload=1
+				fi
+			done
+		fi
 	fi
 fi
 
