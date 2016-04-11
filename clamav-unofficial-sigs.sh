@@ -91,6 +91,8 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 		if [ ! -e "$log_file_path/$log_file_name" ] ; then
 				mkdir -p "$log_file_path" 2>/dev/null
 		    touch "$log_file_path/$log_file_name" 2>/dev/null
+		    perms chown -f $clam_user:$clam_group $log_file_path
+		    perms chown -f $clam_user:$clam_group $log_file_path/$log_file_name
 		fi
 		if [ ! -w "$log_file_path/$log_file_name" ] ; then
 			echo "Warning: Logging Disabled, as file not writable: $log_file_path/$log_file_name"
