@@ -498,7 +498,7 @@ function make_signature_database_from_ascii_file () {
 				if ! cmp -s "$path_file" "$clam_dbs/$db_file" ; then
 					if $rsync_bin -pcqt "$path_file" "$clam_dbs" ; then
 						perms chown -f $clam_user:$clam_group "$clam_dbs/$db_file"
-						chmod -f 0644 "$clam_dbs/$db_file"
+						perms chmod -f 0644 "$clam_dbs/$db_file"
 						if [ "$selinux_fixes" == "yes" ] ; then
 							restorecon "$clam_dbs/$db_file"
 						fi
@@ -641,7 +641,7 @@ function add_signature_whitelist_entry () {
 							echo "This is the monitor ignore file..." > "$work_dir_configs/monitor-ign.txt"
 						fi
 
-						chmod -f 0644 my-whitelist.ign2 "$work_dir_configs/monitor-ign.txt"
+						perms chmod -f 0644 my-whitelist.ign2 "$work_dir_configs/monitor-ign.txt"
 						if [ "$selinux_fixes" == "yes" ] ; then
 							restorecon "$clam_dbs/local.ign"
 						fi
@@ -1145,7 +1145,7 @@ fi
 mkdir -p "$work_dir" "$securiteinfo_dir" "$malwarepatrol_dir" "$linuxmalwaredetect_dir" "$sanesecurity_dir" "$yararules_dir" "$work_dir_configs" "$gpg_dir" "$add_dir"
 
 # Set secured access permissions to the GPG directory
-chmod -f 0700 "$gpg_dir"
+perms chmod -f 0700 "$gpg_dir"
 
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$gpg_dir/publickey.gpg" ] ; then
@@ -2179,7 +2179,7 @@ if [ -r "$clam_dbs/local.ign" -a -s "$work_dir_configs/monitor-ign.txt" ] ; then
 			if $rsync_bin -pcqt $work_dir_configs/local.ign $clam_dbs
 				then
 				perms chown -f $clam_user:$clam_group "$clam_dbs/local.ign"
-				chmod -f 0644 "$clam_dbs/local.ign" "$work_dir_configs/monitor-ign.txt"
+				perms chmod -f 0644 "$clam_dbs/local.ign" "$work_dir_configs/monitor-ign.txt"
 				if [ "$selinux_fixes" == "yes" ] ; then
 					restorecon "$clam_dbs/local.ign"
 				fi
@@ -2224,7 +2224,7 @@ if [ -r "$clam_dbs/my-whitelist.ign2" -a -s "$work_dir_configs/tracker.txt" ] ; 
 			if $rsync_bin -pcqt $work_dir_configs/my-whitelist.ign2 $clam_dbs
 				then
 				perms chown -f $clam_user:$clam_group "$clam_dbs/my-whitelist.ign2"
-				chmod -f 0644 "$clam_dbs/my-whitelist.ign2" "$work_dir_configs/tracker.txt"
+				perms chmod -f 0644 "$clam_dbs/my-whitelist.ign2" "$work_dir_configs/tracker.txt"
 				if [ "$selinux_fixes" == "yes" ] ; then
 					restorecon "$clam_dbs/my-whitelist.ign2"
 					restorecon "$work_dir_configs/tracker.txt"
@@ -2256,7 +2256,6 @@ fi
 
 # Set appropriate directory and file permissions to all production signature files
 # and set file access mode to 0644 on all working directory files.
-perms chown -f -R $clam_user:$clam_group "$clam_dbs"
 if ! find "$work_dir" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
 	if ! find "$work_dir" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
 		if ! find "$work_dir" -type f | xargs chmod -f 0644 2>/dev/null ; then
@@ -2267,6 +2266,7 @@ fi
 
 # If enabled, set file access mode for all production signature database files to 0644.
 if [ "$setmode" = "yes" ] ; then
+	perms chown -f -R $clam_user:$clam_group "$clam_dbs"
 	if ! find "$clam_dbs" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
 		if ! find "$clam_dbs" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
 			if ! find "$clam_dbs" -type f | xargs chmod -f 0644 2>/dev/null ; then
