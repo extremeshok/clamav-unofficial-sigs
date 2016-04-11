@@ -48,6 +48,13 @@ function perms () {
 	fi
 }
 
+# Function to create a dir and set the ownership
+function xshok_mkdir_ownership () { #"path"
+	mkdir -p "$1" 2>/dev/null
+	perms chown -f $clam_user:$clam_group "$1"
+}
+
+
 # Function to handle comments with/out borders and logging.
 # Usage:
 # pretty_echo_and_log "one" 
@@ -89,9 +96,8 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 	# handle logging
 	if [ "$enable_log" == "yes" ] ; then
 		if [ ! -e "$log_file_path/$log_file_name" ] ; then
-				mkdir -p "$log_file_path" 2>/dev/null
+				xshok_mkdir_ownership "$log_file_path"
 		    touch "$log_file_path/$log_file_name" 2>/dev/null
-		    perms chown -f $clam_user:$clam_group $log_file_path
 		    perms chown -f $clam_user:$clam_group $log_file_path/$log_file_name
 		fi
 		if [ ! -w "$log_file_path/$log_file_name" ] ; then
@@ -173,7 +179,7 @@ function install_logrotate (){
 	logrotate_dir=$(echo "$logrotate_dir" | sed 's:/*$::')
 
 	if [ ! -e "$logrotate_dir/$logrotate_filename" ] ; then
-		mkdir -p "$logrotate_dir" 2>/dev/null
+		xshok_mkdir_ownership "$logrotate_dir"
 		touch "$logrotate_dir/$logrotate_filename" 2>/dev/null
 	fi
 	if [ ! -w "$logrotate_dir/$logrotate_filename" ] ; then
@@ -254,7 +260,7 @@ function install_cron (){
 	cron_dir=$(echo "$cron_dir" | sed 's:/*$::')
 
 	if [ ! -e "$cron_dir/$cron_filename" ] ; then
-		mkdir -p "$cron_dir" 2>/dev/null
+		xshok_mkdir_ownership "$cron_dir"
 		touch "$cron_dir/$cron_filename" 2>/dev/null
 	fi
 	if [ ! -w "$cron_dir/$cron_filename" ] ; then
@@ -1113,7 +1119,7 @@ malwarepatrol_url="$malwarepatrol_url?product=$malwarepatrol_product_code&list=$
 test_dir="$work_dir/test"
 if [ -n "$ham_dir" -a -d "$work_dir" -a ! -d "$test_dir" ] ; then
 	if [ -d "$ham_dir" ] ; then
-		mkdir -p "$test_dir"
+		xshok_mkdir_ownership "$test_dir"
 		cp -f "$work_dir"/*/*.ndb "$test_dir"
 		$clamscan_bin --infected --no-summary -d "$test_dir" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "$work_dir_configs/whitelist.txt"
 		grep -h -f "$work_dir_configs/whitelist.txt" "$test_dir"/* | cut -d "*" -f2 | sort | uniq > "$work_dir_configs/whitelist.hex"
@@ -1144,7 +1150,15 @@ fi
 
 # Check to see if the working directories have been created.
 # If not, create them.  Otherwise, ignore and proceed with script.
-mkdir -p "$work_dir" "$securiteinfo_dir" "$malwarepatrol_dir" "$linuxmalwaredetect_dir" "$sanesecurity_dir" "$yararules_dir" "$work_dir_configs" "$gpg_dir" "$add_dir"
+xshok_mkdir_ownership "$work_dir"
+xshok_mkdir_ownership "$securiteinfo_dir"
+xshok_mkdir_ownership "$malwarepatrol_dir"
+xshok_mkdir_ownership "$linuxmalwaredetect_dir"
+xshok_mkdir_ownership "$sanesecurity_dir"
+xshok_mkdir_ownership "$yararules_dir"
+xshok_mkdir_ownership "$work_dir_configs"
+xshok_mkdir_ownership "$gpg_dir"
+xshok_mkdir_ownership "$add_dir"
 
 # Set secured access permissions to the GPG directory
 perms chmod -f 0700 "$gpg_dir"
