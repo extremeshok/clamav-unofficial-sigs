@@ -96,7 +96,8 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 	# handle logging
 	if [ "$enable_log" == "yes" ] ; then
 		if [ ! -e "$log_file_path/$log_file_name" ] ; then
-				xshok_mkdir_ownership "$log_file_path"
+				#xshok_mkdir_ownership "$log_file_path"
+				mkdir -p "$log_file_path"
 		    touch "$log_file_path/$log_file_name" 2>/dev/null
 		    perms chown -f $clam_user:$clam_group $log_file_path/$log_file_name
 		fi
@@ -179,7 +180,7 @@ function install_logrotate (){
 	logrotate_dir=$(echo "$logrotate_dir" | sed 's:/*$::')
 
 	if [ ! -e "$logrotate_dir/$logrotate_filename" ] ; then
-		xshok_mkdir_ownership "$logrotate_dir"
+		mkdir -p "$logrotate_dir"
 		touch "$logrotate_dir/$logrotate_filename" 2>/dev/null
 	fi
 	if [ ! -w "$logrotate_dir/$logrotate_filename" ] ; then
@@ -260,7 +261,7 @@ function install_cron (){
 	cron_dir=$(echo "$cron_dir" | sed 's:/*$::')
 
 	if [ ! -e "$cron_dir/$cron_filename" ] ; then
-		xshok_mkdir_ownership "$cron_dir"
+		mkdir -p "$cron_dir"
 		touch "$cron_dir/$cron_filename" 2>/dev/null
 	fi
 	if [ ! -w "$cron_dir/$cron_filename" ] ; then
