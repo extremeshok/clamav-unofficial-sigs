@@ -28,6 +28,9 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * Run the script with --install-cron to install the cron file
 * Run the script with --install-logrotate to install the logrotate file
 
+### First Usage
+* Run the script once as your superuser to set all the permissions and create the relevant directories
+
 ### Systemd
 * Copy the contents of systemd/ into to /etc/systemd/
 
@@ -80,13 +83,15 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 ## Change Log
 ### Version 5.1.1 (updated 2016-04-12)
  - eXtremeSHOK.com Maintenance 
- - Added OS X config
+ - Added OS X and openbsd configs
+ - Fixed host fallback sed issues by @MichaelKuch
  - Suppress most error messages of chmod and chown
  - check permissions before chmod
  - Added the config option remove_disabled_databases # Default is "no", if enabled when a database is disabled we will remove the associated database files.
  - Added function xshok_mkdir_ownership
  - Do not set permissions of the log, cron and logrotate dirs
  - Fix: fallback for missing gpg -r option on OS X
+ - Update sanesecurity signatures
  - Bump config to 61
 
 ### Version 5.1.0
