@@ -814,7 +814,7 @@ function help_and_usage () {
 
 	echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tUse a specific configuration file or directory\n\teg: '-c /your/dir' or ' -c /your/file.name' \n\tNote: If a directory is specified the directory must contain atleast: \n\tmaster.conf, os.conf or user.conf\n\tDefault Directory: $config_dir"
 
-	echo -e "\n${BOLD}-F${BOLD}, --force${NORM}\t\tForce all databases to be downloaded, could cause ip to be blocked"
+	echo -e "\n${BOLD}-F${BOLD}, --force${NORM}\tForce all databases to be downloaded, could cause ip to be blocked"
 
 	echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
 
@@ -844,11 +844,11 @@ function help_and_usage () {
 
 	echo -e "\n${BOLD}-w${NORM}, ${BOLD}--whitelist${NORM}\tAdds a signature whitelist entry in the newer ClamAV IGN2\n\tformat to 'my-whitelist.ign2' in order to temporarily resolve\n\ta false-positive issue with a specific third-party signature.\n\tScript added whitelist entries will automatically be removed\n\tif the original signature is either modified or removed from\n\tthe third-party signature database" 
 
-	echo -e "\n${BOLD}--check-clamav${NORM}\tIf ClamD status check is enabled and the socket path is correctly specified\n\tthen test to see if clamd is running or not"
+	echo -e "\n${BOLD}--check-clamav${NORM}\tIf ClamD status check is enabled and the socket path is correctly\n\tspecifiedthen test to see if clamd is running or not"
 	
-	echo -e "\n${BOLD}--install-cron${NORM}\tInstall and generate the cron file, autodetects the values based on your config files"
+	echo -e "\n${BOLD}--install-cron${NORM}\tInstall and generate the cron file, autodetects the values\n\tbased on your config files"
 	
-	echo -e "\n${BOLD}--install-logrotate${NORM}\tInstall and generate the logrotate file, autodetects the values based on your config files"
+	echo -e "\n${BOLD}--install-logrotate${NORM}\tInstall and generate the logrotate file, autodetects the\n\tvalues based on your config files"
 
 	echo -e "\nMail suggestions and bug reports to ${BOLD}<admin@extremeshok.com>${NORM}"
 
@@ -860,7 +860,7 @@ function help_and_usage () {
 
 #Script Info
 script_version="5.1.1"
-script_version_date="14 April 2016"
+script_version_date="13 April 2016"
 minimum_required_config_version="60"
 
 #default config files
