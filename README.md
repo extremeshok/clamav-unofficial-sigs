@@ -81,7 +81,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.1.1 (updated 2016-04-12)
+### Version 5.1.1 (updated 2016-04-13)
  - eXtremeSHOK.com Maintenance 
  - Added OS X and openbsd configs
  - Fixed host fallback sed issues by @MichaelKuch
@@ -363,11 +363,11 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 -c, --config    Use a specific configuration file or directory
         eg: '-c /your/dir' or ' -c /your/file.name'
-        Note: If a directory is specified the directory must contain atleast
-        master.conf, os.conf or user.conf.
+        Note: If a directory is specified the directory must contain atleast:
+        master.conf, os.conf or user.conf
         Default Directory: /etc/clamav-unofficial-sigs
 
--F, --force         Force all databases to be downloaded, could cause ip to be blocked
+-F, --force     Force all databases to be downloaded, could cause ip to be blocked
 
 -h, --help      Display this script's help and usage information
 
@@ -416,8 +416,15 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         if the original signature is either modified or removed from
         the third-party signature database
 
---check-clamav  If ClamD status check is enabled and the socket path is correctly specified
-        then test to see if clamd is running or not
+--check-clamav  If ClamD status check is enabled and the socket path is correctly
+        specifiedthen test to see if clamd is running or not
+
+--install-cron  Install and generate the cron file, autodetects the values
+        based on your config files
+
+--install-logrotate     Install and generate the logrotate file, autodetects the
+        values based on your config files
+
 
 ### Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 
