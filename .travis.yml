@@ -26,7 +26,7 @@ before_install:
   # - "sudo mkdir -p tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs"
   # - "sudo rsync -rlptDv tmp/cache/  /var/lib/clamav/"
-  - "sudo cp -f .travis/tests/test.ndb /var/lib/clamav/test.ndb"
+  - "sudo cp -f .travis/tests/bytecode.cvd /var/lib/clamav/bytecode.cvd"
   - "sudo chown -R clamav:clamav /var/lib/clamav"
   # - "sudo freshclam"
   # - "ls -laFh /var/lib/clamav/"
