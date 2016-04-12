@@ -27,7 +27,7 @@ before_install:
   - "sudo chown -R clamav:clamav /var/lib/clamav"
   - "sudo freshclam"
   - "sudo rsync -rlptDav /var/lib/clamav/ tmp/cache/clamav-dbs/"
-  - "sudo chomd -R 777 tmp/cache/"
+  - "sudo chmod -R 777 tmp/cache/"
   - "sudo service clamav-daemon start"
 
 install:
