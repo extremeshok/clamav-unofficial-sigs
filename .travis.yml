@@ -1,5 +1,15 @@
 #language: shell
 
+# Required environment variables from repository settings
+#ci_securiteinfo_authorisation_signature=[secure]
+#ci_malwarepatrol_receipt_code=[secure]
+#ci_malwarepatrol_product_code=[secure]
+#ci_malwarepatrol_list=[secure]
+#ci_malwarepatrol_free=[secure]
+
+# Notes
+# caching the /var/lib/clamav/ saves +/-9mins of run time
+
 #Enable modern build platform
 sudo: required
 dist: trusty
