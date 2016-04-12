@@ -13,6 +13,7 @@ before_install:
   - "sudo apt-get install clamav-daemon -qq"
   - "sudo mkdir -p $HOME/cache/clamav-dbs"
   - "sudo rsync -av $HOME/cache/clamav-dbs/  /var/lib/clamav/"
+  - "sudo chown -R clamav:clamav /var/lib/clamav"
   - "sudo freshclam"
   - "sudo rsync -av /var/lib/clamav/ $HOME/cache/clamav-dbs/"
   - "sudo service clamav-daemon start"
