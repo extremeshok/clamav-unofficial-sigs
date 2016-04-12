@@ -1378,7 +1378,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 			sanesecurity_mirror_name=`dig +short -x $sanesecurity_mirror_ip | command sed 's/\.$//'`
 			#add fallback to host if dig returns no records
 			if [ "$sanesecurity_mirror_name" == "" ] ; then
-				sanesecurity_mirror_name=`host "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*/\1/;p;}'`
+				sanesecurity_mirror_name=`host "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}'`
 			fi
 			sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
 			xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
