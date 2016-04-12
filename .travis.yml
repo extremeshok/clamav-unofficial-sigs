@@ -8,7 +8,7 @@
 #ci_malwarepatrol_free=[secure]
 
 # Notes
-# caching the /var/lib/clamav/ saves +/-9mins of run time
+# caching the /var/lib/clamav/ as this saves +/-9mins of run time
 
 #Enable modern build platform
 sudo: required
