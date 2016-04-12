@@ -1437,7 +1437,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 								fi
 								xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
 								sanesecurity_update=1
-								doclamd_reload=1
+								do_clamd_reload=1
 							else
 								xshok_pretty_echo_and_log "Failed to successfully update Sanesecurity production database file: $db_file - SKIPPING"
 								false
