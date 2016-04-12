@@ -22,10 +22,10 @@ before_install:
   - "sudo apt-get update -qq"
   - "sudo apt-get install clamav-daemon -qq"
   - "sudo mkdir -p tmp/cache/clamav-dbs"
-  - "sudo rsync -av tmp/cache/clamav-dbs/  /var/lib/clamav/"
+  - "sudo rsync -av --no-o --no-g tmp/cache/clamav-dbs/  /var/lib/clamav/"
   - "sudo chown -R clamav:clamav /var/lib/clamav"
   - "sudo freshclam"
-  - "sudo rsync -av /var/lib/clamav/ tmp/cache/clamav-dbs/"
+  - "sudo rsync -av --no-o --no-g /var/lib/clamav/ tmp/cache/clamav-dbs/"
   - "sudo service clamav-daemon start"
 
 install:
