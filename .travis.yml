@@ -11,33 +11,35 @@
 # caching the /var/lib/clamav/ as this saves +/-9mins of run time
 
 #Enable modern build platform
-sudo: required
+#sudo: required
+sudo: false
 dist: trusty
 
 #Enable Caching
 cache:
   directories:
-    - tmp/cache/clamav-dbs
+    - tmp/cache
 
 before_install:
-  - "sudo apt-get update -qq"
-  - "sudo apt-get install clamav-daemon -qq"
-  - "sudo mkdir -p tmp/cache/clamav-dbs"
+  - "apt-get update -qq"
+  - "apt-get install clamav-daemon -qq"
+  - "mkdir -p tmp/cache/"
   - "ls -laFh tmp/cache/clamav-dbs"
-  - "sudo rsync -rlptDv tmp/cache/clamav-dbs/  /var/lib/clamav/"
-  - "sudo chown -R clamav:clamav /var/lib/clamav"
-  - "sudo freshclam"
+  - "rsync -rlptDv tmp/cache/  /var/lib/clamav/"
+  - "chown -R clamav:clamav /var/lib/clamav"
+  - "freshclam"
   - "ls -laFh /var/lib/clamav/"
-  - "sudo rsync -rlptDav /var/lib/clamav/ tmp/cache/clamav-dbs/"
-  - "sudo chmod -R 777 tmp/cache/"
+  - "rsync -rlptDav /var/lib/clamav/ tmp/cache/"
+  - "chown -R travis:travis tmp/cache"
+  - "chmod -R 777 tmp/cache/"
   - "ls -laFh tmp/cache/clamav-dbs/"
-  - "sudo service clamav-daemon start"
+  - "service clamav-daemon start"
 
 install:
-  - "sudo mkdir -p /etc/clamav-unofficial-sigs"
-  - "sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf"
-  - "sudo cp -f config/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf"
-  - "sudo cp -f .travis/tests/user.conf /etc/clamav-unofficial-sigs/user.conf"
+  - "mkdir -p /etc/clamav-unofficial-sigs"
+  - "cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf"
+  - "cp -f config/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf"
+  - "cp -f .travis/tests/user.conf /etc/clamav-unofficial-sigs/user.conf"
 
 script:
-  - sudo sh -e .travis/ci-test.sh
+  - "sh -e .travis/ci-test.sh"
