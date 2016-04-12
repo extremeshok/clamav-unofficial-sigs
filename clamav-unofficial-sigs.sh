@@ -1437,7 +1437,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 								fi
 								xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
 								sanesecurity_update=1
-								do_clamd_reload=1
+								doclamd_reload=1
 							else
 								xshok_pretty_echo_and_log "Failed to successfully update Sanesecurity production database file: $db_file - SKIPPING"
 								false
@@ -2288,6 +2288,7 @@ fi
 
 # Set appropriate directory and file permissions to all production signature files
 # and set file access mode to 0644 on all working directory files.
+perms chown -f -R $clam_user:$clam_group "$work_dir"
 if ! find "$work_dir" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
 	if ! find "$work_dir" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
 		if ! find "$work_dir" -type f | xargs chmod -f 0644 2>/dev/null ; then
@@ -2295,6 +2296,7 @@ if ! find "$work_dir" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
 		fi
 	fi
 fi
+
 
 # If enabled, set file access mode for all production signature database files to 0644.
 if [ "$setmode" = "yes" ] ; then
