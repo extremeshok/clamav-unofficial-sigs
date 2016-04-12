@@ -1384,7 +1384,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 		sanesecurity_mirror_ips=`dig +ignore +short $sanesecurity_url`
 		#add fallback to host if dig returns no records
 		if [ `xshok_array_count  "$sanesecurity_mirror_ips"` -lt 1 ] ; then
-			sanesecurity_mirror_ips=`host -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p}'`
+			sanesecurity_mirror_ips=`host -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}'`
 		fi
 
 		if [ `xshok_array_count  "$sanesecurity_mirror_ips"` -ge "1" ] ; then
@@ -1395,7 +1395,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 			sanesecurity_mirror_name=`dig +short -x $sanesecurity_mirror_ip | command sed 's/\.$//'`
 			#add fallback to host if dig returns no records
 			if [ "$sanesecurity_mirror_name" == "" ] ; then
-				sanesecurity_mirror_name=`host "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*/\1/;p}'`
+				sanesecurity_mirror_name=`host "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}'`
 			fi
 			sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
 			xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
