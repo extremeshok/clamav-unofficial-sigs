@@ -1846,7 +1846,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 				else # The not free branch
 					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $malwarepatrol_dir/$malwarepatrol_db.md5 "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1" 2>/dev/null ;	then
 						if [ -f $clam_dbs/$malwarepatrol_db ] ; then
-							malwarepatrol_md5=`openssl md5 -r $clam_dbs/$malwarepatrol_db | cut -d" " -f1`
+							malwarepatrol_md5=`openssl md5 -r $clam_dbs/$malwarepatrol_db 2>/dev/null | cut -d" " -f1`
+							if [ ! "$malwarepatrol_md5" ] ; then
+								#fallback for missing -r option
+								malwarepatrol_md5=`openssl md5 $clam_dbs/$malwarepatrol_db 2>/dev/null | cut -d" " -f2`
+							fi
 						fi
 						malwarepatrol_md5_new=`cat $malwarepatrol_dir/$malwarepatrol_db.md5`
 						if [ -n "$malwarepatrol_md5_new" -a "$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ; then
