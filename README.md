@@ -78,7 +78,18 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.1.0 (updated 2016-04-08)
+### Version 5.1.1 (updated 2016-04-12)
+ - eXtremeSHOK.com Maintenance 
+ - Added OS X config
+ - Suppress most error messages of chmod and chown
+ - check permissions before chmod
+ - Added the config option remove_disabled_databases # Default is "no", if enabled when a database is disabled we will remove the associated database files.
+ - Added function xshok_mkdir_ownership
+ - Do not set permissions of the log, cron and logrotate dirs
+ - Fix: fallback for missing gpg -r option on OS X
+ - Bump config to 61
+
+### Version 5.1.0
  - eXtremeSHOK.com Maintenance 
  - Added --install-cron this will automatically generate and install the cron file
  - Added --install-logrotate this will automatically generate and install the logrotate file

@@ -859,8 +859,8 @@ function help_and_usage () {
 ################################################################################
 
 #Script Info
-script_version="5.1.0"
-script_version_date="08 April 2016"
+script_version="5.1.1"
+script_version_date="14 April 2016"
 minimum_required_config_version="60"
 
 #default config files
