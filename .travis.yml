@@ -11,6 +11,7 @@ cache:
 before_install:
   - "sudo apt-get update -qq"
   - "sudo apt-get install clamav-daemon -qq"
+  - "mkdir -p $HOME/cache/clamav-dbs"
   - "cp -f $HOME/cache/clamav-dbs/* /var/lib/clamav"
   - "sudo freshclam"
   - "cp -f /var/lib/clamav/* $HOME/cache/clamav-dbs"
