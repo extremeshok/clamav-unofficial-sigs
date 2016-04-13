@@ -28,6 +28,9 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * Run the script with --install-cron to install the cron file
 * Run the script with --install-logrotate to install the logrotate file
 
+### First Usage
+* Run the script once as your superuser to set all the permissions and create the relevant directories
+
 ### Systemd
 * Copy the contents of systemd/ into to /etc/systemd/
 
@@ -78,7 +81,20 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.1.0 (updated 2016-04-08)
+### Version 5.1.1 (updated 2016-04-13)
+ - eXtremeSHOK.com Maintenance 
+ - Added OS X and openbsd configs
+ - Fixed host fallback sed issues by @MichaelKuch
+ - Suppress most error messages of chmod and chown
+ - check permissions before chmod
+ - Added the config option remove_disabled_databases # Default is "no", if enabled when a database is disabled we will remove the associated database files.
+ - Added function xshok_mkdir_ownership
+ - Do not set permissions of the log, cron and logrotate dirs
+ - Fix: fallback for missing gpg -r option on OS X
+ - Update sanesecurity signatures
+ - Bump config to 61
+
+### Version 5.1.0
  - eXtremeSHOK.com Maintenance 
  - Added --install-cron this will automatically generate and install the cron file
  - Added --install-logrotate this will automatically generate and install the logrotate file
@@ -347,11 +363,11 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 -c, --config    Use a specific configuration file or directory
         eg: '-c /your/dir' or ' -c /your/file.name'
-        Note: If a directory is specified the directory must contain atleast
-        master.conf, os.conf or user.conf.
+        Note: If a directory is specified the directory must contain atleast:
+        master.conf, os.conf or user.conf
         Default Directory: /etc/clamav-unofficial-sigs
 
--F, --force         Force all databases to be downloaded, could cause ip to be blocked
+-F, --force     Force all databases to be downloaded, could cause ip to be blocked
 
 -h, --help      Display this script's help and usage information
 
@@ -400,8 +416,15 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         if the original signature is either modified or removed from
         the third-party signature database
 
---check-clamav  If ClamD status check is enabled and the socket path is correctly specified
-        then test to see if clamd is running or not
+--check-clamav  If ClamD status check is enabled and the socket path is correctly
+        specifiedthen test to see if clamd is running or not
+
+--install-cron  Install and generate the cron file, autodetects the values
+        based on your config files
+
+--install-logrotate     Install and generate the logrotate file, autodetects the
+        values based on your config files
+
 
 ### Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 
