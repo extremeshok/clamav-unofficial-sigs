@@ -170,9 +170,8 @@ function install_logrotate (){
 		logrotate_user="$clam_user";
 	fi
 	if [ ! -n "$logrotate_group" ] ; then
-		logrotate_user="$clam_group";
+		logrotate_group="$clam_group";
 	fi
-
 	if [ ! -n "$logrotate_log_file_full_path" ] ; then
 		logrotate_log_file_full_path="$log_file_path/$log_file_name"
 	fi
@@ -212,13 +211,13 @@ function install_logrotate (){
 # To Adjust the logrotate values, edit your configs and run
 # bash clamav-unofficial-sigs.sh --install-logrotate to generate a new file.
 
-$log_file_path/$log_file_name {
+$logrotate_log_file_full_path {
   weekly
   rotate 4
   missingok
   notifempty
   compress
-  create 0644 $clam_user $clam_group
+  create 0644 $logrotate_user $logrotate_group
 }
 
 EOF
@@ -552,15 +551,15 @@ function remove_script () {
 					rm -f -- "$file"
 					echo "     Removed file: $file"
 				done
-				cron_file="/etc/cron.d/clamav-unofficial-sigs-cron"
-				if [ -r "$cron_file" ] ; then
-					rm -f "$cron_file"
-					echo "     Removed file: $cron_file"
+				cron_file_full_path="$cron_dir/$cron_filename"
+				if [ -r "$cron_file_full_path" ] ; then
+					rm -f "$cron_file_full_path"
+					echo "     Removed file: $cron_file_full_path"
 				fi
-				log_rotate_file="/etc/logrotate.d/clamav-unofficial-sigs-logrotate"
-				if [ -r "$log_rotate_file" ] ; then
-					rm -f "$log_rotate_file"
-					echo "     Removed file: $log_rotate_file"
+				logrotate_file_full_path="$logrotate_dir/$logrotate_filename"
+				if [ -r "$logrotate_file_full_path" ] ; then
+					rm -f "$logrotate_file_full_path"
+					echo "     Removed file: $logrotate_file_full_path"
 				fi
 				man_file="/usr/share/man/man8/clamav-unofficial-sigs.8"
 				if [ -r "$man_file" ] ; then
