@@ -87,6 +87,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 ## Change Log
 ### Version 5.2.0 (updated 2016-04-15)
  - eXtremeSHOK.com Maintenance 
+ - Refactor some functions
  - Added --install-man this will automatically generate and install the man (help) file
  - Yararules and yararulesproject enabled by default
  - Added clamav version detection to automatically disable yararules and yararulesproject if the current clamav version does not support them
@@ -100,6 +101,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Rename sanesecurity_dir to work_dir_sanesecurity, securiteinfo_dir to work_dir_securiteinfo, malwarepatrol_dir to work_dir_malwarepatrol, yararules_dir to work_dir_yararules, add_dir to work_dir_add, gpg_dir to work_dir_gpg, work_dir_configs to work_dir_work_configs
  - Rename yararules_enabled to yararulesproject_enabled
  - Rename all yararules to yararulesproject
+ - Fix to prevent disabled databases processing certian things which will not be used as they are disabled
  - Set minimum config required to 62
  - Bump config to 62
 
