@@ -969,7 +969,7 @@ EOF
 ################################################################################
 
 #Script Info
-script_version="5.1.2"
+script_version="5.2.0"
 script_version_date="15 April 2016"
 minimum_required_config_version="60"
 
@@ -1137,7 +1137,7 @@ fi
 # Assign the directories and remove trailing / (removes / and //)
 work_dir=$(echo "$work_dir" | sed 's:/*$::')
 
-#Allow overriding of all the individual workdirs, this is mainly to aid package maintainers\
+#Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
 if [ ! -n "$work_dir_sanesecurity" ] ; then
 	work_dir_sanesecurity=$(echo "$work_dir/$dir_sanesecurity" | sed 's:/*$::')
 else

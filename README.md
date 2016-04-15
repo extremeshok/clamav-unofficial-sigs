@@ -81,7 +81,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.1.2 (updated 2016-04-15)
+### Version 5.2.0 (updated 2016-04-15)
  - eXtremeSHOK.com Maintenance 
  - Added --install-man this will automatically generate and install the man (help) file
  - Script options are added to the man file
@@ -89,6 +89,8 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Fixed incorrectly assigned logrotate varibles in install-logrotate
  - Config added info for port/package maintainers regarding:  pkg_mgr and pkg_rm
  - Removed pkg_mgr and pkg_rm from freebsd and openbsd os configs
+ - Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
+ - Rename sanesecurity_dir  to work_dir_sanesecurity, securiteinfo_dir to work_dir_securiteinfo, malwarepatrol_dir to work_dir_malwarepatrol, yararules_dir to work_dir_yararules, add_dir to work_dir_add, gpg_dir to work_dir_gpg, work_dir_configs to work_dir_work_config
  - Bump config to 62
 
 ### Version 5.1.1
@@ -117,7 +119,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Set minimum config required to 60
  - Bump config to 60
 
-### Version 5.0.6 (updated 2016-04-04)
+### Version 5.0.6
  - eXtremeSHOK.com Maintenance 
  - Updated winnow databases as per information from Tom @ OITC
  - Bump config to 58
