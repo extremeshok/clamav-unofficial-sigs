@@ -53,8 +53,12 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 
 ```setsebool -P antivirus_can_scan_system true```
 
-### Yara Rule Support (as of June 2015)
-Requires clamav 0.99 or above : http://yararules.com 
+### Yara Rule Support automatically enabled (as of April 2016)
+Since usage yara rules requires clamav 0.99 or above, they will be automatically deactivated if your clamav is older than the required version
+
+### Yara-Rules Project Support (as of June 2015)
+Usage of free Yara-Rules Project: http://yararules.com
+- Enabled by default
 
 Current limitations of clamav support : http://blog.clamav.net/search/label/yara
 
@@ -84,13 +88,18 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 ### Version 5.2.0 (updated 2016-04-15)
  - eXtremeSHOK.com Maintenance 
  - Added --install-man this will automatically generate and install the man (help) file
+ - Yararules and yararulesproject enabled by default
+ - Added clamav version detection to automatically disable yararules and yararulesproject if the current clamav version does not support them
  - Script options are added to the man file
  - Fixed hardcoded logrotate and cron in remove_script
  - Fixed incorrectly assigned logrotate varibles in install-logrotate
  - Config added info for port/package maintainers regarding:  pkg_mgr and pkg_rm
  - Removed pkg_mgr and pkg_rm from freebsd and openbsd os configs
  - Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
- - Rename sanesecurity_dir  to work_dir_sanesecurity, securiteinfo_dir to work_dir_securiteinfo, malwarepatrol_dir to work_dir_malwarepatrol, yararules_dir to work_dir_yararules, add_dir to work_dir_add, gpg_dir to work_dir_gpg, work_dir_configs to work_dir_work_configs
+ - Rename sanesecurity_dir to work_dir_sanesecurity, securiteinfo_dir to work_dir_securiteinfo, malwarepatrol_dir to work_dir_malwarepatrol, yararules_dir to work_dir_yararules, add_dir to work_dir_add, gpg_dir to work_dir_gpg, work_dir_configs to work_dir_work_configs
+ - Rename yararules_enabled to yararulesproject_enabled
+ - Rename all yararules to yararulesproject
+ - Set minimum config required to 62
  - Bump config to 62
 
 ### Version 5.1.1

@@ -971,7 +971,8 @@ EOF
 #Script Info
 script_version="5.2.0"
 script_version_date="15 April 2016"
-minimum_required_config_version="60"
+minimum_required_config_version="62"
+minimum_yara_clamav_version="0.99"
 
 #default config files
 config_dir="/etc/clamav-unofficial-sigs"
@@ -1158,10 +1159,10 @@ if [ ! -n "$work_dir_malwarepatrol" ] ; then
 else
 	work_dir_malwarepatrol=$(echo "$work_dir_malwarepatrol" | sed 's:/*$::')
 fi
-if [ ! -n "$work_dir_yararules" ] ; then
-	work_dir_yararules=$(echo "$work_dir/$yararules_dir" | sed 's:/*$::')
+if [ ! -n "$work_dir_yararulesproject" ] ; then
+	work_dir_yararulesproject=$(echo "$work_dir/$yararulesproject_dir" | sed 's:/*$::')
 else
-	work_dir_yararules=$(echo "$work_dir_yararules" | sed 's:/*$::')
+	work_dir_yararulesproject=$(echo "$work_dir_yararulesproject" | sed 's:/*$::')
 fi
 if [ ! -n "$work_dir_add" ] ; then
 	work_dir_add=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
@@ -1211,12 +1212,27 @@ fi
 # Reset the update timers to force a full update.
 if [ "$force_updates" == "yes" ] ; then
 	xshok_pretty_echo_and_log "Force Updates: enabled"     
-
 	securiteinfo_update_hours="0"
 	linuxmalwaredetect_update_hours="0"
 	malwarepatrol_update_hours="0"
-	yararules_update_hours="0"
+	yararulesproject_update_hours="0"
 fi
+
+# Check yararule support is available
+if [ "$enable_yararules" == "yes" ] ; then
+	current_clamav_version=`$clamscan_bin -V | cut -d " " -f2 | cut -d "/" -f1 | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'`
+	minimum_yara_clamav_version=`echo "$minimum_yara_clamav_version" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'`
+	#Check current clamav version against the minimum required version for yara support
+	if [ $current_clamav_version -lt $minimum_yara_clamav_version ]; then #older
+		enable_yararulesproject="no"
+		enable_yararules="no"
+		xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
+	fi
+else
+	enable_yararulesproject="no"
+	enable_yararules="no"
+fi
+exit
 
 ################################################################################
 # MAIN LOGIC
@@ -1302,7 +1318,7 @@ xshok_mkdir_ownership "$work_dir_securiteinfo"
 xshok_mkdir_ownership "$work_dir_malwarepatrol"
 xshok_mkdir_ownership "$work_dir_linuxmalwaredetect"
 xshok_mkdir_ownership "$work_dir_sanesecurity"
-xshok_mkdir_ownership "$work_dir_yararules"
+xshok_mkdir_ownership "$work_dir_yararulesproject"
 xshok_mkdir_ownership "$work_dir_work_configs"
 xshok_mkdir_ownership "$work_dir_gpg"
 xshok_mkdir_ownership "$work_dir_add"
@@ -1411,12 +1427,12 @@ if [ -n "$malwarepatrol_db" ] ; then
 	echo "$work_dir_malwarepatrol/$malwarepatrol_db" >> "$current_tmp"
 	clamav_files
 fi
-if [ -n "$yararules_dbs" ] ; then
-	for db in $yararules_dbs ; do
+if [ -n "$yararulesproject_dbs" ] ; then
+	for db in $yararulesproject_dbs ; do
 		if echo $db|grep -q "/"; then
 			db=`echo $db | cut -d"/" -f2`
 		fi
-		echo "$work_dir_yararules/$db" >> "$current_tmp"
+		echo "$work_dir_yararulesproject/$db" >> "$current_tmp"
 		clamav_files
 	done
 fi
@@ -2106,30 +2122,30 @@ fi
 
 
 ##############################################################################################################################################
-# Check for updated yararules database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
+# Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
 ##############################################################################################################################################
-if [ "$yararules_enabled" == "yes" ] ; then
-	if [ -n "$yararules_dbs" ] ; then
-		if [ `xshok_array_count "$yararules_dbs"` -lt "1" ] ; then
-			xshok_pretty_echo_and_log "Failed yararules_dbs config is invalid or not defined - SKIPPING"
+if [ "$yararulesproject_enabled" == "yes" ] ; then
+	if [ -n "$yararulesproject_dbs" ] ; then
+		if [ `xshok_array_count "$yararulesproject_dbs"` -lt "1" ] ; then
+			xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
 		else
-		rm -f "$work_dir_yararules/*.gz"
-		if [ -r "$work_dir_work_configs/last-yararules-update.txt" ] ; then
-			last_yararules_update=`cat $work_dir_work_configs/last-yararules-update.txt`
+		rm -f "$work_dir_yararulesproject/*.gz"
+		if [ -r "$work_dir_work_configs/last-yararulesproject-update.txt" ] ; then
+			last_yararulesproject_update=`cat $work_dir_work_configs/last-yararulesproject-update.txt`
 		else
-			last_yararules_update="0"
+			last_yararulesproject_update="0"
 		fi
 		db_file=""
 		loop=""
-		update_interval=$(($yararules_update_hours * 3600))
-		time_interval=$(($current_time - $last_yararules_update))
+		update_interval=$(($yararulesproject_update_hours * 3600))
+		time_interval=$(($current_time - $last_yararulesproject_update))
 		if [ "$time_interval" -ge $(($update_interval - 600)) ] ; then
-			echo "$current_time" > "$work_dir_work_configs"/last-yararules-update.txt
+			echo "$current_time" > "$work_dir_work_configs"/last-yararulesproject-update.txt
 
 			xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
-			xshok_pretty_echo_and_log "Checking for yararules updates..."
-			yararules_updates="0"
-			for db_file in $yararules_dbs ; do
+			xshok_pretty_echo_and_log "Checking for yararulesproject updates..."
+			yararulesproject_updates="0"
+			for db_file in $yararulesproject_dbs ; do
 				if echo $db_file|grep -q "/"; then
 					yr_dir="/"`echo $db_file | cut -d"/" -f1`
 					db_file=`echo $db_file | cut -d"/" -f2`
@@ -2138,60 +2154,60 @@ if [ "$yararules_enabled" == "yes" ] ; then
 				if [ "$loop" = "1" ] ; then
 					xshok_pretty_echo_and_log "---"      
 				fi
-				xshok_pretty_echo_and_log "Checking for updated yararules database file: $db_file"
+				xshok_pretty_echo_and_log "Checking for updated yararulesproject database file: $db_file"
 
-				yararules_db_update="0"
-				if [ -r "$work_dir_yararules/$db_file" ] ; then
-					z_opt="-z $work_dir_yararules/$db_file"
+				yararulesproject_db_update="0"
+				if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
+					z_opt="-z $work_dir_yararulesproject/$db_file"
 				else
 					z_opt=""
 				fi
-				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $work_dir_yararules/$db_file "$yararules_url$yr_dir/$db_file" 2>/dev/null ; then
+				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $work_dir_yararulesproject/$db_file "$yararulesproject_url$yr_dir/$db_file" 2>/dev/null ; then
 					loop="1"
-					if ! cmp -s $work_dir_yararules/$db_file $clam_dbs/$db_file ; then
+					if ! cmp -s $work_dir_yararulesproject/$db_file $clam_dbs/$db_file ; then
 						if [ "$?" = "0" ] ; then
 							db_ext=`echo $db_file | cut -d "." -f2`
 
-							xshok_pretty_echo_and_log "Testing updated yararules database file: $db_file"
+							xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
 							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
-								if $clamscan_bin --quiet -d "$work_dir_yararules/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
+								if $clamscan_bin --quiet -d "$work_dir_yararulesproject/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
 									then
-									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good"
+									xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested good"
 									true
 								else
-									xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD"
+									xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested BAD"
 									if [ "$remove_bad_database" == "yes" ] ; then
-										if rm -f "$work_dir_yararules/$db_file" ; then
-											xshok_pretty_echo_and_log "Removed invalid database: $work_dir_yararules/$db_file"
+										if rm -f "$work_dir_yararulesproject/$db_file" ; then
+											xshok_pretty_echo_and_log "Removed invalid database: $work_dir_yararulesproject/$db_file"
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $work_dir_yararules/$db_file $clam_dbs 2>/dev/null ; then
+								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $work_dir_yararulesproject/$db_file $clam_dbs 2>/dev/null ; then
 								perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/$db_file"
 								fi
-								xshok_pretty_echo_and_log "Successfully updated yararules production database file: $db_file"
-								yararules_updates=1
-								yararules_db_update=1
+								xshok_pretty_echo_and_log "Successfully updated yararulesproject production database file: $db_file"
+								yararulesproject_updates=1
+								yararulesproject_db_update=1
 								do_clamd_reload=1
 							else
-								xshok_pretty_echo_and_log "Failed to successfully update yararules production database file: $db_file - SKIPPING"
+								xshok_pretty_echo_and_log "Failed to successfully update yararulesproject production database file: $db_file - SKIPPING"
 							fi
 						else
-							grep -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_yararules/$db_file" > "$test_dir/$db_file"
+							grep -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_yararulesproject/$db_file" > "$test_dir/$db_file"
 							$clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
 							grep -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
 							grep -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
 							mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
 							if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-								xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested good"
+								xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested good"
 								true
 							else
-								xshok_pretty_echo_and_log "Clamscan reports yararules $db_file database integrity tested BAD"
+								xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested BAD"
 								if [ "$remove_bad_database" == "yes" ] ; then
-									if rm -f "$work_dir_yararules/$db_file" ; then
-										xshok_pretty_echo_and_log "Removed invalid database: $work_dir_yararules/$db_file"
+									if rm -f "$work_dir_yararulesproject/$db_file" ; then
+										xshok_pretty_echo_and_log "Removed invalid database: $work_dir_yararulesproject/$db_file"
 									fi
 								fi
 								false
@@ -2200,25 +2216,25 @@ if [ "$yararules_enabled" == "yes" ] ; then
 							if [ "$selinux_fixes" == "yes" ] ; then
 								restorecon "$clam_dbs/$db_file"
 							fi
-							xshok_pretty_echo_and_log "Successfully updated yararules production database file: $db_file"
-							yararules_updates=1
-							yararules_db_update=1
+							xshok_pretty_echo_and_log "Successfully updated yararulesproject production database file: $db_file"
+							yararulesproject_updates=1
+							yararulesproject_db_update=1
 							do_clamd_reload=1
 						else
-							xshok_pretty_echo_and_log "Failed to successfully update yararules production database file: $db_file - SKIPPING"
+							xshok_pretty_echo_and_log "Failed to successfully update yararulesproject production database file: $db_file - SKIPPING"
 						fi
 					fi
 				fi
 			fi
 		else
-			xshok_pretty_echo_and_log "WARNING: Failed curl connection to $yararules_url - SKIPPED yararules $db_file update"
+			xshok_pretty_echo_and_log "WARNING: Failed curl connection to $yararulesproject_url - SKIPPED yararulesproject $db_file update"
 		fi
-		if [ "$yararules_db_update" != "1" ] ; then
-			xshok_pretty_echo_and_log "No updated yararules $db_file database file found"
+		if [ "$yararulesproject_db_update" != "1" ] ; then
+			xshok_pretty_echo_and_log "No updated yararulesproject $db_file database file found"
 		fi
 	done
-	if [ "$yararules_updates" != "1" ] ; then
-		xshok_pretty_echo_and_log "No yararules database file updates found" "-"
+	if [ "$yararulesproject_updates" != "1" ] ; then
+		xshok_pretty_echo_and_log "No yararulesproject database file updates found" "-"
 	fi
 else
 
@@ -2227,22 +2243,22 @@ else
 	time_remaining=$(($update_interval - $time_interval))
 	hours_left=$(($time_remaining / 3600))
 	minutes_left=$(($time_remaining % 3600 / 60))
-	xshok_pretty_echo_and_log "$yararules_update_hours hours have not yet elapsed since the last yararules database update check"
+	xshok_pretty_echo_and_log "$yararulesproject_update_hours hours have not yet elapsed since the last yararulesproject database update check"
 	xshok_pretty_echo_and_log "No update check was performed at this time" "-"
 	xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
 fi
 fi
 fi
 else
-	if [ -n "$yararules_dbs" ] ; then
+	if [ -n "$yararulesproject_dbs" ] ; then
 		if [ "$remove_disabled_databases" == "yes" ] ; then
-			xshok_pretty_echo_and_log "Removing disabled yararules Database files"
-			for db_file in $yararules_dbs ; do
+			xshok_pretty_echo_and_log "Removing disabled yararulesproject Database files"
+			for db_file in $yararulesproject_dbs ; do
 				if echo $db_file|grep -q "/"; then
 					db_file=`echo $db_file | cut -d"/" -f2`
 				fi
-				if [ -r "$work_dir_yararules/$db_file" ] ; then
-					rm -f "$work_dir_yararules/$db_file"
+				if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
+					rm -f "$work_dir_yararulesproject/$db_file"
 					do_clamd_reload=1
 				fi
 				if [ -r "$clam_dbs/$db_file" ] ; then
