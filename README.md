@@ -6,7 +6,7 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Maintained and provided by https://eXtremeSHOK.com
 
 ## Description
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. The script will also generate and install cron, logrotate, and man files.
 
 #### Try our custom spamassasin plugin: https://github.com/extremeshok/spamassassin-extremeshok_fromreplyto
 
@@ -449,7 +449,10 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 --install-logrotate     Install and generate the logrotate file, autodetects the
         values based on your config files
 
+ --install-man   Install and generate the man file, autodetects the
+         values based on your config files
 
-### Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
+## Script updates can be found at: 
+### https://github.com/extremeshok/clamav-unofficial-sigs
 
 Original Script can be found at: http://sourceforge.net/projects/unofficial-sigs
