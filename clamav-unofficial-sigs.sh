@@ -1139,32 +1139,32 @@ work_dir=$(echo "$work_dir" | sed 's:/*$::')
 
 #Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
 if [ ! -n "$work_dir_sanesecurity" ] ; then
-	work_dir_sanesecurity=$(echo "$work_dir/$dir_sanesecurity" | sed 's:/*$::')
+	work_dir_sanesecurity=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
 else
 	work_dir_sanesecurity=$(echo "$work_dir_sanesecurity" | sed 's:/*$::')
 fi
 if [ ! -n "$work_dir_securiteinfo" ] ; then
-	work_dir_securiteinfo=$(echo "$work_dir/$dir_securiteinfo" | sed 's:/*$::')
+	work_dir_securiteinfo=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
 else
 	work_dir_securiteinfo=$(echo "$work_dir_securiteinfo" | sed 's:/*$::')
 fi
 if [ ! -n "$work_dir_linuxmalwaredetect" ] ; then
-	work_dir_linuxmalwaredetect=$(echo "$work_dir/$dir_linuxmalwaredetect" | sed 's:/*$::')
+	work_dir_linuxmalwaredetect=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
 else
 	work_dir_linuxmalwaredetect=$(echo "$work_dir_linuxmalwaredetect" | sed 's:/*$::')
 fi
 if [ ! -n "$work_dir_malwarepatrol" ] ; then
-	work_dir_malwarepatrol=$(echo "$work_dir/$dir_malwarepatrol" | sed 's:/*$::')
+	work_dir_malwarepatrol=$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')
 else
 	work_dir_malwarepatrol=$(echo "$work_dir_malwarepatrol" | sed 's:/*$::')
 fi
 if [ ! -n "$work_dir_yararules" ] ; then
-	work_dir_yararules=$(echo "$work_dir/$dir_yararules" | sed 's:/*$::')
+	work_dir_yararules=$(echo "$work_dir/$yararules_dir" | sed 's:/*$::')
 else
 	work_dir_yararules=$(echo "$work_dir_yararules" | sed 's:/*$::')
 fi
 if [ ! -n "$work_dir_add" ] ; then
-	work_dir_add=$(echo "$work_dir/$dir_add" | sed 's:/*$::')
+	work_dir_add=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
 else
 	work_dir_add=$(echo "$work_dir_add" | sed 's:/*$::')
 fi
@@ -1174,7 +1174,7 @@ else
 	work_dir_work_configs=$(echo "$work_dir_work_configs" | sed 's:/*$::')
 fi
 if [ ! -n "$work_dir_gpg" ] ; then
-	work_dir_gpg=$(echo "$work_dir/$dir_gpg" | sed 's:/*$::')
+	work_dir_gpg=$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')
 else
 	work_dir_gpg=$(echo "$work_dir_gpg" | sed 's:/*$::')
 fi

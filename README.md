@@ -3,8 +3,6 @@ ClamAV Unofficial Signatures Updater
 
 Github fork of the sourceforge hosted and non maintained utility.
 
-#BUG IN CURRENT DEV RELEASE, DO NOT USE UNTIL THIS NOTICE IS REMOVED
-
 ## Maintained and provided by https://eXtremeSHOK.com
 
 ## Description
