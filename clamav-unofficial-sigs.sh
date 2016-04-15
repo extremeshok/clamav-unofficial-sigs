@@ -434,11 +434,11 @@ function hexadecimal_encode_formatted_input_string (){
 function gpg_verify_specific_sanesecurity_database_file () {
 	echo ""
 	db_file=`echo "$OPTARG" | awk -F '/' '{print $NF}'`
-	if [ -r "$sanesecurity_dir/$db_file" ] ; then
-		xshok_pretty_echo_and_log "GPG signature testing database file: $sanesecurity_dir/$db_file"
+	if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
+		xshok_pretty_echo_and_log "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
 
-		if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
-			$gpg_bin --always-trust -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
+		if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $work_dir_sanesecurity/$db_file.sig $work_dir_sanesecurity/$db_file 2>/dev/null ; then
+			$gpg_bin --always-trust -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $work_dir_sanesecurity/$db_file.sig $work_dir_sanesecurity/$db_file 2>/dev/null
 		fi
 	else
 		xshok_pretty_echo_and_log "File '$db_file' cannot be found or is not a Sanesecurity database file."
@@ -1136,13 +1136,12 @@ fi
 
 # Assign the directories and remove trailing / (removes / and //)
 work_dir=$(echo "$work_dir" | sed 's:/*$::')
-sanesecurity_dir=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
+work_dir_sanesecurity=$(echo "$work_dir/$work_dir_sanesecurity" | sed 's:/*$::')
 securiteinfo_dir=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
 linuxmalwaredetect_dir=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
 malwarepatrol_dir=$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')
 yararules_dir=$(echo "$work_dir/$yararules_dir" | sed 's:/*$::')
 add_dir=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
-
 
 work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
 work_dir_gpg=$(echo "$work_dir/$work_dir_gpg" | sed 's:/*$::')
@@ -1269,7 +1268,7 @@ xshok_mkdir_ownership "$work_dir"
 xshok_mkdir_ownership "$securiteinfo_dir"
 xshok_mkdir_ownership "$malwarepatrol_dir"
 xshok_mkdir_ownership "$linuxmalwaredetect_dir"
-xshok_mkdir_ownership "$sanesecurity_dir"
+xshok_mkdir_ownership "$work_dir_sanesecurity"
 xshok_mkdir_ownership "$yararules_dir"
 xshok_mkdir_ownership "$work_dir_configs"
 xshok_mkdir_ownership "$work_dir_gpg"
@@ -1335,7 +1334,7 @@ fi
 # Create the Sanesecurity rsync "include" file (defines which files to download).
 sanesecurity_include_dbs="$work_dir_configs/ss-include-dbs.txt"
 if [ -n "$sanesecurity_dbs" ] ; then
-	rm -f -- "$sanesecurity_include_dbs" "$sanesecurity_dir/*.sha256"
+	rm -f -- "$sanesecurity_include_dbs" "$work_dir_sanesecurity/*.sha256"
 	for db_name in $sanesecurity_dbs ; do
 		echo "$db_name" >> "$sanesecurity_include_dbs"
 		echo "$db_name.sig" >> "$sanesecurity_include_dbs"
@@ -1358,8 +1357,8 @@ rm -f "$current_dbs"
 
 if [ -n "$sanesecurity_dbs" ] ; then
 	for db in $sanesecurity_dbs ; do
-		echo "$sanesecurity_dir/$db" >> "$current_tmp"
-		echo "$sanesecurity_dir/$db.sig" >> "$current_tmp"
+		echo "$work_dir_sanesecurity/$db" >> "$current_tmp"
+		echo "$work_dir_sanesecurity/$db.sig" >> "$current_tmp"
 		clamav_files
 	done
 fi
@@ -1513,15 +1512,15 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 			fi
 			sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
 			xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
-			$rsync_bin $rsync_output_level $no_motd --files-from=$sanesecurity_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$sanesecurity_mirror_ip/sanesecurity $sanesecurity_dir 2>/dev/null
+			$rsync_bin $rsync_output_level $no_motd --files-from=$sanesecurity_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$sanesecurity_mirror_ip/sanesecurity $work_dir_sanesecurity 2>/dev/null
 			if [ "$?" -eq "0" ] ; then #the correct way
 				sanesecurity_rsync_success="1"
 				for db_file in $sanesecurity_dbs ; do
-					if ! cmp -s $sanesecurity_dir/$db_file $clam_dbs/$db_file ; then
+					if ! cmp -s $work_dir_sanesecurity/$db_file $clam_dbs/$db_file ; then
 
 						xshok_pretty_echo_and_log "Testing updated Sanesecurity database file: $db_file"
-						if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
-							$gpg_bin --always-trust -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
+						if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $work_dir_sanesecurity/$db_file.sig $work_dir_sanesecurity/$db_file 2>/dev/null ; then
+							$gpg_bin --always-trust -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $work_dir_sanesecurity/$db_file.sig $work_dir_sanesecurity/$db_file 2>/dev/null
 						fi
 						if [ "$?" = "0" ] ; then
 							test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
@@ -1533,18 +1532,18 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 						if [ "$?" = "0" ] ; then
 							db_ext=`echo $db_file | cut -d "." -f2`
 							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
-								if $clamscan_bin --quiet -d "$sanesecurity_dir/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
+								if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_configs/scan-test.txt" 2>/dev/null ; then
 									xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
 									true
 								else
 									xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
 									if [ "$remove_bad_database" == "yes" ] ; then
-										if rm -f "$sanesecurity_dir/$db_file" ; then
-											xshok_pretty_echo_and_log "Removed invalid database: $sanesecurity_dir/$db_file"
+										if rm -f "$work_dir_sanesecurity/$db_file" ; then
+											xshok_pretty_echo_and_log "Removed invalid database: $work_dir_sanesecurity/$db_file"
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $sanesecurity_dir/$db_file $clam_dbs 2>/dev/null ; then
+								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $work_dir_sanesecurity/$db_file $clam_dbs 2>/dev/null ; then
 								perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/$db_file"
@@ -1557,7 +1556,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 								false
 							fi
 						else
-							grep -h -v -f "$work_dir_configs/whitelist.hex" "$sanesecurity_dir/$db_file" > "$test_dir/$db_file"
+							grep -h -v -f "$work_dir_configs/whitelist.hex" "$work_dir_sanesecurity/$db_file" > "$test_dir/$db_file"
 							$clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_configs/whitelist.txt"
 							grep -h -f "$work_dir_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f2 | sort | uniq >> "$work_dir_configs/whitelist.hex"
 							grep -h -v -f "$work_dir_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
@@ -1608,8 +1607,8 @@ else
 		if [ "$remove_disabled_databases" == "yes" ] ; then
 			xshok_pretty_echo_and_log "Removing disabled Sanesecurity Database files"
 			for db_file in $sanesecurity_dbs ; do
-				if [ -r "$sanesecurity_dir/$db_file" ] ; then
-					rm -f "$sanesecurity_dir/$db_file"*
+				if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
+					rm -f "$work_dir_sanesecurity/$db_file"*
 					do_clamd_reload=1
 				fi
 				if [ -r "$clam_dbs/$db_file" ] ; then
