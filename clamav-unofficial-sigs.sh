@@ -1446,8 +1446,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 			echo "$work_dir_sanesecurity/$db" >> "$current_tmp"
 			echo "$work_dir_sanesecurity/$db.sig" >> "$current_tmp"
 			clamav_files
-			echo "$db_name" >> "$sanesecurity_include_dbs"
-			echo "$db_name.sig" >> "$sanesecurity_include_dbs"
+			echo "$db" >> "$sanesecurity_include_dbs"
+			echo "$db.sig" >> "$sanesecurity_include_dbs"
 		done
 	fi
 fi
