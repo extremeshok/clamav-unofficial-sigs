@@ -154,6 +154,81 @@ function clamav_files () {
 # ADDITIONAL PROGRAM FUNCTIONS
 ################################################################################
 
+
+#generates a man config and installs it
+function install_man (){
+	echo ""
+	echo "Generating man file for install...."
+	
+	#Use defined varibles or attempt to use default varibles
+	if [ ! -n "$man_dir" ] ; then
+		man_dir="/usr/share/man/man8"
+	fi
+	if [ ! -n "$man_filename" ] ; then
+		man_filename="clamav-unofficial-sigs.8"
+	fi	
+	if [ ! -n "$man_log_file_full_path" ] ; then
+		man_log_file_full_path="$log_file_path/$log_file_name"
+	fi
+
+	man_dir=$(echo "$man_dir" | sed 's:/*$::')
+
+	if [ ! -e "$man_dir/$man_filename" ] ; then
+		mkdir -p "$man_dir"
+		touch "$man_dir/$man_filename" 2>/dev/null
+	fi
+	if [ ! -w "$man_dir/$man_filename" ] ; then
+		echo "ERROR: man install aborted, as file not writable: $man_dir/$man_filename"
+	else
+
+BOLD="\fB"
+REV=""
+NORM="\fR"
+manresult=`help_and_usage "man"`
+
+#Our template..
+	cat << EOF > "$man_dir/$man_filename"
+
+.\" Manual page for eXtremeSHOK.com ClamAV Unofficial Signature Updater
+.TH clamav-unofficial-sigs 8 "$script_version_date" "Version: $script_version" "SCRIPT COMMANDS"
+.SH NAME
+clamav-unofficial-sigs \- Download, test, and install third-party ClamAV signature databases.
+.SH SYNOPSIS
+.B clamav-unofficial-sigs
+.RI [ options ]
+.SH DESCRIPTION
+\fBclamav-unofficial-sigs\fP script provides a simple way to download, test, and update third-party 
+signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, 
+Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
+.SH UPDATES
+Script updates can be found at: \fBhttps://github.com/extremeshok/clamav-unofficial-sigs\fP
+.SH OPTIONS
+This script follows the standard GNU command line syntax.
+.LP
+$manresult
+.SH SEE ALSO
+.BR clamd (8),
+.BR clamscan (1)
+.SH COPYRIGHT
+Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+.TP
+You are free to use, modify and distribute, however you may not remove this notice.
+.SH LICENSE
+BSD (Berkeley Software Distribution)
+.SH BUGS
+Report bugs to \fBhttps://github.com/extremeshok/clamav-unofficial-sigs\fP
+.SH AUTHOR
+Adrian Jon Kriel :: admin@extremeshok.com
+Originially based on Script provide by Bill Landry
+
+
+EOF
+
+	fi 
+	echo "Completed: man installed, as file: $man_dir/$man_filename"
+}
+
+
 #generates a logrotate config and installs it
 function install_logrotate (){
 	echo ""
@@ -561,10 +636,10 @@ function remove_script () {
 					rm -f "$logrotate_file_full_path"
 					echo "     Removed file: $logrotate_file_full_path"
 				fi
-				man_file="/usr/share/man/man8/clamav-unofficial-sigs.8"
-				if [ -r "$man_file" ] ; then
-					rm -f "$man_file"
-					echo "     Removed file: $man_file"
+				man_file_full_path="$man_dir/$man_filename"
+				if [ -r "$man_file_full_path" ] ; then
+					rm -f "$man_file_full_path"
+					echo "     Removed file: $man_file_full_path"
 				fi
 				
 				#rather keep the configs
@@ -808,48 +883,84 @@ function check_new_version () {
 }
 
 #function for help and usage
+##usage: 
+# help_and_usage "1" - enables the man output formatting
+# help_and_usage - enables help output formatting
 function help_and_usage () {
-	echo "Usage: `basename $0` [OPTION] [PATH|FILE]"
 
-	echo -e "\n${BOLD}-c${NORM}, ${BOLD}--config${NORM}\tUse a specific configuration file or directory\n\teg: '-c /your/dir' or ' -c /your/file.name' \n\tNote: If a directory is specified the directory must contain atleast: \n\tmaster.conf, os.conf or user.conf\n\tDefault Directory: $config_dir"
+	if [ "$1" ]; then
+		#option_format_start
+		ofs="\fB"
+		#option_format_end
+		ofe="\fR"
+		#option_format_blankline
+		ofb=".TP"
+		#option_format_tab_line
+		oft=" "
+	else
+		#option_format_start
+		ofs="${BOLD}"
+		#option_format_end
+		ofe="${NORM}\t"
+		#option_format_blankline
+		ofb="\n"
+		#option_format_tab_line
+		oft="\n\t"
+	fi
 
-	echo -e "\n${BOLD}-F${BOLD}, --force${NORM}\tForce all databases to be downloaded, could cause ip to be blocked"
+helpcontents=`cat << EOF
+$ofs Usage: $(basename $0) $ofe [OPTION] [PATH|FILE]
+$ofb
+$ofs -c, --config $ofe Use a specific configuration file or directory $oft eg: '-c /your/dir' or ' -c /your/file.name'  $oft Note: If a directory is specified the directory must contain atleast:  $oft master.conf, os.conf or user.conf $oft Default Directory: $config_dir
+$ofb 
+$ofs -F, --force $ofe Force all databases to be downloaded, could cause ip to be blocked
+$ofb 
+$ofs -h, --help $ofe Display this script's help and usage information
+$ofb 
+$ofs -V, --version $ofe Output script version and date information
+$ofb 
+$ofs -v, --verbose $ofe Be verbose, enabled when not run under cron
+$ofb 
+$ofs -s, --silence $ofe Only output error messages, enabled when run under cron
+$ofb 
+$ofs -d, --decode-sig $ofe Decode a third-party signature either by signature name $oft (eg: Sanesecurity.Junk.15248) or hexadecimal string. $oft This flag will 'NOT' decode image signatures
+$ofb 
+$ofs -e, --encode-string $ofe Hexadecimal encode an entire input string that can $oft be used in any '*.ndb' signature database file
+$ofb 
+$ofs -f, --encode-formatted $ofe Hexadecimal encode a formatted input string containing $oft signature spacing fields '{}, (), *', without encoding $oft the spacing fields, so that the encoded signature $oft can be used in any '*.ndb' signature database file
+$ofb 
+$ofs -g, --gpg-verify $ofe GPG verify a specific Sanesecurity database file $oft eg: '-g filename.ext' (do not include file path)
+$ofb 
+$ofs -i, --information $ofe Output system and configuration information for $oft viewing or possible debugging purposes
+$ofb 
+$ofs -m, --make-database $ofe Make a signature database from an ascii file containing $oft data strings, with one data string per line.  Additional $oft information is provided when using this flag
+$ofb 
+$ofs -r, --remove-script $ofe Remove the clamav-unofficial-sigs script and all of $oft its associated files and databases from the system
+$ofb 
+$ofs -t, --test-database $ofe Clamscan integrity test a specific database file $oft eg: '-s filename.ext' (do not include file path)
+$ofb 
+$ofs -o, --output-triggered $ofe If HAM directory scanning is enabled in the script's $oft configuration file, then output names of any third-party $oft signatures that triggered during the HAM directory scan
+$ofb 
+$ofs -w, --whitelist $ofe Adds a signature whitelist entry in the newer ClamAV IGN2 $oft format to 'my-whitelist.ign2' in order to temporarily resolve $oft a false-positive issue with a specific third-party signature. $oft Script added whitelist entries will automatically be removed $oft if the original signature is either modified or removed from $oft the third-party signature database
+$ofb 
+$ofs --check-clamav $ofe If ClamD status check is enabled and the socket path is correctly $oft specifiedthen test to see if clamd is running or not
+$ofb 
+$ofs --install-cron $ofe Install and generate the cron file, autodetects the values $oft based on your config files
+$ofb 
+$ofs --install-logrotate $ofe Install and generate the logrotate file, autodetects the $oft values based on your config files
+$ofb 
+$ofs --install-man $ofe Install and generate the man file, autodetects the $oft values based on your config files
+$ofb 
+EOF
+	` #this is very important...
 
-	echo -e "\n${BOLD}-h${NORM}, ${BOLD}--help${NORM}\tDisplay this script's help and usage information"
+	if [ "$1" ]; then
+		echo "${helpcontents//-/\\-}"
+	else
+		echo -e "$helpcontents"
+	fi
 
-	echo -e "\n${BOLD}-V${NORM}, ${BOLD}--version${NORM}\tOutput script version and date information"
 
-	echo -e "\n${BOLD}-v${NORM}, ${BOLD}--verbose${NORM}\tBe verbose, enabled when not run under cron"
-
-	echo -e "\n${BOLD}-s${NORM}, ${BOLD}--silence${NORM}\tOnly output error messages, enabled when run under cron"
-
-	echo -e "\n${BOLD}-d${NORM}, ${BOLD}--decode-sig${NORM}\tDecode a third-party signature either by signature name\n\t(eg: Sanesecurity.Junk.15248) or hexadecimal string.\n\tThis flag will 'NOT' decode image signatures"
-
-	echo -e "\n${BOLD}-e${NORM}, ${BOLD}--encode-string${NORM}\tHexadecimal encode an entire input string that can\n\tbe used in any '*.ndb' signature database file"
-
-	echo -e "\n${BOLD}-f${NORM}, ${BOLD}--encode-formatted${NORM}\tHexadecimal encode a formatted input string containing\n\tsignature spacing fields '{}, (), *', without encoding\n\tthe spacing fields, so that the encoded signature\n\tcan be used in any '*.ndb' signature database file"
-
-	echo -e "\n${BOLD}-g${NORM}, ${BOLD}--gpg-verify${NORM}\tGPG verify a specific Sanesecurity database file\n\teg: '-g filename.ext' (do not include file path)"
-
-	echo -e "\n${BOLD}-i${NORM}, ${BOLD}--information${NORM}\tOutput system and configuration information for\n\tviewing or possible debugging purposes"
-
-	echo -e "\n${BOLD}-m${NORM}, ${BOLD}--make-database${NORM}\tMake a signature database from an ascii file containing\n\tdata strings, with one data string per line.  Additional\n\tinformation is provided when using this flag"
-
-	echo -e "\n${BOLD}-r${NORM}, ${BOLD}--remove-script${NORM}\tRemove the clamav-unofficial-sigs script and all of\n\tits associated files and databases from the system"
-
-	echo -e "\n${BOLD}-t${NORM}, ${BOLD}--test-database${NORM}\tClamscan integrity test a specific database file\n\teg: '-s filename.ext' (do not include file path)"
-
-	echo -e "\n${BOLD}-o${NORM}, ${BOLD}--output-triggered${NORM}\tIf HAM directory scanning is enabled in the script's\n\tconfiguration file, then output names of any third-party\n\tsignatures that triggered during the HAM directory scan"
-
-	echo -e "\n${BOLD}-w${NORM}, ${BOLD}--whitelist${NORM}\tAdds a signature whitelist entry in the newer ClamAV IGN2\n\tformat to 'my-whitelist.ign2' in order to temporarily resolve\n\ta false-positive issue with a specific third-party signature.\n\tScript added whitelist entries will automatically be removed\n\tif the original signature is either modified or removed from\n\tthe third-party signature database" 
-
-	echo -e "\n${BOLD}--check-clamav${NORM}\tIf ClamD status check is enabled and the socket path is correctly\n\tspecifiedthen test to see if clamd is running or not"
-	
-	echo -e "\n${BOLD}--install-cron${NORM}\tInstall and generate the cron file, autodetects the values\n\tbased on your config files"
-	
-	echo -e "\n${BOLD}--install-logrotate${NORM}\tInstall and generate the logrotate file, autodetects the\n\tvalues based on your config files"
-
-	echo -e "\nMail suggestions and bug reports to ${BOLD}<admin@extremeshok.com>${NORM}"
 
 }
 
@@ -858,8 +969,8 @@ function help_and_usage () {
 ################################################################################
 
 #Script Info
-script_version="5.1.1"
-script_version_date="13 April 2016"
+script_version="5.1.2"
+script_version_date="15 April 2016"
 minimum_required_config_version="60"
 
 #default config files
@@ -1091,6 +1202,7 @@ while true; do
 		--check-clamav ) check_clamav; exit; break ;;
 		--install-cron ) install_cron; exit; break ;;
 		--install-logrotate ) install_logrotate; exit; break ;;
+		--install-man ) install_man; exit; break ;;
 		* ) break ;;
 	esac
 done

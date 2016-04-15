@@ -51,11 +51,11 @@ Uncompress/Unpackage the archive:
 * Set 755 permissions on  /usr/local/bin/clamav-unofficial-sigs.sh
 * Make the directory /etc/clamav-unofficial-sigs/
 * Copy the contents of config/ into /etc/clamav-unofficial-sigs/
-* Copy clamav-unofficial-sigs.8 into /usr/share/man/man8/
 * Rename the your os.your-distro.conf to os.conf, where your-distro is your distribution
 * Set your user config options in the configs /etc/clamav-unofficial-sigs/user.conf
 * Run the script with --install-cron to install the cron file
 * Run the script with --install-logrotate to install the logrotate file
+* Run the script with --install-man to install the man file
 
 Install:
 * mkdir -p /usr/local/bin/
@@ -64,7 +64,6 @@ Install:
 * cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
 * chmod +x /usr/local/bin/clamav-unofficial-sigs.sh
 * cp -f /tmp/clamav-unofficial-sigs/config/*.* /etc/clamav-unofficial-sigs/
-* cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
 
 Install Systemd configs:
 * cp -f /tmp/clamav-unofficial-sigs/systemd/*.* /etc/systemd/  
@@ -77,11 +76,15 @@ Configure:
    
 Install Cron configs:
 * After the configs have been configured
-* Run:  bash clamav-unofficial-sigs.sh --install-croCron:
+* Run:  bash clamav-unofficial-sigs.sh --install-cron:
 
 Install logrotate configs:: 
 * After the configs have been configured
 * Run:  bash clamav-unofficial-sigs.sh --install-logrotate
+
+Install man (help) file:
+* After the configs have been configured
+* Run:  bash clamav-unofficial-sigs.sh --install-man:
 
 ### First Usage
 * Run the script once as your superuser to set all the permissions and create the relevant directories

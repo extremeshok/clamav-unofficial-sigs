@@ -21,12 +21,12 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * Set 755 permissions on  /usr/local/bin/clamav-unofficial-sigs.sh
 * Make the directory /etc/clamav-unofficial-sigs/
 * Copy the contents of config/ into /etc/clamav-unofficial-sigs/
-* Copy clamav-unofficial-sigs.8 into /usr/share/man/man8/
 * Make the directory /var/log/clamav-unofficial-sigs/
 * Rename the your os.your-distro.conf to os.conf, where your-distro is your distribution
 * Set your user config options in the configs /etc/clamav-unofficial-sigs/user.conf
 * Run the script with --install-cron to install the cron file
 * Run the script with --install-logrotate to install the logrotate file
+* Run the script with --install-man to install the man file
 
 ### First Usage
 * Run the script once as your superuser to set all the permissions and create the relevant directories
@@ -81,7 +81,17 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.1.1 (updated 2016-04-13)
+### Version 5.1.2 (updated 2016-04-15)
+ - eXtremeSHOK.com Maintenance 
+ - Added --install-man this will automatically generate and install the man (help) file
+ - Script options are added to the man file
+ - Fixed hardcoded logrotate and cron in remove_script
+ - Fixed incorrectly assigned logrotate varibles in install-logrotate
+ - Config added info for port/package maintainers regarding:  pkg_mgr and pkg_rm
+ - Removed pkg_mgr and pkg_rm from freebsd and openbsd os configs
+ - Bump config to 62
+
+### Version 5.1.1
  - eXtremeSHOK.com Maintenance 
  - Added OS X and openbsd configs
  - Fixed host fallback sed issues by @MichaelKuch
