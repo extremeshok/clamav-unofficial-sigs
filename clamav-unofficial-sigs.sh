@@ -1148,11 +1148,6 @@ if [ ! -n "$work_dir_securiteinfo" ] ; then
 else
 	work_dir_securiteinfo=$(echo "$work_dir_securiteinfo" | sed 's:/*$::')
 fi
-if [ ! -n "$work_dir_securiteinfo" ] ; then
-	work_dir_securiteinfo=$(echo "$work_dir/$dir_securiteinfo" | sed 's:/*$::')
-else
-	work_dir_securiteinfo=$(echo "$work_dir_securiteinfo" | sed 's:/*$::')
-fi
 if [ ! -n "$work_dir_linuxmalwaredetect" ] ; then
 	work_dir_linuxmalwaredetect=$(echo "$work_dir/$dir_linuxmalwaredetect" | sed 's:/*$::')
 else
@@ -1174,10 +1169,10 @@ else
 	work_dir_add=$(echo "$work_dir_add" | sed 's:/*$::')
 fi
 ##alas ugly var name, but it will break conformity if we change it
-if [ ! -n "$work_dir_work_dir_configs" ] ; then
-	work_dir_work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
+if [ ! -n "$work_dir_work_configs" ] ; then
+	work_dir_work_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
 else
-	work_dir_work_dir_configs=$(echo "$work_dir_work_dir_configs" | sed 's:/*$::')
+	work_dir_work_configs=$(echo "$work_dir_work_configs" | sed 's:/*$::')
 fi
 if [ ! -n "$work_dir_gpg" ] ; then
 	work_dir_gpg=$(echo "$work_dir/$dir_gpg" | sed 's:/*$::')
