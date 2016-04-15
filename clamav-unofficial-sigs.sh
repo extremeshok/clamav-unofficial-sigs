@@ -1168,7 +1168,6 @@ if [ ! -n "$work_dir_add" ] ; then
 else
 	work_dir_add=$(echo "$work_dir_add" | sed 's:/*$::')
 fi
-##alas ugly var name, but it will break conformity if we change it
 if [ ! -n "$work_dir_work_configs" ] ; then
 	work_dir_work_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
 else
