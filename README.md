@@ -90,7 +90,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Config added info for port/package maintainers regarding:  pkg_mgr and pkg_rm
  - Removed pkg_mgr and pkg_rm from freebsd and openbsd os configs
  - Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
- - Rename sanesecurity_dir  to work_dir_sanesecurity, securiteinfo_dir to work_dir_securiteinfo, malwarepatrol_dir to work_dir_malwarepatrol, yararules_dir to work_dir_yararules, add_dir to work_dir_add, gpg_dir to work_dir_gpg, work_dir_configs to work_dir_work_config
+ - Rename sanesecurity_dir  to work_dir_sanesecurity, securiteinfo_dir to work_dir_securiteinfo, malwarepatrol_dir to work_dir_malwarepatrol, yararules_dir to work_dir_yararules, add_dir to work_dir_add, gpg_dir to work_dir_gpg, work_dir_configs to work_dir_work_configs
  - Bump config to 62
 
 ### Version 5.1.1
