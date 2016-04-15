@@ -1218,20 +1218,6 @@ if [ "$force_updates" == "yes" ] ; then
 	yararulesproject_update_hours="0"
 fi
 
-# Check yararule support is available
-if [ "$enable_yararules" == "yes" ] ; then
-	current_clamav_version=`$clamscan_bin -V | cut -d " " -f2 | cut -d "/" -f1 | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'`
-	minimum_yara_clamav_version=`echo "$minimum_yara_clamav_version" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'`
-	#Check current clamav version against the minimum required version for yara support
-	if [ $current_clamav_version -lt $minimum_yara_clamav_version ]; then #older
-		enable_yararulesproject="no"
-		enable_yararules="no"
-		xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
-	fi
-else
-	enable_yararulesproject="no"
-	enable_yararules="no"
-fi
 
 ################################################################################
 # MAIN LOGIC
@@ -1256,6 +1242,64 @@ while true; do
 		* ) break ;;
 	esac
 done
+
+# Check yararule support is available
+if [ "$enable_yararules" == "yes" ] ; then
+	current_clamav_version=`$clamscan_bin -V | cut -d " " -f2 | cut -d "/" -f1 | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'`
+	minimum_yara_clamav_version=`echo "$minimum_yara_clamav_version" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'`
+	#Check current clamav version against the minimum required version for yara support
+	if [ $current_clamav_version -lt $minimum_yara_clamav_version ]; then #older
+		enable_yararulesproject="no"
+		enable_yararules="no"
+		xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
+	fi
+else
+	enable_yararulesproject="no"
+	enable_yararules="no"
+fi
+
+#rebuild the database if we need to remove yara rules from them due to yararules being disabled
+if [ "$enable_yararules"=="no" ] ; then #yararules are disabled
+	if [ "$sanesecurity_enabled" == "yes" ] ; then
+		if [ -n "$sanesecurity_dbs" ] ; then
+			if [ `xshok_array_count "$sanesecurity_dbs"` -ge "1" ] ; then
+				new_sanesecurity_dbs=""
+				for db_name in $sanesecurity_dbs ; do
+					if [[ ! "$db_name" =~ ".yar" ]] ; then # if it's the value you want to delete
+				 		new_sanesecurity_dbs="$new_sanesecurity_dbs$db_name "
+					fi
+				done
+				sanesecurity_dbs="$new_sanesecurity_dbs"
+			fi
+		fi
+	fi
+	if [ "$securiteinfo_enabled" == "yes" ] ; then
+		if [ -n "$securiteinfo_dbs" ] ; then
+			if [ `xshok_array_count "$securiteinfo_dbs"` -ge "1" ] ; then
+				new_securiteinfo_dbs=""
+				for db_name in $securiteinfo_dbs ; do
+					if [[ ! "$db_name" =~ ".yar" ]] ; then # if it's the value you want to delete
+				 		new_securiteinfo_dbs="$new_securiteinfo_dbs$db_name "
+					fi
+				done
+				securiteinfo_dbs="$new_securiteinfo_dbs"
+			fi
+		fi
+	fi
+	if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
+		if [ -n "$linuxmalwaredetect_dbs" ] ; then
+			if [ `xshok_array_count "$linuxmalwaredetect_dbs"` -ge "1" ] ; then
+				new_linuxmalwaredetect_dbs=""
+				for db_name in $linuxmalwaredetect_dbs ; do
+					if [[ ! "$db_name" =~ ".yar" ]] ; then # if it's the value you want to delete
+				 		new_linuxmalwaredetect_dbs="$new_linuxmalwaredetect_dbs$db_name "
+					fi
+				done
+				linuxmalwaredetect_dbs="$new_linuxmalwaredetect_dbs"
+			fi
+		fi
+	fi
+fi
 
 # Set the variables for MalwarePatrol
 if [ "$malwarepatrol_free" == "yes" ] ; then
@@ -1379,16 +1423,6 @@ if [ ! -s "$work_dir_work_configs/scan-test.txt" ] ; then
 	echo "This is the clamscan test file..." > "$work_dir_work_configs/scan-test.txt"
 fi
 
-# Create the Sanesecurity rsync "include" file (defines which files to download).
-sanesecurity_include_dbs="$work_dir_work_configs/ss-include-dbs.txt"
-if [ -n "$sanesecurity_dbs" ] ; then
-	rm -f -- "$sanesecurity_include_dbs" "$work_dir_sanesecurity/*.sha256"
-	for db_name in $sanesecurity_dbs ; do
-		echo "$db_name" >> "$sanesecurity_include_dbs"
-		echo "$db_name.sig" >> "$sanesecurity_include_dbs"
-	done
-fi
-
 # If rsync proxy is defined in the config file, then export it for use.
 if [ -n "$rsync_proxy" ] ; then
 	RSYNC_PROXY="$rsync_proxy"
@@ -1403,43 +1437,60 @@ previous_dbs="$work_dir_work_configs/previous-dbs.txt"
 sort "$current_dbs" > "$previous_dbs" 2>/dev/null
 rm -f "$current_dbs"
 
-if [ -n "$sanesecurity_dbs" ] ; then
-	for db in $sanesecurity_dbs ; do
-		echo "$work_dir_sanesecurity/$db" >> "$current_tmp"
-		echo "$work_dir_sanesecurity/$db.sig" >> "$current_tmp"
-		clamav_files
-	done
+if [ "$sanesecurity_enabled" == "yes" ] ; then
+	# Create the Sanesecurity rsync "include" file (defines which files to download).
+	sanesecurity_include_dbs="$work_dir_work_configs/ss-include-dbs.txt"
+	if [ -n "$sanesecurity_dbs" ] ; then
+		rm -f -- "$sanesecurity_include_dbs" "$work_dir_sanesecurity/*.sha256"
+		for db in $sanesecurity_dbs ; do
+			echo "$work_dir_sanesecurity/$db" >> "$current_tmp"
+			echo "$work_dir_sanesecurity/$db.sig" >> "$current_tmp"
+			clamav_files
+			echo "$db_name" >> "$sanesecurity_include_dbs"
+			echo "$db_name.sig" >> "$sanesecurity_include_dbs"
+		done
+	fi
 fi
-if [ -n "$securiteinfo_dbs" ] ; then
-	for db in $securiteinfo_dbs ; do
-		echo "$work_dir_securiteinfo/$db" >> "$current_tmp"
-		clamav_files
-	done
+if [ "$securiteinfo_enabled" == "yes" ] ; then
+	if [ -n "$securiteinfo_dbs" ] ; then
+		for db in $securiteinfo_dbs ; do
+			echo "$work_dir_securiteinfo/$db" >> "$current_tmp"
+			clamav_files
+		done
+	fi
 fi
-if [ -n "$linuxmalwaredetect_dbs" ] ; then
-	for db in $linuxmalwaredetect_dbs ; do
-		echo "$work_dir_linuxmalwaredetect/$db" >> "$current_tmp"
-		clamav_files
-	done
+if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
+	if [ -n "$linuxmalwaredetect_dbs" ] ; then
+		for db in $linuxmalwaredetect_dbs ; do
+			echo "$work_dir_linuxmalwaredetect/$db" >> "$current_tmp"
+			clamav_files
+		done
+	fi
 fi
-if [ -n "$malwarepatrol_db" ] ; then
-	echo "$work_dir_malwarepatrol/$malwarepatrol_db" >> "$current_tmp"
-	clamav_files
-fi
-if [ -n "$yararulesproject_dbs" ] ; then
-	for db in $yararulesproject_dbs ; do
-		if echo $db|grep -q "/"; then
-			db=`echo $db | cut -d"/" -f2`
-		fi
-		echo "$work_dir_yararulesproject/$db" >> "$current_tmp"
+if [ "$malwarepatrol_enabled" == "yes" ] ; then
+	if [ -n "$malwarepatrol_db" ] ; then
+		echo "$work_dir_malwarepatrol/$malwarepatrol_db" >> "$current_tmp"
 		clamav_files
-	done
+	fi
 fi
-if [ -n "$add_dbs" ] ; then
-	for db in $add_dbs ; do
-		echo "$work_dir_add/$db" >> "$current_tmp"
-		clamav_files
-	done
+if [ "$yararulesproject_enabled" == "yes" ] ; then
+	if [ -n "$yararulesproject_dbs" ] ; then
+		for db in $yararulesproject_dbs ; do
+			if echo $db|grep -q "/"; then
+				db=`echo $db | cut -d"/" -f2`
+			fi
+			echo "$work_dir_yararulesproject/$db" >> "$current_tmp"
+			clamav_files
+		done
+	fi
+fi
+if [ "$additional_enabled" == "yes" ] ; then
+	if [ -n "$additional_dbs" ] ; then
+		for db in $additional_dbs ; do
+			echo "$work_dir_add/$db" >> "$current_tmp"
+			clamav_files
+		done
+	fi
 fi
 
 # Remove 3rd-party databases and/or backup files that are no longer being used.
@@ -2270,13 +2321,13 @@ fi
 ###################################################
 # Check for user added signature database updates #
 ###################################################
-if [ -n "$add_dbs" ] ; then
-		if [ `xshok_array_count "$add_dbs"` -lt "1" ] ; then
-			xshok_pretty_echo_and_log "Failed add_dbs config is invalid or not defined - SKIPPING"
+if [ -n "$additional_dbs" ] ; then
+		if [ `xshok_array_count "$additional_dbs"` -lt "1" ] ; then
+			xshok_pretty_echo_and_log "Failed additional_dbs config is invalid or not defined - SKIPPING"
 		else
 	xshok_pretty_echo_and_log "User Added Signature Database File Update(s)" "="
 
-	for db_url in $add_dbs ; do
+	for db_url in $additional_dbs ; do
 		base_url=`echo $db_url | cut -d "/" -f3`
 		db_file=`basename $db_url`
 		if [ "`echo $db_url | cut -d ":" -f1`" = "rsync" ] ; then

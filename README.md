@@ -90,6 +90,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added --install-man this will automatically generate and install the man (help) file
  - Yararules and yararulesproject enabled by default
  - Added clamav version detection to automatically disable yararules and yararulesproject if the current clamav version does not support them
+ - Database files ending with .yar/.yara/.yararules will automatically be disabled from the database if yara rules are not supported
  - Script options are added to the man file
  - Fixed hardcoded logrotate and cron in remove_script
  - Fixed incorrectly assigned logrotate varibles in install-logrotate
