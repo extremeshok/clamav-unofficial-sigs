@@ -6,7 +6,7 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Maintained and provided by https://eXtremeSHOK.com
 
 ## Description
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. The script will also generate and install cron, logrotate, and man files.
 
 #### Try our custom spamassasin plugin: https://github.com/extremeshok/spamassassin-extremeshok_fromreplyto
 
@@ -21,12 +21,12 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * Set 755 permissions on  /usr/local/bin/clamav-unofficial-sigs.sh
 * Make the directory /etc/clamav-unofficial-sigs/
 * Copy the contents of config/ into /etc/clamav-unofficial-sigs/
-* Copy clamav-unofficial-sigs.8 into /usr/share/man/man8/
 * Make the directory /var/log/clamav-unofficial-sigs/
 * Rename the your os.your-distro.conf to os.conf, where your-distro is your distribution
 * Set your user config options in the configs /etc/clamav-unofficial-sigs/user.conf
 * Run the script with --install-cron to install the cron file
 * Run the script with --install-logrotate to install the logrotate file
+* Run the script with --install-man to install the man file
 
 ### First Usage
 * Run the script once as your superuser to set all the permissions and create the relevant directories
@@ -53,8 +53,12 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 
 ```setsebool -P antivirus_can_scan_system true```
 
-### Yara Rule Support (as of June 2015)
-Requires clamav 0.99 or above : http://yararules.com 
+### Yara Rule Support automatically enabled (as of April 2016)
+Since usage yara rules requires clamav 0.99 or above, they will be automatically deactivated if your clamav is older than the required version
+
+### Yara-Rules Project Support (as of June 2015)
+Usage of free Yara-Rules Project: http://yararules.com
+- Enabled by default
 
 Current limitations of clamav support : http://blog.clamav.net/search/label/yara
 
@@ -81,7 +85,27 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.1.1 (updated 2016-04-13)
+### Version 5.2.0 (updated 2016-04-15)
+ - eXtremeSHOK.com Maintenance 
+ - Refactor some functions
+ - Added --install-man this will automatically generate and install the man (help) file
+ - Yararules and yararulesproject enabled by default
+ - Added clamav version detection to automatically disable yararules and yararulesproject if the current clamav version does not support them
+ - Database files ending with .yar/.yara/.yararules will automatically be disabled from the database if yara rules are not supported
+ - Script options are added to the man file
+ - Fixed hardcoded logrotate and cron in remove_script
+ - Fixed incorrectly assigned logrotate varibles in install-logrotate
+ - Config added info for port/package maintainers regarding:  pkg_mgr and pkg_rm
+ - Removed pkg_mgr and pkg_rm from freebsd and openbsd os configs
+ - Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
+ - Rename sanesecurity_dir to work_dir_sanesecurity, securiteinfo_dir to work_dir_securiteinfo, malwarepatrol_dir to work_dir_malwarepatrol, yararules_dir to work_dir_yararules, add_dir to work_dir_add, gpg_dir to work_dir_gpg, work_dir_configs to work_dir_work_configs
+ - Rename yararules_enabled to yararulesproject_enabled
+ - Rename all yararules to yararulesproject
+ - Fix to prevent disabled databases processing certian things which will not be used as they are disabled
+ - Set minimum config required to 62
+ - Bump config to 62
+
+### Version 5.1.1
  - eXtremeSHOK.com Maintenance 
  - Added OS X and openbsd configs
  - Fixed host fallback sed issues by @MichaelKuch
@@ -107,7 +131,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Set minimum config required to 60
  - Bump config to 60
 
-### Version 5.0.6 (updated 2016-04-04)
+### Version 5.0.6
  - eXtremeSHOK.com Maintenance 
  - Updated winnow databases as per information from Tom @ OITC
  - Bump config to 58
@@ -425,7 +449,10 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 --install-logrotate     Install and generate the logrotate file, autodetects the
         values based on your config files
 
+ --install-man   Install and generate the man file, autodetects the
+         values based on your config files
 
-### Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
+## Script updates can be found at: 
+### https://github.com/extremeshok/clamav-unofficial-sigs
 
 Original Script can be found at: http://sourceforge.net/projects/unofficial-sigs

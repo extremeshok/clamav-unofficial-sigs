@@ -9,20 +9,7 @@ Script updates can be found at: https://github.com/extremeshok/clamav-unofficial
 Script provide by Bill Landry (unofficialsigs@gmail.com).
 
 ## Description
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party 
-signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, 
-Securiteinfo, MalwarePatrol. The package also contains cron, logrotate, and man files.
-
-The two files needed to download, test and update third-party ClamAV database files are the script itself
-(clamav-unofficial-sig.sh), and the user configuration file (clamav-unofficial-sigs.conf).
-
-Since the user configuration section has been separated from the script itself, the script now
-needs to reference the configuration file when run by using the "-c" flag when running the script.
-It is also recommended that a copy of the configuration file be place in the "default" location
-"/etc" so that it can be used when running the script manually without using the "-c" flag, or
-when running the script with the "-d" (decode virus signature), "-g" (check gpg signature), or
-"-s" (check database integrity) flags.  This also provides a way to run the script with different
-configuration options when run via cron versus when run manually.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. The script will also generate and install cron, logrotate, and man files.
 
 Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 
@@ -51,11 +38,11 @@ Uncompress/Unpackage the archive:
 * Set 755 permissions on  /usr/local/bin/clamav-unofficial-sigs.sh
 * Make the directory /etc/clamav-unofficial-sigs/
 * Copy the contents of config/ into /etc/clamav-unofficial-sigs/
-* Copy clamav-unofficial-sigs.8 into /usr/share/man/man8/
 * Rename the your os.your-distro.conf to os.conf, where your-distro is your distribution
 * Set your user config options in the configs /etc/clamav-unofficial-sigs/user.conf
 * Run the script with --install-cron to install the cron file
 * Run the script with --install-logrotate to install the logrotate file
+* Run the script with --install-man to install the man file
 
 Install:
 * mkdir -p /usr/local/bin/
@@ -64,7 +51,6 @@ Install:
 * cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
 * chmod +x /usr/local/bin/clamav-unofficial-sigs.sh
 * cp -f /tmp/clamav-unofficial-sigs/config/*.* /etc/clamav-unofficial-sigs/
-* cp -f /tmp/clamav-unofficial-sigs/clamav-unofficial-sigs.8 /usr/share/man/man8/clamav-unofficial-sigs.8
 
 Install Systemd configs:
 * cp -f /tmp/clamav-unofficial-sigs/systemd/*.* /etc/systemd/  
@@ -77,11 +63,15 @@ Configure:
    
 Install Cron configs:
 * After the configs have been configured
-* Run:  bash clamav-unofficial-sigs.sh --install-croCron:
+* Run:  bash clamav-unofficial-sigs.sh --install-cron:
 
 Install logrotate configs:: 
 * After the configs have been configured
 * Run:  bash clamav-unofficial-sigs.sh --install-logrotate
+
+Install man (help) file:
+* After the configs have been configured
+* Run:  bash clamav-unofficial-sigs.sh --install-man:
 
 ### First Usage
 * Run the script once as your superuser to set all the permissions and create the relevant directories
@@ -173,6 +163,8 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 --install-logrotate     Install and generate the logrotate file, autodetects the
         values based on your config files
 
+ --install-man   Install and generate the man file, autodetects the
+         values based on your config files
 
 ### Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 
