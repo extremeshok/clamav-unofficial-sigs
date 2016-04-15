@@ -437,8 +437,8 @@ function gpg_verify_specific_sanesecurity_database_file () {
 	if [ -r "$sanesecurity_dir/$db_file" ] ; then
 		xshok_pretty_echo_and_log "GPG signature testing database file: $sanesecurity_dir/$db_file"
 
-		if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
-			$gpg_bin --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
+		if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
+			$gpg_bin --always-trust -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
 		fi
 	else
 		xshok_pretty_echo_and_log "File '$db_file' cannot be found or is not a Sanesecurity database file."
@@ -1141,9 +1141,12 @@ securiteinfo_dir=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
 linuxmalwaredetect_dir=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
 malwarepatrol_dir=$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')
 yararules_dir=$(echo "$work_dir/$yararules_dir" | sed 's:/*$::')
-work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
-gpg_dir=$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')
 add_dir=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
+
+
+work_dir_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
+work_dir_gpg=$(echo "$work_dir/$work_dir_gpg" | sed 's:/*$::')
+
 
 ### SANITY checks
 #Check default Binaries & Commands are defined
@@ -1269,39 +1272,39 @@ xshok_mkdir_ownership "$linuxmalwaredetect_dir"
 xshok_mkdir_ownership "$sanesecurity_dir"
 xshok_mkdir_ownership "$yararules_dir"
 xshok_mkdir_ownership "$work_dir_configs"
-xshok_mkdir_ownership "$gpg_dir"
+xshok_mkdir_ownership "$work_dir_gpg"
 xshok_mkdir_ownership "$add_dir"
 
 # Set secured access permissions to the GPG directory
-perms chmod -f 0700 "$gpg_dir"
+perms chmod -f 0700 "$work_dir_gpg"
 
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
-if [ ! -s "$gpg_dir/publickey.gpg" ] ; then
-	if ! $curl_bin -s -S $curl_proxy $curl_insecure --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o $gpg_dir/publickey.gpg 2>/dev/null ; then
+if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
+	if ! $curl_bin -s -S $curl_proxy $curl_insecure --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o $work_dir_gpg/publickey.gpg 2>/dev/null ; then
 		xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
 		exit 1
 	else
 
 		xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully downloaded"
-		rm -f -- "$gpg_dir/ss-keyring.gp*"
-		if ! $gpg_bin -q --no-options --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --import $gpg_dir/publickey.gpg 2>/dev/null ; then
+		rm -f -- "$work_dir_gpg/ss-keyring.gp*"
+		if ! $gpg_bin -q --no-options --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --import $work_dir_gpg/publickey.gpg 2>/dev/null ; then
 			xshok_pretty_echo_and_log "ALERT: could not import Sanesecurity public GPG key to custom keyring" "*"
 			exit 1
 		else
-			chmod -f 0644 $gpg_dir/*.*
+			chmod -f 0644 $work_dir_gpg/*.*
 			xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully imported to custom keyring"
 		fi
 	fi
 fi
 
 # If custom keyring is missing, try to re-import Sanesecurity public GPG key.
-if [ ! -s "$gpg_dir/ss-keyring.gpg" ] ; then
-	rm -f -- "$gpg_dir/ss-keyring.gp*"
-	if ! $gpg_bin -q --no-options --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --import $gpg_dir/publickey.gpg 2>/dev/null ; then
+if [ ! -s "$work_dir_gpg/ss-keyring.gpg" ] ; then
+	rm -f -- "$work_dir_gpg/ss-keyring.gp*"
+	if ! $gpg_bin -q --no-options --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --import $work_dir_gpg/publickey.gpg 2>/dev/null ; then
 		xshok_pretty_echo_and_log "ALERT: Custom keyring MISSING or CORRUPT!  Could not import Sanesecurity public GPG key to custom keyring" "*"
 		exit 1
 	else
-		chmod -f 0644 $gpg_dir/*.*
+		chmod -f 0644 $work_dir_gpg/*.*
 		xshok_pretty_echo_and_log "Sanesecurity custom keyring MISSING!  GPG key successfully re-imported to custom keyring"
 	fi
 fi
@@ -1426,10 +1429,10 @@ echo "$work_dir_configs/previous-dbs.txt" >> "$purge"
 echo "$work_dir_configs/scan-test.txt" >> "$purge"
 echo "$work_dir_configs/ss-include-dbs.txt" >> "$purge"
 echo "$work_dir_configs/whitelist.hex" >> "$purge"
-echo "$gpg_dir/publickey.gpg" >> "$purge"
-echo "$gpg_dir/secring.gpg" >> "$purge"
-echo "$gpg_dir/ss-keyring.gpg*" >> "$purge"
-echo "$gpg_dir/trustdb.gpg" >> "$purge"
+echo "$work_dir_gpg/publickey.gpg" >> "$purge"
+echo "$work_dir_gpg/secring.gpg" >> "$purge"
+echo "$work_dir_gpg/ss-keyring.gpg*" >> "$purge"
+echo "$work_dir_gpg/trustdb.gpg" >> "$purge"
 echo "$log_file_path/$log_file_name*" >> "$purge"
 echo "$purge" >> "$purge"
 
@@ -1517,8 +1520,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 					if ! cmp -s $sanesecurity_dir/$db_file $clam_dbs/$db_file ; then
 
 						xshok_pretty_echo_and_log "Testing updated Sanesecurity database file: $db_file"
-						if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
-							$gpg_bin --always-trust -q --no-default-keyring --homedir $gpg_dir --keyring $gpg_dir/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
+						if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null ; then
+							$gpg_bin --always-trust -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $sanesecurity_dir/$db_file.sig $sanesecurity_dir/$db_file 2>/dev/null
 						fi
 						if [ "$?" = "0" ] ; then
 							test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
