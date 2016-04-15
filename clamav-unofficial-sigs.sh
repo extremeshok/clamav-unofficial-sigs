@@ -1232,7 +1232,6 @@ else
 	enable_yararulesproject="no"
 	enable_yararules="no"
 fi
-exit
 
 ################################################################################
 # MAIN LOGIC
@@ -1510,8 +1509,6 @@ if [ "$curl_silence" = "yes" ] ; then
 else
 	curl_output_level=""
 fi
-
-#check_clamav
 
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
