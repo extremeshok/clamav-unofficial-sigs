@@ -88,6 +88,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 ### Version 5.2.1 (updated 2016-04-16)
  - eXtremeSHOK.com Maintenance
  - Minor bugfix for Sanesecurity_sigtest.yara Sanesecurity_spam.yara files being removed incorrectly
+ - Minor fix: yararulesproject_enabled not yararulesproject_enable
 
 ### Version 5.2.0
  - eXtremeSHOK.com Maintenance 
