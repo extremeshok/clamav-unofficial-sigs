@@ -967,8 +967,8 @@ EOF
 ################################################################################
 
 #Script Info
-script_version="5.2.0"
-script_version_date="15 April 2016"
+script_version="5.2.1"
+script_version_date="16 April 2016"
 minimum_required_config_version="62"
 minimum_yara_clamav_version="0.99"
 
@@ -1256,12 +1256,8 @@ else
 	enable_yararules="no"
 fi
 
-echo "$sanesecurity_dbs"
-echo "e_yrp $yararulesproject_enabled"
-echo "e_yr $enable_yararules"
-
 #rebuild the database if we need to remove yara rules from them due to yararules being disabled
-if [ "$enable_yararules"=="no" ] ; then #yararules are disabled
+if [ "$enable_yararules" == "no" ] ; then #yararules are disabled
 	if [ "$sanesecurity_enabled" == "yes" ] ; then
 		if [ -n "$sanesecurity_dbs" ] ; then
 			if [ `xshok_array_count "$sanesecurity_dbs"` -ge "1" ] ; then
@@ -1430,10 +1426,6 @@ if [ -n "$rsync_proxy" ] ; then
 	RSYNC_PROXY="$rsync_proxy"
 	export RSYNC_PROXY
 fi
-
-
-echo "$sanesecurity_dbs"
-exit
 
 # Create $current_dbsfiles containing lists of current and previously active 3rd-party databases
 # so that databases and/or backup files that are no longer being used can be removed.

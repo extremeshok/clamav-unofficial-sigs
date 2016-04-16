@@ -85,7 +85,11 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.2.0 (updated 2016-04-15)
+### Version 5.2.1 (updated 2016-04-16)
+ - eXtremeSHOK.com Maintenance
+ - Minor bugfix for Sanesecurity_sigtest.yara Sanesecurity_spam.yara files being removed incorrectly
+
+### Version 5.2.0
  - eXtremeSHOK.com Maintenance 
  - Refactor some functions
  - Added --install-man this will automatically generate and install the man (help) file
