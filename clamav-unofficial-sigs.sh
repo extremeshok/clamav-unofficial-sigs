@@ -967,8 +967,8 @@ EOF
 ################################################################################
 
 #Script Info
-script_version="5.2.0"
-script_version_date="15 April 2016"
+script_version="5.2.1"
+script_version_date="16 April 2016"
 minimum_required_config_version="62"
 minimum_yara_clamav_version="0.99"
 
@@ -1247,17 +1247,17 @@ if [ "$enable_yararules" == "yes" ] ; then
 	minimum_yara_clamav_version=`echo "$minimum_yara_clamav_version" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'`
 	#Check current clamav version against the minimum required version for yara support
 	if [ $current_clamav_version -lt $minimum_yara_clamav_version ]; then #older
-		enable_yararulesproject="no"
+		yararulesproject_enabled="no"
 		enable_yararules="no"
 		xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
 	fi
 else
-	enable_yararulesproject="no"
+	yararulesproject_enabled="no"
 	enable_yararules="no"
 fi
 
 #rebuild the database if we need to remove yara rules from them due to yararules being disabled
-if [ "$enable_yararules"=="no" ] ; then #yararules are disabled
+if [ "$enable_yararules" == "no" ] ; then #yararules are disabled
 	if [ "$sanesecurity_enabled" == "yes" ] ; then
 		if [ -n "$sanesecurity_dbs" ] ; then
 			if [ `xshok_array_count "$sanesecurity_dbs"` -ge "1" ] ; then
@@ -1427,7 +1427,7 @@ if [ -n "$rsync_proxy" ] ; then
 	export RSYNC_PROXY
 fi
 
-# Create files containing lists of current and previously active 3rd-party databases
+# Create $current_dbsfiles containing lists of current and previously active 3rd-party databases
 # so that databases and/or backup files that are no longer being used can be removed.
 current_tmp="$work_dir_work_configs/current-dbs.tmp"
 current_dbs="$work_dir_work_configs/current-dbs.txt"
@@ -1441,11 +1441,12 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 	if [ -n "$sanesecurity_dbs" ] ; then
 		rm -f -- "$sanesecurity_include_dbs" "$work_dir_sanesecurity/*.sha256"
 		for db in $sanesecurity_dbs ; do
+			echo "$db" >> "$sanesecurity_include_dbs"
+			echo "$db.sig" >> "$sanesecurity_include_dbs"
+			
 			echo "$work_dir_sanesecurity/$db" >> "$current_tmp"
 			echo "$work_dir_sanesecurity/$db.sig" >> "$current_tmp"
 			clamav_files
-			echo "$db" >> "$sanesecurity_include_dbs"
-			echo "$db.sig" >> "$sanesecurity_include_dbs"
 		done
 	fi
 fi
@@ -1471,7 +1472,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 		clamav_files
 	fi
 fi
-if [ "$yararulesproject_enabled" == "yes" ] ; then
+if [ "$yararulesproject_enabledd" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		for db in $yararulesproject_dbs ; do
 			if echo $db|grep -q "/"; then
@@ -2170,7 +2171,7 @@ fi
 ##############################################################################################################################################
 # Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
 ##############################################################################################################################################
-if [ "$yararulesproject_enabled" == "yes" ] ; then
+if [ "$yararulesproject_enabledd" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		if [ `xshok_array_count "$yararulesproject_dbs"` -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
