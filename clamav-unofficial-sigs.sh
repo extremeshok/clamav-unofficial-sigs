@@ -48,6 +48,41 @@ function perms () {
 	fi
 }
 
+# Function to prompt a user if they should complete an action with Y or N
+xshok_prompt_confirm () {
+  while true; do
+    read -r -p "${1:-Are you sure? [y/N]} " response
+    case $response in
+      [yY]) echo ; return 0 ;;
+      [nN]) echo ; return 1 ;;
+      *) printf " \033[31m %s \n\033[0m" "invalid input"
+    esac 
+  done  
+}
+
+# Function to check if its a file, otherwise return false
+xshok_is_file () { #"filepath"
+	filepath=$1
+  if [ -f "${filepath}" ]; then
+  	return 0 ;;
+  else
+  	return 1 ;;	#not a file
+  fi 
+}
+
+# Function to check if its a subdir, otherwise return false
+xshok_is_subdir () {
+	filepath=$1
+	res="${filepath//[^\/]}"
+	echo "${#res}"
+	if [ "${#res}" -gt 1 ]; then]
+		return 0 ;;
+	else
+		return 1 ;;	#not a subdir
+	fi
+}
+
+
 # Function to create a dir and set the ownership
 function xshok_mkdir_ownership () { #"path"
 	mkdir -p "$1" 2>/dev/null
@@ -161,17 +196,6 @@ function install_man (){
 	echo "Generating man file for install...."
 	
 	#Use defined varibles or attempt to use default varibles
-	if [ ! -n "$man_dir" ] ; then
-		man_dir="/usr/share/man/man8"
-	fi
-	if [ ! -n "$man_filename" ] ; then
-		man_filename="clamav-unofficial-sigs.8"
-	fi	
-	if [ ! -n "$man_log_file_full_path" ] ; then
-		man_log_file_full_path="$log_file_path/$log_file_name"
-	fi
-
-	man_dir=$(echo "$man_dir" | sed 's:/*$::')
 
 	if [ ! -e "$man_dir/$man_filename" ] ; then
 		mkdir -p "$man_dir"
@@ -233,12 +257,7 @@ function install_logrotate (){
 	echo "Generating logrotate file for install...."
 	
 	#Use defined varibles or attempt to use default varibles
-	if [ ! -n "$logrotate_dir" ] ; then
-		logrotate_dir="/etc/logrotate.d"
-	fi
-	if [ ! -n "$logrotate_filename" ] ; then
-		logrotate_filename="clamav-unofficial-sigs"
-	fi	
+
 	if [ ! -n "$logrotate_user" ] ; then
 		logrotate_user="$clam_user";
 	fi
@@ -249,7 +268,6 @@ function install_logrotate (){
 		logrotate_log_file_full_path="$log_file_path/$log_file_name"
 	fi
 
-	logrotate_dir=$(echo "$logrotate_dir" | sed 's:/*$::')
 
 	if [ ! -e "$logrotate_dir/$logrotate_filename" ] ; then
 		mkdir -p "$logrotate_dir"
@@ -305,12 +323,6 @@ function install_cron (){
 	echo "Generating cron file for install...."
 	
 	#Use defined varibles or attempt to use default varibles
-	if [ ! -n "$cron_dir" ] ; then
-		cron_dir="/etc/cron.d"
-	fi
-	if [ ! -n "$cron_filename" ] ; then
-		cron_filename="clamav-unofficial-sigs"
-	fi	
 	if [ ! -n "$cron_minute" ] ; then
 		cron_minute=$[ ( $RANDOM % 59 )  + 1 ];
 	fi
@@ -330,7 +342,7 @@ function install_cron (){
 		cron_script_full_path="$cron_script_dir/$cron_script_name"
 	fi
 
-	cron_dir=$(echo "$cron_dir" | sed 's:/*$::')
+	
 
 	if [ ! -e "$cron_dir/$cron_filename" ] ; then
 		mkdir -p "$cron_dir"
@@ -1178,6 +1190,31 @@ else
 	work_dir_gpg=$(echo "$work_dir_gpg" | sed 's:/*$::')
 fi
 
+#	Assign defaults if not defined
+if [ ! -n "$cron_dir" ] ; then
+	cron_dir="/etc/cron.d"
+fi
+cron_dir=$(echo "$cron_dir" | sed 's:/*$::')
+if [ ! -n "$cron_filename" ] ; then
+	cron_filename="clamav-unofficial-sigs"
+fi
+if [ ! -n "$logrotate_dir" ] ; then
+	logrotate_dir="/etc/logrotate.d"
+fi
+logrotate_dir=$(echo "$logrotate_dir" | sed 's:/*$::')
+if [ ! -n "$logrotate_filename" ] ; then
+	logrotate_filename="clamav-unofficial-sigs"
+fi	
+if [ ! -n "$man_dir" ] ; then
+	man_dir="/usr/share/man/man8"
+fi
+man_dir=$(echo "$man_dir" | sed 's:/*$::')
+if [ ! -n "$man_filename" ] ; then
+	man_filename="clamav-unofficial-sigs.8"
+fi	
+if [ ! -n "$man_log_file_full_path" ] ; then
+	man_log_file_full_path="$log_file_path/$log_file_name"
+fi
 
 ### SANITY checks
 #Check default Binaries & Commands are defined
