@@ -1545,22 +1545,23 @@ if [ "$additional_enabled" == "yes" ] ; then
 fi
 
 # Remove 3rd-party databases and/or backup files that are no longer being used.
-sort "$current_tmp" > "$current_dbs" 2>/dev/null
-rm -f "$current_tmp"
-db_changes="$work_dir_work_configs/db-changes.txt"
-if [ ! -s "$previous_dbs" ] ; then
-	cp -f "$current_dbs" "$previous_dbs" 2>/dev/null
-fi
-diff "$current_dbs" "$previous_dbs" 2>/dev/null | grep '>' | awk '{print $2}' > "$db_changes"
-if [ -r "$db_changes" ] ; then
-	if grep -vq "bak" $db_changes 2>/dev/null ; then
-		do_clamd_reload=2
+if [ "$remove_disabled_databases" == "yes" ] ; then
+	sort "$current_tmp" > "$current_dbs" 2>/dev/null
+	rm -f "$current_tmp"
+	db_changes="$work_dir_work_configs/db-changes.txt"
+	if [ ! -s "$previous_dbs" ] ; then
+		cp -f "$current_dbs" "$previous_dbs" 2>/dev/null
 	fi
-
-	for file in `cat $db_changes` ; do
-		rm -f -- "$file"
-		xshok_pretty_echo_and_log "File removed: $file"
-	done
+	diff "$current_dbs" "$previous_dbs" 2>/dev/null | grep '>' | awk '{print $2}' > "$db_changes"
+	if [ -r "$db_changes" ] ; then
+		if grep -vq "bak" $db_changes 2>/dev/null ; then
+			do_clamd_reload=2
+		fi
+		for file in `cat $db_changes` ; do
+			rm -f -- "$file"
+			xshok_pretty_echo_and_log "Unused/Disabled file removed: $file"
+		done
+	fi
 fi
 
 # Create "purge.txt" file for package maintainers to support package uninstall.
