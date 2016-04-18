@@ -195,6 +195,7 @@ function clamav_files () {
 	fi
 }
 
+
 ################################################################################
 # ADDITIONAL PROGRAM FUNCTIONS
 ################################################################################
@@ -1523,7 +1524,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 		clamav_files
 	fi
 fi
-if [ "$yararulesproject_enabledd" == "yes" ] ; then
+if [ "$|yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		for db in $yararulesproject_dbs ; do
 			if echo $db|grep -q "/"; then
@@ -2222,7 +2223,7 @@ fi
 ##############################################################################################################################################
 # Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
 ##############################################################################################################################################
-if [ "$yararulesproject_enabledd" == "yes" ] ; then
+if [ "$|yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		if [ `xshok_array_count "$yararulesproject_dbs"` -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
