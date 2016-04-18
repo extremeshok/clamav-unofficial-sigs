@@ -57,8 +57,8 @@ xshok_prompt_confirm () {
   while true; do
     read -r -p "${1:-Are you sure? [y/N]} " response
     case $response in
-      [yY]) return 0 ;;
-      [nN]) return 1 ;;
+      [yY]) echo ; return 0 ;;
+      [nN]) echo ;return 1 ;;
       *) printf " \033[31m %s \n\033[0m" "invalid input"
     esac 
   done  
@@ -553,7 +553,7 @@ function make_signature_database_from_ascii_file () {
 	- Line numbering will be done automatically by the script.
 	" | command sed 's/^          //g'
 	echo -n "Do you wish to continue? "
-	if [ xshok_prompt_confirm ] ; then
+	if [ `xshok_prompt_confirm` ] ; then
 
 		echo -n "Enter the source file as /path/filename: "
 		read source
@@ -595,7 +595,7 @@ function make_signature_database_from_ascii_file () {
 			echo "Clamscan reports database integrity tested good."
 
 			echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases?"
-			if [ xshok_prompt_confirm ] ; then
+			if [ `xshok_prompt_confirm` ] ; then
 				if ! cmp -s "$path_file" "$clam_dbs/$db_file" ; then
 					if $rsync_bin -pcqt "$path_file" "$clam_dbs" ; then
 						perms chown -f $clam_user:$clam_group "$clam_dbs/$db_file"
@@ -636,7 +636,7 @@ function remove_script () {
 	else
 		echo "  Are you sure you want to remove the clamav-unofficial-sigs script and all of its"
 		echo -n "  associated files, third-party databases, and work directories from the system?"
-		if [ xshok_prompt_confirm ] ; then
+		if [ `xshok_prompt_confirm` ] ; then
 			if [ -r "$work_dir_work_configs/purge.txt" ] ; then
 
 				for file in `cat $work_dir_work_configs/purge.txt` ; do
