@@ -964,6 +964,8 @@ $ofs -w, --whitelist $ofe Adds a signature whitelist entry in the newer ClamAV I
 $ofb 
 $ofs --check-clamav $ofe If ClamD status check is enabled and the socket path is correctly $oft specifiedthen test to see if clamd is running or not
 $ofb 
+$ofs --install-all $ofe Install and generate the cron, logroate and man files, autodetects the values $oft based on your config files
+$ofb
 $ofs --install-cron $ofe Install and generate the cron file, autodetects the values $oft based on your config files
 $ofb 
 $ofs --install-logrotate $ofe Install and generate the logrotate file, autodetects the $oft values based on your config files
@@ -1281,6 +1283,7 @@ while true; do
 		-o | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
 		-w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
 		--check-clamav ) check_clamav; exit; break ;;
+		--install-all ) install_cron; install_logrotate; install_man; exit; break ;;
 		--install-cron ) install_cron; exit; break ;;
 		--install-logrotate ) install_logrotate; exit; break ;;
 		--install-man ) install_man; exit; break ;;
