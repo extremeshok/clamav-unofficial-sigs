@@ -154,6 +154,9 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 --check-clamav  If ClamD status check is enabled and the socket path is correctly
         specifiedthen test to see if clamd is running or not
 
+--install-all   Install and generate the cron, logroate and man files, autodetects the values
+         based on your config files
+
 --install-cron  Install and generate the cron file, autodetects the values
         based on your config files
 

@@ -86,7 +86,8 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## Change Log
 ### Version 5.2.2 (updated 2016-04-18)
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
+ - Added --install-all Install and generate the cron, logroate and man files, autodetects the values $oft based on your config files
  - Added functions: xshok_prompt_confirm, xshok_is_file, xshok_is_subdir
  - Replaced Y/N prompts with xshok_prompt_confirm
  - Added more warnings to remove_script and made it double confirmed
@@ -454,6 +455,9 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 --check-clamav  If ClamD status check is enabled and the socket path is correctly
         specifiedthen test to see if clamd is running or not
+
+--install-all   Install and generate the cron, logroate and man files, autodetects the values
+         based on your config files
 
 --install-cron  Install and generate the cron file, autodetects the values
         based on your config files
