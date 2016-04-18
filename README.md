@@ -94,6 +94,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added --install-all Install and generate the cron, logroate and man files, autodetects the values $oft based on your config files
  - Added functions: xshok_prompt_confirm, xshok_is_file, xshok_is_subdir
  - Replaced Y/N prompts with xshok_prompt_confirm
+ - Bug Fix for disabled databases being removed when the remove_disabled_databases is set to NO (default)
  - Added more warnings to remove_script and made it double confirmed
  - Remove_script will only remove work_dir if its a sub directory
  - Remove_script will only remove files if they are files
