@@ -1486,6 +1486,7 @@ fi
 # Create $current_dbsfiles containing lists of current and previously active 3rd-party databases
 # so that databases and/or backup files that are no longer being used can be removed.
 current_tmp="$work_dir_work_configs/current-dbs.tmp"
+current_dbs="$work_dir_work_configs/current-dbs.txt"
 
 if [ "$sanesecurity_enabled" == "yes" ] ; then
 	# Create the Sanesecurity rsync "include" file (defines which files to download).
@@ -1543,16 +1544,15 @@ if [ "$additional_enabled" == "yes" ] ; then
 		done
 	fi
 fi
+sort "$current_tmp" > "$current_dbs" 2>/dev/null
+rm -f "$current_tmp"
 
 # Remove 3rd-party databases and/or backup files that are no longer being used.
 if [ "$remove_disabled_databases" == "yes" ] ; then
-	current_dbs="$work_dir_work_configs/current-dbs.txt"
 	previous_dbs="$work_dir_work_configs/previous-dbs.txt"
 	sort "$current_dbs" > "$previous_dbs" 2>/dev/null
 	rm -f "$current_dbs"
 
-	sort "$current_tmp" > "$current_dbs" 2>/dev/null
-	rm -f "$current_tmp"
 	db_changes="$work_dir_work_configs/db-changes.txt"
 	if [ ! -s "$previous_dbs" ] ; then
 		cp -f "$current_dbs" "$previous_dbs" 2>/dev/null
