@@ -1,9 +1,10 @@
+---
 engines:
-	shellcheck:
+  shellcheck:
     enabled: true
   fixme:
     enabled: true
 ratings:
   paths: []
 exclude_paths:
-- config/
+  - .travis/
