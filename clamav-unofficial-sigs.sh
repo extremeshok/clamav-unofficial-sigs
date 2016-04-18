@@ -49,39 +49,49 @@ function perms () {
 }
 
 # Function to prompt a user if they should complete an action with Y or N
+# usage: xshok_prompt_confirm
+# if [ xshok_prompt_confirm ]; then
+# xshok_prompt_confirm && echo "accepted"
+# xshok_prompt_confirm && echo "yes" || echo "no"
 xshok_prompt_confirm () {
   while true; do
     read -r -p "${1:-Are you sure? [y/N]} " response
     case $response in
-      [yY]) echo ; return 0 ;;
-      [nN]) echo ; return 1 ;;
+      [yY]) return 0 ;;
+      [nN]) return 1 ;;
       *) printf " \033[31m %s \n\033[0m" "invalid input"
     esac 
   done  
 }
 
+
 # Function to check if its a file, otherwise return false
 xshok_is_file () { #"filepath"
 	filepath=$1
   if [ -f "${filepath}" ]; then
-  	return 0 ;;
+  	return 0 ;
   else
-  	return 1 ;;	#not a file
+  	return 1 ;	#not a file
   fi 
 }
 
-# Function to check if its a subdir, otherwise return false
-xshok_is_subdir () {
-	filepath=$1
-	res="${filepath//[^\/]}"
-	echo "${#res}"
-	if [ "${#res}" -gt 1 ]; then]
-		return 0 ;;
+# Function to check if filepath is a subdir, otherwise return false
+# Usage: xshok_is_subdir "filepath"
+# xshok_is_subdir "/root/" - false
+# xshok_is_subdir "/usr/local/etc" && echo "yes" - yes
+xshok_is_subdir () { #filepath
+	filepath=$(echo "$1" | sed 's:/*$::')
+	if [ -d "$filepath" ] ; then
+		res="${filepath//[^\/]}"
+		if [ "${#res}" -gt 1 ] ; then
+			return 0 ;
+		else
+			return 1 ;	#not a subdir
+		fi
 	else
-		return 1 ;;	#not a subdir
+		return 1 ;	#not a dir
 	fi
 }
-
 
 # Function to create a dir and set the ownership
 function xshok_mkdir_ownership () { #"path"
@@ -542,9 +552,8 @@ function make_signature_database_from_ascii_file () {
 
 	- Line numbering will be done automatically by the script.
 	" | command sed 's/^          //g'
-	echo -n "Do you wish to continue? (y/n): "
-	read reply
-	if [ "$reply" = "y" -o "$reply" = "Y" ] ; then
+	echo -n "Do you wish to continue? "
+	if [ xshok_prompt_confirm ] ; then
 
 		echo -n "Enter the source file as /path/filename: "
 		read source
@@ -585,9 +594,8 @@ function make_signature_database_from_ascii_file () {
 
 			echo "Clamscan reports database integrity tested good."
 
-			echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases? (y/n): "
-			read reply
-			if [ "$reply" = "y" -o "$reply" = "Y" ] ; then
+			echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases?"
+			if [ xshok_prompt_confirm ] ; then
 				if ! cmp -s "$path_file" "$clam_dbs/$db_file" ; then
 					if $rsync_bin -pcqt "$path_file" "$clam_dbs" ; then
 						perms chown -f $clam_user:$clam_group "$clam_dbs/$db_file"
@@ -627,35 +635,34 @@ function remove_script () {
 
 	else
 		echo "  Are you sure you want to remove the clamav-unofficial-sigs script and all of its"
-		echo -n "  associated files, third-party databases, and work directories from the system? (y/n): "
-		read response
-		if [ "$response" = "y" -o "$response" = "Y" ] ; then
+		echo -n "  associated files, third-party databases, and work directories from the system?"
+		if [ xshok_prompt_confirm ] ; then
 			if [ -r "$work_dir_work_configs/purge.txt" ] ; then
 
 				for file in `cat $work_dir_work_configs/purge.txt` ; do
-					rm -f -- "$file"
+					xshok_is_file "$file" && rm -f -- "$file"
 					echo "     Removed file: $file"
 				done
 				cron_file_full_path="$cron_dir/$cron_filename"
 				if [ -r "$cron_file_full_path" ] ; then
-					rm -f "$cron_file_full_path"
+					xshok_is_file "$cron_file_full_path" && rm -f "$cron_file_full_path"
 					echo "     Removed file: $cron_file_full_path"
 				fi
 				logrotate_file_full_path="$logrotate_dir/$logrotate_filename"
 				if [ -r "$logrotate_file_full_path" ] ; then
-					rm -f "$logrotate_file_full_path"
+					xshok_is_file "$logrotate_file_full_path" && rm -f "$logrotate_file_full_path"
 					echo "     Removed file: $logrotate_file_full_path"
 				fi
 				man_file_full_path="$man_dir/$man_filename"
 				if [ -r "$man_file_full_path" ] ; then
-					rm -f "$man_file_full_path"
+					xshok_is_file "$man_file_full_path" && rm -f "$man_file_full_path"
 					echo "     Removed file: $man_file_full_path"
 				fi
 				
 				#rather keep the configs
 				#rm -f -- "$default_config" && echo "     Removed file: $default_config"
 				#rm -f -- "$0" && echo "     Removed file: $0"
-				rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
+				xshok_is_subdir "$work_dir" && rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
 
 				echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
 				echo "  databases, and work directories have been successfully removed from the system."
