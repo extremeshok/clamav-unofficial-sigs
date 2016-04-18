@@ -44,3 +44,7 @@ install:
 
 script:
   - sudo sh -e .travis/ci-test.sh
+
+addons:
+  code_climate:
+    repo_token: 270be84579d01fcbe78b21b91719c2c55cd627f074c8abb83699a8319c980b60
