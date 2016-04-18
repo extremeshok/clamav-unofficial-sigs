@@ -675,6 +675,7 @@ function remove_script () {
 				fi
 			else
 				echo "Aborted"
+			fi
 		else
 			echo "Aborted"
 		fi
