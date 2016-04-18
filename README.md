@@ -1,4 +1,8 @@
 # clamav-unofficial-sigs [![Build Status](https://travis-ci.org/extremeshok/clamav-unofficial-sigs.svg?branch=master)](https://travis-ci.org/extremeshok/clamav-unofficial-sigs)
+[![Code Climate](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/gpa.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
+[![Test Coverage](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/coverage.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/coverage)
+[![Issue Count](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/issue_count.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
+
 ClamAV Unofficial Signatures Updater
 
 Github fork of the sourceforge hosted and non maintained utility.
