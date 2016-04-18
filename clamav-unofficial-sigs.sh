@@ -195,7 +195,8 @@ function clamav_files () {
 	fi
 }
 
-
+# Function to manage the databases and allow multi-dimensions as well as global overrides
+# since the datbases are basically a multi-dimentional associative arrays in bash
 function xshok_database () { #database #override
 	true ;
 }
@@ -1525,7 +1526,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 		clamav_files
 	fi
 fi
-if [ "$|yararulesproject_enabled" == "yes" ] ; then
+if [ "$yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		for db in $yararulesproject_dbs ; do
 			if echo $db|grep -q "/"; then
@@ -1621,17 +1622,15 @@ fi
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
 if [ -n "$securiteinfo_dbs" -o -n "malwarepatrol_db" ] ; then
-	if [ `date +%s` -gt 0 2>/dev/null ] ; then
-		current_time=`date +%s`
-	else
-		if [ `perl -le print+time 2>/dev/null` ] ; then
-			current_time=`perl -le print+time`
-		fi
+	current_time=$(date +%s 2>/dev/null)
+	if [ $current_time -le 0 ] ; then
+		current_time=$(perl -le print+time 2>/dev/null)
 	fi
-else
-	xshok_pretty_echo_and_log "WARNING: No support for 'date +%s' or 'perl' was not found , SecuriteInfo and MalwarePatrol updates bypassed" "="
-	securiteinfo_dbs=""
-	malwarepatrol_db=""
+	if [ $current_time -le 0 ] ; then
+		xshok_pretty_echo_and_log "WARNING: No support for 'date +%s' or 'perl' was not found , SecuriteInfo and MalwarePatrol updates bypassed" "="
+		securiteinfo_dbs=""
+		malwarepatrol_db=""
+	fi
 fi
 
 ################################################################
@@ -2229,7 +2228,7 @@ fi
 ##############################################################################################################################################
 # Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
 ##############################################################################################################################################
-if [ "$|yararulesproject_enabled" == "yes" ] ; then
+if [ "$yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		if [ `xshok_array_count "$yararulesproject_dbs"` -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
