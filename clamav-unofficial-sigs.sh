@@ -50,15 +50,15 @@ function perms () {
 
 # Function to prompt a user if they should complete an action with Y or N
 # usage: xshok_prompt_confirm
-# if [ xshok_prompt_confirm ]; then
+# if xshok_prompt_confirm; then
 # xshok_prompt_confirm && echo "accepted"
 # xshok_prompt_confirm && echo "yes" || echo "no"
 xshok_prompt_confirm () {
   while true; do
     read -r -p "${1:-Are you sure? [y/N]} " response
     case $response in
-      [yY]) echo ; return 0 ;;
-      [nN]) echo ;return 1 ;;
+      [yY]) return 0 ;;
+      [nN]) return 1 ;;
       *) printf " \033[31m %s \n\033[0m" "invalid input"
     esac 
   done  
@@ -553,7 +553,7 @@ function make_signature_database_from_ascii_file () {
 	- Line numbering will be done automatically by the script.
 	" | command sed 's/^          //g'
 	echo -n "Do you wish to continue? "
-	if [ `xshok_prompt_confirm` ] ; then
+	if xshok_prompt_confirm ; then
 
 		echo -n "Enter the source file as /path/filename: "
 		read source
@@ -595,7 +595,7 @@ function make_signature_database_from_ascii_file () {
 			echo "Clamscan reports database integrity tested good."
 
 			echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases?"
-			if [ `xshok_prompt_confirm` ] ; then
+			if xshok_prompt_confirm ; then
 				if ! cmp -s "$path_file" "$clam_dbs/$db_file" ; then
 					if $rsync_bin -pcqt "$path_file" "$clam_dbs" ; then
 						perms chown -f $clam_user:$clam_group "$clam_dbs/$db_file"
@@ -629,51 +629,54 @@ function make_signature_database_from_ascii_file () {
 function remove_script () {
 	echo ""
 	if [ -n "$pkg_mgr" -a -n "$pkg_rm" ] ; then
-		echo "  This script (clamav-unofficial-sigs) was installed on the system"
-		echo "  via '$pkg_mgr', use '$pkg_rm' to remove the script"
-		echo "  and all of its associated files and databases from the system."
+		echo "This script (clamav-unofficial-sigs) was installed on the system via '$pkg_mgr'"
+		echo "use '$pkg_rm' to remove the script and all of its associated files and databases from the system."
 
 	else
-		echo "  Are you sure you want to remove the clamav-unofficial-sigs script and all of its"
-		echo -n "  associated files, third-party databases, and work directories from the system?"
-		if [ `xshok_prompt_confirm` ] ; then
-			if [ -r "$work_dir_work_configs/purge.txt" ] ; then
+		cron_file_full_path="$cron_dir/$cron_filename"
+		logrotate_file_full_path="$logrotate_dir/$logrotate_filename"
+		man_file_full_path="$man_dir/$man_filename"
+		
+		echo "This will remove the workdir ($work_dir), logrotate file ($logrotate_file_full_path), cron file ($cron_file_full_path), man file ($man_file_full_path)"
+		echo "Are you sure you want to remove the clamav-unofficial-sigs script and all of its associated files, third-party databases, and work directory from the system?"
+		if xshok_prompt_confirm ; then
+			echo "This can not be undone are you sure ?"
+			if xshok_prompt_confirm ; then
+				if [ -r "$work_dir_work_configs/purge.txt" ] ; then
 
-				for file in `cat $work_dir_work_configs/purge.txt` ; do
-					xshok_is_file "$file" && rm -f -- "$file"
-					echo "     Removed file: $file"
-				done
-				cron_file_full_path="$cron_dir/$cron_filename"
-				if [ -r "$cron_file_full_path" ] ; then
-					xshok_is_file "$cron_file_full_path" && rm -f "$cron_file_full_path"
-					echo "     Removed file: $cron_file_full_path"
-				fi
-				logrotate_file_full_path="$logrotate_dir/$logrotate_filename"
-				if [ -r "$logrotate_file_full_path" ] ; then
-					xshok_is_file "$logrotate_file_full_path" && rm -f "$logrotate_file_full_path"
-					echo "     Removed file: $logrotate_file_full_path"
-				fi
-				man_file_full_path="$man_dir/$man_filename"
-				if [ -r "$man_file_full_path" ] ; then
-					xshok_is_file "$man_file_full_path" && rm -f "$man_file_full_path"
-					echo "     Removed file: $man_file_full_path"
-				fi
-				
-				#rather keep the configs
-				#rm -f -- "$default_config" && echo "     Removed file: $default_config"
-				#rm -f -- "$0" && echo "     Removed file: $0"
-				xshok_is_subdir "$work_dir" && rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
+					for file in `cat $work_dir_work_configs/purge.txt` ; do
+						xshok_is_file "$file" && rm -f -- "$file"
+						echo "     Removed file: $file"
+					done
+					if [ -r "$cron_file_full_path" ] ; then
+						xshok_is_file "$cron_file_full_path" && rm -f "$cron_file_full_path"
+						echo "     Removed file: $cron_file_full_path"
+					fi
+					if [ -r "$logrotate_file_full_path" ] ; then
+						xshok_is_file "$logrotate_file_full_path" && rm -f "$logrotate_file_full_path"
+						echo "     Removed file: $logrotate_file_full_path"
+					fi
+					if [ -r "$man_file_full_path" ] ; then
+						xshok_is_file "$man_file_full_path" && rm -f "$man_file_full_path"
+						echo "     Removed file: $man_file_full_path"
+					fi
+					
+					#rather keep the configs
+					#rm -f -- "$default_config" && echo "     Removed file: $default_config"
+					#rm -f -- "$0" && echo "     Removed file: $0"
+					xshok_is_subdir "$work_dir" && rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
 
-				echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
-				echo "  databases, and work directories have been successfully removed from the system."
+					echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
+					echo "  databases, and work directories have been successfully removed from the system."
 
+				else
+					echo "  Cannot locate 'purge.txt' file in $work_dir_work_configs."
+					echo "  Files and signature database will need to be removed manually."
+				fi
 			else
-				echo "  Cannot locate 'purge.txt' file in $work_dir_work_configs."
-				echo "  Files and signature database will need to be removed manually."
-
-			fi
+				echo "Aborted"
 		else
-			help_and_usage
+			echo "Aborted"
 		fi
 	fi
 }
@@ -952,8 +955,6 @@ $ofs -i, --information $ofe Output system and configuration information for $oft
 $ofb 
 $ofs -m, --make-database $ofe Make a signature database from an ascii file containing $oft data strings, with one data string per line.  Additional $oft information is provided when using this flag
 $ofb 
-$ofs -r, --remove-script $ofe Remove the clamav-unofficial-sigs script and all of $oft its associated files and databases from the system
-$ofb 
 $ofs -t, --test-database $ofe Clamscan integrity test a specific database file $oft eg: '-s filename.ext' (do not include file path)
 $ofb 
 $ofs -o, --output-triggered $ofe If HAM directory scanning is enabled in the script's $oft configuration file, then output names of any third-party $oft signatures that triggered during the HAM directory scan
@@ -967,6 +968,8 @@ $ofb
 $ofs --install-logrotate $ofe Install and generate the logrotate file, autodetects the $oft values based on your config files
 $ofb 
 $ofs --install-man $ofe Install and generate the man file, autodetects the $oft values based on your config files
+$ofb 
+$ofs --remove-script $ofe Remove the clamav-unofficial-sigs script and all of $oft its associated files and databases from the system
 $ofb 
 EOF
 	` #this is very important...
@@ -986,8 +989,8 @@ EOF
 ################################################################################
 
 #Script Info
-script_version="5.2.1"
-script_version_date="16 April 2016"
+script_version="5.2.2"
+script_version_date="18 April 2016"
 minimum_required_config_version="62"
 minimum_yara_clamav_version="0.99"
 
@@ -1273,7 +1276,6 @@ while true; do
 		-g | --gpg-verify ) gpg_verify_specific_sanesecurity_database_file; exit; break ;;
 		-i | --information ) output_system_configuration_information; exit; break ;;
 		-m | --make-database ) make_signature_database_from_ascii_file; exit; break ;;
-		-r | --remove-script ) remove_script; exit; break ;;
 		-t | --test-database ) clamscan_integrity_test_specific_database_file; exit; break ;;
 		-o | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
 		-w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
@@ -1281,6 +1283,7 @@ while true; do
 		--install-cron ) install_cron; exit; break ;;
 		--install-logrotate ) install_logrotate; exit; break ;;
 		--install-man ) install_man; exit; break ;;
+		--remove-script ) remove_script; exit; break ;;
 		* ) break ;;
 	esac
 done

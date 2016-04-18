@@ -85,7 +85,17 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.2.1 (updated 2016-04-16)
+### Version 5.2.2 (updated 2016-04-18)
+ - eXtremeSHOK.com Maintenance 
+ - Added functions: xshok_prompt_confirm, xshok_is_file, xshok_is_subdir
+ - Replaced Y/N prompts with xshok_prompt_confirm
+ - Added more warnings to remove_script and made it double confirmed
+ - Remove_script will only remove work_dir if its a sub directory
+ - Remove_script will only remove files if they are files
+ - Removed -r switch, --remove-script needs to be used instead of both -r and --remove-script
+ - Fixed: remove_script not removing logrotate file, cron file, man file
+
+### Version 5.2.1
  - eXtremeSHOK.com Maintenance
  - Minor bugfix for Sanesecurity_sigtest.yara Sanesecurity_spam.yara files being removed incorrectly
  - Minor fix: yararulesproject_enabled not yararulesproject_enable
@@ -428,9 +438,6 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         data strings, with one data string per line.  Additional
         information is provided when using this flag
 
--r, --remove-script     Remove the clamav-unofficial-sigs script and all of
-        its associated files and databases from the system
-
 -t, --test-database     Clamscan integrity test a specific database file
         eg: '-s filename.ext' (do not include file path)
 
@@ -454,8 +461,11 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 --install-logrotate     Install and generate the logrotate file, autodetects the
         values based on your config files
 
- --install-man   Install and generate the man file, autodetects the
+--install-man   Install and generate the man file, autodetects the
          values based on your config files
+
+--remove-script     Remove the clamav-unofficial-sigs script and all of
+        its associated files and databases from the system
 
 ## Script updates can be found at: 
 ### https://github.com/extremeshok/clamav-unofficial-sigs
