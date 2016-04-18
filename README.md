@@ -1,4 +1,8 @@
 # clamav-unofficial-sigs [![Build Status](https://travis-ci.org/extremeshok/clamav-unofficial-sigs.svg?branch=master)](https://travis-ci.org/extremeshok/clamav-unofficial-sigs)
+[![Code Climate](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/gpa.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
+[![Test Coverage](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/coverage.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/coverage)
+[![Issue Count](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/issue_count.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
+
 ClamAV Unofficial Signatures Updater
 
 Github fork of the sourceforge hosted and non maintained utility.
@@ -85,7 +89,19 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.2.1 (updated 2016-04-16)
+### Version 5.2.2 (updated 2016-04-18)
+ - eXtremeSHOK.com Maintenance
+ - Added --install-all Install and generate the cron, logroate and man files, autodetects the values $oft based on your config files
+ - Added functions: xshok_prompt_confirm, xshok_is_file, xshok_is_subdir
+ - Replaced Y/N prompts with xshok_prompt_confirm
+ - Bug Fix for disabled databases being removed when the remove_disabled_databases is set to NO (default)
+ - Added more warnings to remove_script and made it double confirmed
+ - Remove_script will only remove work_dir if its a sub directory
+ - Remove_script will only remove files if they are files
+ - Removed -r switch, --remove-script needs to be used instead of both -r and --remove-script
+ - Fixed: remove_script not removing logrotate file, cron file, man file
+
+### Version 5.2.1
  - eXtremeSHOK.com Maintenance
  - Minor bugfix for Sanesecurity_sigtest.yara Sanesecurity_spam.yara files being removed incorrectly
  - Minor fix: yararulesproject_enabled not yararulesproject_enable
@@ -428,9 +444,6 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         data strings, with one data string per line.  Additional
         information is provided when using this flag
 
--r, --remove-script     Remove the clamav-unofficial-sigs script and all of
-        its associated files and databases from the system
-
 -t, --test-database     Clamscan integrity test a specific database file
         eg: '-s filename.ext' (do not include file path)
 
@@ -448,14 +461,20 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 --check-clamav  If ClamD status check is enabled and the socket path is correctly
         specifiedthen test to see if clamd is running or not
 
+--install-all   Install and generate the cron, logroate and man files, autodetects the values
+         based on your config files
+
 --install-cron  Install and generate the cron file, autodetects the values
         based on your config files
 
 --install-logrotate     Install and generate the logrotate file, autodetects the
         values based on your config files
 
- --install-man   Install and generate the man file, autodetects the
+--install-man   Install and generate the man file, autodetects the
          values based on your config files
+
+--remove-script     Remove the clamav-unofficial-sigs script and all of
+        its associated files and databases from the system
 
 ## Script updates can be found at: 
 ### https://github.com/extremeshok/clamav-unofficial-sigs

@@ -1,0 +1,10 @@
+---
+engines:
+  shellcheck:
+    enabled: true
+  fixme:
+    enabled: true
+ratings:
+  paths: []
+exclude_paths:
+  - .travis/

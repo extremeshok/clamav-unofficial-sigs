@@ -48,6 +48,51 @@ function perms () {
 	fi
 }
 
+# Function to prompt a user if they should complete an action with Y or N
+# usage: xshok_prompt_confirm
+# if xshok_prompt_confirm; then
+# xshok_prompt_confirm && echo "accepted"
+# xshok_prompt_confirm && echo "yes" || echo "no"
+xshok_prompt_confirm () {
+  while true; do
+    read -r -p "${1:-Are you sure? [y/N]} " response
+    case $response in
+      [yY]) return 0 ;;
+      [nN]) return 1 ;;
+      *) printf " \033[31m %s \n\033[0m" "invalid input"
+    esac 
+  done  
+}
+
+
+# Function to check if its a file, otherwise return false
+xshok_is_file () { #"filepath"
+	filepath=$1
+  if [ -f "${filepath}" ]; then
+  	return 0 ;
+  else
+  	return 1 ;	#not a file
+  fi 
+}
+
+# Function to check if filepath is a subdir, otherwise return false
+# Usage: xshok_is_subdir "filepath"
+# xshok_is_subdir "/root/" - false
+# xshok_is_subdir "/usr/local/etc" && echo "yes" - yes
+xshok_is_subdir () { #filepath
+	filepath=$(echo "$1" | sed 's:/*$::')
+	if [ -d "$filepath" ] ; then
+		res="${filepath//[^\/]}"
+		if [ "${#res}" -gt 1 ] ; then
+			return 0 ;
+		else
+			return 1 ;	#not a subdir
+		fi
+	else
+		return 1 ;	#not a dir
+	fi
+}
+
 # Function to create a dir and set the ownership
 function xshok_mkdir_ownership () { #"path"
 	mkdir -p "$1" 2>/dev/null
@@ -150,6 +195,12 @@ function clamav_files () {
 	fi
 }
 
+# Function to manage the databases and allow multi-dimensions as well as global overrides
+# since the datbases are basically a multi-dimentional associative arrays in bash
+function xshok_database () { #database #override
+	true ;
+}
+
 ################################################################################
 # ADDITIONAL PROGRAM FUNCTIONS
 ################################################################################
@@ -161,17 +212,6 @@ function install_man (){
 	echo "Generating man file for install...."
 	
 	#Use defined varibles or attempt to use default varibles
-	if [ ! -n "$man_dir" ] ; then
-		man_dir="/usr/share/man/man8"
-	fi
-	if [ ! -n "$man_filename" ] ; then
-		man_filename="clamav-unofficial-sigs.8"
-	fi	
-	if [ ! -n "$man_log_file_full_path" ] ; then
-		man_log_file_full_path="$log_file_path/$log_file_name"
-	fi
-
-	man_dir=$(echo "$man_dir" | sed 's:/*$::')
 
 	if [ ! -e "$man_dir/$man_filename" ] ; then
 		mkdir -p "$man_dir"
@@ -233,12 +273,7 @@ function install_logrotate (){
 	echo "Generating logrotate file for install...."
 	
 	#Use defined varibles or attempt to use default varibles
-	if [ ! -n "$logrotate_dir" ] ; then
-		logrotate_dir="/etc/logrotate.d"
-	fi
-	if [ ! -n "$logrotate_filename" ] ; then
-		logrotate_filename="clamav-unofficial-sigs"
-	fi	
+
 	if [ ! -n "$logrotate_user" ] ; then
 		logrotate_user="$clam_user";
 	fi
@@ -249,7 +284,6 @@ function install_logrotate (){
 		logrotate_log_file_full_path="$log_file_path/$log_file_name"
 	fi
 
-	logrotate_dir=$(echo "$logrotate_dir" | sed 's:/*$::')
 
 	if [ ! -e "$logrotate_dir/$logrotate_filename" ] ; then
 		mkdir -p "$logrotate_dir"
@@ -305,12 +339,6 @@ function install_cron (){
 	echo "Generating cron file for install...."
 	
 	#Use defined varibles or attempt to use default varibles
-	if [ ! -n "$cron_dir" ] ; then
-		cron_dir="/etc/cron.d"
-	fi
-	if [ ! -n "$cron_filename" ] ; then
-		cron_filename="clamav-unofficial-sigs"
-	fi	
 	if [ ! -n "$cron_minute" ] ; then
 		cron_minute=$[ ( $RANDOM % 59 )  + 1 ];
 	fi
@@ -330,7 +358,7 @@ function install_cron (){
 		cron_script_full_path="$cron_script_dir/$cron_script_name"
 	fi
 
-	cron_dir=$(echo "$cron_dir" | sed 's:/*$::')
+	
 
 	if [ ! -e "$cron_dir/$cron_filename" ] ; then
 		mkdir -p "$cron_dir"
@@ -530,9 +558,8 @@ function make_signature_database_from_ascii_file () {
 
 	- Line numbering will be done automatically by the script.
 	" | command sed 's/^          //g'
-	echo -n "Do you wish to continue? (y/n): "
-	read reply
-	if [ "$reply" = "y" -o "$reply" = "Y" ] ; then
+	echo -n "Do you wish to continue? "
+	if xshok_prompt_confirm ; then
 
 		echo -n "Enter the source file as /path/filename: "
 		read source
@@ -573,9 +600,8 @@ function make_signature_database_from_ascii_file () {
 
 			echo "Clamscan reports database integrity tested good."
 
-			echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases? (y/n): "
-			read reply
-			if [ "$reply" = "y" -o "$reply" = "Y" ] ; then
+			echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases?"
+			if xshok_prompt_confirm ; then
 				if ! cmp -s "$path_file" "$clam_dbs/$db_file" ; then
 					if $rsync_bin -pcqt "$path_file" "$clam_dbs" ; then
 						perms chown -f $clam_user:$clam_group "$clam_dbs/$db_file"
@@ -609,52 +635,55 @@ function make_signature_database_from_ascii_file () {
 function remove_script () {
 	echo ""
 	if [ -n "$pkg_mgr" -a -n "$pkg_rm" ] ; then
-		echo "  This script (clamav-unofficial-sigs) was installed on the system"
-		echo "  via '$pkg_mgr', use '$pkg_rm' to remove the script"
-		echo "  and all of its associated files and databases from the system."
+		echo "This script (clamav-unofficial-sigs) was installed on the system via '$pkg_mgr'"
+		echo "use '$pkg_rm' to remove the script and all of its associated files and databases from the system."
 
 	else
-		echo "  Are you sure you want to remove the clamav-unofficial-sigs script and all of its"
-		echo -n "  associated files, third-party databases, and work directories from the system? (y/n): "
-		read response
-		if [ "$response" = "y" -o "$response" = "Y" ] ; then
-			if [ -r "$work_dir_work_configs/purge.txt" ] ; then
+		cron_file_full_path="$cron_dir/$cron_filename"
+		logrotate_file_full_path="$logrotate_dir/$logrotate_filename"
+		man_file_full_path="$man_dir/$man_filename"
+		
+		echo "This will remove the workdir ($work_dir), logrotate file ($logrotate_file_full_path), cron file ($cron_file_full_path), man file ($man_file_full_path)"
+		echo "Are you sure you want to remove the clamav-unofficial-sigs script and all of its associated files, third-party databases, and work directory from the system?"
+		if xshok_prompt_confirm ; then
+			echo "This can not be undone are you sure ?"
+			if xshok_prompt_confirm ; then
+				if [ -r "$work_dir_work_configs/purge.txt" ] ; then
 
-				for file in `cat $work_dir_work_configs/purge.txt` ; do
-					rm -f -- "$file"
-					echo "     Removed file: $file"
-				done
-				cron_file_full_path="$cron_dir/$cron_filename"
-				if [ -r "$cron_file_full_path" ] ; then
-					rm -f "$cron_file_full_path"
-					echo "     Removed file: $cron_file_full_path"
-				fi
-				logrotate_file_full_path="$logrotate_dir/$logrotate_filename"
-				if [ -r "$logrotate_file_full_path" ] ; then
-					rm -f "$logrotate_file_full_path"
-					echo "     Removed file: $logrotate_file_full_path"
-				fi
-				man_file_full_path="$man_dir/$man_filename"
-				if [ -r "$man_file_full_path" ] ; then
-					rm -f "$man_file_full_path"
-					echo "     Removed file: $man_file_full_path"
-				fi
-				
-				#rather keep the configs
-				#rm -f -- "$default_config" && echo "     Removed file: $default_config"
-				#rm -f -- "$0" && echo "     Removed file: $0"
-				rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
+					for file in `cat $work_dir_work_configs/purge.txt` ; do
+						xshok_is_file "$file" && rm -f -- "$file"
+						echo "     Removed file: $file"
+					done
+					if [ -r "$cron_file_full_path" ] ; then
+						xshok_is_file "$cron_file_full_path" && rm -f "$cron_file_full_path"
+						echo "     Removed file: $cron_file_full_path"
+					fi
+					if [ -r "$logrotate_file_full_path" ] ; then
+						xshok_is_file "$logrotate_file_full_path" && rm -f "$logrotate_file_full_path"
+						echo "     Removed file: $logrotate_file_full_path"
+					fi
+					if [ -r "$man_file_full_path" ] ; then
+						xshok_is_file "$man_file_full_path" && rm -f "$man_file_full_path"
+						echo "     Removed file: $man_file_full_path"
+					fi
+					
+					#rather keep the configs
+					#rm -f -- "$default_config" && echo "     Removed file: $default_config"
+					#rm -f -- "$0" && echo "     Removed file: $0"
+					xshok_is_subdir "$work_dir" && rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
 
-				echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
-				echo "  databases, and work directories have been successfully removed from the system."
+					echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
+					echo "  databases, and work directories have been successfully removed from the system."
 
+				else
+					echo "  Cannot locate 'purge.txt' file in $work_dir_work_configs."
+					echo "  Files and signature database will need to be removed manually."
+				fi
 			else
-				echo "  Cannot locate 'purge.txt' file in $work_dir_work_configs."
-				echo "  Files and signature database will need to be removed manually."
-
+				echo "Aborted"
 			fi
 		else
-			help_and_usage
+			echo "Aborted"
 		fi
 	fi
 }
@@ -933,8 +962,6 @@ $ofs -i, --information $ofe Output system and configuration information for $oft
 $ofb 
 $ofs -m, --make-database $ofe Make a signature database from an ascii file containing $oft data strings, with one data string per line.  Additional $oft information is provided when using this flag
 $ofb 
-$ofs -r, --remove-script $ofe Remove the clamav-unofficial-sigs script and all of $oft its associated files and databases from the system
-$ofb 
 $ofs -t, --test-database $ofe Clamscan integrity test a specific database file $oft eg: '-s filename.ext' (do not include file path)
 $ofb 
 $ofs -o, --output-triggered $ofe If HAM directory scanning is enabled in the script's $oft configuration file, then output names of any third-party $oft signatures that triggered during the HAM directory scan
@@ -943,11 +970,15 @@ $ofs -w, --whitelist $ofe Adds a signature whitelist entry in the newer ClamAV I
 $ofb 
 $ofs --check-clamav $ofe If ClamD status check is enabled and the socket path is correctly $oft specifiedthen test to see if clamd is running or not
 $ofb 
+$ofs --install-all $ofe Install and generate the cron, logroate and man files, autodetects the values $oft based on your config files
+$ofb
 $ofs --install-cron $ofe Install and generate the cron file, autodetects the values $oft based on your config files
 $ofb 
 $ofs --install-logrotate $ofe Install and generate the logrotate file, autodetects the $oft values based on your config files
 $ofb 
 $ofs --install-man $ofe Install and generate the man file, autodetects the $oft values based on your config files
+$ofb 
+$ofs --remove-script $ofe Remove the clamav-unofficial-sigs script and all of $oft its associated files and databases from the system
 $ofb 
 EOF
 	` #this is very important...
@@ -967,8 +998,8 @@ EOF
 ################################################################################
 
 #Script Info
-script_version="5.2.1"
-script_version_date="16 April 2016"
+script_version="5.2.2"
+script_version_date="18 April 2016"
 minimum_required_config_version="62"
 minimum_yara_clamav_version="0.99"
 
@@ -1178,6 +1209,31 @@ else
 	work_dir_gpg=$(echo "$work_dir_gpg" | sed 's:/*$::')
 fi
 
+#	Assign defaults if not defined
+if [ ! -n "$cron_dir" ] ; then
+	cron_dir="/etc/cron.d"
+fi
+cron_dir=$(echo "$cron_dir" | sed 's:/*$::')
+if [ ! -n "$cron_filename" ] ; then
+	cron_filename="clamav-unofficial-sigs"
+fi
+if [ ! -n "$logrotate_dir" ] ; then
+	logrotate_dir="/etc/logrotate.d"
+fi
+logrotate_dir=$(echo "$logrotate_dir" | sed 's:/*$::')
+if [ ! -n "$logrotate_filename" ] ; then
+	logrotate_filename="clamav-unofficial-sigs"
+fi	
+if [ ! -n "$man_dir" ] ; then
+	man_dir="/usr/share/man/man8"
+fi
+man_dir=$(echo "$man_dir" | sed 's:/*$::')
+if [ ! -n "$man_filename" ] ; then
+	man_filename="clamav-unofficial-sigs.8"
+fi	
+if [ ! -n "$man_log_file_full_path" ] ; then
+	man_log_file_full_path="$log_file_path/$log_file_name"
+fi
 
 ### SANITY checks
 #Check default Binaries & Commands are defined
@@ -1229,14 +1285,15 @@ while true; do
 		-g | --gpg-verify ) gpg_verify_specific_sanesecurity_database_file; exit; break ;;
 		-i | --information ) output_system_configuration_information; exit; break ;;
 		-m | --make-database ) make_signature_database_from_ascii_file; exit; break ;;
-		-r | --remove-script ) remove_script; exit; break ;;
 		-t | --test-database ) clamscan_integrity_test_specific_database_file; exit; break ;;
 		-o | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
 		-w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
 		--check-clamav ) check_clamav; exit; break ;;
+		--install-all ) install_cron; install_logrotate; install_man; exit; break ;;
 		--install-cron ) install_cron; exit; break ;;
 		--install-logrotate ) install_logrotate; exit; break ;;
 		--install-man ) install_man; exit; break ;;
+		--remove-script ) remove_script; exit; break ;;
 		* ) break ;;
 	esac
 done
@@ -1431,9 +1488,6 @@ fi
 # so that databases and/or backup files that are no longer being used can be removed.
 current_tmp="$work_dir_work_configs/current-dbs.tmp"
 current_dbs="$work_dir_work_configs/current-dbs.txt"
-previous_dbs="$work_dir_work_configs/previous-dbs.txt"
-sort "$current_dbs" > "$previous_dbs" 2>/dev/null
-rm -f "$current_dbs"
 
 if [ "$sanesecurity_enabled" == "yes" ] ; then
 	# Create the Sanesecurity rsync "include" file (defines which files to download).
@@ -1472,7 +1526,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 		clamav_files
 	fi
 fi
-if [ "$yararulesproject_enabledd" == "yes" ] ; then
+if [ "$yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		for db in $yararulesproject_dbs ; do
 			if echo $db|grep -q "/"; then
@@ -1491,24 +1545,29 @@ if [ "$additional_enabled" == "yes" ] ; then
 		done
 	fi
 fi
-
-# Remove 3rd-party databases and/or backup files that are no longer being used.
 sort "$current_tmp" > "$current_dbs" 2>/dev/null
 rm -f "$current_tmp"
-db_changes="$work_dir_work_configs/db-changes.txt"
-if [ ! -s "$previous_dbs" ] ; then
-	cp -f "$current_dbs" "$previous_dbs" 2>/dev/null
-fi
-diff "$current_dbs" "$previous_dbs" 2>/dev/null | grep '>' | awk '{print $2}' > "$db_changes"
-if [ -r "$db_changes" ] ; then
-	if grep -vq "bak" $db_changes 2>/dev/null ; then
-		do_clamd_reload=2
-	fi
 
-	for file in `cat $db_changes` ; do
-		rm -f -- "$file"
-		xshok_pretty_echo_and_log "File removed: $file"
-	done
+# Remove 3rd-party databases and/or backup files that are no longer being used.
+if [ "$remove_disabled_databases" == "yes" ] ; then
+	previous_dbs="$work_dir_work_configs/previous-dbs.txt"
+	sort "$current_dbs" > "$previous_dbs" 2>/dev/null
+	rm -f "$current_dbs"
+
+	db_changes="$work_dir_work_configs/db-changes.txt"
+	if [ ! -s "$previous_dbs" ] ; then
+		cp -f "$current_dbs" "$previous_dbs" 2>/dev/null
+	fi
+	diff "$current_dbs" "$previous_dbs" 2>/dev/null | grep '>' | awk '{print $2}' > "$db_changes"
+	if [ -r "$db_changes" ] ; then
+		if grep -vq "bak" $db_changes 2>/dev/null ; then
+			do_clamd_reload=2
+		fi
+		for file in `cat $db_changes` ; do
+			rm -f -- "$file"
+			xshok_pretty_echo_and_log "Unused/Disabled file removed: $file"
+		done
+	fi
 fi
 
 # Create "purge.txt" file for package maintainers to support package uninstall.
@@ -1563,17 +1622,15 @@ fi
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
 if [ -n "$securiteinfo_dbs" -o -n "malwarepatrol_db" ] ; then
-	if [ `date +%s` -gt 0 2>/dev/null ] ; then
-		current_time=`date +%s`
-	else
-		if [ `perl -le print+time 2>/dev/null` ] ; then
-			current_time=`perl -le print+time`
-		fi
+	current_time=$(date +%s 2>/dev/null)
+	if [ $current_time -le 0 ] ; then
+		current_time=$(perl -le print+time 2>/dev/null)
 	fi
-else
-	xshok_pretty_echo_and_log "WARNING: No support for 'date +%s' or 'perl' was not found , SecuriteInfo and MalwarePatrol updates bypassed" "="
-	securiteinfo_dbs=""
-	malwarepatrol_db=""
+	if [ $current_time -le 0 ] ; then
+		xshok_pretty_echo_and_log "WARNING: No support for 'date +%s' or 'perl' was not found , SecuriteInfo and MalwarePatrol updates bypassed" "="
+		securiteinfo_dbs=""
+		malwarepatrol_db=""
+	fi
 fi
 
 ################################################################
@@ -2171,7 +2228,7 @@ fi
 ##############################################################################################################################################
 # Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
 ##############################################################################################################################################
-if [ "$yararulesproject_enabledd" == "yes" ] ; then
+if [ "$yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		if [ `xshok_array_count "$yararulesproject_dbs"` -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
