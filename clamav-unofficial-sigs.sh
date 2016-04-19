@@ -2449,8 +2449,8 @@ if [ -n "$additional_dbs" ] ; then
 		fi
 	done
 	db_file=""
-	#refactor ls iteration
-	for db_file in $(ls "$work_dir_add"); do
+	for db_file in "$work_dir_add/*" ; do
+		[[ -e $db_file ]] || break  # handle the case of no files
 		if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
 
 			xshok_pretty_echo_and_log "Testing updated database file: $db_file"
