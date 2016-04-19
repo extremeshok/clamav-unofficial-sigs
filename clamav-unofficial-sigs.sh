@@ -393,7 +393,7 @@ function install_cron (){
 	
 	#Use defined varibles or attempt to use default varibles
 	if [ ! -n "$cron_minute" ] ; then
-		cron_minute=$(( ( $RANDOM % 59 )  + 1 ));
+		cron_minute=$(( ( RANDOM % 59 )  + 1 ));
 	fi
 	if [ ! -n "$cron_user" ] ; then
 		cron_user="$clam_user";
@@ -467,11 +467,11 @@ function decode_third_party_signature_by_signature_name (){
 	echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
 	echo "a hexadecimal encoded data string and press enter (do not include '.UNOFFICIAL'"
 	echo "in the signature name nor add quote marks to any input string):"
-	read input
+	read -r input
 	input=$(echo "$input" | tr -d "'" | tr -d '"')
-	if $(echo "$input" | grep "\." > /dev/null) ; then
+	if echo "$input" | grep "\." > /dev/null ; then
 		cd "$clam_dbs" || exit
-		sig=$(grep "$input:" *.ndb)
+		sig=$(grep "$input:" ./*.ndb)
 		if [ -n "$sig" ] ; then
 			db_file=$(echo "$sig" | cut -d ':' -f1)
 			echo "$input found in: $db_file"
@@ -493,7 +493,7 @@ function hexadecimal_encode_entire_input_string (){
 	echo ""
 	echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
 	echo "any quotes around the string unless you want them included in the hexadecimal encoded output:"
-	read input
+	read -r input
 	echo "Here is the hexadecimal encoded input string:"
 	echo "$input" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg'
 }
@@ -504,7 +504,7 @@ function hexadecimal_encode_formatted_input_string (){
 	echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
 	echo "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
 	echo "around the string unless you want them included in the hexadecimal encoded output:"
-	read input
+	read -r input
 	echo "Here is the hexadecimal encoded input string:"
 	echo "$input" | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg'
 }
@@ -547,14 +547,14 @@ function output_system_configuration_information () {
 	$gpg_bin --version | head -1
 
 	echo "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
-	ls -ld $work_dir
+	ls -ld "$work_dir"
 
-	ls -lR $work_dir | grep -v total
+	ls -lR "$work_dir" | grep -v total
 
 	echo "*** CLAMAV DIRECTORY INFORMATION ***"
-	ls -ld $clam_dbs
+	ls -ld "$clam_dbs"
 	echo "---"
-	ls -l $clam_dbs | grep -v total
+	ls -l "$clam_dbs" | grep -v total
 
 	echo "*** SCRIPT CONFIGURATION SETTINGS ***"
 	if [ "$custom_config" != "no" ] ; then
@@ -625,12 +625,12 @@ function make_signature_database_from_ascii_file () {
 			echo -n "Enter signature prefix: "
 			read prefix
 			path_file=$(echo "$source" | cut -d "." -f-1 | command sed 's/$/.ndb/')
-			db_file=$(basename $path_file)
+			db_file=$(basename "$path_file")
 			rm -f "$path_file"
 			total=$(wc -l "$source" | cut -d " " -f1)
 			line_num=1
 
-			cat "$source" | while read line ; do
+			while read -r line ; do
 				line_prefix=$(echo "$line" | awk -F ':' '{print $1}')
 				if [ "$line_prefix" = "-" ] ; then
 					echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
@@ -640,8 +640,8 @@ function make_signature_database_from_ascii_file () {
 					echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
 				fi
 				echo "Hexadecimal encoding $source_file line: $line_num of $total"
-				line_num=$(($line_num + 1))
-			done
+				line_num=$((line_num + 1))
+			done < "$source"
 		else
 			echo "Source file not found, exiting..."
 			exit
@@ -657,8 +657,8 @@ function make_signature_database_from_ascii_file () {
 			if xshok_prompt_confirm ; then
 				if ! cmp -s "$path_file" "$clam_dbs/$db_file" ; then
 					if $rsync_bin -pcqt "$path_file" "$clam_dbs" ; then
-						perms chown -f $clam_user:$clam_group "$clam_dbs/$db_file"
-						perms chmod -f 0644 "$clam_dbs/$db_file"
+						perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
+						perms chmod -f 0644 "$clam_dbs"/"$db_file"
 						if [ "$selinux_fixes" == "yes" ] ; then
 							restorecon "$clam_dbs/$db_file"
 						fi
@@ -703,10 +703,10 @@ function remove_script () {
 			if xshok_prompt_confirm ; then
 				if [ -r "$work_dir_work_configs/purge.txt" ] ; then
 
-					for file in $(cat $work_dir_work_configs/purge.txt) ; do
+					while read file ; do
 						xshok_is_file "$file" && rm -f -- "$file"
 						echo "     Removed file: $file"
-					done
+					done < "$work_dir_work_configs"/purge.txt
 					if [ -r "$cron_file_full_path" ] ; then
 						xshok_is_file "$cron_file_full_path" && rm -f "$cron_file_full_path"
 						echo "     Removed file: $cron_file_full_path"
@@ -784,7 +784,7 @@ function add_signature_whitelist_entry () {
 	echo "and press enter (do not include '.UNOFFICIAL' in the signature name nor add quote"
 	echo "marks to the input string):"
 
-	read input
+	read -r input
 	if [ -n "$input" ] ; then
 		cd "$clam_dbs"
 		input=$(echo "$input" | tr -d "'" | tr -d '"')
@@ -1617,10 +1617,10 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
 		if grep -vq "bak" $db_changes 2>/dev/null ; then
 			do_clamd_reload=2
 		fi
-		for file in $(cat $db_changes) ; do
+		while read file ; do
 			rm -f -- "$file"
 			xshok_pretty_echo_and_log "Unused/Disabled file removed: $file"
-		done
+		done < "$db_changes"
 	fi
 fi
 
@@ -2503,7 +2503,7 @@ if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt"
 	cp -f "$work_dir_work_configs/monitor-ign.txt" "$work_dir_work_configs/monitor-ign-old.txt"
 
 	xshok_pretty_echo_and_log "" "=" "80"
-	for entry in $(cat "$work_dir_work_configs/monitor-ign-old.txt" 2>/dev/null) ; do
+	while read entry ; do
 		sig_file=$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $1}')
 		sig_hex=$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $NF}')
 		sig_name_old=$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $3}')
@@ -2528,13 +2528,13 @@ if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt"
 			xshok_pretty_echo_and_log "$sig_name_old signature has been removed from $sig_file, entry removed from local.ign."
 			ign_updated=1
 		fi
-	done
+	done < "$work_dir_work_configs"/monitor-ign-old.txt
 	if [ "$ign_updated" = "1" ] ; then
 		if $clamscan_bin --quiet -d "$work_dir_work_configs/local.ign" "$work_dir_work_configs/scan-test.txt"
 			then
 			if $rsync_bin -pcqt $work_dir_work_configs/local.ign $clam_dbs
 				then
-				perms chown -f $clam_user:$clam_group "$clam_dbs/local.ign"
+				perms chown -f "$clam_user":"$clam_group" "$clam_dbs/local.ign"
 				perms chmod -f 0644 "$clam_dbs/local.ign" "$work_dir_work_configs/monitor-ign.txt"
 				if [ "$selinux_fixes" == "yes" ] ; then
 					restorecon "$clam_dbs/local.ign"
@@ -2559,7 +2559,7 @@ if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.
 	cp -f my-whitelist.ign2 "$work_dir_work_configs/my-whitelist.ign2"
 
 	xshok_pretty_echo_and_log "" "=" "80"
-	for entry in $(cat "$work_dir_work_configs/tracker.txt" 2>/dev/null) ; do
+	while read entry ; do
 		sig_file=$(echo "$entry" | cut -d ":" -f1)
 		sig_full=$(echo "$entry" | cut -d ":" -f2-)
 		sig_name=$(echo "$entry" | cut -d ":" -f2)
@@ -2570,16 +2570,16 @@ if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.
 			xshok_pretty_echo_and_log "$sig_name signature no longer exists in $sig_file, whitelist entry removed from my-whitelist.ign2"
 			ign2_updated=1
 		fi
-	done
+	done < "$work_dir_work_configs"/tracker.txt
 
 	xshok_pretty_echo_and_log "" "=" "80"
 	if [ "$ign2_updated" = "1" ]
 		then
 		if $clamscan_bin --quiet -d "$work_dir_work_configs/my-whitelist.ign2" "$work_dir_work_configs/scan-test.txt"
 			then
-			if $rsync_bin -pcqt $work_dir_work_configs/my-whitelist.ign2 $clam_dbs
+			if $rsync_bin -pcqt "$work_dir_work_configs"/my-whitelist.ign2 "$clam_dbs"
 				then
-				perms chown -f $clam_user:$clam_group "$clam_dbs/my-whitelist.ign2"
+				perms chown -f "$clam_user":"$clam_group" "$clam_dbs/my-whitelist.ign2"
 				perms chmod -f 0644 "$clam_dbs/my-whitelist.ign2" "$work_dir_work_configs/tracker.txt"
 				if [ "$selinux_fixes" == "yes" ] ; then
 					restorecon "$clam_dbs/my-whitelist.ign2"
@@ -2612,7 +2612,7 @@ fi
 
 # Set appropriate directory and file permissions to all production signature files
 # and set file access mode to 0644 on all working directory files.
-perms chown -f -R $clam_user:$clam_group "$work_dir"
+perms chown -f -R "$clam_user":"$clam_group" "$work_dir"
 if ! find "$work_dir" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
 	if ! find "$work_dir" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
 		if ! find "$work_dir" -type f | xargs chmod -f 0644 2>/dev/null ; then
@@ -2624,7 +2624,7 @@ fi
 
 # If enabled, set file access mode for all production signature database files to 0644.
 if [ "$setmode" = "yes" ] ; then
-	perms chown -f -R $clam_user:$clam_group "$clam_dbs"
+	perms chown -f -R "$clam_user":"$clam_group" "$clam_dbs"
 	if ! find "$clam_dbs" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
 		if ! find "$clam_dbs" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
 			if ! find "$clam_dbs" -type f | xargs chmod -f 0644 2>/dev/null ; then
