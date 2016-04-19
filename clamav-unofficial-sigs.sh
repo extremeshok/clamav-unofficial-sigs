@@ -630,7 +630,7 @@ function make_signature_database_from_ascii_file () {
 			total=$(wc -l "$source" | cut -d " " -f1)
 			line_num=1
 
-			while read line ; do
+			while read -r line ; do
 				line_prefix=$(echo "$line" | awk -F ':' '{print $1}')
 				if [ "$line_prefix" = "-" ] ; then
 					echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
@@ -745,7 +745,7 @@ function remove_script () {
 function clamscan_integrity_test_specific_database_file (){
 	echo ""
 	input=$(echo "$OPTARG" | awk -F '/' '{print $NF}')
-	db_file=$(find $work_dir -name $input)
+	db_file=$(find "$work_dir" -name "$input")
 	if [ -r "$db_file" ] ; then
 		echo "Clamscan integrity testing: $db_file"
 
@@ -786,9 +786,9 @@ function add_signature_whitelist_entry () {
 
 	read -r input
 	if [ -n "$input" ] ; then
-		cd "$clam_dbs"
+		cd "$clam_dbs" || exit
 		input=$(echo "$input" | tr -d "'" | tr -d '"')
-		sig_full=$(grep -H "$input" *.*db)
+		sig_full=$(grep -H "$input" ./*.*db)
 		sig_name=$(echo "$sig_full" | cut -d ":" -f2)
 		if [ -n "$sig_name" ] ; then
 			if ! grep "$sig_name" my-whitelist.ign2 > /dev/null 2>&1 ; then
@@ -796,8 +796,8 @@ function add_signature_whitelist_entry () {
 				echo "$sig_name" >> "$work_dir_work_configs/my-whitelist.ign2"
 				echo "$sig_full" >> "$work_dir_work_configs/tracker.txt"
 				if $clamscan_bin --quiet -d "$work_dir_work_configs/my-whitelist.ign2" "$work_dir_work_configs/scan-test.txt" ; then
-					if $rsync_bin -pcqt $work_dir_work_configs/my-whitelist.ign2 $clam_dbs ; then
-						perms chown -f $clam_user:$clam_group my-whitelist.ign2
+					if $rsync_bin -pcqt "$work_dir_work_configs/my-whitelist.ign2" "$clam_dbs" ; then
+						perms chown -f "$clam_user":"$clam_group" my-whitelist.ign2
 
 						if [ ! -s "$work_dir_work_configs/monitor-ign.txt" ] ; then 
 							# Create "monitor-ign.txt" file for clamscan database integrity testing.
@@ -858,8 +858,8 @@ function clamscan_reload_dbs (){
 			if [[ $($clamd_reload_opt 2>&1) =~ "ERROR" ]] ; then
 				xshok_pretty_echo_and_log "ERROR: Failed to reload, trying again" "-"
 				if [ -r "$clamd_pid" ] ; then
-					mypid=$(cat $clamd_pid)
-					kill -USR2 $mypid
+					mypid=$(cat "$clamd_pid")
+					kill -USR2 "$mypid"
 					if [ $? -eq  0 ] ; then
 						xshok_pretty_echo_and_log "ClamAV databases Reloaded" "="
 					else
@@ -989,7 +989,7 @@ function help_and_usage () {
 	fi
 
 helpcontents=$(cat << EOF
-$ofs Usage: $(basename $0) $ofe [OPTION] [PATH|FILE]
+$ofs Usage: $(basename "$0") $ofe [OPTION] [PATH|FILE]
 $ofb
 $ofs -c, --config $ofe Use a specific configuration file or directory $oft eg: '-c /your/dir' or ' -c /your/file.name'  $oft Note: If a directory is specified the directory must contain atleast:  $oft master.conf, os.conf or user.conf $oft Default Directory: $config_dir
 $ofb 
@@ -1100,7 +1100,7 @@ fi
 # Generic command line options
 while true ; do
 	case "$1" in
-		-c | --config ) xshok_check_s2 $2; custom_config="$2"; shift 2; break ;;
+		-c | --config ) xshok_check_s2 "$2"; custom_config="$2"; shift 2; break ;;
 		-F | --force ) force_updates="yes"; shift 1; break ;;
 		-v | --verbose ) force_verbose="yes"; shift 1; break ;;
 		-s | --silence ) force_verbose="no"; shift 1; break ;;
@@ -1172,7 +1172,7 @@ for config_file in "${config_files[@]}" ; do
 		fi
 
 		# check there is an = for every set of "" #optional whitespace \s* between = and "
-		config_check_vars=$(echo "$clean_config" | grep -o '=\s*\"' | wc -l)
+		config_check_vars=$(echo "$clean_config" | grep -o '=\s*\"' -c )
 		if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ] ; then 
 			xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\"" "="    
 			exit 1
@@ -1361,7 +1361,7 @@ if [ "$enable_yararules" == "yes" ] ; then
 	current_clamav_version=$($clamscan_bin -V | cut -d " " -f2 | cut -d "/" -f1 | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')
 	minimum_yara_clamav_version=$(echo "$minimum_yara_clamav_version" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')
 	#Check current clamav version against the minimum required version for yara support
-	if [ $current_clamav_version -lt $minimum_yara_clamav_version ]; then #older
+	if [ "$current_clamav_version" -lt "$minimum_yara_clamav_version" ]; then #older
 		yararulesproject_enabled="no"
 		enable_yararules="no"
 		xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
@@ -1438,13 +1438,14 @@ if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
 		cp -f "$work_dir"/*/*.ndb "$test_dir"
 		$clamscan_bin --infected --no-summary -d "$test_dir" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "$work_dir_work_configs/whitelist.txt"
 		grep -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir"/* | cut -d "*" -f2 | sort | uniq > "$work_dir_work_configs/whitelist.hex"
-		cd "$test_dir"
+		cd "$test_dir" || exit
+		#refactor ls iteration
 		for db_file in $(ls); do
 			grep -h -v -f "$work_dir_work_configs/whitelist.hex" "$db_file" > "$db_file-tmp"
 			mv -f "$db_file-tmp" "$db_file"
 			if $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-				if $rsync_bin -pcqt $db_file $clam_dbs ; then
-					perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+				if $rsync_bin -pcqt "$db_file" "$clam_dbs" ; then
+					perms chown -f "$clam_user":"$clam_group" $clam_dbs/$db_file
 					if [ "$selinux_fixes" == "yes" ] ; then
 						restorecon "$clam_dbs/$db_file"
 					fi
@@ -1463,8 +1464,7 @@ if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
 	fi
 fi
 
-# Check to see if the working directories have been created.
-# If not, create them.  Otherwise, ignore and proceed with script.
+# Check to see if the working directories have been created. If not, create them.  Otherwise, ignore and proceed with script.
 xshok_mkdir_ownership "$work_dir"
 xshok_mkdir_ownership "$work_dir_securiteinfo"
 xshok_mkdir_ownership "$work_dir_malwarepatrol"
@@ -1480,14 +1480,14 @@ perms chmod -f 0700 "$work_dir_gpg"
 
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
-	if ! $curl_bin -s -S $curl_proxy $curl_insecure --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o $work_dir_gpg/publickey.gpg 2>/dev/null ; then
+	if ! $curl_bin -s -S $curl_proxy $curl_insecure --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o "$work_dir_gpg/publickey.gpg" 2>/dev/null ; then
 		xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
 		exit 1
 	else
 
 		xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully downloaded"
 		rm -f -- "$work_dir_gpg/ss-keyring.gp*"
-		if ! $gpg_bin -q --no-options --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --import $work_dir_gpg/publickey.gpg 2>/dev/null ; then
+		if ! $gpg_bin -q --no-options --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --import "$work_dir_gpg/publickey.gpg" 2>/dev/null ; then
 			xshok_pretty_echo_and_log "ALERT: could not import Sanesecurity public GPG key to custom keyring" "*"
 			exit 1
 		else
@@ -1500,11 +1500,11 @@ fi
 # If custom keyring is missing, try to re-import Sanesecurity public GPG key.
 if [ ! -s "$work_dir_gpg/ss-keyring.gpg" ] ; then
 	rm -f -- "$work_dir_gpg/ss-keyring.gp*"
-	if ! $gpg_bin -q --no-options --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --import $work_dir_gpg/publickey.gpg 2>/dev/null ; then
+	if ! $gpg_bin -q --no-options --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --import "$work_dir_gpg/publickey.gpg" 2>/dev/null ; then
 		xshok_pretty_echo_and_log "ALERT: Custom keyring MISSING or CORRUPT!  Could not import Sanesecurity public GPG key to custom keyring" "*"
 		exit 1
 	else
-		chmod -f 0644 $work_dir_gpg/*.*
+		chmod -f 0644 "$work_dir_gpg/*.*"
 		xshok_pretty_echo_and_log "Sanesecurity custom keyring MISSING!  GPG key successfully re-imported to custom keyring"
 	fi
 fi
@@ -1513,7 +1513,7 @@ fi
 # provides support for both bash and non-bash enabled system shells.
 if [ "$enable_random" = "yes" ] ; then
 	if [ -n "$RANDOM" ] ; then
-		sleep_time=$(($RANDOM * $(($max_sleep_time - $min_sleep_time)) / 32767 + $min_sleep_time))
+		sleep_time=$((RANDOM * $((max_sleep_time - min_sleep_time)) / 32767 + $min_sleep_time))
 	else
 		sleep_time=0
 		while [ "$sleep_time" -lt "$min_sleep_time" ] || [ "$sleep_time" -gt "$max_sleep_time" ] ; do
@@ -1522,7 +1522,7 @@ if [ "$enable_random" = "yes" ] ; then
 	fi
 	if [ ! -t 0 ] ; then
 		xshok_pretty_echo_and_log "$(date) - Pausing database file updates for $sleep_time seconds..."
-		sleep $sleep_time
+		sleep "$sleep_time"
 		xshok_pretty_echo_and_log "$(date) - Pause complete, checking for new database files..."
 	fi
 fi
@@ -1583,8 +1583,8 @@ fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		for db in $yararulesproject_dbs ; do
-			if echo $db|grep -q "/"; then
-				db=$(echo $db | cut -d"/" -f2)
+			if echo "$db"|grep -q "/"; then
+				db=$(echo "$db" | cut -d"/" -f2)
 			fi
 			echo "$work_dir_yararulesproject/$db" >> "$current_tmp"
 			clamav_files
@@ -1614,10 +1614,10 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
 	fi
 	diff "$current_dbs" "$previous_dbs" 2>/dev/null | grep '>' | awk '{print $2}' > "$db_changes"
 	if [ -r "$db_changes" ] ; then
-		if grep -vq "bak" $db_changes 2>/dev/null ; then
+		if grep -vq "bak" "$db_changes" 2>/dev/null ; then
 			do_clamd_reload=2
 		fi
-		while read file ; do
+		while read -r file ; do
 			rm -f -- "$file"
 			xshok_pretty_echo_and_log "Unused/Disabled file removed: $file"
 		done < "$db_changes"
@@ -1675,12 +1675,12 @@ fi
 
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
-if [ -n "$securiteinfo_dbs" ] || [ -n "malwarepatrol_db" ] ; then
+if [ -n "$securiteinfo_dbs" ] || [ -n "$malwarepatrol_db" ] ; then
 	current_time=$(date +%s 2>/dev/null)
 	if [ $current_time -le 0 ] ; then
 		current_time=$(perl -le print+time 2>/dev/null)
 	fi
-	if [ $current_time -le 0 ] ; then
+	if [ "$current_time" -le 0 ] ; then
 		xshok_pretty_echo_and_log "WARNING: No support for 'date +%s' or 'perl' was not found , SecuriteInfo and MalwarePatrol updates bypassed" "="
 		securiteinfo_dbs=""
 		malwarepatrol_db=""
@@ -1703,31 +1703,31 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 
 		sanesecurity_mirror_ips=$(dig +ignore +short $sanesecurity_url)
 		#add fallback to host if dig returns no records
-		if [ $(xshok_array_count  "$sanesecurity_mirror_ips") -lt 1 ] ; then
+		if [ "$(xshok_array_count  "$sanesecurity_mirror_ips")" -lt 1 ] ; then
 			sanesecurity_mirror_ips=$(host -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')
 		fi
 
-		if [ $(xshok_array_count  "$sanesecurity_mirror_ips") -ge "1" ] ; then
+		if [ "$(xshok_array_count  "$sanesecurity_mirror_ips")" -ge "1" ] ; then
 
 
-		for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
+		for sanesecurity_mirror_ip in "$sanesecurity_mirror_ips" ; do
 			sanesecurity_mirror_name=""
-			sanesecurity_mirror_name=$(dig +short -x $sanesecurity_mirror_ip | command sed 's/\.$//')
+			sanesecurity_mirror_name=$(dig +short -x "$sanesecurity_mirror_ip" | command sed 's/\.$//')
 			#add fallback to host if dig returns no records
 			if [ "$sanesecurity_mirror_name" == "" ] ; then
 				sanesecurity_mirror_name=$(host "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')
 			fi
 			sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
 			xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
-			$rsync_bin $rsync_output_level $no_motd --files-from=$sanesecurity_include_dbs -ctuz $connect_timeout --timeout="$rsync_max_time" --stats rsync://$sanesecurity_mirror_ip/sanesecurity $work_dir_sanesecurity 2>/dev/null
+			$rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" --stats "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
 			if [ "$?" -eq "0" ] ; then #the correct way
 				sanesecurity_rsync_success="1"
-				for db_file in $sanesecurity_dbs ; do
-					if ! cmp -s $work_dir_sanesecurity/$db_file $clam_dbs/$db_file ; then
+				for db_file in "$sanesecurity_dbs" ; do
+					if ! cmp -s "$work_dir_sanesecurity/$db_file" "$clam_dbs/$db_file" ; then
 
 						xshok_pretty_echo_and_log "Testing updated Sanesecurity database file: $db_file"
-						if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $work_dir_sanesecurity/$db_file.sig $work_dir_sanesecurity/$db_file 2>/dev/null ; then
-							$gpg_bin --always-trust -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $work_dir_sanesecurity/$db_file.sig $work_dir_sanesecurity/$db_file 2>/dev/null
+						if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null ; then
+							$gpg_bin --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null
 						fi
 						if [ "$?" = "0" ] ; then
 							test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
@@ -1750,8 +1750,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $work_dir_sanesecurity/$db_file $clam_dbs 2>/dev/null ; then
-								perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+								fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_sanesecurity/$db_file" "$clam_dbs" 2>/dev/null ; then
+								perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/$db_file"
 								fi
@@ -1776,7 +1776,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 								##DO NOT KILL THIS DB
 								false
 							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
-							perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+							perms chown -f "$clam_user":"$clam_group" $clam_dbs/$db_file
 							if [ "$selinux_fixes" == "yes" ] ; then
 								restorecon "$clam_dbs/$db_file"
 							fi
@@ -1838,16 +1838,16 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 			else
 			rm -f "$work_dir_securiteinfo/*.gz"
 			if [ -r "$work_dir_work_configs/last-si-update.txt" ] ; then
-				last_securiteinfo_update=$(cat $work_dir_work_configs/last-si-update.txt)
+				last_securiteinfo_update=$(cat "$work_dir_work_configs/last-si-update.txt")
 			else
 				last_securiteinfo_update="0"
 			fi
 			db_file=""
 			loop=""
-			update_interval=$(($securiteinfo_update_hours * 3600))
-			time_interval=$(($current_time - $last_securiteinfo_update))
-			if [ "$time_interval" -ge $(($update_interval - 600)) ] ; then
-				echo "$current_time" > "$work_dir_work_configs"/last-si-update.txt
+			update_interval=$((securiteinfo_update_hours * 3600))
+			time_interval=$((current_time - last_securiteinfo_update))
+			if [ "$time_interval" -ge $((update_interval - 600)) ] ; then
+				echo "$current_time" > "$work_dir_work_configs/last-si-update.txt"
 
 				xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
 				xshok_pretty_echo_and_log "Checking for SecuriteInfo updates..."
@@ -1864,11 +1864,11 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 					else
 						z_opt=""
 					fi
-					if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o "$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file" 2>/dev/null ;	then
+					if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$z_opt" -o "$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file" 2>/dev/null ;	then
 						loop="1"
-						if ! cmp -s $work_dir_securiteinfo/$db_file $clam_dbs/$db_file ; then
+						if ! cmp -s "$work_dir_securiteinfo/$db_file" "$clam_dbs/$db_file" ; then
 							if [ "$?" = "0" ] ; then
-								db_ext=$(echo $db_file | cut -d "." -f2)
+								db_ext=$(echo "$db_file" | cut -d "." -f2)
 
 								xshok_pretty_echo_and_log "Testing updated SecuriteInfo database file: $db_file"
 								if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ]
@@ -1885,8 +1885,8 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 											fi
 										fi
 										false
-									fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $work_dir_securiteinfo/$db_file $clam_dbs 2>/dev/null ; then
-									perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+									fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_securiteinfo/$db_file" "$clam_dbs" 2>/dev/null ; then
+									perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 									if [ "$selinux_fixes" == "yes" ] ; then
 										restorecon "$clam_dbs/$db_file"
 									fi
@@ -1917,7 +1917,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 									fi
 									false
 								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
-								perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+								perms chown -f "$clam_user":"$clam_group" $clam_dbs/$db_file
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/$db_file"
 								fi
@@ -1944,9 +1944,9 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 	else
 		xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
 
-		time_remaining=$(($update_interval - $time_interval))
-		hours_left=$(($time_remaining / 3600))
-		minutes_left=$(($time_remaining % 3600 / 60))
+		time_remaining=$((update_interval - time_interval))
+		hours_left=$((time_remaining / 3600))
+		minutes_left=$((time_remaining % 3600 / 60))
 		xshok_pretty_echo_and_log "$securiteinfo_update_hours hours have not yet elapsed since the last SecuriteInfo update check"
 		xshok_pretty_echo_and_log "No update check was performed at this time" "-"
 		xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
@@ -2009,11 +2009,11 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 				else
 					z_opt=""
 				fi
-				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $work_dir_linuxmalwaredetect/$db_file "$linuxmalwaredetect_url/$db_file" 2>/dev/null ; then
+				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file" 2>/dev/null ; then
 					loop="1"
-					if ! cmp -s $work_dir_linuxmalwaredetect/$db_file $clam_dbs/$db_file ; then
+					if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
 						if [ "$?" = "0" ] ; then
-							db_ext=$(echo $db_file | cut -d "." -f2)
+							db_ext=$(echo "$db_file" | cut -d "." -f2)
 
 							xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
 							if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
@@ -2029,8 +2029,8 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $work_dir_linuxmalwaredetect/$db_file $clam_dbs 2>/dev/null ; then
-								perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+								fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs" 2>/dev/null ; then
+								perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/local.ign"
 								fi
@@ -2058,8 +2058,8 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 									fi
 								fi
 								false
-							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ;	then
-							perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+							fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ;	then
+							perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 							if [ "$selinux_fixes" == "yes" ] ; then
 								restorecon "$clam_dbs/$db_file"
 							fi
@@ -2088,9 +2088,9 @@ else
 
 	xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
 
-	time_remaining=$(($update_interval - $time_interval))
-	hours_left=$(($time_remaining / 3600))
-	minutes_left=$(($time_remaining % 3600 / 60))
+	time_remaining=$((update_interval - time_interval))
+	hours_left=$((time_remaining / 3600))
+	minutes_left=$((time_remaining % 3600 / 60))
 	xshok_pretty_echo_and_log "$linuxmalwaredetect_update_hours hours have not yet elapsed since the last linux malware detect update check"
 	xshok_pretty_echo_and_log "No update check was performed at this time" "-"
 	xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
@@ -2151,8 +2151,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
 				malwarepatrol_reloaded=0
 				if [ "$malwarepatrol_free" == "yes" ] ; then
-					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $work_dir_malwarepatrol/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
-						if ! cmp -s $work_dir_malwarepatrol/$malwarepatrol_db $clam_dbs/$malwarepatrol_db ; then
+					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
+						if ! cmp -s "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db" ; then
 							if [ "$?" = "0" ] ; then
 								malwarepatrol_reloaded=1
 							else
@@ -2164,17 +2164,17 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 					fi # if culr
 
 				else # The not free branch
-					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $work_dir_malwarepatrol/$malwarepatrol_db.md5 "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1" 2>/dev/null ;	then
+					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o "$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1" 2>/dev/null ;	then
 						if [ -f $clam_dbs/$malwarepatrol_db ] ; then
-							malwarepatrol_md5=$(openssl md5 -r $clam_dbs/$malwarepatrol_db 2>/dev/null | cut -d" " -f1)
+							malwarepatrol_md5=$(openssl md5 -r "$clam_dbs/$malwarepatrol_db" 2>/dev/null | cut -d" " -f1)
 							if [ ! "$malwarepatrol_md5" ] ; then
 								#fallback for missing -r option
-								malwarepatrol_md5=$(openssl md5 $clam_dbs/$malwarepatrol_db 2>/dev/null | cut -d" " -f2)
+								malwarepatrol_md5=$(openssl md5 "$clam_dbs/$malwarepatrol_db" 2>/dev/null | cut -d" " -f2)
 							fi
 						fi
-						malwarepatrol_md5_new=$(cat $work_dir_malwarepatrol/$malwarepatrol_db.md5)
+						malwarepatrol_md5_new=$(cat "$work_dir_malwarepatrol/$malwarepatrol_db.md5")
 						if [ -n "$malwarepatrol_md5_new" ] && [ "$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ; then
-							if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $work_dir_malwarepatrol/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
+							if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
 								malwarepatrol_reloaded=1
 							else # curl DB fail
 								malwarepatrol_reloaded=-1
@@ -2199,8 +2199,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							fi
 						fi
 						false
-					fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $work_dir_malwarepatrol/$malwarepatrol_db $clam_dbs 2>/dev/null ;	then
-					perms chown -f $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
+					fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ;	then
+					perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$malwarepatrol_db"
 					if [ "$selinux_fixes" == "yes" ] ; then
 						restorecon "$clam_dbs/$malwarepatrol_db"
 					fi
@@ -2228,8 +2228,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 						fi
 					fi
 					false
-				fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$malwarepatrol_db $clam_dbs/$malwarepatrol_db-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$malwarepatrol_db $clam_dbs 2>/dev/null ; then
-				perms chown -f $clam_user:$clam_group $clam_dbs/$malwarepatrol_db
+				fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ; then
+				perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$malwarepatrol_db"
 				if [ "$selinux_fixes" == "yes" ] ; then
 					restorecon "$clam_dbs/$malwarepatrol_db"
 				fi
@@ -2252,9 +2252,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
 		xshok_pretty_echo_and_log "MalwarePatrol Database File Update" "="
 
-		time_remaining=$(($update_interval - $time_interval))
-		hours_left=$(($time_remaining / 3600))
-		minutes_left=$(($time_remaining % 3600 / 60))
+		time_remaining=$((update_interval - $time_interval))
+		hours_left=$((time_remaining / 3600))
+		minutes_left=$((time_remaining % 3600 / 60))
 		xshok_pretty_echo_and_log "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
 		xshok_pretty_echo_and_log "No database download was performed at this time" "-"
 		xshok_pretty_echo_and_log "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
@@ -2289,24 +2289,24 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 		else
 		rm -f "$work_dir_yararulesproject/*.gz"
 		if [ -r "$work_dir_work_configs/last-yararulesproject-update.txt" ] ; then
-			last_yararulesproject_update=$(cat $work_dir_work_configs/last-yararulesproject-update.txt)
+			last_yararulesproject_update=$(cat "$work_dir_work_configs/last-yararulesproject-update.txt")
 		else
 			last_yararulesproject_update="0"
 		fi
 		db_file=""
 		loop=""
-		update_interval=$(($yararulesproject_update_hours * 3600))
-		time_interval=$(($current_time - $last_yararulesproject_update))
-		if [ "$time_interval" -ge $(($update_interval - 600)) ] ; then
-			echo "$current_time" > "$work_dir_work_configs"/last-yararulesproject-update.txt
+		update_interval=$((yararulesproject_update_hours * 3600))
+		time_interval=$((current_time - last_yararulesproject_update))
+		if [ "$time_interval" -ge $((update_interval - 600)) ] ; then
+			echo "$current_time" > "$work_dir_work_configs/last-yararulesproject-update.txt"
 
 			xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
 			xshok_pretty_echo_and_log "Checking for yararulesproject updates..."
 			yararulesproject_updates="0"
 			for db_file in $yararulesproject_dbs ; do
 				if echo $db_file|grep -q "/"; then
-					yr_dir="/"$(echo $db_file | cut -d"/" -f1)
-					db_file=$(echo $db_file | cut -d"/" -f2)
+					yr_dir="/"$(echo "$db_file" | cut -d"/" -f1)
+					db_file=$(echo "$db_file" | cut -d"/" -f2)
 				else yr_dir=""
 				fi
 				if [ "$loop" = "1" ] ; then
@@ -2320,9 +2320,9 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 				else
 					z_opt=""
 				fi
-				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $work_dir_yararulesproject/$db_file "$yararulesproject_url$yr_dir/$db_file" 2>/dev/null ; then
+				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o "$work_dir_yararulesproject/$db_file" "$yararulesproject_url$yr_dir/$db_file" 2>/dev/null ; then
 					loop="1"
-					if ! cmp -s $work_dir_yararulesproject/$db_file $clam_dbs/$db_file ; then
+					if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
 						if [ "$?" = "0" ] ; then
 							db_ext=$(echo $db_file | cut -d "." -f2)
 
@@ -2340,8 +2340,8 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $work_dir_yararulesproject/$db_file $clam_dbs 2>/dev/null ; then
-								perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+								fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_yararulesproject/$db_file" "$clam_dbs" 2>/dev/null ; then
+								perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/$db_file"
 								fi
@@ -2369,8 +2369,8 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 									fi
 								fi
 								false
-							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
-							perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+							fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+							perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 							if [ "$selinux_fixes" == "yes" ] ; then
 								restorecon "$clam_dbs/$db_file"
 							fi
@@ -2398,9 +2398,9 @@ else
 
 	xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
 
-	time_remaining=$(($update_interval - $time_interval))
-	hours_left=$(($time_remaining / 3600))
-	minutes_left=$(($time_remaining % 3600 / 60))
+	time_remaining=$((update_interval - $time_interval))
+	hours_left=$((time_remaining / 3600))
+	minutes_left=$((time_remaining % 3600 / 60))
 	xshok_pretty_echo_and_log "$yararulesproject_update_hours hours have not yet elapsed since the last yararulesproject database update check"
 	xshok_pretty_echo_and_log "No update check was performed at this time" "-"
 	xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
@@ -2412,8 +2412,8 @@ else
 		if [ "$remove_disabled_databases" == "yes" ] ; then
 			xshok_pretty_echo_and_log "Removing disabled yararulesproject Database files"
 			for db_file in $yararulesproject_dbs ; do
-				if echo $db_file|grep -q "/"; then
-					db_file=$(echo $db_file | cut -d"/" -f2)
+				if echo "$db_file"|grep -q "/"; then
+					db_file=$(echo "$db_file" | cut -d"/" -f2)
 				fi
 				if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
 					rm -f "$work_dir_yararulesproject/$db_file"
@@ -2438,10 +2438,10 @@ if [ -n "$additional_dbs" ] ; then
 	xshok_pretty_echo_and_log "User Added Signature Database File Update(s)" "="
 
 	for db_url in $additional_dbs ; do
-		base_url=$(echo $db_url | cut -d "/" -f3)
-		db_file=$(basename $db_url)
-		if [ "$(echo $db_url | cut -d ":" -f1)" = "rsync" ] ; then
-			if ! $rsync_bin $rsync_output_level $no_motd $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt -crtuz --stats --exclude=*.sha256 --exclude=*.sig --exclude=*.gz $db_url $work_dir_add 2>/dev/null ;  then
+		base_url=$(echo "$db_url" | cut -d "/" -f3)
+		db_file=$(basename "$db_url")
+		if [ "$(echo "$db_url" | cut -d ":" -f1)" = "rsync" ] ; then
+			if ! $rsync_bin $rsync_output_level $no_motd $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt -crtuz --stats --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null ;  then
 				xshok_pretty_echo_and_log "Failed rsync connection to $base_url - SKIPPED $db_file update"
 			fi
 		else
@@ -2450,14 +2450,15 @@ if [ -n "$additional_dbs" ] ; then
 			else
 				z_opt=""
 			fi
-			if ! $curl_bin $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o $work_dir_add/$db_file $db_url 2>/dev/null ; then
+			if ! $curl_bin $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o "$work_dir_add/$db_file" "$db_url" 2>/dev/null ; then
 				xshok_pretty_echo_and_log "Failed curl connection to $base_url - SKIPPED $db_file update"
 			fi
 		fi
 	done
 	db_file=""
-	for db_file in $(ls $work_dir_add); do
-		if ! cmp -s $work_dir_add/$db_file $clam_dbs/$db_file ; then
+	#refactor ls iteration
+	for db_file in $(ls "$work_dir_add"); do
+		if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
 
 			xshok_pretty_echo_and_log "Testing updated database file: $db_file"
 			$clamscan_bin --quiet -d "$work_dir_add/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
@@ -2472,8 +2473,8 @@ if [ -n "$additional_dbs" ] ; then
 					fi
 				fi
 				false
-			fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $work_dir_add/$db_file $clam_dbs ; then
-			perms chown -f $clam_user:$clam_group $clam_dbs/$db_file
+			fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_add/$db_file" "$clam_dbs" ; then
+			perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 			if [ "$selinux_fixes" == "yes" ] ; then
 				restorecon "$clam_dbs/$db_file"
 			fi
@@ -2498,12 +2499,12 @@ fi
 # added bypass entries can be removed due to offending signature modifications or removals.
 if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt" ] ; then
 	ign_updated=0
-	cd "$clam_dbs"
+	cd "$clam_dbs" || exit
 	cp -f local.ign "$work_dir_work_configs/local.ign"
 	cp -f "$work_dir_work_configs/monitor-ign.txt" "$work_dir_work_configs/monitor-ign-old.txt"
 
 	xshok_pretty_echo_and_log "" "=" "80"
-	while read entry ; do
+	while read -r entry ; do
 		sig_file=$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $1}')
 		sig_hex=$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $NF}')
 		sig_name_old=$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $3}')
@@ -2528,11 +2529,11 @@ if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt"
 			xshok_pretty_echo_and_log "$sig_name_old signature has been removed from $sig_file, entry removed from local.ign."
 			ign_updated=1
 		fi
-	done < "$work_dir_work_configs"/monitor-ign-old.txt
+	done < "$work_dir_work_configs/monitor-ign-old.txt"
 	if [ "$ign_updated" = "1" ] ; then
 		if $clamscan_bin --quiet -d "$work_dir_work_configs/local.ign" "$work_dir_work_configs/scan-test.txt"
 			then
-			if $rsync_bin -pcqt $work_dir_work_configs/local.ign $clam_dbs
+			if $rsync_bin -pcqt "$work_dir_work_configs/local.ign" "$clam_dbs"
 				then
 				perms chown -f "$clam_user":"$clam_group" "$clam_dbs/local.ign"
 				perms chmod -f 0644 "$clam_dbs/local.ign" "$work_dir_work_configs/monitor-ign.txt"
@@ -2555,11 +2556,11 @@ fi
 # added whitelist entries can be removed due to offending signature modifications or removals.
 if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.txt" ] ; then
 	ign2_updated=0
-	cd "$clam_dbs"
+	cd "$clam_dbs" || exit
 	cp -f my-whitelist.ign2 "$work_dir_work_configs/my-whitelist.ign2"
 
 	xshok_pretty_echo_and_log "" "=" "80"
-	while read entry ; do
+	while read -r entry ; do
 		sig_file=$(echo "$entry" | cut -d ":" -f1)
 		sig_full=$(echo "$entry" | cut -d ":" -f2-)
 		sig_name=$(echo "$entry" | cut -d ":" -f2)
@@ -2570,14 +2571,14 @@ if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.
 			xshok_pretty_echo_and_log "$sig_name signature no longer exists in $sig_file, whitelist entry removed from my-whitelist.ign2"
 			ign2_updated=1
 		fi
-	done < "$work_dir_work_configs"/tracker.txt
+	done < "$work_dir_work_configs/tracker.txt"
 
 	xshok_pretty_echo_and_log "" "=" "80"
 	if [ "$ign2_updated" = "1" ]
 		then
 		if $clamscan_bin --quiet -d "$work_dir_work_configs/my-whitelist.ign2" "$work_dir_work_configs/scan-test.txt"
 			then
-			if $rsync_bin -pcqt "$work_dir_work_configs"/my-whitelist.ign2 "$clam_dbs"
+			if $rsync_bin -pcqt "$work_dir_work_configs/my-whitelist.ign2" "$clam_dbs"
 				then
 				perms chown -f "$clam_user":"$clam_group" "$clam_dbs/my-whitelist.ign2"
 				perms chmod -f 0644 "$clam_dbs/my-whitelist.ign2" "$work_dir_work_configs/tracker.txt"
