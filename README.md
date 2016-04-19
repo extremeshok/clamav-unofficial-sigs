@@ -7,6 +7,8 @@ ClamAV Unofficial Signatures Updater
 
 Github fork of the sourceforge hosted and non maintained utility.
 
+# DO NOT USE THIS BRANCH, code is currently being refactored
+
 ## Maintained and provided by https://eXtremeSHOK.com
 
 ## Description
