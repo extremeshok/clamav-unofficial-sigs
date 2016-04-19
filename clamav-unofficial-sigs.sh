@@ -207,11 +207,12 @@ function xshok_database () { #database #override
 	new_dbs=""
 
 	if [ -n "$current_dbs" ] ; then
-		if [ $(xshok_array_count "$current_dbs") -ge "1" ] ; then
+		if [ "$(xshok_array_count "$current_dbs")" -ge "1" ] ; then
 			for db_name in $current_dbs ; do
 				#checks
 				if [ "$enable_yararules" == "no" ] ; then #yararules are disabled
-						if [[ "$db_name" =~ ".yar" ]] ; then # if it's the value you want to delete
+#						if [[ "$db_name" =~ ".yar" ]] ; then # if it's the value you want to delete
+						if [[ "$db_name" = *".yar"* ]] ; then # if it's the value you want to delete
 					 		echo "skip"
 					 		continue # skip to the next value
 						fi
@@ -392,7 +393,7 @@ function install_cron (){
 	
 	#Use defined varibles or attempt to use default varibles
 	if [ ! -n "$cron_minute" ] ; then
-		cron_minute=$[ ( $RANDOM % 59 )  + 1 ];
+		cron_minute=$(( ( $RANDOM % 59 )  + 1 ));
 	fi
 	if [ ! -n "$cron_user" ] ; then
 		cron_user="$clam_user";
@@ -469,7 +470,7 @@ function decode_third_party_signature_by_signature_name (){
 	read input
 	input=$(echo "$input" | tr -d "'" | tr -d '"')
 	if $(echo "$input" | grep "\." > /dev/null) ; then
-		cd "$clam_dbs"
+		cd "$clam_dbs" || exit
 		sig=$(grep "$input:" *.ndb)
 		if [ -n "$sig" ] ; then
 			db_file=$(echo "$sig" | cut -d ':' -f1)
@@ -515,8 +516,8 @@ function gpg_verify_specific_sanesecurity_database_file () {
 	if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
 		xshok_pretty_echo_and_log "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
 
-		if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $work_dir_sanesecurity/$db_file.sig $work_dir_sanesecurity/$db_file 2>/dev/null ; then
-			$gpg_bin --always-trust -q --no-default-keyring --homedir $work_dir_gpg --keyring $work_dir_gpg/ss-keyring.gpg --verify $work_dir_sanesecurity/$db_file.sig $work_dir_sanesecurity/$db_file 2>/dev/null
+		if ! "$gpg_bin" --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" 2>/dev/null ; then
+			"$gpg_bin" --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" 2>/dev/null
 		fi
 	else
 		xshok_pretty_echo_and_log "File '$db_file' cannot be found or is not a Sanesecurity database file."
@@ -529,7 +530,7 @@ function gpg_verify_specific_sanesecurity_database_file () {
 function output_system_configuration_information () {
 	echo ""
 	echo "*** SCRIPT VERSION ***"
-	echo "$(basename $0) $script_version ($script_version_date)"
+	echo "$(basename "$0") $script_version ($script_version_date)"
 	echo "*** SYSTEM INFORMATION ***"
 	$uname_bin -a
 	echo "*** CLAMSCAN LOCATION & VERSION ***"
@@ -1070,7 +1071,8 @@ custom_config="no"
 we_have_a_config="0"
 
 #Default Binaries & Commands
-clamd_reload_opt="clamdscan --reload"  
+clamd_reload_opt="clamdscan --reload"
+uname_bin=$(which uname)
 clamscan_bin=$(which clamscan)
 rsync_bin=$(which rsync)
 curl_bin=$(which curl)
@@ -1291,6 +1293,10 @@ fi
 #Check default Binaries & Commands are defined
 if [ "$clamd_reload_opt" == "" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt" "="
+	exit 1
+fi
+if [ "$uname_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: uname (uname_bin) not found" "="
 	exit 1
 fi
 if [ "$clamscan_bin" == "" ] ; then
@@ -1611,7 +1617,7 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
 		if grep -vq "bak" $db_changes 2>/dev/null ; then
 			do_clamd_reload=2
 		fi
-		for file in ($cat $db_changes) ; do
+		for file in $(cat $db_changes) ; do
 			rm -f -- "$file"
 			xshok_pretty_echo_and_log "Unused/Disabled file removed: $file"
 		done
