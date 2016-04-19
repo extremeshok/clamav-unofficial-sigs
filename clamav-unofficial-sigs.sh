@@ -198,12 +198,12 @@ function clamav_files () {
 # Function to manage the databases and allow multi-dimensions as well as global overrides
 # since the datbases are basically a multi-dimentional associative arrays in bash
 # ratings: LOW| MEDIUM| HIGH| REQUIRED| LOWONLY| MEDIUMONLY| LOWMEDIUMONLY | MEDIUMHIGHONLY | HIGHONLY| DISABLED
-function xshok_database () { #database #override
+function xshok_database () { #database #rating
 
-	#assign
+	# assign
 	current_dbs="$1"
-	current_override="$2"
-
+	current_rating="$2"
+	# zero
 	new_dbs=""
 
 	if [ -n "$current_dbs" ] ; then
@@ -213,11 +213,10 @@ function xshok_database () { #database #override
 				if [ "$enable_yararules" == "no" ] ; then #yararules are disabled
 #						if [[ "$db_name" =~ ".yar" ]] ; then # if it's the value you want to delete
 						if [[ "$db_name" = *".yar"* ]] ; then # if it's the value you want to delete
-					 		echo "skip"
 					 		continue # skip to the next value
 						fi
 				fi
-				if [ "$current_override" == "" ] ; then #yararules are disabled
+				if [ "$current_rating" == "" ] ; then #yararules are disabled
 					new_dbs="$new_dbs $db_name"
 				else
 					if [[ ! "$db_name" =~ "|" ]] ; then # this old format
@@ -225,23 +224,23 @@ function xshok_database () { #database #override
 					else
 						db_name_rating=$(echo "$db_name" | cut -d "|" -f2)
 						db_name=$(echo "$db_name" | cut -d "|" -f1)
-						
+
 						if [ "$db_name_rating" != "DISABLED" ] ; then
-							if [ "$db_name_rating" == "$default_dbs_rating" ] ; then
+							if [ "$db_name_rating" == "$current_rating" ] ; then
 								new_dbs="$new_dbs $db_name"
 							elif [ "$db_name_rating" == "REQUIRED" ] ; then
 								new_dbs="$new_dbs $db_name"
-							elif [ "$default_dbs_rating" == "LOW" ] ; then
-								if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ] ; then
+							elif [ "$current_rating" == "LOW" ] ; then
+								if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "LOWMEDIUM" ]; then
 									new_dbs="$new_dbs $db_name"		
 								fi
-							elif [ "$default_dbs_rating" == "MED" ] ; then
-								if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] ; then
-									new_dbs="$new_dbs $db_name"			
+							elif [ "$current_rating" == "MED" ] ; then
+								if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] || [ "$db_name_rating" == "LOWMEDIUM" ] ; then
+									new_dbs="$new_dbs $db_name"
 								fi
-							elif [ "$default_dbs_rating" == "HIGH" ] ; then
-								if [ "$db_name_rating" == "HIGHONLY" ] || [ "$db_name_rating" == "HIGH" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] ; then
-									new_dbs="$new_dbs $db_name"		
+							elif [ "$current_rating" == "HIGH" ] ; then
+								if [ "$db_name_rating" == "HIGH" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] ; then
+									new_dbs="$new_dbs $db_name"
 								fi
 							fi
 						fi
@@ -250,7 +249,7 @@ function xshok_database () { #database #override
 			done
 		fi
 	fi
-	echo "$new_dbs"
+	echo "$new_dbs" | xargs #remove extra whitespace
 
 }
 
@@ -1370,36 +1369,36 @@ fi
 if [ "$sanesecurity_enabled" == "yes" ] ; then
 	if [ -n "$sanesecurity_dbs" ] ; then
 		if [ -n "$sanesecurity_dbs_rating" ] ; then
- 			xshok_database "$sanesecurity_dbs" "$sanesecurity_dbs_rating"
+ 			sanesecurity_dbs="$(xshok_database "$sanesecurity_dbs" "$sanesecurity_dbs_rating")"
  		else
- 			xshok_database "$sanesecurity_dbs" "$default_dbs_rating"
+ 			sanesecurity_dbs="$(xshok_database "$sanesecurity_dbs" "$default_dbs_rating")"
  		fi
 	fi
 fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
 	if [ -n "$securiteinfo_dbs" ] ; then
  		if [ -n "$securiteinfo_dbs_rating" ] ; then
- 			xshok_database "$securiteinfo_dbs" "$securiteinfo_dbs_rating"
+ 			securiteinfo_dbs="$(xshok_database "$securiteinfo_dbs" "$securiteinfo_dbs_rating")"
  		else
- 			xshok_database "$securiteinfo_dbs" "$default_dbs_rating"
+ 			securiteinfo_dbs="$(xshok_database "$securiteinfo_dbs" "$default_dbs_rating")"
  		fi
  	fi
 fi
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 	if [ -n "$linuxmalwaredetect_dbs" ] ; then
  		if [ -n "$linuxmalwaredetect_dbs_rating" ] ; then
- 			xshok_database "$linuxmalwaredetect_dbs" "$linuxmalwaredetect_dbs_rating"
+ 			linuxmalwaredetect_dbs="$(xshok_database "$linuxmalwaredetect_dbs" "$linuxmalwaredetect_dbs_rating")"
  		else
- 			xshok_database "$linuxmalwaredetect_dbs" "$default_dbs_rating"
+ 			linuxmalwaredetect_dbs="$(xshok_database "$linuxmalwaredetect_dbs" "$default_dbs_rating")"
  		fi
 	fi
 fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
  		if [ -n "$yararulesproject_dbs_rating" ] ; then
- 			xshok_database "$yararulesproject_dbs" "$yararulesproject_dbs_rating"
+ 			yararulesproject_dbs="$(xshok_database "$yararulesproject_dbs" "$yararulesproject_dbs_rating")"
  		else
- 			xshok_database "$yararulesproject_dbs" "$default_dbs_rating"
+ 			yararulesproject_dbs="$(xshok_database "$yararulesproject_dbs" "$default_dbs_rating")"
  		fi
 	fi
 fi
