@@ -615,7 +615,7 @@ function make_signature_database_from_ascii_file () {
 	if xshok_prompt_confirm ; then
 
 		echo -n "Enter the source file as /path/filename: "
-		read source
+		read -r source
 		if [ -r "$source" ] ; then
 			source_file=$(basename "$source")
 
@@ -623,14 +623,14 @@ function make_signature_database_from_ascii_file () {
 			echo "will create signatures that looks like: 'Phish.Domains.1:4:*:HexSigHere'"
 
 			echo -n "Enter signature prefix: "
-			read prefix
+			read -r prefix
 			path_file=$(echo "$source" | cut -d "." -f-1 | command sed 's/$/.ndb/')
 			db_file=$(basename "$path_file")
 			rm -f "$path_file"
 			total=$(wc -l "$source" | cut -d " " -f1)
 			line_num=1
 
-			while read -r line ; do
+			while read line ; do
 				line_prefix=$(echo "$line" | awk -F ':' '{print $1}')
 				if [ "$line_prefix" = "-" ] ; then
 					echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
@@ -703,7 +703,7 @@ function remove_script () {
 			if xshok_prompt_confirm ; then
 				if [ -r "$work_dir_work_configs/purge.txt" ] ; then
 
-					while read file ; do
+					while read -r file ; do
 						xshok_is_file "$file" && rm -f -- "$file"
 						echo "     Removed file: $file"
 					done < "$work_dir_work_configs"/purge.txt
@@ -756,7 +756,7 @@ function clamscan_integrity_test_specific_database_file (){
 		echo "File '$input' cannot be found."
 		echo "Here is a list of third-party databases that can be clamscan integrity tested:"
 
-		echo "Sanesecurity $sanesecurity_dbs""SecuriteInfo $securiteinfo_dbs""MalwarePatrol $malwarepatrol_dbs"
+		echo "Sanesecurity $sanesecurity_dbs" "SecuriteInfo $securiteinfo_dbs" "MalwarePatrol $malwarepatrol_db"
 		echo "Check the file name and try again..."
 	fi 
 }
