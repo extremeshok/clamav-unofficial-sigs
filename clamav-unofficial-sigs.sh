@@ -1730,7 +1730,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 							false
 						fi
 						if [ "$?" = "0" ] ; then
-							db_ext=$(echo $db_file | cut -d "." -f2)
+							db_ext=$(echo "$db_file" | cut -d "." -f2)
 							if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
 								if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
 									xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
@@ -1768,8 +1768,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 								xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
 								##DO NOT KILL THIS DB
 								false
-							fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
-							perms chown -f "$clam_user":"$clam_group" $clam_dbs/$db_file
+							fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+							perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 							if [ "$selinux_fixes" == "yes" ] ; then
 								restorecon "$clam_dbs/$db_file"
 							fi
@@ -1826,7 +1826,7 @@ fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
 	if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
 		if [ -n "$securiteinfo_dbs" ] ; then
-			if [ $(xshok_array_count "$securiteinfo_dbs") -lt "1" ] ; then
+			if [ "$(xshok_array_count "$securiteinfo_dbs")" -lt "1" ] ; then
 				xshok_pretty_echo_and_log "Failed securiteinfo_dbs config is invalid or not defined - SKIPPING"
 			else
 			rm -f "$work_dir_securiteinfo/*.gz"
@@ -1909,8 +1909,8 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-								fi && (test "$keep_db_backup" = "yes" && cp -f $clam_dbs/$db_file $clam_dbs/$db_file-bak 2>/dev/null ; true) && if $rsync_bin -pcqt $test_dir/$db_file $clam_dbs 2>/dev/null ; then
-								perms chown -f "$clam_user":"$clam_group" $clam_dbs/$db_file
+								fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+								perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 								if [ "$selinux_fixes" == "yes" ] ; then
 									restorecon "$clam_dbs/$db_file"
 								fi
@@ -1971,21 +1971,21 @@ fi
 ##############################################################################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 	if [ -n "$linuxmalwaredetect_dbs" ] ; then
-		if [ $(xshok_array_count "$linuxmalwaredetect_dbs") -lt "1" ] ; then
+		if [ "$(xshok_array_count "$linuxmalwaredetect_dbs")" -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed linuxmalwaredetect_dbs config is invalid or not defined - SKIPPING"
 		else
 		rm -f "$work_dir_linuxmalwaredetect/*.gz"
 		if [ -r "$work_dir_work_configs/last-linuxmalwaredetect-update.txt" ] ; then
-			last_linuxmalwaredetect_update=$(cat $work_dir_work_configs/last-linuxmalwaredetect-update.txt)
+			last_linuxmalwaredetect_update=$(cat "$work_dir_work_configs/last-linuxmalwaredetect-update.txt")
 		else
 			last_linuxmalwaredetect_update="0"
 		fi
 		db_file=""
 		loop=""
-		update_interval=$(($linuxmalwaredetect_update_hours * 3600))
-		time_interval=$(($current_time - $last_linuxmalwaredetect_update))
-		if [ "$time_interval" -ge $(($update_interval - 600)) ] ; then
-			echo "$current_time" > "$work_dir_work_configs"/last-linuxmalwaredetect-update.txt
+		update_interval=$((linuxmalwaredetect_update_hours * 3600))
+		time_interval=$((current_time - last_linuxmalwaredetect_update))
+		if [ "$time_interval" -ge $((update_interval - 600)) ] ; then
+			echo "$current_time" > "$work_dir_work_configs/last-linuxmalwaredetect-update.txt"
 
 			xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
 			xshok_pretty_echo_and_log "Checking for linuxmalwaredetect updates..."
@@ -2002,7 +2002,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 				else
 					z_opt=""
 				fi
-				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file" 2>/dev/null ; then
+				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$z_opt" -o "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file" 2>/dev/null ; then
 					loop="1"
 					if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
 						if [ "$?" = "0" ] ; then
@@ -2121,9 +2121,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 				last_malwarepatrol_update="0"
 			fi
 			db_file=""
-			update_interval=$(($malwarepatrol_update_hours * 3600))
-			time_interval=$(($current_time - $last_malwarepatrol_update))
-			if [ "$time_interval" -ge $(($update_interval - 600)) ] ; then
+			update_interval=$((malwarepatrol_update_hours * 3600))
+			time_interval=$((current_time - last_malwarepatrol_update))
+			if [ "$time_interval" -ge $((update_interval - 600)) ] ; then
 				echo "$current_time" > "$work_dir_work_configs"/last-mbl-update.txt
 				xshok_pretty_echo_and_log "Checking for MalwarePatrol updates..."
 				# Delete the old MBL (mbl.db) database file if it exists and start using the newer
@@ -2245,7 +2245,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
 		xshok_pretty_echo_and_log "MalwarePatrol Database File Update" "="
 
-		time_remaining=$((update_interval - $time_interval))
+		time_remaining=$((update_interval - time_interval))
 		hours_left=$((time_remaining / 3600))
 		minutes_left=$((time_remaining % 3600 / 60))
 		xshok_pretty_echo_and_log "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
@@ -2277,7 +2277,7 @@ fi
 ##############################################################################################################################################
 if [ "$yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
-		if [ $(xshok_array_count "$yararulesproject_dbs") -lt "1" ] ; then
+		if [ "$(xshok_array_count "$yararulesproject_dbs")" -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
 		else
 		rm -f "$work_dir_yararulesproject/*.gz"
@@ -2297,7 +2297,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 			xshok_pretty_echo_and_log "Checking for yararulesproject updates..."
 			yararulesproject_updates="0"
 			for db_file in $yararulesproject_dbs ; do
-				if echo $db_file|grep -q "/"; then
+				if echo "$db_file"|grep -q "/"; then
 					yr_dir="/"$(echo "$db_file" | cut -d"/" -f1)
 					db_file=$(echo "$db_file" | cut -d"/" -f2)
 				else yr_dir=""
@@ -2313,7 +2313,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 				else
 					z_opt=""
 				fi
-				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o "$work_dir_yararulesproject/$db_file" "$yararulesproject_url$yr_dir/$db_file" 2>/dev/null ; then
+				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$z_opt" -o "$work_dir_yararulesproject/$db_file" "$yararulesproject_url$yr_dir/$db_file" 2>/dev/null ; then
 					loop="1"
 					if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
 						if [ "$?" = "0" ] ; then
@@ -2391,7 +2391,7 @@ else
 
 	xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
 
-	time_remaining=$((update_interval - $time_interval))
+	time_remaining=$((update_interval - time_interval))
 	hours_left=$((time_remaining / 3600))
 	minutes_left=$((time_remaining % 3600 / 60))
 	xshok_pretty_echo_and_log "$yararulesproject_update_hours hours have not yet elapsed since the last yararulesproject database update check"
@@ -2425,7 +2425,7 @@ fi
 # Check for user added signature database updates #
 ###################################################
 if [ -n "$additional_dbs" ] ; then
-		if [ $(xshok_array_count "$additional_dbs") -lt "1" ] ; then
+		if [ "$(xshok_array_count "$additional_dbs")" -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed additional_dbs config is invalid or not defined - SKIPPING"
 		else
 	xshok_pretty_echo_and_log "User Added Signature Database File Update(s)" "="
@@ -2443,7 +2443,7 @@ if [ -n "$additional_dbs" ] ; then
 			else
 				z_opt=""
 			fi
-			if ! $curl_bin $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R $z_opt -o "$work_dir_add/$db_file" "$db_url" 2>/dev/null ; then
+			if ! $curl_bin $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$z_opt" -o "$work_dir_add/$db_file" "$db_url" 2>/dev/null ; then
 				xshok_pretty_echo_and_log "Failed curl connection to $base_url - SKIPPED $db_file update"
 			fi
 		fi
@@ -2609,7 +2609,7 @@ fi
 perms chown -f -R "$clam_user":"$clam_group" "$work_dir"
 if ! find "$work_dir" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
 	if ! find "$work_dir" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
-		if ! find "$work_dir" -type f | xargs chmod -f 0644 2>/dev/null ; then
+		if ! find "$work_dir" -type f -print0 | xargs chmod -f 0644 2>/dev/null ; then
 			find "$work_dir" -type f -exec chmod -f 0644 {} \;
 		fi
 	fi
@@ -2621,7 +2621,7 @@ if [ "$setmode" = "yes" ] ; then
 	perms chown -f -R "$clam_user":"$clam_group" "$clam_dbs"
 	if ! find "$clam_dbs" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
 		if ! find "$clam_dbs" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
-			if ! find "$clam_dbs" -type f | xargs chmod -f 0644 2>/dev/null ; then
+			if ! find "$clam_dbs" -type f -print0 | xargs chmod -f 0644 2>/dev/null ; then
 				find "$clam_dbs" -type f -exec chmod -f 0644 {} \;
 			fi
 		fi
