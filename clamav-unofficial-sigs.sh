@@ -1404,7 +1404,6 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 	fi
 fi
 
-
 # Set the variables for MalwarePatrol
 if [ "$malwarepatrol_free" == "yes" ] ; then
 	malwarepatrol_product_code="8"
