@@ -639,7 +639,7 @@ function make_signature_database_from_ascii_file () {
 				else
 					echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
 				fi
-				printf "Hexadecimal encoding $source_file line: $line_num of $total\r"
+				echo "Hexadecimal encoding $source_file line: $line_num of $total"
 				line_num=$(($line_num + 1))
 			done
 		else
@@ -687,7 +687,7 @@ function make_signature_database_from_ascii_file () {
 #Remove the clamav-unofficial-sigs script
 function remove_script () {
 	echo ""
-	if [ -n "$pkg_mgr" -a -n "$pkg_rm" ] ; then
+	if [ -n "$pkg_mgr" ] && [ -n "$pkg_rm" ] ; then
 		echo "This script (clamav-unofficial-sigs) was installed on the system via '$pkg_mgr'"
 		echo "use '$pkg_rm' to remove the script and all of its associated files and databases from the system."
 
@@ -906,7 +906,7 @@ function check_clamav () {
 				fi
 			else
 				socat="$(which socat 2>/dev/null)"
-				if [ -n "$socat" -a -x "$socat" ] ; then
+				if [ -n "$socat" ] && [ -x "$socat" ] ; then
 					socket_cat1=1
 					if [ "$( (echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null)" = "PONG" ] ; then
 						socket_cat2=1
@@ -914,10 +914,10 @@ function check_clamav () {
 					fi
 				fi
 			fi
-			if [ -z "$io_socket1" -a -z "$socket_cat1" ] ; then
+			if [ -z "$io_socket1" ] && [ -z "$socket_cat1" ] ; then
 				xshok_pretty_echo_and_log "WARNING: socat or perl module 'IO::Socket::UNIX' not found, cannot test if ClamD is running" "*"
 			else
-				if [ -z "$io_socket2" -a -z "$socket_cat2" ] ; then
+				if [ -z "$io_socket2" ] && [ -z "$socket_cat2" ] ; then
 
 					xshok_pretty_echo_and_log "ALERT: CLAMD IS NOT RUNNING!" "="
 					if [ -n "$clamd_restart_opt" ] ; then
@@ -1432,7 +1432,7 @@ malwarepatrol_url="$malwarepatrol_url?product=$malwarepatrol_product_code&list=$
 
 # If "ham_dir" variable is set, then create initial whitelist files (skipped if first-time script run).
 test_dir="$work_dir/test"
-if [ -n "$ham_dir" -a -d "$work_dir" -a ! -d "$test_dir" ] ; then
+if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
 	if [ -d "$ham_dir" ] ; then
 		xshok_mkdir_ownership "$test_dir"
 		cp -f "$work_dir"/*/*.ndb "$test_dir"
@@ -1516,7 +1516,7 @@ if [ "$enable_random" = "yes" ] ; then
 		sleep_time=$(($RANDOM * $(($max_sleep_time - $min_sleep_time)) / 32767 + $min_sleep_time))
 	else
 		sleep_time=0
-		while [ "$sleep_time" -lt "$min_sleep_time" -o "$sleep_time" -gt "$max_sleep_time" ] ; do
+		while [ "$sleep_time" -lt "$min_sleep_time" ] || [ "$sleep_time" -gt "$max_sleep_time" ] ; do
 			sleep_time=$(head -1 /dev/urandom | cksum | awk '{print $2}')
 		done
 	fi
@@ -1675,7 +1675,7 @@ fi
 
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
-if [ -n "$securiteinfo_dbs" -o -n "malwarepatrol_db" ] ; then
+if [ -n "$securiteinfo_dbs" ] || [ -n "malwarepatrol_db" ] ; then
 	current_time=$(date +%s 2>/dev/null)
 	if [ $current_time -le 0 ] ; then
 		current_time=$(perl -le print+time 2>/dev/null)
@@ -1738,7 +1738,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 						fi
 						if [ "$?" = "0" ] ; then
 							db_ext=$(echo $db_file | cut -d "." -f2)
-							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
+							if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
 								if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
 									xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
 									true
@@ -1871,7 +1871,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 								db_ext=$(echo $db_file | cut -d "." -f2)
 
 								xshok_pretty_echo_and_log "Testing updated SecuriteInfo database file: $db_file"
-								if [ -z "$ham_dir" -o "$db_ext" != "ndb" ]
+								if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ]
 									then
 									if $clamscan_bin --quiet -d "$work_dir_securiteinfo/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
 										then
@@ -2016,7 +2016,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 							db_ext=$(echo $db_file | cut -d "." -f2)
 
 							xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
-							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
+							if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
 								if $clamscan_bin --quiet -d "$work_dir_linuxmalwaredetect/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
 									then
 									xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
@@ -2139,11 +2139,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
 				# remove the .db is th new format if ndb and
 				# symetrically
-				if [ "$malwarepatrol_db" == "malwarepatrol.db" -a -f "$clam_dbs/malwarepatrol.ndb" ] ; then
+				if [ "$malwarepatrol_db" == "malwarepatrol.db" ] && [ -f "$clam_dbs/malwarepatrol.ndb" ] ; then
 					rm "$clam_dbs/malwarepatrol.ndb";
 				fi
 
-				if [ "$malwarepatrol_db" == "malwarepatrol.ndb" -a -f "$clam_dbs/malwarepatrol.db" ] ; then
+				if [ "$malwarepatrol_db" == "malwarepatrol.ndb" ] && [ -f "$clam_dbs/malwarepatrol.db" ] ; then
 					rm "$clam_dbs/malwarepatrol.db";
 				fi
 
@@ -2173,7 +2173,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							fi
 						fi
 						malwarepatrol_md5_new=$(cat $work_dir_malwarepatrol/$malwarepatrol_db.md5)
-						if [ -n "$malwarepatrol_md5_new" -a "$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ; then
+						if [ -n "$malwarepatrol_md5_new" ] && [ "$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ; then
 							if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o $work_dir_malwarepatrol/$malwarepatrol_db "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
 								malwarepatrol_reloaded=1
 							else # curl DB fail
@@ -2327,7 +2327,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 							db_ext=$(echo $db_file | cut -d "." -f2)
 
 							xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
-							if [ -z "$ham_dir" -o "$db_ext" != "ndb" ] ; then
+							if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
 								if $clamscan_bin --quiet -d "$work_dir_yararulesproject/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
 									then
 									xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested good"
@@ -2496,7 +2496,7 @@ fi
 ###################################################
 # Check to see if the local.ign file exists, and if it does, check to see if any of the script
 # added bypass entries can be removed due to offending signature modifications or removals.
-if [ -r "$clam_dbs/local.ign" -a -s "$work_dir_work_configs/monitor-ign.txt" ] ; then
+if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt" ] ; then
 	ign_updated=0
 	cd "$clam_dbs"
 	cp -f local.ign "$work_dir_work_configs/local.ign"
@@ -2512,7 +2512,7 @@ if [ -r "$clam_dbs/local.ign" -a -s "$work_dir_work_configs/monitor-ign.txt" ] ;
 		sig_new=$(grep -hwF ":$sig_hex" "$sig_file" | tr -d "\r" 2>/dev/null)
 		sig_mon_new=$(grep -HwF -n ":$sig_hex" "$sig_file" | tr -d "\r")
 		if [ -n "$sig_new" ] ; then
-			if [ "$sig_old" != "$sig_new" -o "$entry" != "$sig_mon_new" ] ; then
+			if [ "$sig_old" != "$sig_new" ] || [ "$entry" != "$sig_mon_new" ] ; then
 				sig_name_new=$(echo "$sig_new" | tr -d "\r" | awk -F ":" '{print $1}')
 				sig_ign_new=$(echo "$sig_mon_new" | cut -d ":" -f1-3)
 				perl -i -ne "print unless /$sig_ign_old/" "$work_dir_work_configs/monitor-ign.txt"
@@ -2553,7 +2553,7 @@ fi
 
 # Check to see if my-whitelist.ign2 file exists, and if it does, check to see if any of the script
 # added whitelist entries can be removed due to offending signature modifications or removals.
-if [ -r "$clam_dbs/my-whitelist.ign2" -a -s "$work_dir_work_configs/tracker.txt" ] ; then
+if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.txt" ] ; then
 	ign2_updated=0
 	cd "$clam_dbs"
 	cp -f my-whitelist.ign2 "$work_dir_work_configs/my-whitelist.ign2"
