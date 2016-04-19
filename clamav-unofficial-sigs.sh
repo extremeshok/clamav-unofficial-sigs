@@ -1484,7 +1484,7 @@ if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
 			xshok_pretty_echo_and_log "ALERT: could not import Sanesecurity public GPG key to custom keyring" "*"
 			exit 1
 		else
-			chmod -f 0644 $work_dir_gpg/*.*
+			chmod -f 0644 "$work_dir_gpg/*.*"
 			xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully imported to custom keyring"
 		fi
 	fi
@@ -1506,7 +1506,7 @@ fi
 # provides support for both bash and non-bash enabled system shells.
 if [ "$enable_random" = "yes" ] ; then
 	if [ -n "$RANDOM" ] ; then
-		sleep_time=$((RANDOM * $((max_sleep_time - min_sleep_time)) / 32767 + $min_sleep_time))
+		sleep_time=$((RANDOM * $((max_sleep_time - min_sleep_time)) / 32767 + min_sleep_time))
 	else
 		sleep_time=0
 		while [ "$sleep_time" -lt "$min_sleep_time" ] || [ "$sleep_time" -gt "$max_sleep_time" ] ; do
@@ -2116,7 +2116,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 	if [ "$malwarepatrol_receipt_code" != "YOUR-RECEIPT-NUMBER" ] ; then
 		if [ -n "$malwarepatrol_db" ] ; then
 			if [ -r "$work_dir_work_configs/last-mbl-update.txt" ] ; then
-				last_malwarepatrol_update=$(cat $work_dir_work_configs/last-mbl-update.txt)
+				last_malwarepatrol_update=$(cat "$work_dir_work_configs/last-mbl-update.txt")
 			else
 				last_malwarepatrol_update="0"
 			fi
@@ -2158,7 +2158,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
 				else # The not free branch
 					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o "$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1" 2>/dev/null ;	then
-						if [ -f $clam_dbs/$malwarepatrol_db ] ; then
+						if [ -f "$clam_dbs/$malwarepatrol_db" ] ; then
 							malwarepatrol_md5=$(openssl md5 -r "$clam_dbs/$malwarepatrol_db" 2>/dev/null | cut -d" " -f1)
 							if [ ! "$malwarepatrol_md5" ] ; then
 								#fallback for missing -r option
@@ -2317,7 +2317,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 					loop="1"
 					if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
 						if [ "$?" = "0" ] ; then
-							db_ext=$(echo $db_file | cut -d "." -f2)
+							db_ext=$(echo "$db_file" | cut -d "." -f2)
 
 							xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
 							if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
