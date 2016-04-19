@@ -2449,7 +2449,7 @@ if [ -n "$additional_dbs" ] ; then
 		fi
 	done
 	db_file=""
-	for db_file in "$work_dir_add/*" ; do
+	for db_file in $work_dir_add/* ; do
 		[[ -e $db_file ]] || break  # handle the case of no files
 		if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
 
