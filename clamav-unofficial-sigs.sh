@@ -150,7 +150,7 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 			echo "Warning: Logging Disabled, as file not writable: $log_file_path/$log_file_name"
 			enable_log="no"
 		else
-			echo "$(date +%b %d %T) $1" >> "$log_file_path/$log_file_name"
+			echo $(date "+%b %d %T") "$1" >> "$log_file_path/$log_file_name"
 		fi 
 	fi
 }
@@ -545,17 +545,10 @@ function output_system_configuration_information () {
 	echo "*** GPG LOCATION & VERSION ***"
 	echo "$gpg_bin"
 	$gpg_bin --version | head -1
-
 	echo "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
-	ls -ld "$work_dir"
-
-	ls -lR "$work_dir" | grep -v total
-
+	echo "$work_dir"
 	echo "*** CLAMAV DIRECTORY INFORMATION ***"
-	ls -ld "$clam_dbs"
-	echo "---"
-	ls -l "$clam_dbs" | grep -v total
-
+	echo "$clam_dbs"
 	echo "*** SCRIPT CONFIGURATION SETTINGS ***"
 	if [ "$custom_config" != "no" ] ; then
 		if [ -d "$custom_config" ]; then
@@ -1445,7 +1438,7 @@ if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
 			mv -f "$db_file-tmp" "$db_file"
 			if $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
 				if $rsync_bin -pcqt "$db_file" "$clam_dbs" ; then
-					perms chown -f "$clam_user":"$clam_group" $clam_dbs/$db_file
+					perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
 					if [ "$selinux_fixes" == "yes" ] ; then
 						restorecon "$clam_dbs/$db_file"
 					fi
@@ -1676,8 +1669,8 @@ fi
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
 if [ -n "$securiteinfo_dbs" ] || [ -n "$malwarepatrol_db" ] ; then
-	current_time=$(date +%s 2>/dev/null)
-	if [ $current_time -le 0 ] ; then
+	current_time=$(date "+%s" 2>/dev/null)
+	if [ "$current_time" -le 0 ] ; then
 		current_time=$(perl -le print+time 2>/dev/null)
 	fi
 	if [ "$current_time" -le 0 ] ; then
@@ -1694,14 +1687,14 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 	if [ -n "$sanesecurity_dbs" ] ; then
 		##if [ ${#sanesecurity_dbs[@]} -lt "1" ] ; then ##will not work due to compound array assignment
 
-		if [ $(xshok_array_count "$sanesecurity_dbs") -lt "1" ] ; then
+		if [ "$(xshok_array_count "$sanesecurity_dbs")" -lt "1" ] ; then
 			xshok_pretty_echo_and_log "Failed sanesecurity_dbs config is invalid or not defined - SKIPPING"
 		else
 		
 		db_file=""
 		xshok_pretty_echo_and_log "Sanesecurity Database & GPG Signature File Updates" "="
 
-		sanesecurity_mirror_ips=$(dig +ignore +short $sanesecurity_url)
+		sanesecurity_mirror_ips=$(dig +ignore +short "$sanesecurity_url")
 		#add fallback to host if dig returns no records
 		if [ "$(xshok_array_count  "$sanesecurity_mirror_ips")" -lt 1 ] ; then
 			sanesecurity_mirror_ips=$(host -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')
@@ -1710,7 +1703,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 		if [ "$(xshok_array_count  "$sanesecurity_mirror_ips")" -ge "1" ] ; then
 
 
-		for sanesecurity_mirror_ip in "$sanesecurity_mirror_ips" ; do
+		for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
 			sanesecurity_mirror_name=""
 			sanesecurity_mirror_name=$(dig +short -x "$sanesecurity_mirror_ip" | command sed 's/\.$//')
 			#add fallback to host if dig returns no records
@@ -1722,7 +1715,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 			$rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" --stats "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
 			if [ "$?" -eq "0" ] ; then #the correct way
 				sanesecurity_rsync_success="1"
-				for db_file in "$sanesecurity_dbs" ; do
+				for db_file in $sanesecurity_dbs ; do
 					if ! cmp -s "$work_dir_sanesecurity/$db_file" "$clam_dbs/$db_file" ; then
 
 						xshok_pretty_echo_and_log "Testing updated Sanesecurity database file: $db_file"
