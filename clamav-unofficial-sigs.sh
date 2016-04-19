@@ -1349,6 +1349,8 @@ while true; do
 	esac
 done
 
+xshok_pretty_echo_and_log "Preparing Databases" "="
+
 # Check yararule support is available
 if [ "$enable_yararules" == "yes" ] ; then
 	current_clamav_version=$($clamscan_bin -V | cut -d " " -f2 | cut -d "/" -f1 | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')
