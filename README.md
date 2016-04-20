@@ -7,8 +7,6 @@ ClamAV Unofficial Signatures Updater
 
 Github fork of the sourceforge hosted and non maintained utility.
 
-# DO NOT USE THIS BRANCH, code is currently being refactored
-
 ## Maintained and provided by https://eXtremeSHOK.com
 
 ## Description
@@ -91,6 +89,22 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
+
+### Version 5.X.X (updated 2016-XX-XX)
+ - eXtremeSHOK.com Maintenance
+ - Major change: Updated to use new database structure
+ - Code refactor: remove legacy `..` replaced with $(...)
+ - Code refactor: replace [ ... -a ... ] with [ ... ] && [ ... ]
+ - Code refactor: replace [ ... -o ... ] with [ ... ] || [ ... ]
+ - Code refactor: replace cat "..." with done < ... from loops
+ - Code refactor: convert for loops using files to while loops
+ - Code refactor: read replaced with read -r
+ - Code refactor: added cd ... || exit , to handle a failed cd
+ - Code refactor: double quoted all varibles
+ - Code refactor: refactor all "ls" iterations to use globs
+ -  Defined missing uname_bin variable
+ - Added function xshok_database
+
 ### Version 5.2.2 (updated 2016-04-18)
  - eXtremeSHOK.com Maintenance
  - Added --install-all Install and generate the cron, logroate and man files, autodetects the values $oft based on your config files
