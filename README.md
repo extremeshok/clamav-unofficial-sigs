@@ -102,7 +102,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Code refactor: added cd ... || exit , to handle a failed cd
  - Code refactor: double quoted all varibles
  - Code refactor: refactor all "ls" iterations to use globs
- -  Defined missing uname_bin variable
+ - Defined missing uname_bin variable
  - Added function xshok_database
 
 ### Version 5.2.2 (updated 2016-04-18)
