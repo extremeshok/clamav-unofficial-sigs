@@ -56,7 +56,7 @@ function perms () {
 xshok_prompt_confirm () { #optional_message
 	message="${1:-Are you sure?}"
   while true; do
-    read -r -p "$message [y/N]" response
+    read -r -p "$message [y/N]" response  </dev/tty
     case $response in
       [yY]) return 0 ;;
       [nN]) return 1 ;;
