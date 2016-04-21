@@ -234,7 +234,7 @@ function xshok_database () { #database #rating
 								if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "LOWMEDIUM" ]; then
 									new_dbs="$new_dbs $db_name"		
 								fi
-							elif [ "$current_rating" == "MED" ] ; then
+							elif [ "$current_rating" == "MEDIUM" ] ; then
 								if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] || [ "$db_name_rating" == "LOWMEDIUM" ] ; then
 									new_dbs="$new_dbs $db_name"
 								fi
