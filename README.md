@@ -3,6 +3,10 @@
 [![Test Coverage](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/coverage.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/coverage)
 [![Issue Count](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/issue_count.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
 
+[![GitHub Release](https://img.shields.io/github/release/extremeshok/clamav-unofficial-sigs.svg?label=Latest)](https://github.com/extremeshok/clamav-unofficial-sigs/releases/latest)
+[![Github All Releases](https://img.shields.io/github/downloads/extremeshok/clamav-unofficial-sigs/total.svg?label=Downloads)](https://github.com/extremeshok/clamav-unofficial-sigs/releases)
+
+
 ClamAV Unofficial Signatures Updater
 
 Github fork of the sourceforge hosted and non maintained utility.
