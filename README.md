@@ -1,7 +1,4 @@
-# clamav-unofficial-sigs 
-
-[![Build Status](https://travis-ci.org/extremeshok/clamav-unofficial-sigs.svg?branch=master)](https://travis-ci.org/extremeshok/clamav-unofficial-sigs)
-[![GitHub Release](https://img.shields.io/github/release/extremeshok/clamav-unofficial-sigs.svg?label=Latest)](https://github.com/extremeshok/clamav-unofficial-sigs/releases/latest)
+# clamav-unofficial-sigs [![Build Status](https://travis-ci.org/extremeshok/clamav-unofficial-sigs.svg?branch=master)](https://travis-ci.org/extremeshok/clamav-unofficial-sigs) [![GitHub Release](https://img.shields.io/github/release/extremeshok/clamav-unofficial-sigs.svg?label=Latest)](https://github.com/extremeshok/clamav-unofficial-sigs/releases/latest)
 
 [![Code Climate](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/gpa.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
 [![Test Coverage](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/coverage.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/coverage)
