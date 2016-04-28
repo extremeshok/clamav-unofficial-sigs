@@ -946,7 +946,7 @@ function check_clamav () {
 
 #function to check for a new version
 function check_new_version () {
-	latest_version=$(curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2)
+	latest_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2)"
 	if [ "$latest_version" ] ; then
 		if [ ! "$latest_version" == "$script_version" ] ; then
 			xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
