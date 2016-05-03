@@ -1627,7 +1627,7 @@ fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
 	if [ -n "$yararulesproject_dbs" ] ; then
 		for db in $yararulesproject_dbs ; do
-			if echo "$db"|grep -q "/"; then
+			if echo "$db" | grep -q "/"; then
 				db=$(echo "$db" | cut -d"/" -f2)
 			fi
 			echo "$work_dir_yararulesproject/$db" >> "$current_tmp"
@@ -1697,7 +1697,9 @@ fi
 
 # Silence rsync output and only report errors - useful if script is run via cron.
 if [ "$rsync_silence" = "yes" ] ; then
-	rsync_output_level="-q"
+	rsync_output_level="--quiet"
+else
+	rsync_output_level="--stats --progress"
 fi
 
 # If the local rsync client supports the '--no-motd' flag, then enable it.
@@ -1712,7 +1714,7 @@ fi
 
 # Silence curl output and only report errors - useful if script is run via cron.
 if [ "$curl_silence" = "yes" ] ; then
-	curl_output_level="-s -S"
+	curl_output_level="--silent --show-error"
 else
 	curl_output_level=""
 fi
@@ -1763,7 +1765,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 			fi
 			sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
 			xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
-			$rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" --stats "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
+			$rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
 			if [ "$?" -eq "0" ] ; then #the correct way
 				sanesecurity_rsync_success="1"
 				for db_file in $sanesecurity_dbs ; do
@@ -2348,7 +2350,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 			xshok_pretty_echo_and_log "Checking for yararulesproject updates..."
 			yararulesproject_updates="0"
 			for db_file in $yararulesproject_dbs ; do
-				if echo "$db_file"|grep -q "/"; then
+				if echo "$db_file" | grep -q "/"; then
 					yr_dir="/"$(echo "$db_file" | cut -d"/" -f1)
 					db_file=$(echo "$db_file" | cut -d"/" -f2)
 				else yr_dir=""
@@ -2456,7 +2458,7 @@ else
 		if [ "$remove_disabled_databases" == "yes" ] ; then
 			xshok_pretty_echo_and_log "Removing disabled yararulesproject Database files"
 			for db_file in $yararulesproject_dbs ; do
-				if echo "$db_file"|grep -q "/"; then
+				if echo "$db_file" | grep -q "/"; then
 					db_file=$(echo "$db_file" | cut -d"/" -f2)
 				fi
 				if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
@@ -2485,7 +2487,7 @@ if [ -n "$additional_dbs" ] ; then
 		base_url=$(echo "$db_url" | cut -d "/" -f3)
 		db_file=$(basename "$db_url")
 		if [ "$(echo "$db_url" | cut -d ":" -f1)" = "rsync" ] ; then
-			if ! $rsync_bin $rsync_output_level $no_motd $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt -crtuz --stats --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null ;  then
+			if ! $rsync_bin $rsync_output_level $no_motd $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt -crtuz --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null ;  then
 				xshok_pretty_echo_and_log "Failed rsync connection to $base_url - SKIPPED $db_file update"
 			fi
 		else
