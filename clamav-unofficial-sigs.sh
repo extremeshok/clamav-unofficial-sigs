@@ -66,7 +66,7 @@ function xshok_prompt_confirm () { #optional_message
   done  
 }
 
-function create_pid_file { #pid.file
+function xshok_create_pid_file { #pid.file
 	if [ "$1" ]; then
 		pidfile="$1"
     echo $$ > "$pidfile"
@@ -83,7 +83,7 @@ function create_pid_file { #pid.file
 
 # Function to check if its a file, otherwise return false
 function xshok_is_file () { #"filepath"
-	filepath=$1
+	filepath="$1"
   if [ -f "${filepath}" ]; then
   	return 0 ;
   else
@@ -1273,7 +1273,7 @@ else
 fi
 
 if [ ! -n "$work_dir_pid" ] ; then
-	work_dir_pid=$(echo "$work_dir/$dir_dir" | sed 's:/*$::')
+	work_dir_pid=$(echo "$work_dir/$pid_dir" | sed 's:/*$::')
 else
 	work_dir_pid=$(echo "$work_dir_pid" | sed 's:/*$::')
 fi
@@ -1356,10 +1356,10 @@ if [ "$enable_locking" == "yes" ] ; then
 			xshok_pretty_echo_and_log "ERROR: Only one instance can run at the same time." "="
 	    exit 1
 	  else
-   		create_pid_file "$pid_file_fullpath"
+   		xshok_create_pid_file "$pid_file_fullpath"
   	fi
 	else
-   		create_pid_file "$pid_file_fullpath"
+   		xshok_create_pid_file "$pid_file_fullpath"
 	fi
 	trap -- "rm -f $pid_file_fullpath" EXIT
 fi
