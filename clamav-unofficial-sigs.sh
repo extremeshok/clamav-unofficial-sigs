@@ -1273,7 +1273,7 @@ else
 fi
 
 if [ ! -n "$work_dir_pid" ] ; then
-	work_dir_pid=$(echo "$work_dir/$pid_dir" | sed 's:/*$::')
+	work_dir_pid=$(echo "$work_dir/$_dir" | sed 's:/*$::')
 else
 	work_dir_pid=$(echo "$work_dir_pid" | sed 's:/*$::')
 fi
@@ -1348,6 +1348,7 @@ fi
 # Enable pid file to prevent issues with multiple instances
 # opted not to use flock as it appears to have issues with some systems
 if [ "$enable_locking" == "yes" ] ; then
+	xshok_mkdir_ownership "$work_dir_pid"
 	pid_file_fullpath="$work_dir_pid/clamav-unofficial-sigs.pid"
 	if [ -f $pid_file_fullpath ] ; then
 	  pid_file_pid=$(cat $pid_file_fullpath)
