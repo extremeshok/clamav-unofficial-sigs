@@ -67,12 +67,11 @@ function xshok_prompt_confirm () { #optional_message
 }
 
 function xshok_create_pid_file { #pid.file
-	if [ "$1" ]; then
+	if [ "$1" ] ; then
 		pidfile="$1"
     echo $$ > "$pidfile"
-    if [ $? -ne 0 ]
-    then
-      xshok_pretty_echo_and_log "ERROR: Could not create PID file"
+    if [ $? -ne 0 ] ;  then
+      xshok_pretty_echo_and_log "ERROR: Could not create PID file: $pidfile"
       exit 1
     fi
 	else
@@ -84,7 +83,7 @@ function xshok_create_pid_file { #pid.file
 # Function to check if its a file, otherwise return false
 function xshok_is_file () { #"filepath"
 	filepath="$1"
-  if [ -f "${filepath}" ]; then
+  if [ -f "${filepath}" ] ; then
   	return 0 ;
   else
   	return 1 ;	#not a file
@@ -111,8 +110,17 @@ function xshok_is_subdir () { #filepath
 
 # Function to create a dir and set the ownership
 function xshok_mkdir_ownership () { #"path"
-	mkdir -p "$1" 2>/dev/null
-	perms chown -f "$clam_user":"$clam_group" "$1"
+	if [ "$1" ] ; then
+		mkdir -p "$1" 2>/dev/null
+		if [ $? -ne 0 ] ;  then
+      xshok_pretty_echo_and_log "ERROR: Could not create directory: $1"
+      exit 1
+    fi
+		perms chown -f "$clam_user":"$clam_group" "$1" > /dev/null 2>&1
+	else
+		xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+		exit 1
+	fi
 }
 
 
@@ -173,8 +181,8 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 
 # function to check if the $2 value is not null and does not start with -
 function xshok_check_s2 () {
-	if [ "$1" ]; then
-		if [[ "$1" =~ ^-.* ]]; then
+	if [ "$1" ] ; then
+		if [[ "$1" =~ ^-.* ]] ; then
 			xshok_pretty_echo_and_log "ERROR: Missing value for option or value begins with -" "="
 			exit 1
 		fi
@@ -247,7 +255,7 @@ function xshok_database () { #database #rating
 							elif [ "$db_name_rating" == "REQUIRED" ] ; then
 								new_dbs="$new_dbs $db_name"
 							elif [ "$current_rating" == "LOW" ] ; then
-								if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "LOWMEDIUM" ]; then
+								if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "LOWMEDIUM" ] ; then
 									new_dbs="$new_dbs $db_name"		
 								fi
 							elif [ "$current_rating" == "MEDIUM" ] ; then
@@ -566,7 +574,7 @@ function output_system_configuration_information () {
 	echo "$clam_dbs"
 	echo "*** SCRIPT CONFIGURATION SETTINGS ***"
 	if [ "$custom_config" != "no" ] ; then
-		if [ -d "$custom_config" ]; then
+		if [ -d "$custom_config" ] ; then
 			# Assign the custom config dir and remove trailing / (removes / and //)
 			echo "Custom Configuration Directory: $config_dir"
 		else
@@ -976,7 +984,7 @@ function check_new_version () {
 # help_and_usage - normal help output formatting
 function help_and_usage () {
 
-	if [ "$1" ]; then
+	if [ "$1" ] ; then
 		#option_format_start
 		ofs="\fB"
 		#option_format_end
@@ -1044,7 +1052,7 @@ $ofb
 EOF
 	) #this is very important...
 
-	if [ "$1" ]; then
+	if [ "$1" ] ; then
 		echo "${helpcontents//-/\\-}"
 	else
 		echo -e "$helpcontents"
@@ -1150,7 +1158,7 @@ done
 
 ## CONFIG LOADING AND ERROR CHECKING ##############################################
 if [ "$custom_config" != "no" ] ; then
-	if [ -d "$custom_config" ]; then
+	if [ -d "$custom_config" ] ; then
 		# Assign the custom config dir and remove trailing / (removes / and //)
 		config_dir=$(echo "$custom_config" | sed 's:/*$::')
 		config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
@@ -1398,7 +1406,7 @@ if [ "$enable_yararules" == "yes" ] ; then
 	current_clamav_version=$($clamscan_bin -V | cut -d " " -f2 | cut -d "/" -f1 | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')
 	minimum_yara_clamav_version=$(echo "$minimum_yara_clamav_version" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')
 	#Check current clamav version against the minimum required version for yara support
-	if [ "$current_clamav_version" -lt "$minimum_yara_clamav_version" ]; then #older
+	if [ "$current_clamav_version" -lt "$minimum_yara_clamav_version" ] ; then #older
 		yararulesproject_enabled="no"
 		enable_yararules="no"
 		xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
