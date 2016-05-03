@@ -1396,9 +1396,17 @@ if [ "$enable_locking" == "yes" ] ; then
 	else
    		xshok_create_pid_file "$pid_file_fullpath"
 	fi
+	# run this wehen the script exits
 	trap -- "rm -f $pid_file_fullpath" EXIT
 fi
-##run this wehen the script exits
+
+# Verify the clam_user and clam_group actually exists
+if [ ! xshok_user_group_exists "$clam_user" "$clam_group" ] ; then
+	xshok_pretty_echo_and_log "ERROR: Either the user: $clam_user and/or group: $clam_group does not exist on the system." "="
+	exit 1
+fi
+
+
 
 ################################################################################
 # MAIN LOGIC
