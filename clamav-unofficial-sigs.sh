@@ -37,6 +37,7 @@ if [ ! "$( tail -1 "$0" | head -1 | cut -c1-7 )" == "exit \$?" ] ; then
 	exit 1
 fi
 
+
 ################################################################################
 # HELPER FUNCTIONS
 ################################################################################
@@ -53,7 +54,7 @@ function perms () {
 # if xshok_prompt_confirm; then
 # xshok_prompt_confirm && echo "accepted"
 # xshok_prompt_confirm && echo "yes" || echo "no"
-xshok_prompt_confirm () { #optional_message
+function xshok_prompt_confirm () { #optional_message
 	message="${1:-Are you sure?}"
   while true; do
     read -r -p "$message [y/N]" response  </dev/tty
@@ -65,8 +66,23 @@ xshok_prompt_confirm () { #optional_message
   done  
 }
 
+function create_pid_file { #pid.file
+	if [ "$1" ]; then
+		pidfile="$1"
+    echo $$ > "$pidfile"
+    if [ $? -ne 0 ]
+    then
+      xshok_pretty_echo_and_log "ERROR: Could not create PID file"
+      exit 1
+    fi
+	else
+		xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+		exit 1
+	fi
+}	
+
 # Function to check if its a file, otherwise return false
-xshok_is_file () { #"filepath"
+function xshok_is_file () { #"filepath"
 	filepath=$1
   if [ -f "${filepath}" ]; then
   	return 0 ;
@@ -79,7 +95,7 @@ xshok_is_file () { #"filepath"
 # Usage: xshok_is_subdir "filepath"
 # xshok_is_subdir "/root/" - false
 # xshok_is_subdir "/usr/local/etc" && echo "yes" - yes
-xshok_is_subdir () { #filepath
+function xshok_is_subdir () { #filepath
 	filepath=$(echo "$1" | sed 's:/*$::')
 	if [ -d "$filepath" ] ; then
 		res="${filepath//[^\/]}"
@@ -1069,6 +1085,7 @@ clamscan_bin=$(which clamscan)
 rsync_bin=$(which rsync)
 curl_bin=$(which curl)
 gpg_bin=$(which gpg)
+flock_bin=$(flock)
 
 #Detect if terminal
 if [ -t 1 ] ; then
@@ -1255,6 +1272,12 @@ else
 	work_dir_gpg=$(echo "$work_dir_gpg" | sed 's:/*$::')
 fi
 
+if [ ! -n "$work_dir_pid" ] ; then
+	work_dir_pid=$(echo "$work_dir/$dir_dir" | sed 's:/*$::')
+else
+	work_dir_pid=$(echo "$work_dir_pid" | sed 's:/*$::')
+fi
+
 #	Assign defaults if not defined
 if [ ! -n "$cron_dir" ] ; then
 	cron_dir="/etc/cron.d"
@@ -1322,6 +1345,25 @@ if [ "$force_updates" == "yes" ] ; then
 	yararulesproject_update_hours="0"
 fi
 
+# Enable pid file to prevent issues with multiple instances
+# opted not to use flock as it appears to have issues with some systems
+if [ "$enable_locking" == "yes" ] ; then
+	pid_file_fullpath="$work_dir_pid/clamav-unofficial-sigs.pid"
+	if [ -f $pid_file_fullpath ] ; then
+	  pid_file_pid=$(cat $pid_file_fullpath)
+	  ps -p "$pid_file_pid" > /dev/null 2>&1
+	  if [ $? -eq 0 ] ; then 
+			xshok_pretty_echo_and_log "ERROR: Only one instance can run at the same time." "="
+	    exit 1
+	  else
+   		create_pid_file "$pid_file_fullpath"
+  	fi
+	else
+   		create_pid_file "$pid_file_fullpath"
+	fi
+	trap -- "rm -f $pid_file_fullpath" EXIT
+fi
+##run this wehen the script exits
 
 ################################################################################
 # MAIN LOGIC
