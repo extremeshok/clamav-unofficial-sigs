@@ -123,6 +123,32 @@ function xshok_mkdir_ownership () { #"path"
 	fi
 }
 
+# Function to check if a user and group exists on the system otherwise return false
+# Usage: 
+# xshok_is_subdir "username" && echo "user found" || echo "no"
+# xshok_is_subdir "username" "groupname" && echo "user and group found" || echo "no"
+function xshok_user_group_exists () { #"username" "groupname"
+	if [ "$1" ] ; then
+		id -u "$1" > /dev/null 2>&1
+	  if [ $? -eq 0 ]; then
+	  	if [ "$2" ] ; then
+		  	id -g "$2" > /dev/null 2>&1
+			  if [ $? -eq 0 ]; then
+			  	return 0 ; #user and group exists
+			  else
+			  	return 1 ;	#group does NOT exist
+			  fi
+			 else
+			 		return 0; #user exists
+			 fi
+		else
+			return 1 ;	#user does NOT exist
+	  fi
+	else
+		xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+		exit 1
+	fi
+}
 
 # Function to handle comments with/out borders and logging.
 # Usage:
