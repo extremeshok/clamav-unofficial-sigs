@@ -1681,7 +1681,8 @@ rm -f "$current_tmp"
 if [ "$remove_disabled_databases" == "yes" ] ; then
 	previous_dbs="$work_dir_work_configs/previous-dbs.txt"
 	sort "$current_dbs" > "$previous_dbs" 2>/dev/null
-	rm -f "$current_dbs"
+	#do not remove the current_dbs
+	#rm -f "$current_dbs"
 
 	db_changes="$work_dir_work_configs/db-changes.txt"
 	if [ ! -s "$previous_dbs" ] ; then
