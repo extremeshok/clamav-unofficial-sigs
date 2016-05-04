@@ -1093,9 +1093,9 @@ EOF
 ################################################################################
 
 #Script Info
-script_version="5.2.2"
-script_version_date="18 April 2016"
-minimum_required_config_version="62"
+script_version="5.3"
+script_version_date="04 May 2016"
+minimum_required_config_version="64"
 minimum_yara_clamav_version="0.99"
 
 #default config files
@@ -1400,13 +1400,11 @@ if [ "$enable_locking" == "yes" ] ; then
 	trap -- "rm -f $pid_file_fullpath" EXIT
 fi
 
-# Verify the clam_user and clam_group actually exists
+# Verify the clam_user and clam_group actually exists on the system
 if [ ! xshok_user_group_exists "$clam_user" "$clam_group" ] ; then
 	xshok_pretty_echo_and_log "ERROR: Either the user: $clam_user and/or group: $clam_group does not exist on the system." "="
 	exit 1
 fi
-
-
 
 ################################################################################
 # MAIN LOGIC
