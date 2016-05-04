@@ -1222,7 +1222,7 @@ for config_file in "${config_files[@]}" ; do
 
 		#config loading
 		for i in "${clean_config[@]}" ; do
-			eval $(echo ${i} | command sed -e 's/[[:space:]]*$//')
+			eval $(echo "${i}" | command sed -e 's/[[:space:]]*$//')
 		done
 	fi
 done
@@ -1242,7 +1242,7 @@ fi
 
 #prevent some issues with an incomplete or only a user.conf being loaded
 if [ $config_version  == "0" ] ; then
-	xshok_pretty_echo_and_log "ERROR: Config file is missing important contents of the master.conf" "="
+	xshok_pretty_echo_and_log "ERROR: Config file/s are missing important contents" "="
 	xshok_pretty_echo_and_log "Note: Possible fix would be to point the script to the dir with the configs"
 	exit 1
 fi
