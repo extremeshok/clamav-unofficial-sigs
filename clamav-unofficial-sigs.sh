@@ -139,7 +139,7 @@ function xshok_user_group_exists () { #"username" "groupname"
 			  	return 1 ;	#group does NOT exist
 			  fi
 			 else
-			 		return 0; #user exists
+			 		return 0 ; #user exists
 			 fi
 		else
 			return 1 ;	#user does NOT exist
@@ -1119,7 +1119,6 @@ clamscan_bin=$(which clamscan)
 rsync_bin=$(which rsync)
 curl_bin=$(which curl)
 gpg_bin=$(which gpg)
-flock_bin=$(flock)
 
 #Detect if terminal
 if [ -t 1 ] ; then
@@ -1401,7 +1400,7 @@ if [ "$enable_locking" == "yes" ] ; then
 fi
 
 # Verify the clam_user and clam_group actually exists on the system
-if [ ! xshok_user_group_exists "$clam_user" "$clam_group" ] ; then
+if ! xshok_user_group_exists "$clam_user" "$clam_group" ; then
 	xshok_pretty_echo_and_log "ERROR: Either the user: $clam_user and/or group: $clam_group does not exist on the system." "="
 	exit 1
 fi
