@@ -21,6 +21,10 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 
 ### Submit Patches / Pull requests to the "Dev" Branch
 
+### Required Ports / Firewall Exceptions
+* rsync: TCP port 873
+* curl/wget : TCP port 443
+
 ### Quick Install Guide
 * Download the files to /tmp/
 * Copy clamav-unofficial-sigs.sh to /usr/local/bin/
