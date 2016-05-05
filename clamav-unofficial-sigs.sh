@@ -590,9 +590,15 @@ function output_system_configuration_information () {
 	echo "*** RSYNC LOCATION & VERSION ***"
 	echo "$rsync_bin"
 	$rsync_bin --version | head -1
-	echo "*** WGET LOCATION & VERSION ***"
-	echo "$wget_bin"
-	$wget_bin --version | head -1
+	if [ "$wget_bin" != "" ] ; then
+		echo "*** WGET LOCATION & VERSION ***"
+		echo "$wget_bin"
+		$wget_bin --version | head -1
+	else
+		echo "*** CURL LOCATION & VERSION ***"
+		echo "$curl_bin"
+		$curl_bin --version | head -1
+	fi
 	echo "*** GPG LOCATION & VERSION ***"
 	echo "$gpg_bin"
 	$gpg_bin --version | head -1
@@ -998,7 +1004,11 @@ function check_clamav () {
 
 #function to check for a new version
 function check_new_version () {
-	latest_version="$($wget_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | grep  "script""_version=" | cut -d\" -f2)"
+	if [ "$wget_bin" != "" ] ; then
+		latest_version="$($wget_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | grep  "script""_version=" | cut -d\" -f2)"
+	else
+		latest_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2)"
+	fi
 	if [ "$latest_version" ] ; then
 		if [ ! "$latest_version" == "$script_version" ] ; then
 			xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
@@ -1117,6 +1127,7 @@ uname_bin=$(which uname)
 clamscan_bin=$(which clamscan)
 rsync_bin=$(which rsync)
 wget_bin=$(which wget)
+curl_bin=$(which curl)
 gpg_bin=$(which gpg)
 
 #Detect if terminal
@@ -1152,13 +1163,13 @@ done
 #Set the verbosity
 if [ "$force_verbose" == "yes" ] ; then
 	#verbose
-	wget_silence="no"
+	downloader_silence="no"
 	rsync_silence="no"
 	gpg_silence="no"
 	comment_silence="no"
 else
 	#silence
-	wget_silence="yes"
+	downloader_silence="yes"
 	rsync_silence="yes"
 	gpg_silence="yes"
 	comment_silence="yes"
@@ -1355,8 +1366,10 @@ if [ "$rsync_bin" == "" ] ; then
 	exit 1
 fi
 if [ "$wget_bin" == "" ] ; then
-	xshok_pretty_echo_and_log "ERROR: wget binary (wget_bin) not found" "="
-	exit 1
+	if [ "$curl_bin" == "" ] ; then
+		xshok_pretty_echo_and_log "ERROR: wget and curl binaries not found, script requires either wget or curl" "="
+		exit 1
+	fi
 fi
 if [ "$gpg_bin" == "" ] ; then
 	xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
@@ -1411,11 +1424,13 @@ this_script_full_path="$this_script_path/$this_script_name"
 
 if xshok_is_root ; then
 	my_script_name="$(basename "$0")"
-	if [ "$(stat -c '%a' "$this_script_path/$this_script_name")" != "755" ] ; then
-		xshok_pretty_echo_and_log "Setting 755 permission on $this_script_path/$this_script_name" "="
-	else
-		echo "already set"
-	fi
+	#if [ "$(stat -c '%a' "$this_script_path/$this_script_name")" != "755" ] ; then
+		chmod 755 "$this_script_path/$this_script_name"
+		xshok_pretty_echo_and_log "Fixing permission on $this_script_path/$this_script_name" "="
+		perms chown -f "$clam_user":"$clam_group" "$this_script_path/$this_script_name"
+	#else
+#		echo "already set"
+	#fi
 fi
 
 ################################################################################
@@ -1568,12 +1583,15 @@ perms chmod -f 0700 "$work_dir_gpg"
 
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
-	$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" "$sanesecurity_gpg_url" --output-document="$work_dir_gpg/publickey.gpg"
+	if [ "$wget_bin" != "" ] ; then
+		$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
+	else
+		$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --relative --retry "$downloader_tries" --timeout "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
+	fi		
 	if [ $? -ne 0 ]; then
 		xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
 		exit 1
 	else
-
 		xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully downloaded"
 		rm -f -- "$work_dir_gpg/ss-keyring.gp*"
 		if ! $gpg_bin -q --no-options --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --import "$work_dir_gpg/publickey.gpg" 2>/dev/null ; then
@@ -1737,8 +1755,9 @@ echo "$log_file_path/$log_file_name*" >> "$purge"
 echo "$purge" >> "$purge"
 
 # Ignore SSL errors
-if [ "$ignore_ssl" = "yes" ] ; then
+if [ "$downloader_ignore_ssl" = "yes" ] ; then
 	wget_insecure="--no-check-certificate"
+	curl_insecure="--insecure"
 fi
 
 # Silence rsync output and only report errors - useful if script is run via cron.
@@ -1759,10 +1778,12 @@ if $rsync_bin --help | grep 'contimeout' > /dev/null ; then
 fi
 
 # Silence wget output and only report errors - useful if script is run via cron.
-if [ "$wget_silence" = "yes" ] ; then
+if [ "$downloader_silence" = "yes" ] ; then
 	wget_output_level="--quiet" #--quiet
+	curl_output_level="--silent --show-error"
 else
 	wget_output_level="--no-verbose"
+	curl_output_level=""
 fi
 
 # Check and save current system time since epoch for time related database downloads.
@@ -1951,7 +1972,11 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 					fi
 					xshok_pretty_echo_and_log "Checking for updated SecuriteInfo database file: $db_file"
 					securiteinfo_db_update="0"
-					$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
+					if [ "$wget_bin" != "" ] ; then
+						$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
+					else
+						$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --relative --retry "$downloader_tries" --timeout "$downloader_max_time" --output "$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
+					fi
 					if [ $? -ne 0 ]; then
 						loop="1"
 						if ! cmp -s "$work_dir_securiteinfo/$db_file" "$clam_dbs/$db_file" ; then
@@ -2093,7 +2118,11 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 				xshok_pretty_echo_and_log "Checking for updated linuxmalwaredetect database file: $db_file"
 
 				linuxmalwaredetect_db_update="0"
-				$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
+				if [ "$wget_bin" != "" ] ; then
+					$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
+				else
+					$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --relative --retry "$downloader_tries" --timeout "$downloader_max_time" --output "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
+				fi
 				if [ $? -ne 0 ]; then
 					loop="1"
 					if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
@@ -2236,7 +2265,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
 				malwarepatrol_reloaded=0
 				if [ "$malwarepatrol_free" == "yes" ] ; then
-					$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+					if [ "$wget_bin" != "" ] ; then
+						$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+					else
+						$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --relative --retry "$downloader_tries" --timeout "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+					fi
 					if [ $? -ne 0 ]; then
 						if ! cmp -s "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db" ; then
 							if [ "$?" = "0" ] ; then
@@ -2250,7 +2283,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 					fi
 
 				else # The not free branch
-					$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
+					if [ "$wget_bin" != "" ] ; then
+						$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
+					else
+						$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --relative --retry="$downloader_tries" --timeout "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
+					fi
 					if [ $? -ne 0 ]; then
 						if [ -f "$clam_dbs/$malwarepatrol_db" ] ; then
 							malwarepatrol_md5=$(openssl md5 -r "$clam_dbs/$malwarepatrol_db" 2>/dev/null | cut -d" " -f1)
@@ -2261,7 +2298,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 						fi
 						malwarepatrol_md5_new=$(cat "$work_dir_malwarepatrol/$malwarepatrol_db.md5")
 						if [ -n "$malwarepatrol_md5_new" ] && [ "$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ; then
-							$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+							if [ "$wget_bin" != "" ] ; then
+								$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+							else
+								$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --relative --retry "$downloader_tries" --timeout "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+							fi
 							if [ $? -ne 0 ]; then
 								malwarepatrol_reloaded=1
 							else # wget DB fail
@@ -2403,8 +2444,12 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 				xshok_pretty_echo_and_log "Checking for updated yararulesproject database file: $db_file"
 
 				yararulesproject_db_update="0"
-				$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
-				if [ $? -ne 0 ]; then
+					if [ "$wget_bin" != "" ] ; then
+						$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
+					else
+						$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --relative --retry "$downloader_tries" --timeout "$downloader_max_time" --output "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
+					fi
+					if [ $? -ne 0 ]; then
 					loop="1"
 					if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
 						if [ "$?" = "0" ] ; then
@@ -2529,8 +2574,11 @@ if [ -n "$additional_dbs" ] ; then
 				xshok_pretty_echo_and_log "Failed rsync connection to $base_url - SKIPPED $db_file update"
 			fi
 		else
-
-			$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_add/$db_file" "$db_url"
+			if [ "$wget_bin" != "" ] ; then
+				$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_add/$db_file" "$db_url"
+			else
+				$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --relative --retry "$downloader_tries" --timeout "$downloader_max_time" --output "$work_dir_add/$db_file" "$db_url"
+			fi
 			if [ $? -eq 0 ]; then
 				xshok_pretty_echo_and_log "Failed connection to $base_url - SKIPPED $db_file update"
 			fi

@@ -23,7 +23,7 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 
 ### Required Ports / Firewall Exceptions
 * rsync: TCP port 873
-* wget : TCP port 443
+* wget/curl : TCP port 443
 
 ### Quick Install Guide
 * Download the files to /tmp/
@@ -100,6 +100,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - eXtremeSHOK.com Maintenance
  - Major change: Updated to use new database structure
  - Major change: curl replaced with wget, we now have retries for failed transfers
+ - Added fallback to curl if wget is not available
  - Added locking (Enable pid file to prevent issues with multiple instances)
  - Code refactor: if wget repaced with if $? -ne 0
  - Enhancement: Verify the clam_user and clam_group actually exists on the system
