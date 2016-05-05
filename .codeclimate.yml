@@ -8,3 +8,6 @@ ratings:
   paths: []
 exclude_paths:
   - .travis/
+checks:
+  SC2001:
+    enabled: false
