@@ -588,6 +588,9 @@ function output_system_configuration_information () {
 	echo "*** RSYNC LOCATION & VERSION ***"
 	echo "$rsync_bin"
 	$rsync_bin --version | head -1
+	echo "*** WGET LOCATION & VERSION ***"
+	echo "$wget_bin"
+	$wget_bin --version | head -1
 	echo "*** CURL LOCATION & VERSION ***"
 	echo "$curl_bin"
 	$curl_bin --version | head -1
@@ -1117,6 +1120,7 @@ clamd_reload_opt="clamdscan --reload"
 uname_bin=$(which uname)
 clamscan_bin=$(which clamscan)
 rsync_bin=$(which rsync)
+wget_bin=$(which wget)
 curl_bin=$(which curl)
 gpg_bin=$(which gpg)
 
@@ -1153,13 +1157,13 @@ done
 #Set the verbosity
 if [ "$force_verbose" == "yes" ] ; then
 	#verbose
-	curl_silence="no"
+	wget_silence="no"
 	rsync_silence="no"
 	gpg_silence="no"
 	comment_silence="no"
 else
 	#silence
-	curl_silence="yes"
+	wget_silence="yes"
 	rsync_silence="yes"
 	gpg_silence="yes"
 	comment_silence="yes"
@@ -1355,8 +1359,8 @@ if [ "$rsync_bin" == "" ] ; then
 	xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found" "="
 	exit 1
 fi
-if [ "$curl_bin" == "" ] ; then
-	xshok_pretty_echo_and_log "ERROR: curl binary (curl_bin) not found" "="
+if [ "$wget_bin" == "" ] ; then
+	xshok_pretty_echo_and_log "ERROR: curl binary (wget_bin) not found" "="
 	exit 1
 fi
 if [ "$gpg_bin" == "" ] ; then
@@ -1555,7 +1559,8 @@ perms chmod -f 0700 "$work_dir_gpg"
 
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
-	if ! $curl_bin -s -S $curl_proxy $curl_insecure --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$sanesecurity_gpg_url" -o "$work_dir_gpg/publickey.gpg" 2>/dev/null ; then
+	$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" "$sanesecurity_gpg_url" --output-document="$work_dir_gpg/publickey.gpg"
+	if [ $? -eq 0 ]; then
 		xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
 		exit 1
 	else
@@ -1724,14 +1729,14 @@ echo "$purge" >> "$purge"
 
 # Ignore SSL errors
 if [ "$ignore_ssl" = "yes" ] ; then
-	curl_insecure="--insecure"
+	wget_insecure="--no-check-certificate"
 fi
 
 # Silence rsync output and only report errors - useful if script is run via cron.
 if [ "$rsync_silence" = "yes" ] ; then
 	rsync_output_level="--quiet"
 else
-	rsync_output_level="--stats --progress"
+	rsync_output_level="--progress"
 fi
 
 # If the local rsync client supports the '--no-motd' flag, then enable it.
@@ -1745,10 +1750,10 @@ if $rsync_bin --help | grep 'contimeout' > /dev/null ; then
 fi
 
 # Silence curl output and only report errors - useful if script is run via cron.
-if [ "$curl_silence" = "yes" ] ; then
-	curl_output_level="--silent --show-error"
+if [ "$wget_silence" = "yes" ] ; then
+	wget_output_level="--quiet" #--quiet
 else
-	curl_output_level=""
+	wget_output_level="--no-verbose"
 fi
 
 # Check and save current system time since epoch for time related database downloads.
@@ -1905,6 +1910,8 @@ else
 	fi
 fi
 
+########### REMOVE THIS
+
 ##############################################################################################################################################
 # Check for updated SecuriteInfo database files every set number of  hours as defined in the "USER CONFIGURATION" section of this script #
 ##############################################################################################################################################
@@ -1926,27 +1933,22 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 			time_interval=$((current_time - last_securiteinfo_update))
 			if [ "$time_interval" -ge $((update_interval - 600)) ] ; then
 				echo "$current_time" > "$work_dir_work_configs/last-si-update.txt"
-
 				xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
 				xshok_pretty_echo_and_log "Checking for SecuriteInfo updates..."
-				securiteinfo_updates="0"
+				securiteinfo_updates="0" 
 				for db_file in $securiteinfo_dbs ; do
 					if [ "$loop" = "1" ] ; then
 						xshok_pretty_echo_and_log "---"      
 					fi
 					xshok_pretty_echo_and_log "Checking for updated SecuriteInfo database file: $db_file"
-
 					securiteinfo_db_update="0"
-					if [ -r "$work_dir_securiteinfo/$db_file" ] ; then
-						z_opt="-z $work_dir_securiteinfo/$db_file"
-					else
-						z_opt=""
-					fi
-					if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$z_opt" -o "$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file" 2>/dev/null ;	then
+					$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
+					if [ $? -ne 0 ]; then
 						loop="1"
 						if ! cmp -s "$work_dir_securiteinfo/$db_file" "$clam_dbs/$db_file" ; then
 							if [ "$?" = "0" ] ; then
 								db_ext=$(echo "$db_file" | cut -d "." -f2)
+
 
 								xshok_pretty_echo_and_log "Testing updated SecuriteInfo database file: $db_file"
 								if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ]
@@ -2010,7 +2012,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 					fi
 				fi
 			else
-				xshok_pretty_echo_and_log "Failed curl connection to $securiteinfo_url - SKIPPED SecuriteInfo $db_file update"
+				xshok_pretty_echo_and_log "Failed connection to $securiteinfo_url - SKIPPED SecuriteInfo $db_file update"
 			fi
 			if [ "$securiteinfo_db_update" != "1" ] ; then          
 				xshok_pretty_echo_and_log "No updated SecuriteInfo $db_file database file found" "-"
@@ -2082,12 +2084,8 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 				xshok_pretty_echo_and_log "Checking for updated linuxmalwaredetect database file: $db_file"
 
 				linuxmalwaredetect_db_update="0"
-				if [ -r "$work_dir_linuxmalwaredetect/$db_file" ] ; then
-					z_opt="-z $work_dir_linuxmalwaredetect/$db_file"
-				else
-					z_opt=""
-				fi
-				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$z_opt" -o "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file" 2>/dev/null ; then
+				$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
+				if [ $? -ne 0 ]; then
 					loop="1"
 					if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
 						if [ "$?" = "0" ] ; then
@@ -2152,7 +2150,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 				fi
 			fi
 		else
-			xshok_pretty_echo_and_log "WARNING: Failed curl connection to $linuxmalwaredetect_url - SKIPPED linuxmalwaredetect $db_file update"
+			xshok_pretty_echo_and_log "WARNING: Failed connection to $linuxmalwaredetect_url - SKIPPED linuxmalwaredetect $db_file update"
 		fi
 		if [ "$linuxmalwaredetect_db_update" != "1" ] ; then
 
@@ -2229,7 +2227,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
 				malwarepatrol_reloaded=0
 				if [ "$malwarepatrol_free" == "yes" ] ; then
-					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
+					$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+					if [ $? -ne 0 ]; then
 						if ! cmp -s "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db" ; then
 							if [ "$?" = "0" ] ; then
 								malwarepatrol_reloaded=1
@@ -2242,7 +2241,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 					fi # if culr
 
 				else # The not free branch
-					if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o "$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1" 2>/dev/null ;	then
+					$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
+					if [ $? -ne 0 ]; then
 						if [ -f "$clam_dbs/$malwarepatrol_db" ] ; then
 							malwarepatrol_md5=$(openssl md5 -r "$clam_dbs/$malwarepatrol_db" 2>/dev/null | cut -d" " -f1)
 							if [ ! "$malwarepatrol_md5" ] ; then
@@ -2252,7 +2252,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 						fi
 						malwarepatrol_md5_new=$(cat "$work_dir_malwarepatrol/$malwarepatrol_db.md5")
 						if [ -n "$malwarepatrol_md5_new" ] && [ "$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ; then
-							if $curl_bin $curl_proxy $curl_insecure $curl_output_level -R --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -o "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code" 2>/dev/null ; then
+							$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
+							if [ $? -ne 0 ]; then
 								malwarepatrol_reloaded=1
 							else # curl DB fail
 								malwarepatrol_reloaded=-1
@@ -2322,7 +2323,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 			xshok_pretty_echo_and_log "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
 			;;
 			-1) # Curl failed
-			xshok_pretty_echo_and_log "WARNING - Failed curl connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
+			xshok_pretty_echo_and_log "WARNING - Failed connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
 			;;
 		esac
 
@@ -2393,12 +2394,8 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 				xshok_pretty_echo_and_log "Checking for updated yararulesproject database file: $db_file"
 
 				yararulesproject_db_update="0"
-				if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
-					z_opt="-z $work_dir_yararulesproject/$db_file"
-				else
-					z_opt=""
-				fi
-				if $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$z_opt" -o "$work_dir_yararulesproject/$db_file" "$yararulesproject_url$yr_dir/$db_file" 2>/dev/null ; then
+				$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
+				if [ $? -ne 0 ]; then
 					loop="1"
 					if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
 						if [ "$?" = "0" ] ; then
@@ -2463,7 +2460,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 				fi
 			fi
 		else
-			xshok_pretty_echo_and_log "WARNING: Failed curl connection to $yararulesproject_url - SKIPPED yararulesproject $db_file update"
+			xshok_pretty_echo_and_log "WARNING: Failed connection to $yararulesproject_url - SKIPPED yararulesproject $db_file update"
 		fi
 		if [ "$yararulesproject_db_update" != "1" ] ; then
 			xshok_pretty_echo_and_log "No updated yararulesproject $db_file database file found"
@@ -2523,13 +2520,10 @@ if [ -n "$additional_dbs" ] ; then
 				xshok_pretty_echo_and_log "Failed rsync connection to $base_url - SKIPPED $db_file update"
 			fi
 		else
-			if [ -r "$work_dir_add/$db_file" ] ; then
-				z_opt="-z $work_dir_add/$db_file"
-			else
-				z_opt=""
-			fi
-			if ! $curl_bin $curl_output_level --connect-timeout "$curl_connect_timeout" --max-time "$curl_max_time" -L -R "$z_opt" -o "$work_dir_add/$db_file" "$db_url" 2>/dev/null ; then
-				xshok_pretty_echo_and_log "Failed curl connection to $base_url - SKIPPED $db_file update"
+
+			$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_add/$db_file" "$db_url"
+			if [ $? -eq 0 ]; then
+				xshok_pretty_echo_and_log "Failed connection to $base_url - SKIPPED $db_file update"
 			fi
 		fi
 	done
