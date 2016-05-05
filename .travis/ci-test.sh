@@ -11,7 +11,15 @@ else
   exit 1
 fi
 
-#check cron file generation
+echo "check gpg file was downloaded"
+if [ -e "/var/lib/clamav-unofficial-sigs/gpg-key/publickey.gpg" ] ; then
+	echo .. OK	
+else
+	echo .. ERROR
+  exit 1
+fi
+
+echo "check cron file generation"
 if bash clamav-unofficial-sigs.sh --install-cron ; then
 	if [ -e "/etc/cron.d/clamav-unofficial-sigs" ] ; then
 		echo .. OK	
@@ -24,7 +32,7 @@ else
   exit 1
 fi
 
-#check logrotate file generation
+echo "check logrotate file generation"
 if bash clamav-unofficial-sigs.sh --install-logrotate  ; then
 	if [ -e "/etc/logrotate.d/clamav-unofficial-sigs" ] ; then
 		echo .. OK	
@@ -37,7 +45,7 @@ else
   exit 1
 fi
 
-#check man file generation
+echo "check man file generation"
 if bash clamav-unofficial-sigs.sh --install-man  ; then
 	if [ -e "/usr/share/man/man8/clamav-unofficial-sigs.8" ] ; then
 		echo .. OK	
