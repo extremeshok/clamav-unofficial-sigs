@@ -1560,7 +1560,7 @@ perms chmod -f 0700 "$work_dir_gpg"
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
 	$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" "$sanesecurity_gpg_url" --output-document="$work_dir_gpg/publickey.gpg"
-	if [ $? -eq 0 ]; then
+	if [ $? -ne 0 ]; then
 		xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
 		exit 1
 	else
