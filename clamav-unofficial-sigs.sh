@@ -1592,7 +1592,7 @@ if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
 		$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
 		ret="$?"
 	fi		
-	if [ "$ret" = "0" ] ; then
+	if [ "$ret" != "0" ] ; then
 		xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
 		exit 1
 	else
