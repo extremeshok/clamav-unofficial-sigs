@@ -2759,18 +2759,19 @@ fi
 
 # Set appropriate directory and file permissions to all production signature files
 # and set file access mode to 0644 on all working directory files.
-perms chown -f -R "$clam_user":"$clam_group" "$work_dir"
-if ! find "$work_dir" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
-	if ! find "$work_dir" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
-		if ! find "$work_dir" -type f -print0 | xargs chmod -f 0644 2>/dev/null ; then
-			find "$work_dir" -type f -exec chmod -f 0644 {} \;
+
+if [ "$setmode" = "yes" ] && xshok_is_root ; then
+	xshok_pretty_echo_and_log "Setting permissions and ownership" "="
+	perms chown -f -R "$clam_user":"$clam_group" "$work_dir"
+	if ! find "$work_dir" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
+		if ! find "$work_dir" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
+			if ! find "$work_dir" -type f -print0 | xargs chmod -f 0644 2>/dev/null ; then
+				find "$work_dir" -type f -exec chmod -f 0644 {} \;
+			fi
 		fi
 	fi
-fi
-
 
 # If enabled, set file access mode for all production signature database files to 0644.
-if [ "$setmode" = "yes" ] ; then
 	perms chown -f -R "$clam_user":"$clam_group" "$clam_dbs"
 	if ! find "$clam_dbs" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
 		if ! find "$clam_dbs" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
