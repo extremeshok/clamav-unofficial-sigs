@@ -591,9 +591,6 @@ function output_system_configuration_information () {
 	echo "*** WGET LOCATION & VERSION ***"
 	echo "$wget_bin"
 	$wget_bin --version | head -1
-	echo "*** CURL LOCATION & VERSION ***"
-	echo "$curl_bin"
-	$curl_bin --version | head -1
 	echo "*** GPG LOCATION & VERSION ***"
 	echo "$gpg_bin"
 	$gpg_bin --version | head -1
@@ -999,7 +996,7 @@ function check_clamav () {
 
 #function to check for a new version
 function check_new_version () {
-	latest_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | grep  "script""_version=" | cut -d\" -f2)"
+	latest_version="$($wget_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | grep  "script""_version=" | cut -d\" -f2)"
 	if [ "$latest_version" ] ; then
 		if [ ! "$latest_version" == "$script_version" ] ; then
 			xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
@@ -1121,7 +1118,6 @@ uname_bin=$(which uname)
 clamscan_bin=$(which clamscan)
 rsync_bin=$(which rsync)
 wget_bin=$(which wget)
-curl_bin=$(which curl)
 gpg_bin=$(which gpg)
 
 #Detect if terminal
@@ -1360,7 +1356,7 @@ if [ "$rsync_bin" == "" ] ; then
 	exit 1
 fi
 if [ "$wget_bin" == "" ] ; then
-	xshok_pretty_echo_and_log "ERROR: curl binary (wget_bin) not found" "="
+	xshok_pretty_echo_and_log "ERROR: wget binary (wget_bin) not found" "="
 	exit 1
 fi
 if [ "$gpg_bin" == "" ] ; then
@@ -1749,7 +1745,7 @@ if $rsync_bin --help | grep 'contimeout' > /dev/null ; then
 	connect_timeout="--contimeout=$rsync_connect_timeout"
 fi
 
-# Silence curl output and only report errors - useful if script is run via cron.
+# Silence wget output and only report errors - useful if script is run via cron.
 if [ "$wget_silence" = "yes" ] ; then
 	wget_output_level="--quiet" #--quiet
 else
@@ -2236,9 +2232,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 								malwarepatrol_reloaded=2
 							fi
 						fi
-					else # curl failed
+					else # wget failed
 						malwarepatrol_reloaded=-1
-					fi # if culr
+					fi
 
 				else # The not free branch
 					$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
@@ -2255,14 +2251,14 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$wget_connect_timeout" --random-wait --tries="$wget_tries" --timeout="$wget_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
 							if [ $? -ne 0 ]; then
 								malwarepatrol_reloaded=1
-							else # curl DB fail
+							else # wget DB fail
 								malwarepatrol_reloaded=-1
-							fi # curl DB
+							fi # wget DB
 						fi # MD5 not equal
-					else # curl MD5 fail
+					else # wget MD5 fail
 						malwarepatrol_reloaded=-1
-					fi # curl md5
-				fi # if free
+					fi # wget md5
+				fi
 
 				case "$malwarepatrol_reloaded" in 
 					1) # database was updated, need test and reload 
@@ -2322,7 +2318,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 			0) # The database did not update
 			xshok_pretty_echo_and_log "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
 			;;
-			-1) # Curl failed
+			-1) # wget failed
 			xshok_pretty_echo_and_log "WARNING - Failed connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
 			;;
 		esac
