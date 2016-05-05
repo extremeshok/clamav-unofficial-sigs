@@ -23,7 +23,7 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 
 ### Required Ports / Firewall Exceptions
 * rsync: TCP port 873
-* curl/wget : TCP port 443
+* wget : TCP port 443
 
 ### Quick Install Guide
 * Download the files to /tmp/
@@ -96,10 +96,16 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## Change Log
 
-### Version 5.X.X (updated 2016-XX-XX)
+### Version 5.3.0 (updated 2016-05-05)
  - eXtremeSHOK.com Maintenance
  - Major change: Updated to use new database structure
- - Code refactor: remove legacy `..` replaced with $(...)
+ - Major change: curl replaced with wget, we now have retries for failed transfers
+ - Added locking (Enable pid file to prevent issues with multiple instances)
+ - Code refactor: if wget repaced with if $? -ne 0
+ - Enhancement: Verify the clam_user and clam_group actually exists on the system
+ - Added function : xshok_user_group_exists, to check if a specific user and group exists
+ - Bug fix: rsync output not correctly silenced
+ - Code refactor: remove legacy `..` with $(...)
  - Code refactor: replace [ ... -a ... ] with [ ... ] && [ ... ]
  - Code refactor: replace [ ... -o ... ] with [ ... ] || [ ... ]
  - Code refactor: replace cat "..." with done < ... from loops
@@ -110,6 +116,8 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Code refactor: refactor all "ls" iterations to use globs
  - Defined missing uname_bin variable
  - Added function xshok_database
+ - Set minimum config required to 64
+ - Bump config to 64
 
 ### Version 5.2.2 (updated 2016-04-18)
  - eXtremeSHOK.com Maintenance

@@ -1093,8 +1093,8 @@ EOF
 ################################################################################
 
 #Script Info
-script_version="5.3"
-script_version_date="04 May 2016"
+script_version="5.3.0"
+script_version_date="05 May 2016"
 minimum_required_config_version="64"
 minimum_yara_clamav_version="0.99"
 
