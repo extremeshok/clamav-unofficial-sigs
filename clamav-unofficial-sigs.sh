@@ -66,6 +66,7 @@ function xshok_prompt_confirm () { #optional_message
   done  
 }
 
+# Function to create a pid file
 function xshok_create_pid_file { #pid.file
 	if [ "$1" ] ; then
 		pidfile="$1"
@@ -79,6 +80,15 @@ function xshok_create_pid_file { #pid.file
 		exit 1
 	fi
 }	
+
+# Function to check if the current running user is the root user, otherwise return false
+function xshok_is_root () {
+  if [ $(id -u) = 0 ] ; then
+  	return 0 ;
+  else
+  	return 1 ;	#not root
+  fi 
+}
 
 # Function to check if its a file, otherwise return false
 function xshok_is_file () { #"filepath"
@@ -451,16 +461,8 @@ function install_cron (){
 		cron_bash=$(which bash)
 	fi	
 	if [ ! -n "$cron_script_full_path" ] ; then
-		#my script filename
-		cron_script_name=$(basename -- "$0")
-		#my script directory
-		cron_script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-		cron_script_dir=$(echo "$cron_script_dir" | sed 's:/*$::')
-		cron_script_full_path="$cron_script_dir/$cron_script_name"
-	fi
-
-	
+		cron_script_full_path="$this_script_full_path"
+	fi	
 
 	if [ ! -e "$cron_dir/$cron_filename" ] ; then
 		mkdir -p "$cron_dir"
@@ -579,7 +581,7 @@ function gpg_verify_specific_sanesecurity_database_file () {
 function output_system_configuration_information () {
 	echo ""
 	echo "*** SCRIPT VERSION ***"
-	echo "$(basename "$0") $script_version ($script_version_date)"
+	echo "$this_script_name $script_version ($script_version_date)"
 	echo "*** SYSTEM INFORMATION ***"
 	$uname_bin -a
 	echo "*** CLAMSCAN LOCATION & VERSION ***"
@@ -1083,9 +1085,6 @@ EOF
 	else
 		echo -e "$helpcontents"
 	fi
-
-
-
 }
 
 ################################################################################
@@ -1403,6 +1402,20 @@ fi
 if ! xshok_user_group_exists "$clam_user" "$clam_group" ; then
 	xshok_pretty_echo_and_log "ERROR: Either the user: $clam_user and/or group: $clam_group does not exist on the system." "="
 	exit 1
+fi
+
+# This scripts name and path
+this_script_name="$(basename "$0")"
+this_script_path="$( cd $(dirname "$0") ; pwd -P )"
+this_script_full_path="$this_script_path/$this_script_name"
+
+if xshok_is_root ; then
+	my_script_name="$(basename "$0")"
+	if [ "$(stat -c '%a' "$this_script_path/$this_script_name")" != "755" ] ; then
+		xshok_pretty_echo_and_log "Setting 755 permission on $this_script_path/$this_script_name" "="
+	else
+		echo "already set"
+	fi
 fi
 
 ################################################################################
