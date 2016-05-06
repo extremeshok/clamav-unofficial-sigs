@@ -1419,6 +1419,43 @@ if ! xshok_user_group_exists "$clam_user" "$clam_group" ; then
   exit 1
 fi
 
+# Ignore SSL errors
+if [ "$downloader_ignore_ssl" = "yes" ] ; then
+  echo "WOOF"
+  wget_insecure="--no-check-certificate"
+  curl_insecure="--insecure"
+else
+  echo "MEOW"
+  exit 1
+fi
+
+# Silence rsync output and only report errors - useful if script is run via cron.
+if [ "$rsync_silence" = "yes" ] ; then
+  rsync_output_level="--quiet"
+else
+  rsync_output_level="--progress"
+fi
+
+# If the local rsync client supports the '--no-motd' flag, then enable it.
+if $rsync_bin --help | grep 'no-motd' > /dev/null ; then
+  no_motd="--no-motd"
+fi
+
+# If the local rsync client supports the '--contimeout' flag, then enable it.
+if $rsync_bin --help | grep 'contimeout' > /dev/null ; then
+  connect_timeout="--contimeout=$rsync_connect_timeout"
+fi
+
+# Silence wget output and only report errors - useful if script is run via cron.
+if [ "$downloader_silence" = "yes" ] ; then
+  wget_output_level="--quiet" #--quiet
+  curl_output_level="--silent --show-error"
+else
+  wget_output_level="--no-verbose"
+  curl_output_level=""
+fi
+
+
 # This scripts name and path
 this_script_name="$(basename "$0")"
 this_script_path="$( cd $(dirname "$0") ; pwd -P )"
@@ -1762,37 +1799,6 @@ echo "$work_dir_gpg/trustdb.gpg" >> "$purge"
 echo "$log_file_path/$log_file_name*" >> "$purge"
 echo "$purge" >> "$purge"
 
-# Ignore SSL errors
-if [ "$downloader_ignore_ssl" = "yes" ] ; then
-  wget_insecure="--no-check-certificate"
-  curl_insecure="--insecure"
-fi
-
-# Silence rsync output and only report errors - useful if script is run via cron.
-if [ "$rsync_silence" = "yes" ] ; then
-  rsync_output_level="--quiet"
-else
-  rsync_output_level="--progress"
-fi
-
-# If the local rsync client supports the '--no-motd' flag, then enable it.
-if $rsync_bin --help | grep 'no-motd' > /dev/null ; then
-  no_motd="--no-motd"
-fi
-
-# If the local rsync client supports the '--contimeout' flag, then enable it.
-if $rsync_bin --help | grep 'contimeout' > /dev/null ; then
-  connect_timeout="--contimeout=$rsync_connect_timeout"
-fi
-
-# Silence wget output and only report errors - useful if script is run via cron.
-if [ "$downloader_silence" = "yes" ] ; then
-  wget_output_level="--quiet" #--quiet
-  curl_output_level="--silent --show-error"
-else
-  wget_output_level="--no-verbose"
-  curl_output_level=""
-fi
 
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
