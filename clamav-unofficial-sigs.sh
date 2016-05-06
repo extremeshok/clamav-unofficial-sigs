@@ -1462,7 +1462,6 @@ this_script_full_path="$this_script_path/$this_script_name"
 #set the script to 755 permissions
 if xshok_is_root ; then
   if [ "$setmode" == "yes" ] ; then
-    # need to find a osx compatible command
     if [ ! -x "$this_script_path/$this_script_name" ] ; then
       chmod 755 "$this_script_path/$this_script_name"
       xshok_pretty_echo_and_log "Fixing permission on $this_script_path/$this_script_name" "="
