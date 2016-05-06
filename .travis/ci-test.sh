@@ -5,7 +5,7 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/lo
 pwd
 
 echo "running script as root"
-sudo bash clamav-unofficial-sigs.sh
+sudo bash /usr/sbin/clamav-unofficial-sigs
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
