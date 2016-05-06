@@ -41,6 +41,7 @@ install:
   - "sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf"
   - "sudo cp -f config/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf"
   - "sudo cp -f .travis/tests/user.conf /etc/clamav-unofficial-sigs/user.conf"
+  - "sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs"
 
 script:
   - sudo sh -e .travis/ci-test.sh
