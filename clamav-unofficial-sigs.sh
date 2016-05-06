@@ -1103,7 +1103,7 @@ EOF
 
 #Script Info
 script_version="5.3.0"
-script_version_date="05 May 2016"
+script_version_date="06 May 2016"
 minimum_required_config_version="65"
 minimum_yara_clamav_version="0.99"
 
@@ -1462,7 +1462,8 @@ this_script_full_path="$this_script_path/$this_script_name"
 #set the script to 755 permissions
 if xshok_is_root ; then
   if [ "$setmode" == "yes" ] ; then
-    if [ "$(stat -c '%a' "$this_script_path/$this_script_name")" != "755" ] ; then
+    # need to find a osx compatible command
+    if [ ! -x "$this_script_path/$this_script_name" ] ; then
       chmod 755 "$this_script_path/$this_script_name"
       xshok_pretty_echo_and_log "Fixing permission on $this_script_path/$this_script_name" "="
     fi
