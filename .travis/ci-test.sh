@@ -4,7 +4,18 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/lo
 
 pwd
 
-if bash clamav-unofficial-sigs.sh ; then
+echo "running script as root"
+/bin/bash /usr/sbin/clamav-unofficial-sigs
+if [ "$?" == "0" ] ; then
+	echo .. OK
+else
+ 	echo .. ERROR
+  exit 1
+fi
+
+echo "running script as clamav"
+sudo -u clamav  [ -x /usr/sbin/clamav-unofficial-sigs ] && /bin/bash /usr/sbin/clamav-unofficial-sigs --force
+if [ "$?" == "0" ] ; then
 	echo .. OK
 else
  	echo .. ERROR
@@ -20,7 +31,8 @@ else
 fi
 
 echo "check cron file generation"
-if bash clamav-unofficial-sigs.sh --install-cron ; then
+bash clamav-unofficial-sigs.sh --install-cron
+if [ "$?" == "0" ] ; then
 	if [ -e "/etc/cron.d/clamav-unofficial-sigs" ] ; then
 		echo .. OK	
 	else
@@ -33,7 +45,8 @@ else
 fi
 
 echo "check logrotate file generation"
-if bash clamav-unofficial-sigs.sh --install-logrotate  ; then
+bash clamav-unofficial-sigs.sh --install-logrotate
+if [ "$?" == "0" ] ; then
 	if [ -e "/etc/logrotate.d/clamav-unofficial-sigs" ] ; then
 		echo .. OK	
 	else
@@ -46,7 +59,8 @@ else
 fi
 
 echo "check man file generation"
-if bash clamav-unofficial-sigs.sh --install-man  ; then
+bash clamav-unofficial-sigs.sh --install-man
+if [ "$?" == "0" ] ; then
 	if [ -e "/usr/share/man/man8/clamav-unofficial-sigs.8" ] ; then
 		echo .. OK	
 	else
