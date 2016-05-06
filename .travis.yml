@@ -23,6 +23,8 @@ dist: trusty
 before_install:
   - "sudo apt-get update -qq"
   - "sudo apt-get install clamav-daemon -qq"
+  - "sudo apt-get install ca-certificates -qq"
+  - "sudo apt-get install wget rsync -qq"
   # - "sudo mkdir -p tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs"
   # - "sudo rsync -rlptDv tmp/cache/  /var/lib/clamav/"
