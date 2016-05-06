@@ -1419,16 +1419,6 @@ if ! xshok_user_group_exists "$clam_user" "$clam_group" ; then
   exit 1
 fi
 
-# Ignore SSL errors
-if [ "$downloader_ignore_ssl" = "yes" ] ; then
-  echo "WOOF"
-  wget_insecure="--no-check-certificate"
-  curl_insecure="--insecure"
-else
-  echo "MEOW"
-  exit 1
-fi
-
 # Silence rsync output and only report errors - useful if script is run via cron.
 if [ "$rsync_silence" = "yes" ] ; then
   rsync_output_level="--quiet"
@@ -1625,11 +1615,11 @@ perms chmod -f 0700 "$work_dir_gpg"
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
   if [ "$wget_bin" != "" ] ; then
-    echo "$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level" --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
+    #echo "$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level" --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     "$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level" --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     ret="$?"
   else
-    echo "$curl_bin $curl_proxy $curl_insecure $curl_output_level" --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
+    #echo "$curl_bin $curl_proxy $curl_insecure $curl_output_level" --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     "$curl_bin $curl_proxy $curl_insecure $curl_output_level" --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     ret="$?"
   fi    
