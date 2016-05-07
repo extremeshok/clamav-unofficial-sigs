@@ -96,15 +96,19 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## Change Log
 
-### Version 5.3.0 (updated 2016-05-05)
+### Version 5.3.0 (updated 2016-05-07)
  - eXtremeSHOK.com Maintenance
- - Major change: Updated to use new database structure
- - Major change: curl replaced with wget, we now have retries for failed transfers
+ - Major change: Updated to use new database structure, now allows all low/medium/high databases to be enabled or disabled.
+ - Major change: curl replaced with wget (will fallback to curl is wget is not installed)
+ - Major change: script now functions correctly as the clamav user when started under cron
  - Added fallback to curl if wget is not available
  - Added locking (Enable pid file to prevent issues with multiple instances)
+ - Added retries to fetching downloads
  - Code refactor: if wget repaced with if $? -ne 0
  - Enhancement: Verify the clam_user and clam_group actually exists on the system
  - Added function : xshok_user_group_exists, to check if a specific user and group exists
+ - Bug Fix: setmode only if is root
+ - Bug Fix: eval not working on certain systems
  - Bug fix: rsync output not correctly silenced
  - Code refactor: remove legacy `..` with $(...)
  - Code refactor: replace [ ... -a ... ] with [ ... ] && [ ... ]
@@ -117,10 +121,10 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Code refactor: refactor all "ls" iterations to use globs
  - Defined missing uname_bin variable
  - Added function xshok_database
- - Set minimum config required to 64
- - Bump config to 64
+ - Set minimum config required to 65
+ - Bump config to 65
 
-### Version 5.2.2 (updated 2016-04-18)
+### Version 5.2.2
  - eXtremeSHOK.com Maintenance
  - Added --install-all Install and generate the cron, logroate and man files, autodetects the values $oft based on your config files
  - Added functions: xshok_prompt_confirm, xshok_is_file, xshok_is_subdir
