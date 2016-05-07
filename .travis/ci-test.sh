@@ -4,15 +4,35 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/lo
 
 pwd
 
-if bash clamav-unofficial-sigs.sh ; then
+echo "running script as root"
+sudo bash /usr/sbin/clamav-unofficial-sigs
+if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
  	echo .. ERROR
   exit 1
 fi
 
-#check cron file generation
-if bash clamav-unofficial-sigs.sh --install-cron ; then
+echo "running script as clamav"
+sudo -u clamav  [ -x /usr/sbin/clamav-unofficial-sigs ] && bash /usr/sbin/clamav-unofficial-sigs --force
+if [ "$?" -eq "0" ] ; then
+	echo .. OK
+else
+ 	echo .. ERROR
+  exit 1
+fi
+
+echo "check gpg file was downloaded"
+if [ -e "/var/lib/clamav-unofficial-sigs/gpg-key/publickey.gpg" ] ; then
+	echo .. OK	
+else
+	echo .. ERROR
+  exit 1
+fi
+
+echo "check cron file generation"
+bash clamav-unofficial-sigs.sh --install-cron
+if [ "$?" -eq "0" ] ; then
 	if [ -e "/etc/cron.d/clamav-unofficial-sigs" ] ; then
 		echo .. OK	
 	else
@@ -24,8 +44,9 @@ else
   exit 1
 fi
 
-#check logrotate file generation
-if bash clamav-unofficial-sigs.sh --install-logrotate  ; then
+echo "check logrotate file generation"
+bash clamav-unofficial-sigs.sh --install-logrotate
+if [ "$?" -eq "0" ] ; then
 	if [ -e "/etc/logrotate.d/clamav-unofficial-sigs" ] ; then
 		echo .. OK	
 	else
@@ -37,8 +58,9 @@ else
   exit 1
 fi
 
-#check man file generation
-if bash clamav-unofficial-sigs.sh --install-man  ; then
+echo "check man file generation"
+bash clamav-unofficial-sigs.sh --install-man
+if [ "$?" -eq "0" ] ; then
 	if [ -e "/usr/share/man/man8/clamav-unofficial-sigs.8" ] ; then
 		echo .. OK	
 	else

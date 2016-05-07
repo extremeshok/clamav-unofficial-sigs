@@ -1,10 +1,13 @@
 {
-	"tab_size": 2,
-	"word_wrap": "auto",
 	"folders":
 	[
 		{
 			"path": "."
+		},
+		{
+			"path": "C:\\repo\\powerdns-to-gdnsd"
 		}
-	]
+	],
+	"tab_size": 2,
+	"word_wrap": "auto"
 }

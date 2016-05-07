@@ -1,7 +1,9 @@
-# clamav-unofficial-sigs [![Build Status](https://travis-ci.org/extremeshok/clamav-unofficial-sigs.svg?branch=master)](https://travis-ci.org/extremeshok/clamav-unofficial-sigs)
+# clamav-unofficial-sigs [![Build Status](https://travis-ci.org/extremeshok/clamav-unofficial-sigs.svg?branch=master)](https://travis-ci.org/extremeshok/clamav-unofficial-sigs) [![GitHub Release](https://img.shields.io/github/release/extremeshok/clamav-unofficial-sigs.svg?label=Latest)](https://github.com/extremeshok/clamav-unofficial-sigs/releases/latest)
+
 [![Code Climate](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/gpa.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
 [![Test Coverage](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/coverage.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/coverage)
 [![Issue Count](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/issue_count.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
+
 
 ClamAV Unofficial Signatures Updater
 
@@ -18,6 +20,10 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 Please post them on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
 
 ### Submit Patches / Pull requests to the "Dev" Branch
+
+### Required Ports / Firewall Exceptions
+* rsync: TCP port 873
+* wget/curl : TCP port 443
 
 ### Quick Install Guide
 * Download the files to /tmp/
@@ -89,7 +95,36 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Enabled by default, no configuration required
 
 ## Change Log
-### Version 5.2.2 (updated 2016-04-18)
+
+### Version 5.3.0 (updated 2016-05-07)
+ - eXtremeSHOK.com Maintenance
+ - Major change: Updated to use new database structure, now allows all low/medium/high databases to be enabled or disabled.
+ - Major change: curl replaced with wget (will fallback to curl is wget is not installed)
+ - Major change: script now functions correctly as the clamav user when started under cron
+ - Added fallback to curl if wget is not available
+ - Added locking (Enable pid file to prevent issues with multiple instances)
+ - Added retries to fetching downloads
+ - Code refactor: if wget repaced with if $? -ne 0
+ - Enhancement: Verify the clam_user and clam_group actually exists on the system
+ - Added function : xshok_user_group_exists, to check if a specific user and group exists
+ - Bug Fix: setmode only if is root
+ - Bug Fix: eval not working on certain systems
+ - Bug fix: rsync output not correctly silenced
+ - Code refactor: remove legacy `..` with $(...)
+ - Code refactor: replace [ ... -a ... ] with [ ... ] && [ ... ]
+ - Code refactor: replace [ ... -o ... ] with [ ... ] || [ ... ]
+ - Code refactor: replace cat "..." with done < ... from loops
+ - Code refactor: convert for loops using files to while loops
+ - Code refactor: read replaced with read -r
+ - Code refactor: added cd ... || exit , to handle a failed cd
+ - Code refactor: double quoted all varibles
+ - Code refactor: refactor all "ls" iterations to use globs
+ - Defined missing uname_bin variable
+ - Added function xshok_database
+ - Set minimum config required to 65
+ - Bump config to 65
+
+### Version 5.2.2
  - eXtremeSHOK.com Maintenance
  - Added --install-all Install and generate the cron, logroate and man files, autodetects the values $oft based on your config files
  - Added functions: xshok_prompt_confirm, xshok_is_file, xshok_is_subdir

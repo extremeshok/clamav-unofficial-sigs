@@ -23,6 +23,8 @@ dist: trusty
 before_install:
   - "sudo apt-get update -qq"
   - "sudo apt-get install clamav-daemon -qq"
+  - "sudo apt-get install ca-certificates -qq"
+  - "sudo apt-get install wget rsync -qq"
   # - "sudo mkdir -p tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs"
   # - "sudo rsync -rlptDv tmp/cache/  /var/lib/clamav/"
@@ -41,6 +43,7 @@ install:
   - "sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf"
   - "sudo cp -f config/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf"
   - "sudo cp -f .travis/tests/user.conf /etc/clamav-unofficial-sigs/user.conf"
+  - "sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs"
 
 script:
   - sudo sh -e .travis/ci-test.sh
