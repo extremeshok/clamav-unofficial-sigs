@@ -1361,7 +1361,7 @@ else
 fi
 
 if [ ! -n "$work_dir_pid" ] ; then
-  work_dir_pid=$(echo "$work_dir/$_dir" | sed 's:/*$::')
+  work_dir_pid=$(echo "$work_dir/$pid_dir" | sed 's:/*$::')
 else
   work_dir_pid=$(echo "$work_dir_pid" | sed 's:/*$::')
 fi
