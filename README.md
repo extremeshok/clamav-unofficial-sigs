@@ -102,6 +102,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Remove unused $GETOPT
  - Refactor clamscan_integrity_test_specific_database_file (--test-database)
  - Refactor gpg_verify_specific_sanesecurity_database_file (--gpg-verify)
+ - Big fix: missing $pid_dir
 
 ### Version 5.3.0
  - eXtremeSHOK.com Maintenance
