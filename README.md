@@ -96,7 +96,13 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## Change Log
 
-### Version 5.3.0 (updated 2016-05-07)
+### Version 5.3.1 (updated 2016-05-14)
+ - eXtremeSHOK.com Maintenance
+ - Bug Fix: for GPG Signature test FAILED by @DamianoBianchi
+ - Remove unused $GETOPT
+ - Refactor functions clamscan_integrity_test_specific_database_file and gpg_verify_specific_sanesecurity_database_file to use command line option
+
+### Version 5.3.0
  - eXtremeSHOK.com Maintenance
  - Major change: Updated to use new database structure, now allows all low/medium/high databases to be enabled or disabled.
  - Major change: curl replaced with wget (will fallback to curl is wget is not installed)
