@@ -807,12 +807,33 @@ function clamscan_integrity_test_specific_database_file (){ #databasefile
 
       if $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt" ; then
         echo "Clamscan reports that '$input' database integrity tested GOOD"
+        exit 0
+      else
+        echo "Clamscan reports that '$input' database integrity tested BAD"
+        exit 1
       fi
     else
       echo "File '$input' cannot be found."
       echo "Here is a list of third-party databases that can be clamscan integrity tested:"
 
-      echo "Sanesecurity $sanesecurity_dbs" "SecuriteInfo $securiteinfo_dbs" "MalwarePatrol $malwarepatrol_db"
+      echo "=== Sanesecurity ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_sanesecurity"
+      
+      echo "=== SecuriteInfo ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_securiteinfo"
+      
+      echo "=== MalwarePatrol ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_malwarepatrol"
+
+      echo "=== Linux Malware Detect ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_linuxmalwaredetect"
+
+      echo "=== Linux Malware Detect ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_yararulesproject"
+
+      echo "=== User Defined Databases ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_add"
+
       echo "Check the file name and try again..."
     fi 
   else
@@ -1865,8 +1886,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
               $gpg_bin --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null
               ret="$?"
             else
-				ret="0"  
-			fi
+        ret="0"  
+      fi
             if [ "$ret" = "0" ] ; then
               test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
               true

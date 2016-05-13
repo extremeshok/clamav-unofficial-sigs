@@ -71,3 +71,12 @@ else
  	echo .. ERROR
   exit 1
 fi
+
+echo "check database integrity test"
+bash clamav-unofficial-sigs.sh --test-database sanesecurity.ftm
+if [ "$?" -eq "0" ] ; then
+	echo .. OK	
+else
+	echo .. ERROR
+	exit 1
+fi
