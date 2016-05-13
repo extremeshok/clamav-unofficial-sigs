@@ -486,7 +486,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         information is provided when using this flag
 
 -t, --test-database     Clamscan integrity test a specific database file
-        eg: '-s filename.ext' (do not include file path)
+        eg: '-t filename.ext' (do not include file path)
 
 -o, --output-triggered  If HAM directory scanning is enabled in the script's
         configuration file, then output names of any third-party

@@ -1079,7 +1079,7 @@ $ofs -i, --information $ofe Output system and configuration information for $oft
 $ofb 
 $ofs -m, --make-database $ofe Make a signature database from an ascii file containing $oft data strings, with one data string per line.  Additional $oft information is provided when using this flag
 $ofb 
-$ofs -t, --test-database $ofe Clamscan integrity test a specific database file $oft eg: '-s filename.ext' (do not include file path)
+$ofs -t, --test-database $ofe Clamscan integrity test a specific database file $oft eg: '-t filename.ext' (do not include file path)
 $ofb 
 $ofs -o, --output-triggered $ofe If HAM directory scanning is enabled in the script's $oft configuration file, then output names of any third-party $oft signatures that triggered during the HAM directory scan
 $ofb 
