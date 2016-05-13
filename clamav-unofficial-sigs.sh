@@ -319,7 +319,7 @@ function xshok_database () { #database #rating
 
 
 #generates a man config and installs it
-function install_man (){
+function install_man () {
   echo ""
   echo "Generating man file for install...."
   
@@ -380,7 +380,7 @@ EOF
 
 
 #generates a logrotate config and installs it
-function install_logrotate (){
+function install_logrotate () {
   echo ""
   echo "Generating logrotate file for install...."
   
@@ -446,7 +446,7 @@ EOF
 }
 
 #generates a cron config and installs it
-function install_cron (){
+function install_cron () {
   echo ""
   echo "Generating cron file for install...."
   
@@ -513,7 +513,7 @@ EOF
 
 
 #decode a third-party signature either by signature name
-function decode_third_party_signature_by_signature_name (){
+function decode_third_party_signature_by_signature_name () {
   echo ""
   echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
   echo "a hexadecimal encoded data string and press enter (do not include '.UNOFFICIAL'"
@@ -540,7 +540,7 @@ function decode_third_party_signature_by_signature_name (){
 }
 
 #Hexadecimal encode an entire input string
-function hexadecimal_encode_entire_input_string (){
+function hexadecimal_encode_entire_input_string () {
   echo ""
   echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
   echo "any quotes around the string unless you want them included in the hexadecimal encoded output:"
@@ -550,7 +550,7 @@ function hexadecimal_encode_entire_input_string (){
 }
 
 #Hexadecimal encode a formatted input string
-function hexadecimal_encode_formatted_input_string (){
+function hexadecimal_encode_formatted_input_string () {
   echo ""
   echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
   echo "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
@@ -808,7 +808,7 @@ function remove_script () {
 }
 
 #Clamscan integrity test a specific database file
-function clamscan_integrity_test_specific_database_file (){ #databasefile
+function clamscan_integrity_test_specific_database_file () { #databasefile
   echo ""
   if [ "$1" ] ; then
     input=$(echo "$1" | awk -F '/' '{print $NF}')
@@ -932,7 +932,7 @@ function add_signature_whitelist_entry () {
 }
 
 #Clamscan reload database
-function clamscan_reload_dbs (){
+function clamscan_reload_dbs () {
   # Reload all clamd databases if updates detected and $reload_dbs" is set to "yes"
   if [ "$reload_dbs" = "yes" ] ; then
     if [ "$do_clamd_reload" != "0" ] ; then
