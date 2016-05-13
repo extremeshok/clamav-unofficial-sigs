@@ -561,19 +561,24 @@ function hexadecimal_encode_formatted_input_string (){
 }
 
 #GPG verify a specific Sanesecurity database file
-function gpg_verify_specific_sanesecurity_database_file () {
+function gpg_verify_specific_sanesecurity_database_file () { #databasefile
   echo ""
-  db_file=$(echo "$OPTARG" | awk -F '/' '{print $NF}')
-  if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
-    xshok_pretty_echo_and_log "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
+  if [ "$1" ] ; then
+    db_file=$(echo "$1" | awk -F '/' '{print $NF}')
+    if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
+      xshok_pretty_echo_and_log "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
 
-    if ! "$gpg_bin" --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" 2>/dev/null ; then
-      "$gpg_bin" --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" 2>/dev/null
+      if ! "$gpg_bin" --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" 2>/dev/null ; then
+        "$gpg_bin" --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" 2>/dev/null
+      fi
+    else
+      xshok_pretty_echo_and_log "File '$db_file' cannot be found or is not a Sanesecurity database file."
+      xshok_pretty_echo_and_log "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
+      xshok_pretty_echo_and_log "$sanesecurity_dbs"
     fi
   else
-    xshok_pretty_echo_and_log "File '$db_file' cannot be found or is not a Sanesecurity database file."
-    xshok_pretty_echo_and_log "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
-    xshok_pretty_echo_and_log "$sanesecurity_dbs"
+    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+    exit 1
   fi
 }
 
@@ -792,23 +797,28 @@ function remove_script () {
 }
 
 #Clamscan integrity test a specific database file
-function clamscan_integrity_test_specific_database_file (){
+function clamscan_integrity_test_specific_database_file (){ #databasefile
   echo ""
-  input=$(echo "$OPTARG" | awk -F '/' '{print $NF}')
-  db_file=$(find "$work_dir" -name "$input")
-  if [ -r "$db_file" ] ; then
-    echo "Clamscan integrity testing: $db_file"
+  if [ "$1" ] ; then
+    input=$(echo "$1" | awk -F '/' '{print $NF}')
+    db_file=$(find "$work_dir" -name "$input")
+    if [ -r "$db_file" ] ; then
+      echo "Clamscan integrity testing: $db_file"
 
-    if $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt" ; then
-      echo "Clamscan reports that '$input' database integrity tested GOOD"
-    fi
+      if $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt" ; then
+        echo "Clamscan reports that '$input' database integrity tested GOOD"
+      fi
+    else
+      echo "File '$input' cannot be found."
+      echo "Here is a list of third-party databases that can be clamscan integrity tested:"
+
+      echo "Sanesecurity $sanesecurity_dbs" "SecuriteInfo $securiteinfo_dbs" "MalwarePatrol $malwarepatrol_db"
+      echo "Check the file name and try again..."
+    fi 
   else
-    echo "File '$input' cannot be found."
-    echo "Here is a list of third-party databases that can be clamscan integrity tested:"
-
-    echo "Sanesecurity $sanesecurity_dbs" "SecuriteInfo $securiteinfo_dbs" "MalwarePatrol $malwarepatrol_db"
-    echo "Check the file name and try again..."
-  fi 
+    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+    exit 1
+  fi
 }
 
 #output names of any third-party signatures that triggered during the HAM directory scan
@@ -1481,10 +1491,10 @@ while true; do
     -d | --decode-sig ) decode_third_party_signature_by_signature_name; exit; break ;;
     -e | --encode-string ) hexadecimal_encode_entire_input_string; exit; break ;;
     -f | --encode-formatted ) hexadecimal_encode_formatted_input_string; exit; break ;;
-    -g | --gpg-verify ) gpg_verify_specific_sanesecurity_database_file; exit; break ;;
+    -g | --gpg-verify ) xshok_check_s2 "$2"; gpg_verify_specific_sanesecurity_database_file "$2"; exit; break ;;
     -i | --information ) output_system_configuration_information; exit; break ;;
     -m | --make-database ) make_signature_database_from_ascii_file; exit; break ;;
-    -t | --test-database ) clamscan_integrity_test_specific_database_file; exit; break ;;
+    -t | --test-database ) xshok_check_s2 "$2"; clamscan_integrity_test_specific_database_file "$2"; exit; break ;;
     -o | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
     -w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
     --check-clamav ) check_clamav; exit; break ;;
