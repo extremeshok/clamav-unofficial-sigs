@@ -80,3 +80,13 @@ else
 	echo .. ERROR
 	exit 1
 fi
+
+echo "check gpg verify test"
+bash clamav-unofficial-sigs.sh --gpg-verify scam.ndb
+if [ "$?" -eq "0" ] ; then
+	echo .. OK	
+else
+	echo .. ERROR
+	exit 1
+fi
+

@@ -101,7 +101,7 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Bug Fix: for GPG Signature test FAILED by @DamianoBianchi
  - Remove unused $GETOPT
  - Refactor clamscan_integrity_test_specific_database_file (--test-database)
- - Refactor gpg_verify_specific_sanesecurity_database_file to use command line option
+ - Refactor gpg_verify_specific_sanesecurity_database_file (--gpg-verify)
 
 ### Version 5.3.0
  - eXtremeSHOK.com Maintenance
