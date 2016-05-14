@@ -319,7 +319,7 @@ function xshok_database () { #database #rating
 
 
 #generates a man config and installs it
-function install_man (){
+function install_man () {
   echo ""
   echo "Generating man file for install...."
   
@@ -380,7 +380,7 @@ EOF
 
 
 #generates a logrotate config and installs it
-function install_logrotate (){
+function install_logrotate () {
   echo ""
   echo "Generating logrotate file for install...."
   
@@ -446,7 +446,7 @@ EOF
 }
 
 #generates a cron config and installs it
-function install_cron (){
+function install_cron () {
   echo ""
   echo "Generating cron file for install...."
   
@@ -513,7 +513,7 @@ EOF
 
 
 #decode a third-party signature either by signature name
-function decode_third_party_signature_by_signature_name (){
+function decode_third_party_signature_by_signature_name () {
   echo ""
   echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
   echo "a hexadecimal encoded data string and press enter (do not include '.UNOFFICIAL'"
@@ -540,7 +540,7 @@ function decode_third_party_signature_by_signature_name (){
 }
 
 #Hexadecimal encode an entire input string
-function hexadecimal_encode_entire_input_string (){
+function hexadecimal_encode_entire_input_string () {
   echo ""
   echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
   echo "any quotes around the string unless you want them included in the hexadecimal encoded output:"
@@ -550,7 +550,7 @@ function hexadecimal_encode_entire_input_string (){
 }
 
 #Hexadecimal encode a formatted input string
-function hexadecimal_encode_formatted_input_string (){
+function hexadecimal_encode_formatted_input_string () {
   echo ""
   echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
   echo "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
@@ -561,19 +561,35 @@ function hexadecimal_encode_formatted_input_string (){
 }
 
 #GPG verify a specific Sanesecurity database file
-function gpg_verify_specific_sanesecurity_database_file () {
+function gpg_verify_specific_sanesecurity_database_file () { #databasefile
   echo ""
-  db_file=$(echo "$OPTARG" | awk -F '/' '{print $NF}')
-  if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
-    xshok_pretty_echo_and_log "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
-
-    if ! "$gpg_bin" --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" 2>/dev/null ; then
-      "$gpg_bin" --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" 2>/dev/null
+  if [ "$1" ] ; then
+    db_file=$(echo "$1" | awk -F '/' '{print $NF}')
+    if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
+      echo "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
+      if [ -r "$work_dir_sanesecurity/$db_file".sig ] ; then
+        "$gpg_bin" -q --trust-model always --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
+        if [ "$?" != "0" ]; then
+          "$gpg_bin" -q --always-trust --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
+          if [ "$?" == "0" ]; then
+            exit 0
+          else
+            exit 1
+          fi
+        else
+          exit 0
+        fi
+      else
+        echo "Signature '$db_file.sig' cannot be found."
+      fi
+    else
+      echo "File '$db_file' cannot be found or is not a Sanesecurity database file."
+      echo "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_sanesecurity"
     fi
   else
-    xshok_pretty_echo_and_log "File '$db_file' cannot be found or is not a Sanesecurity database file."
-    xshok_pretty_echo_and_log "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
-    xshok_pretty_echo_and_log "$sanesecurity_dbs"
+    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+    exit 1
   fi
 }
 
@@ -792,23 +808,50 @@ function remove_script () {
 }
 
 #Clamscan integrity test a specific database file
-function clamscan_integrity_test_specific_database_file (){
+function clamscan_integrity_test_specific_database_file () { #databasefile
   echo ""
-  input=$(echo "$OPTARG" | awk -F '/' '{print $NF}')
-  db_file=$(find "$work_dir" -name "$input")
-  if [ -r "$db_file" ] ; then
-    echo "Clamscan integrity testing: $db_file"
+  if [ "$1" ] ; then
+    input=$(echo "$1" | awk -F '/' '{print $NF}')
+    db_file=$(find "$work_dir" -name "$input")
+    if [ -r "$db_file" ] ; then
+      echo "Clamscan integrity testing: $db_file"
 
-    if $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt" ; then
-      echo "Clamscan reports that '$input' database integrity tested GOOD"
-    fi
+      $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt"
+      if [ "$?" -eq "0" ]; then
+        echo "Clamscan reports that '$input' database integrity tested GOOD"
+        exit 0
+      else
+        echo "Clamscan reports that '$input' database integrity tested BAD"
+        exit 1
+      fi
+    else
+      echo "File '$input' cannot be found."
+      echo "Here is a list of third-party databases that can be clamscan integrity tested:"
+
+      echo "=== Sanesecurity ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_sanesecurity"
+      
+      echo "=== SecuriteInfo ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_securiteinfo"
+      
+      echo "=== MalwarePatrol ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_malwarepatrol"
+
+      echo "=== Linux Malware Detect ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_linuxmalwaredetect"
+
+      echo "=== Linux Malware Detect ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_yararulesproject"
+
+      echo "=== User Defined Databases ==="
+      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_add"
+
+      echo "Check the file name and try again..."
+    fi 
   else
-    echo "File '$input' cannot be found."
-    echo "Here is a list of third-party databases that can be clamscan integrity tested:"
-
-    echo "Sanesecurity $sanesecurity_dbs" "SecuriteInfo $securiteinfo_dbs" "MalwarePatrol $malwarepatrol_db"
-    echo "Check the file name and try again..."
-  fi 
+    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+    exit 1
+  fi
 }
 
 #output names of any third-party signatures that triggered during the HAM directory scan
@@ -889,7 +932,7 @@ function add_signature_whitelist_entry () {
 }
 
 #Clamscan reload database
-function clamscan_reload_dbs (){
+function clamscan_reload_dbs () {
   # Reload all clamd databases if updates detected and $reload_dbs" is set to "yes"
   if [ "$reload_dbs" = "yes" ] ; then
     if [ "$do_clamd_reload" != "0" ] ; then
@@ -1069,7 +1112,7 @@ $ofs -i, --information $ofe Output system and configuration information for $oft
 $ofb 
 $ofs -m, --make-database $ofe Make a signature database from an ascii file containing $oft data strings, with one data string per line.  Additional $oft information is provided when using this flag
 $ofb 
-$ofs -t, --test-database $ofe Clamscan integrity test a specific database file $oft eg: '-s filename.ext' (do not include file path)
+$ofs -t, --test-database $ofe Clamscan integrity test a specific database file $oft eg: '-t filename.ext' (do not include file path)
 $ofb 
 $ofs -o, --output-triggered $ofe If HAM directory scanning is enabled in the script's $oft configuration file, then output names of any third-party $oft signatures that triggered during the HAM directory scan
 $ofb 
@@ -1102,8 +1145,8 @@ EOF
 ################################################################################
 
 #Script Info
-script_version="5.3.0"
-script_version_date="07 May 2016"
+script_version="5.3.1"
+script_version_date="14 May 2016"
 minimum_required_config_version="65"
 minimum_yara_clamav_version="0.99"
 
@@ -1318,7 +1361,7 @@ else
 fi
 
 if [ ! -n "$work_dir_pid" ] ; then
-  work_dir_pid=$(echo "$work_dir/$_dir" | sed 's:/*$::')
+  work_dir_pid=$(echo "$work_dir/$pid_dir" | sed 's:/*$::')
 else
   work_dir_pid=$(echo "$work_dir_pid" | sed 's:/*$::')
 fi
@@ -1481,10 +1524,10 @@ while true; do
     -d | --decode-sig ) decode_third_party_signature_by_signature_name; exit; break ;;
     -e | --encode-string ) hexadecimal_encode_entire_input_string; exit; break ;;
     -f | --encode-formatted ) hexadecimal_encode_formatted_input_string; exit; break ;;
-    -g | --gpg-verify ) gpg_verify_specific_sanesecurity_database_file; exit; break ;;
+    -g | --gpg-verify ) xshok_check_s2 "$2"; gpg_verify_specific_sanesecurity_database_file "$2"; exit; break ;;
     -i | --information ) output_system_configuration_information; exit; break ;;
     -m | --make-database ) make_signature_database_from_ascii_file; exit; break ;;
-    -t | --test-database ) clamscan_integrity_test_specific_database_file; exit; break ;;
+    -t | --test-database ) xshok_check_s2 "$2"; clamscan_integrity_test_specific_database_file "$2"; exit; break ;;
     -o | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
     -w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
     --check-clamav ) check_clamav; exit; break ;;
@@ -1854,15 +1897,17 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
             if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null ; then
               $gpg_bin --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null
               ret="$?"
-            fi
-            if [ "$ret" = "0" ] ; then
+            else
+        ret="0"  
+      fi
+            if [ "$ret" -eq "0" ] ; then
               test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
               true
             else
               xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING" 
               false
             fi
-            if [ "$?" = "0" ] ; then
+            if [ "$?" -eq "0" ] ; then
               db_ext=$(echo "$db_file" | cut -d "." -f2)
               if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
                 if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
@@ -1992,10 +2037,10 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
             ret="$?"
           fi
-          if [ "$ret" = "0" ] ; then
+          if [ "$ret" -eq "0" ] ; then
             loop="1"
             if ! cmp -s "$work_dir_securiteinfo/$db_file" "$clam_dbs/$db_file" ; then
-              if [ "$?" = "0" ] ; then
+              if [ "$?" -eq "0" ] ; then
                 db_ext=$(echo "$db_file" | cut -d "." -f2)
 
 
@@ -2140,10 +2185,10 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
           ret="$?"
         fi
-        if [ "$ret" = "0" ] ; then
+        if [ "$ret" -eq "0" ] ; then
           loop="1"
           if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
-            if [ "$?" = "0" ] ; then
+            if [ "$?" -eq "0" ] ; then
               db_ext=$(echo "$db_file" | cut -d "." -f2)
 
               xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
@@ -2289,9 +2334,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
             ret="$?"
           fi
-          if [ "$ret" = "0" ] ; then
+          if [ "$ret" -eq "0" ] ; then
             if ! cmp -s "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db" ; then
-              if [ "$?" = "0" ] ; then
+              if [ "$?" -eq "0" ] ; then
                 malwarepatrol_reloaded=1
               else
                 malwarepatrol_reloaded=2
@@ -2309,7 +2354,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
             ret="$?"
           fi
-          if [ "$ret" = "0" ] ; then
+          if [ "$ret" -eq "0" ] ; then
             if [ -f "$clam_dbs/$malwarepatrol_db" ] ; then
               malwarepatrol_md5=$(openssl md5 -r "$clam_dbs/$malwarepatrol_db" 2>/dev/null | cut -d" " -f1)
               if [ ! "$malwarepatrol_md5" ] ; then
@@ -2326,7 +2371,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                 $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
                 ret="$?"
               fi
-              if [ "$ret" = "0" ] ; then
+              if [ "$ret" -eq "0" ] ; then
                 malwarepatrol_reloaded=1
               else # wget DB fail
                 malwarepatrol_reloaded=-1
@@ -2474,10 +2519,10 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
             ret="$?"
           fi
-          if [ "$ret" = "0" ] ; then
+          if [ "$ret" -eq "0" ] ; then
           loop="1"
           if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
-            if [ "$?" = "0" ] ; then
+            if [ "$?" -eq "0" ] ; then
               db_ext=$(echo "$db_file" | cut -d "." -f2)
 
               xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
@@ -2616,7 +2661,7 @@ if [ -n "$additional_dbs" ] ; then
 
       xshok_pretty_echo_and_log "Testing updated database file: $db_file"
       $clamscan_bin --quiet -d "$work_dir_add/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-      if [ "$?" = "0" ] ; then
+      if [ "$?" -eq "0" ] ; then
         xshok_pretty_echo_and_log "Clamscan reports $db_file database integrity tested good"
         true
       else

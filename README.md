@@ -96,7 +96,15 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## Change Log
 
-### Version 5.3.0 (updated 2016-05-07)
+### Version 5.3.1 (updated 2016-05-14)
+ - eXtremeSHOK.com Maintenance
+ - Bug Fix: for GPG Signature test FAILED by @DamianoBianchi
+ - Remove unused $GETOPT
+ - Refactor clamscan_integrity_test_specific_database_file (--test-database)
+ - Refactor gpg_verify_specific_sanesecurity_database_file (--gpg-verify)
+ - Big fix: missing $pid_dir
+
+### Version 5.3.0
  - eXtremeSHOK.com Maintenance
  - Major change: Updated to use new database structure, now allows all low/medium/high databases to be enabled or disabled.
  - Major change: curl replaced with wget (will fallback to curl is wget is not installed)
@@ -480,7 +488,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         information is provided when using this flag
 
 -t, --test-database     Clamscan integrity test a specific database file
-        eg: '-s filename.ext' (do not include file path)
+        eg: '-t filename.ext' (do not include file path)
 
 -o, --output-triggered  If HAM directory scanning is enabled in the script's
         configuration file, then output names of any third-party
