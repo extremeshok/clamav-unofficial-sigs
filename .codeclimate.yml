@@ -2,10 +2,10 @@
 engines:
   shellcheck:
     enabled: true
-		checks:
-		  SC2001:
-		    enabled: false
-		  SC2154:
+    checks:
+      SC2001:
+        enabled: false
+      SC2154:
         enabled: false
       SC2076:
         enabled: false
