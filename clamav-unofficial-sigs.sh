@@ -1750,6 +1750,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
       clamav_files
     done
   fi
+else
+  sanesecurity_enabled="no"
 fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_dbs" ] ; then
@@ -1758,6 +1760,8 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
       clamav_files
     done
   fi
+else
+  securiteinfo_enabled="no"
 fi
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
@@ -1766,6 +1770,8 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
       clamav_files
     done
   fi
+else 
+  linuxmalwaredetect_enabled="no"
 fi
 if [ "$malwarepatrol_enabled" == "yes" ] ; then
   if [ -n "$malwarepatrol_db" ] ; then
@@ -1783,6 +1789,8 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
       clamav_files
     done
   fi
+else
+  yararulesproject_enabled="no"
 fi
 if [ "$additional_enabled" == "yes" ] ; then
   if [ -n "$additional_dbs" ] ; then
@@ -1791,6 +1799,8 @@ if [ "$additional_enabled" == "yes" ] ; then
       clamav_files
     done
   fi
+else
+  additional_enabled="no"
 fi
 sort "$current_tmp" > "$current_dbs" 2>/dev/null
 rm -f "$current_tmp"
@@ -2473,8 +2483,6 @@ else
     fi
   fi
 fi
-## MEOW POSSIBLY MISSING OR EXTRA fi....
-
 
 ##############################################################################################################################################
 # Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
@@ -2627,68 +2635,167 @@ else
   fi
 fi
 
-###################################################
-# Check for user added signature database updates #
-###################################################
-if [ -n "$additional_dbs" ] ; then
+##############################################################################################################################################
+# Check for updated additional database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
+##############################################################################################################################################
+if [ "$additional_enabled" == "yes" ] ; then
+  if [ -n "$additional_dbs" ] ; then
     if [ "$(xshok_array_count "$additional_dbs")" -lt "1" ] ; then
       xshok_pretty_echo_and_log "Failed additional_dbs config is invalid or not defined - SKIPPING"
     else
-  xshok_pretty_echo_and_log "User Added Signature Database File Update(s)" "="
-
-  for db_url in $additional_dbs ; do
-    base_url=$(echo "$db_url" | cut -d "/" -f3)
-    db_file=$(basename "$db_url")
-    if [ "$(echo "$db_url" | cut -d ":" -f1)" = "rsync" ] ; then
-      if ! $rsync_bin $rsync_output_level $no_motd $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt -crtuz --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null ;  then
-        xshok_pretty_echo_and_log "Failed rsync connection to $base_url - SKIPPED $db_file update"
-      fi
+    rm -f "$work_dir_add/*.gz"
+    if [ -r "$work_dir_work_configs/last-additional-update.txt" ] ; then
+      last_additional_update=$(cat "$work_dir_work_configs/last-additional-update.txt")
     else
-      if [ "$wget_bin" != "" ] ; then
-        $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_add/$db_file" "$db_url"
-      else
-        $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_add/$db_file" "$db_url"
-      fi
-      if [ $? -eq 0 ]; then
-        xshok_pretty_echo_and_log "Failed connection to $base_url - SKIPPED $db_file update"
-      fi
+      last_additional_update="0"
     fi
-  done
-  db_file=""
-  for db_file in $work_dir_add/* ; do
-    [[ -e $db_file ]] || break  # handle the case of no files
-    if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
+    db_file=""
+    loop=""
+    update_interval=$((additional_update_hours * 3600))
+    time_interval=$((current_time - last_additional_update))
+    if [ "$time_interval" -ge $((update_interval - 600)) ] ; then
+      echo "$current_time" > "$work_dir_work_configs/last-additional-update.txt"
 
-      xshok_pretty_echo_and_log "Testing updated database file: $db_file"
-      $clamscan_bin --quiet -d "$work_dir_add/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-      if [ "$?" -eq "0" ] ; then
-        xshok_pretty_echo_and_log "Clamscan reports $db_file database integrity tested good"
-        true
-      else
-        xshok_pretty_echo_and_log "Clamscan reports User Added $db_file database integrity tested BAD"
-        if [ "$remove_bad_database" == "yes" ] ; then
-          if rm -f "$work_dir_add/$db_file" ; then
-            xshok_pretty_echo_and_log "Removed invalid database: $work_dir_add/$db_file"
+      xshok_pretty_echo_and_log "Additional Database File Updates" "="
+      xshok_pretty_echo_and_log "Checking for additional updates..."
+      additional_updates="0"
+      for db_url in $additional_dbs ; do
+        # left for future dir manipulation       
+        # if echo "$db_file" | grep -q "/"; then
+        #   add_dir="/"$(echo "$db_file" | cut -d"/" -f1)
+        #   db_file=$(echo "$db_file" | cut -d"/" -f2)
+        # else 
+        #   add_dir=""
+        # fi
+       db_file=$(basename "$db_url")
+
+        if [ "$loop" = "1" ] ; then
+          xshok_pretty_echo_and_log "---"      
+        fi
+        xshok_pretty_echo_and_log "Checking for updated additional database file: $db_file"
+
+        additional_db_update="0"
+
+        if [ "$(echo "$db_url" | cut -d ":" -f1)" = "rsync" ] ; then
+          $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
+          ret="$?"
+        else
+          if [ "$wget_bin" != "" ] ; then
+            $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_add/$db_file" "$db_url"
+            ret="$?"
+          else
+            $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_add/$db_file" "$db_url"
+            ret="$?"
           fi
         fi
-        false
-      fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_add/$db_file" "$clam_dbs" ; then
-      perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
-      if [ "$selinux_fixes" == "yes" ] ; then
-        restorecon "$clam_dbs/$db_file"
+
+        ##this needs enhancement for rsync, as it will only work with single files... maybe better to process each file inside work_dir_add in its own for loop.
+        if [ "$ret" -eq "0" ] ; then
+          loop="1"
+          if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
+            if [ "$?" -eq "0" ] ; then
+              db_ext=$(echo "$db_file" | cut -d "." -f2)
+
+              xshok_pretty_echo_and_log "Testing updated additional database file: $db_file"
+              if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
+                if $clamscan_bin --quiet -d "$work_dir_add/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
+                  then
+                  xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested good"
+                  true
+                else
+                  xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested BAD"
+                  if [ "$remove_bad_database" == "yes" ] ; then
+                    if rm -f "$work_dir_add/$db_file" ; then
+                      xshok_pretty_echo_and_log "Removed invalid database: $work_dir_add/$db_file"
+                    fi
+                  fi
+                  false
+                fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_add/$db_file" "$clam_dbs" 2>/dev/null ; then
+                perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
+                if [ "$selinux_fixes" == "yes" ] ; then
+                  restorecon "$clam_dbs/$db_file"
+                fi
+                xshok_pretty_echo_and_log "Successfully updated additional production database file: $db_file"
+                additional_updates=1
+                additional_db_update=1
+                do_clamd_reload=1
+              else
+                xshok_pretty_echo_and_log "Failed to successfully update additional production database file: $db_file - SKIPPING"
+              fi
+            else
+              grep -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_add/$db_file" > "$test_dir/$db_file"
+              $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
+              grep -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+              grep -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
+              mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
+              if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
+                xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested good"
+                true
+              else
+                xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested BAD"
+                if [ "$remove_bad_database" == "yes" ] ; then
+                  if rm -f "$work_dir_add/$db_file" ; then
+                    xshok_pretty_echo_and_log "Removed invalid database: $work_dir_add/$db_file"
+                  fi
+                fi
+                false
+              fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+              perms chown -f "$clam_user":"$clam_group" "$clam_dbs/$db_file"
+              if [ "$selinux_fixes" == "yes" ] ; then
+                restorecon "$clam_dbs/$db_file"
+              fi
+              xshok_pretty_echo_and_log "Successfully updated additional production database file: $db_file"
+              additional_updates=1
+              additional_db_update=1
+              do_clamd_reload=1
+            else
+              xshok_pretty_echo_and_log "Failed to successfully update additional production database file: $db_file - SKIPPING"
+            fi
+          fi
+        fi
       fi
-      xshok_pretty_echo_and_log "Successfully updated User-Added production database file: $db_file"
-      add_update=1
-      do_clamd_reload=1
     else
-      xshok_pretty_echo_and_log "Failed to successfully update User-Added production database file: $db_file - SKIPPING"
+      xshok_pretty_echo_and_log "WARNING: Failed connection to $additional_url - SKIPPED additional $db_file update"
+    fi
+    if [ "$additional_db_update" != "1" ] ; then
+      xshok_pretty_echo_and_log "No updated additional $db_file database file found"
+    fi
+  done
+  if [ "$additional_updates" != "1" ] ; then
+    xshok_pretty_echo_and_log "No additional database file updates found" "-"
+  fi
+else
+
+  xshok_pretty_echo_and_log "Additional Database File Updates" "="
+
+  time_remaining=$((update_interval - time_interval))
+  hours_left=$((time_remaining / 3600))
+  minutes_left=$((time_remaining % 3600 / 60))
+  xshok_pretty_echo_and_log "$additional_update_hours hours have not yet elapsed since the last additional database update check"
+  xshok_pretty_echo_and_log "No update check was performed at this time" "-"
+  xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+fi
+fi
+fi
+else
+  if [ -n "$additional_dbs" ] ; then
+    if [ "$remove_disabled_databases" == "yes" ] ; then
+      xshok_pretty_echo_and_log "Removing disabled additional Database files"
+      for db_file in $additional_dbs ; do
+        if echo "$db_file" | grep -q "/"; then
+          db_file=$(echo "$db_file" | cut -d"/" -f2)
+        fi
+        if [ -r "$work_dir_add/$db_file" ] ; then
+          rm -f "$work_dir_add/$db_file"
+          do_clamd_reload=1
+        fi
+        if [ -r "$clam_dbs/$db_file" ] ; then
+          rm -f "$clam_dbs/$db_file"
+          do_clamd_reload=1
+        fi
+      done
     fi
   fi
-done
-if [ "$add_update" != "1" ] ; then      
-  xshok_pretty_echo_and_log "No User-Defined database file updates found" "-"
-fi
-fi
 fi
 
 ###################################################
