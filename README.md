@@ -96,7 +96,15 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## Change Log
 
-### Version 5.3.1 (updated 2016-05-14)
+### Version 5.3.2 (updated 2016-05-24)
+ - eXtremeSHOK.com Maintenance
+ - Bug Fix: Additional Databases not downloading
+ - Added sanesecurity_update_hours option to limit updating to once every 2 hours
+ - Added additional_update_hours option to limit updating to once every 4 hours
+ - Refactor Additional Database File Update code
+ - Updated osx config with correct group for homebrew
+
+### Version 5.3.1
  - eXtremeSHOK.com Maintenance
  - Bug Fix: for GPG Signature test FAILED by @DamianoBianchi
  - Remove unused $GETOPT

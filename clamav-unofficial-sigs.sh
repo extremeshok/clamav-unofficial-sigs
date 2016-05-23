@@ -1146,7 +1146,7 @@ EOF
 
 #Script Info
 script_version="5.3.2"
-script_version_date="23 May 2016"
+script_version_date="24 May 2016"
 minimum_required_config_version="65"
 minimum_yara_clamav_version="0.99"
 
