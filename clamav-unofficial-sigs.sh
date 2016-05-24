@@ -83,7 +83,7 @@ function xshok_create_pid_file { #pid.file
 
 # Function to check if the current running user is the root user, otherwise return false
 function xshok_is_root () {
-  if [ $(id -u) = 0 ] ; then
+  if [ "$(id -u)" = 0 ] ; then
     return 0 ;
   else
     return 1 ;  #not root
@@ -210,7 +210,7 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
       echo "Warning: Logging Disabled, as file not writable: $log_file_path/$log_file_name"
       enable_log="no"
     else
-      echo $(date "+%b %d %T") "$1" >> "$log_file_path/$log_file_name"
+      echo "$(date "+%b %d %T")" "$1" >> "$log_file_path/$log_file_name"
     fi 
   fi
 }
@@ -334,7 +334,7 @@ function install_man () {
   else
 
 BOLD="\fB"
-REV=""
+#REV=""
 NORM="\fR"
 manresult=$(help_and_usage "man")
 
@@ -1158,8 +1158,8 @@ config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.
 config_version="0"
 do_clamd_reload="0"
 comment_silence="no"
-enable_logging="no"
-forced_updates="no"
+logging_enabled="no"
+force_updates="no"
 enable_log="no"
 custom_config="no"
 we_have_a_config="0"
@@ -1180,14 +1180,14 @@ if [ -t 1 ] ; then
   #Set fonts
   ##Usage: echo "${BOLD}-a${NORM}"
   BOLD=$(tput bold)
-  REV=$(tput smso)
+  #REV=$(tput smso)
   NORM=$(tput sgr0)
   #Verbose
   force_verbose="yes"
 else
   #Null Fonts
   BOLD=''
-  REV=''
+  #REV=''
   NORM=''
   #silence
   force_verbose="no"
@@ -1442,8 +1442,8 @@ fi
 if [ "$enable_locking" == "yes" ] ; then
   xshok_mkdir_ownership "$work_dir_pid"
   pid_file_fullpath="$work_dir_pid/clamav-unofficial-sigs.pid"
-  if [ -f $pid_file_fullpath ] ; then
-    pid_file_pid=$(cat $pid_file_fullpath)
+  if [ -f "$pid_file_fullpath" ] ; then
+    pid_file_pid=$(cat "$pid_file_fullpath")
     ps -p "$pid_file_pid" > /dev/null 2>&1
     if [ $? -eq 0 ] ; then 
       xshok_pretty_echo_and_log "ERROR: Only one instance can run at the same time." "="
@@ -1501,7 +1501,7 @@ fi
 
 # This scripts name and path
 this_script_name="$(basename "$0")"
-this_script_path="$( cd $(dirname "$0") ; pwd -P )"
+this_script_path="$( cd "$(dirname "$0")" ; pwd -P )"
 this_script_full_path="$this_script_path/$this_script_name"
 
 #set the script to 755 permissions
@@ -1823,24 +1823,25 @@ fi
 # Create "purge.txt" file for package maintainers to support package uninstall.
 purge="$work_dir_work_configs/purge.txt"
 cp -f "$current_dbs" "$purge"
-echo "$work_dir_work_configs/current-dbs.txt" >> "$purge"
-echo "$work_dir_work_configs/db-changes.txt" >> "$purge"
-echo "$work_dir_work_configs/last-mbl-update.txt" >> "$purge"
-echo "$work_dir_work_configs/last-si-update.txt" >> "$purge"
-echo "$work_dir_work_configs/local.ign" >> "$purge"
-echo "$work_dir_work_configs/monitor-ign.txt" >> "$purge"
-echo "$work_dir_work_configs/my-whitelist.ign2" >> "$purge"
-echo "$work_dir_work_configs/tracker.txt"  >> "$purge"
-echo "$work_dir_work_configs/previous-dbs.txt" >> "$purge"
-echo "$work_dir_work_configs/scan-test.txt" >> "$purge"
-echo "$work_dir_work_configs/ss-include-dbs.txt" >> "$purge"
-echo "$work_dir_work_configs/whitelist.hex" >> "$purge"
-echo "$work_dir_gpg/publickey.gpg" >> "$purge"
-echo "$work_dir_gpg/secring.gpg" >> "$purge"
-echo "$work_dir_gpg/ss-keyring.gpg*" >> "$purge"
-echo "$work_dir_gpg/trustdb.gpg" >> "$purge"
-echo "$log_file_path/$log_file_name*" >> "$purge"
-echo "$purge" >> "$purge"
+{ echo "$work_dir_work_configs/current-dbs.txt"
+echo "$work_dir_work_configs/db-changes.txt"
+echo "$work_dir_work_configs/last-mbl-update.txt"
+echo "$work_dir_work_configs/last-si-update.txt"
+echo "$work_dir_work_configs/local.ign"
+echo "$work_dir_work_configs/monitor-ign.txt"
+echo "$work_dir_work_configs/my-whitelist.ign2"
+echo "$work_dir_work_configs/tracker.txt"
+echo "$work_dir_work_configs/previous-dbs.txt"
+echo "$work_dir_work_configs/scan-test.txt"
+echo "$work_dir_work_configs/ss-include-dbs.txt"
+echo "$work_dir_work_configs/whitelist.hex"
+echo "$work_dir_gpg/publickey.gpg"
+echo "$work_dir_gpg/secring.gpg"
+echo "$work_dir_gpg/ss-keyring.gpg*"
+echo "$work_dir_gpg/trustdb.gpg"
+echo "$log_file_path/$log_file_name*"
+echo "$purge" 
+} >> "$purge"
 
 
 # Check and save current system time since epoch for time related database downloads.
@@ -2417,7 +2418,6 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             restorecon "$clam_dbs/$malwarepatrol_db"
           fi
           xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
-          malwarepatrol_update=1
           do_clamd_reload=1
         else
           xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
@@ -2446,7 +2446,6 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
           restorecon "$clam_dbs/$malwarepatrol_db"
         fi
         xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
-        malwarepatrol_update=1
         do_clamd_reload=1
       else
         xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
@@ -2871,6 +2870,8 @@ if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.
   cp -f my-whitelist.ign2 "$work_dir_work_configs/my-whitelist.ign2"
 
   xshok_pretty_echo_and_log "" "=" "80"
+
+##TOFIX: This needs to be reworked, as the file is being read and written in the same pipeline
   while read -r entry ; do
     sig_file=$(echo "$entry" | cut -d ":" -f1)
     sig_full=$(echo "$entry" | cut -d ":" -f2-)
