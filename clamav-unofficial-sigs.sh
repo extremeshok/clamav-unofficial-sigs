@@ -79,6 +79,22 @@ function xshok_create_pid_file { #pid.file
     xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
     exit 1
   fi
+}
+
+# Function to intercept ctrl+c and calls the cleanup function
+function xshok_control_c () {
+  echo -en "\n"
+  xshok_pretty_echo_and_log "--------------| Exiting ... Please wait |--------------" "-"
+  xshok_cleanup
+  exit $?
+}
+
+# cleanup function
+function xshok_cleanup () {
+  #wait for all processes to end
+  wait
+  xshok_pretty_echo_and_log "      Powered By https://eXtremeSHOK.com      " "#"
+  return $?
 } 
 
 # Function to check if the current running user is the root user, otherwise return false
@@ -2955,7 +2971,7 @@ xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav
 
 check_new_version
 
-xshok_pretty_echo_and_log "      Powered By https://eXtremeSHOK.com      " "#"
+xshok_cleanup
 
 # And lastly we exit, Note: the exit is always on the 2nd last line
 exit $?
