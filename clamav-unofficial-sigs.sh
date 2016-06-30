@@ -37,6 +37,8 @@ if [ ! "$( tail -1 "$0" | head -1 | cut -c1-7 )" == "exit \$?" ] ; then
   exit 1
 fi
 
+# trap the keyboard interrupt (ctrl+c)
+trap xshok_control_c SIGINT
 
 ################################################################################
 # HELPER FUNCTIONS
