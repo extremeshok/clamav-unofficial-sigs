@@ -1892,7 +1892,8 @@ fi
 # Create "purge.txt" file for package maintainers to support package uninstall.
 purge="$work_dir_work_configs/purge.txt"
 cp -f "$current_dbs" "$purge"
-{ echo "$work_dir_work_configs/current-dbs.txt"
+{ 
+echo "$work_dir_work_configs/current-dbs.txt"
 echo "$work_dir_work_configs/db-changes.txt"
 echo "$work_dir_work_configs/last-mbl-update.txt"
 echo "$work_dir_work_configs/last-si-update.txt"
@@ -1909,7 +1910,7 @@ echo "$work_dir_gpg/secring.gpg"
 echo "$work_dir_gpg/ss-keyring.gpg*"
 echo "$work_dir_gpg/trustdb.gpg"
 echo "$log_file_path/$log_file_name*"
-echo "$purge" 
+echo "$work_dir_work_configs/purge.txt" 
 } >> "$purge"
 
 # Check and save current system time since epoch for time related database downloads.
@@ -2941,19 +2942,19 @@ if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.
 
   xshok_pretty_echo_and_log "" "=" "80"
 
-##TOFIX: This needs to be reworked, as the file is being read and written in the same pipeline
   while read -r entry ; do
     sig_file=$(echo "$entry" | cut -d ":" -f1)
     sig_full=$(echo "$entry" | cut -d ":" -f2-)
     sig_name=$(echo "$entry" | cut -d ":" -f2)
     if ! $grep_bin -F "$sig_full" "$sig_file" > /dev/null 2>&1 ; then
       perl -i -ne "print unless /$sig_name$/" "$work_dir_work_configs/my-whitelist.ign2"
-      perl -i -ne "print unless /:$sig_name:/" "$work_dir_work_configs/tracker.txt"
+      perl -i -ne "print unless /:$sig_name:/" "$work_dir_work_configs/tracker-tmp.txt"
 
       xshok_pretty_echo_and_log "$sig_name signature no longer exists in $sig_file, whitelist entry removed from my-whitelist.ign2"
       ign2_updated=1
     fi
   done < "$work_dir_work_configs/tracker.txt"
+  mv -f "$work_dir_work_configs/tracker-tmp.txt" "$work_dir_work_configs/tracker.txt"
 
   xshok_pretty_echo_and_log "" "=" "80"
   if [ "$ign2_updated" = "1" ]
