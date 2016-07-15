@@ -264,7 +264,7 @@ function xshok_check_s2 () {
 # 3
 function xshok_array_count () {
   k_array=( "$@" )
-  if [ -n "$k_array" ] ; then
+  if [ -n "${k_array[*]}" ] ; then
     i="0"
     for k in "${k_array[@]}" ; do
       let i=$i+1;
