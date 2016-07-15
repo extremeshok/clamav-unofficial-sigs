@@ -107,11 +107,10 @@ function xshok_is_root () {
     id_bin="$(which id)"
   fi
   if [ "$($id_bin -u)" = 0 ] ; then
-      return 0 ;
-    else
-      return 1 ;  #not root
-    fi
-  fi 
+    return 0 ;
+  else
+    return 1 ;  #not root
+  fi
 }
 
 # Function to check if its a file, otherwise return false
