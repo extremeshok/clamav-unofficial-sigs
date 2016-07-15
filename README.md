@@ -25,6 +25,9 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * rsync: TCP port 873
 * wget/curl : TCP port 443
 
+### Supported Operating Systems
+Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS) and derivative systems  
+
 ### Quick Install Guide
 * Download the files to /tmp/
 * Copy clamav-unofficial-sigs.sh to /usr/local/bin/
@@ -96,7 +99,21 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## Change Log
 
-### Version 5.3.2 (updated 2016-05-24)
+### Version 5.4 (updated 2016-06-15)
+ - eXtremeSHOK.com Maintenance
+ - Added Solaris 10 and 11 configs
+ - When under Solaris we define our own which function
+ - Define grep_bin variable, use gnu grep on sun os
+ - Fallback to gpg2 if gpg not found, 
+ - Added support for csw gnupg on solaris
+ - Trap the keyboard interrupt (ctrl+c) and gracefully exit
+ - Added CentOS 7 Atomic config @deajan
+ - Minor refactoring and removing of unused variables
+ - Removed CRDF signatures as per Sanesecurity #124
+ - Added more Yara rule project Rules
+ - Incremented the config to version 68
+
+### Version 5.3.2
  - eXtremeSHOK.com Maintenance
  - Bug Fix: Additional Databases not downloading
  - Added sanesecurity_update_hours option to limit updating to once every 2 hours

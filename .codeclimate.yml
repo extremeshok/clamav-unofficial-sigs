@@ -9,6 +9,8 @@ engines:
         enabled: false
       SC2076:
         enabled: false
+      SC2086:
+        enabled: false
   fixme:
     enabled: true
 ratings:
