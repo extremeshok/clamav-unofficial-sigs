@@ -2753,7 +2753,7 @@ if [ "$additional_enabled" == "yes" ] ; then
         additional_db_update="0"
 
         if [ "$(echo "$db_url" | cut -d ":" -f1)" = "rsync" ] ; then
-          $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
+          $rsync_bin $rsync_output_level $no_motd -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
           ret="$?"
         else
           if [ "$wget_bin" != "" ] ; then
