@@ -1206,7 +1206,12 @@ clamd_reload_opt="clamdscan --reload"
 uname_bin=$(which uname)
 clamscan_bin=$(which clamscan)
 rsync_bin=$(which rsync)
-wget_bin=$(which wget)
+#detect support for wget
+if [ -x /usr/sfw/bin/wget ] ; then
+  wget_bin="/usr/sfw/bin/wget"
+else
+  wget_bin=$(which wget)
+fi
 if [ "$wget_bin" == "" ] ; then
   curl_bin=$(which curl)
 fi
@@ -1216,7 +1221,11 @@ if [ -x /usr/gnu/bin/grep ] ; then
 else
   grep_bin=$(which grep)
 fi
-gpg_bin=$(which gpg)
+if [ -x /opt/csw/bin/gpg ] ; then
+  gpg_bin="/opt/csw/bin/gpg"
+else
+  gpg_bin=$(which gpg)
+fi
 if [ "$gpg_bin" == "" ] ; then
   gpg_bin=$(which gpg2)
 fi
@@ -1302,16 +1311,17 @@ for config_file in "${config_files[@]}" ; do
    
 
     if [ "$(uname -s)" = "SunOS" ] ; then
-      #Solaris FIXES only
-      clean_confi=$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' -e '/^[[:blank:]]*#/d;s/#.*//' -e 's/*$//g' "$config_file")
-      echo "NEED TO FIX"
-      exit
+      #Solaris FIXES only, i had issues with running with a single command..
+      clean_config=$(command sed -e '/^#.*/d' "$config_file") # comment line
+      clean_config=$(echo "$clean_config" | sed -e 's/#[[:space:]].*//') # comment line (duplicated)
+      clean_config=$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//') #comments at end of line
+      clean_config=$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//') #trailing and leading whitespace
+      clean_config=$(echo "$clean_config" | sed -e '/^\s*$/d') #blank lines
     else 
       # delete lines beginning with #
       # delete from ' #' to end of the line
       # delete from '# ' to end of the line
       # delete both trailing and leading whitespace
-      # delete all trailing comments which dont get removed on solaris
       # delete all trailing whitespace
       # delete all empty lines
       clean_config=$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")
@@ -1333,8 +1343,6 @@ for config_file in "${config_files[@]}" ; do
       exit 1
     fi
 
-    echo "$clean_config" >> /tmp/clean_config
-
     #config loading
     for i in "${clean_config[@]}" ; do
       eval $(echo "${i}" | command sed -e 's/[[:space:]]*$//' 2> /dev/null)
@@ -1342,6 +1350,8 @@ for config_file in "${config_files[@]}" ; do
     done
   fi
 done
+
+
 
 # Assign the log_file_path earlier and remove trailing / (removes / and //)
 log_file_path=$(echo "$log_file_path" | sed 's:/*$::')
