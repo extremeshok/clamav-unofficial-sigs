@@ -1299,15 +1299,24 @@ for config_file in "${config_files[@]}" ; do
     #config stripping
     xshok_pretty_echo_and_log "Loading config: $config_file" "="
 
-    # delete lines beginning with #
-    # delete from ' #' to end of the line
-    # delete from '# ' to end of the line
-    # delete both trailing and leading whitespace
-    # delete all empty lines
-    # delete all trailing comments which dont get removed on solaris
-    # delete all trailing whitespace
-    clean_config=$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' -e '/^[[:blank:]]*#/d;s/#.*//' -e 's/ *$//g' "$config_file")
+   
 
+    if [ "$(uname -s)" = "SunOS" ] ; then
+      #Solaris FIXES only
+      clean_confi=$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' -e '/^[[:blank:]]*#/d;s/#.*//' -e 's/*$//g' "$config_file")
+      echo "NEED TO FIX"
+      exit
+    else 
+      # delete lines beginning with #
+      # delete from ' #' to end of the line
+      # delete from '# ' to end of the line
+      # delete both trailing and leading whitespace
+      # delete all trailing comments which dont get removed on solaris
+      # delete all trailing whitespace
+      # delete all empty lines
+      clean_config=$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")
+    fi
+    
     ### config error checking
     # check "" are an even number
     config_check="${clean_config//[^\"]}"
@@ -1324,9 +1333,12 @@ for config_file in "${config_files[@]}" ; do
       exit 1
     fi
 
+    echo "$clean_config" >> /tmp/clean_config
+
     #config loading
     for i in "${clean_config[@]}" ; do
-      eval $(echo "${i}" | command sed -e 's/[[:space:]]*$//')
+      eval $(echo "${i}" | command sed -e 's/[[:space:]]*$//' 2> /dev/null)
+      #eval $(echo "${i}" 2> /dev/null)
     done
   fi
 done
