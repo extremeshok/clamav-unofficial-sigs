@@ -110,6 +110,8 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
  - Added CentOS 7 Atomic config @deajan
  - Minor refactoring and removing of unused variables
  - Removed CRDF signatures as per Sanesecurity #124
+ - Added more Yara rule project Rules
+ - Incremented the config to version 68
 
 ### Version 5.3.2
  - eXtremeSHOK.com Maintenance
