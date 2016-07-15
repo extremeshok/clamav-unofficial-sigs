@@ -101,10 +101,16 @@ function xshok_cleanup () {
 
 # Function to check if the current running user is the root user, otherwise return false
 function xshok_is_root () {
-  if [ "$(id -u)" = 0 ] ; then
-    return 0 ;
+  if [ "$(uname -s)" = "SunOS" ] ; then
+    id_bin="/usr/xpg4/bin/id"
   else
-    return 1 ;  #not root
+    id_bin="$(which id)"
+  fi
+  if [ "$($id_bin -u)" = 0 ] ; then
+      return 0 ;
+    else
+      return 1 ;  #not root
+    fi
   fi 
 }
 
@@ -156,11 +162,16 @@ function xshok_mkdir_ownership () { #"path"
 # xshok_is_subdir "username" && echo "user found" || echo "no"
 # xshok_is_subdir "username" "groupname" && echo "user and group found" || echo "no"
 function xshok_user_group_exists () { #"username" "groupname"
+  if [ "$(uname -s)" = "SunOS" ] ; then
+    id_bin="/usr/xpg4/bin/id"
+  else
+    id_bin="$(which id)"
+  fi
   if [ "$1" ] ; then
-    id -u "$1" > /dev/null 2>&1
+    $id_bin -u "$1" > /dev/null 2>&1
     if [ $? -eq 0 ]; then
       if [ "$2" ] ; then
-        id -g "$2" > /dev/null 2>&1
+        $id_bin -g "$2" > /dev/null 2>&1
         if [ $? -eq 0 ]; then
           return 0 ; #user and group exists
         else
@@ -1882,13 +1893,14 @@ echo "$log_file_path/$log_file_name*"
 echo "$purge" 
 } >> "$purge"
 
-
 # Check and save current system time since epoch for time related database downloads.
 # However, if unsuccessful, issue a warning that we cannot calculate times since epoch.
 if [ -n "$securiteinfo_dbs" ] || [ -n "$malwarepatrol_db" ] ; then
-  current_time=$(date "+%s" 2>/dev/null)
+  current_time=$(date "+%s" 2> /dev/null)
+  current_time="${current_time//[^0-9]/}"
+  current_time="$((current_time + 0))"
   if [ "$current_time" -le 0 ] ; then
-    current_time=$(perl -le print+time 2>/dev/null)
+    current_time=$(perl -le print+time 2> /dev/null)
   fi
   if [ "$current_time" -le 0 ] ; then
     xshok_pretty_echo_and_log "WARNING: No support for 'date +%s' or 'perl' was not found , SecuriteInfo and MalwarePatrol updates bypassed" "="
