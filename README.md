@@ -99,7 +99,14 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## Change Log
 
-### Version 5.4 (updated 2016-06-15)
+### Version 5.4.1 (updated 2016-06-20)
+ - eXtremeSHOK.com Maintenance
+ - Disable installation when either pkg_mgr or pkg_rm is defined.
+ - Minor refactoring
+ - Update master.conf with the new Yara-rules project file names 
+ - Incremented the config to version 69
+ 
+### Version 5.4
  - eXtremeSHOK.com Maintenance
  - Added Solaris 10 and 11 configs
  - When under Solaris we define our own which function
