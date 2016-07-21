@@ -244,7 +244,7 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
 }
 
 # function to check if the $2 value is not null and does not start with -
-function xshok_check_s2 () {
+function xshok_check_s2 () { #value1 #value2
   if [ "$1" ] ; then
     if [[ "$1" =~ ^-.* ]] ; then
       xshok_pretty_echo_and_log "ERROR: Missing value for option or value begins with -" "="
@@ -262,7 +262,7 @@ function xshok_check_s2 () {
 # array=("one" "two" "three")
 # xshok_array_count $array
 # 3
-function xshok_array_count () {
+function xshok_array_count () { #array
   k_array=( "$@" )
   if [ -n "${k_array[*]}" ] ; then
     i="0"
@@ -273,6 +273,45 @@ function xshok_array_count () {
   else
     echo "0"
   fi
+}
+# function to auto update
+function xshok_auto_update() { #version
+  xshok_pretty_echo_and_log "Performing automatic update..."
+
+  # Download new version
+  echo -n "Downloading latest version..."
+  if ! wget --quiet --output-document="$0.tmp" $UPDATE_BASE/$SELF ; then
+    echo "Failed: Error while trying to wget new version!"
+    echo "File requested: $UPDATE_BASE/$SELF"
+    exit 1
+  fi
+  echo "Done."
+
+  # Copy over modes from old version
+  OCTAL_MODE=$(stat -c '%a' $SELF)
+  if ! chmod $OCTAL_MODE "$0.tmp" ; then
+    echo "Failed: Error while trying to set mode on $0.tmp."
+    exit 1
+  fi
+
+  # Generate the update script
+  cat > xshok_update_script.sh << EOF
+#!/bin/bash
+# Overwrite old file with new
+if mv "$0.tmp" "$0"; then
+  echo "Done. Update complete."
+  rm \$0
+else
+  echo "Failed! The update was not completed."
+fi
+EOF
+
+
+  echo -n "Inserting update process..."
+  
+  #replaced with $0, so code will update and then call itself with the same parameters it had
+  #exec /bin/bash xshok_update_script.sh
+  exec "$0" "$@"
 }
 
 #function to handle list of database files
@@ -347,6 +386,13 @@ function xshok_database () { #database #rating
 
 #generates a man config and installs it
 function install_man () {
+
+  if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
+    echo "This script (clamav-unofficial-sigs) was installed on the system via '$pkg_mgr'"
+    exit 1
+  fi
+
+
   echo ""
   echo "Generating man file for install...."
   
@@ -408,6 +454,12 @@ EOF
 
 #generates a logrotate config and installs it
 function install_logrotate () {
+
+  if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
+    echo "This script (clamav-unofficial-sigs) was installed on the system via '$pkg_mgr'"
+    exit 1
+  fi
+
   echo ""
   echo "Generating logrotate file for install...."
   
@@ -474,6 +526,12 @@ EOF
 
 #generates a cron config and installs it
 function install_cron () {
+
+  if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
+    echo "This script (clamav-unofficial-sigs) was installed on the system via '$pkg_mgr'"
+    exit 1
+  fi
+
   echo ""
   echo "Generating cron file for install...."
   
@@ -780,7 +838,7 @@ function make_signature_database_from_ascii_file () {
 #Remove the clamav-unofficial-sigs script
 function remove_script () {
   echo ""
-  if [ -n "$pkg_mgr" ] && [ -n "$pkg_rm" ] ; then
+  if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
     echo "This script (clamav-unofficial-sigs) was installed on the system via '$pkg_mgr'"
     echo "use '$pkg_rm' to remove the script and all of its associated files and databases from the system."
 
@@ -1172,8 +1230,8 @@ EOF
 ################################################################################
 
 #Script Info
-script_version="5.4"
-script_version_date="15 July 2016"
+script_version="5.4.1"
+script_version_date="20 July 2016"
 minimum_required_config_version="65"
 minimum_yara_clamav_version="0.99"
 
