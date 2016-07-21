@@ -274,6 +274,7 @@ function xshok_array_count () { #array
     echo "0"
   fi
 }
+
 # function to auto update
 function xshok_auto_update() { #version
   xshok_pretty_echo_and_log "Performing automatic update..."
@@ -391,7 +392,6 @@ function install_man () {
     echo "This script (clamav-unofficial-sigs) was installed on the system via '$pkg_mgr'"
     exit 1
   fi
-
 
   echo ""
   echo "Generating man file for install...."
@@ -2132,11 +2132,16 @@ else
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled Sanesecurity Database files"
       for db_file in $sanesecurity_dbs ; do
+        if echo "$db_file" | $grep_bin -q "|"; then
+          db_file=$(echo "$db_file" | cut -d"|" -f1)
+        fi
         if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
-          rm -f "$work_dir_sanesecurity/$db_file"*
+          xshok_pretty_echo_and_log "Removing $work_dir_sanesecurity/$db_file"
+          rm -f "$work_dir_sanesecurity/$db_file"
           do_clamd_reload=1
         fi
         if [ -r "$clam_dbs/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $clam_dbs/$db_file"
           rm -f "$clam_dbs/$db_file"
           do_clamd_reload=1
         fi
@@ -2278,11 +2283,16 @@ else
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled SecuriteInfo Database files"
       for db_file in $securiteinfo_dbs ; do
+        if echo "$db_file" | $grep_bin -q "|"; then
+          db_file=$(echo "$db_file" | cut -d"|" -f1)
+        fi
         if [ -r "$work_dir_securiteinfo/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $work_dir_securiteinfo/$db_file"
           rm -f "$work_dir_securiteinfo/$db_file"
           do_clamd_reload=1
         fi
         if [ -r "$clam_dbs/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $clam_dbs/$db_file"
           rm -f "$clam_dbs/$db_file"
           do_clamd_reload=1
         fi
@@ -2423,11 +2433,16 @@ else
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled linuxmalwaredetect Database files"
       for db_file in $linuxmalwaredetect_dbs ; do
+        if echo "$db_file" | $grep_bin -q "|"; then
+          db_file=$(echo "$db_file" | cut -d"|" -f1)
+        fi
         if [ -r "$work_dir_linuxmalwaredetect/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $work_dir_linuxmalwaredetect/$db_file"
           rm -f "$work_dir_linuxmalwaredetect/$db_file"
           do_clamd_reload=1
         fi
         if [ -r "$clam_dbs/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $clam_dbs/$db_file"
           rm -f "$clam_dbs/$db_file"
           do_clamd_reload=1
         fi
@@ -2754,6 +2769,9 @@ else
       for db_file in $yararulesproject_dbs ; do
         if echo "$db_file" | $grep_bin -q "/"; then
           db_file=$(echo "$db_file" | cut -d"/" -f2)
+        fi
+        if echo "$db_file" | $grep_bin -q "|"; then
+          db_file=$(echo "$db_file" | cut -d"|" -f1)
         fi
         if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
           rm -f "$work_dir_yararulesproject/$db_file"
