@@ -515,7 +515,7 @@ $logrotate_log_file_full_path {
   missingok
   notifempty
   compress
-  create 0644 $logrotate_user $logrotate_group
+  create 0640 $logrotate_user $logrotate_group
 }
 
 EOF
