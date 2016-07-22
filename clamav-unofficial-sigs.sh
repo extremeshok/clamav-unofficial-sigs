@@ -101,15 +101,10 @@ function xshok_cleanup () {
 
 # Function to check if the current running user is the root user, otherwise return false
 function xshok_is_root () {
-  if [ "$(uname -s)" = "SunOS" ] ; then
-    id_bin="/usr/xpg4/bin/id"
-  else
-    id_bin="$(which id)"
-  fi
-  if [ "$($id_bin -u)" = 0 ] ; then
-    return 0 ;
-  else
+  if ! [[ $EUID -eq 0 ]]; then
     return 1 ;  #not root
+  else
+    return 0 ;
   fi
 }
 
