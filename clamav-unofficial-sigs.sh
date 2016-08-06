@@ -44,7 +44,7 @@ trap xshok_control_c SIGINT
 # HELPER FUNCTIONS
 ################################################################################
 
-# Function to support user config settings for applying file and directory access permissions.
+# Support user config settings for applying file and directory access permissions.
 function perms () {
   if [ -n "$clam_user" ] && [ -n "$clam_group" ] ; then
     "${@:-}"
@@ -68,7 +68,7 @@ function xshok_prompt_confirm () { # optional_message
   done
 }
 
-# Function to create a pid file
+# Create a pid file
 function xshok_create_pid_file () { # pid.file
   if [ "$1" ] ; then
     pidfile="$1"
@@ -83,7 +83,7 @@ function xshok_create_pid_file () { # pid.file
   fi
 }
 
-# Function to intercept ctrl+c and calls the cleanup function
+# Intercept ctrl+c and calls the cleanup function
 function xshok_control_c () {
   echo -en "\n"
   xshok_pretty_echo_and_log "--------------| Exiting ... Please wait |--------------" "-"
@@ -99,7 +99,7 @@ function xshok_cleanup () {
   return $?
 }
 
-# Function to check if the current running user is the root user, otherwise return false
+# Check if the current running user is the root user, otherwise return false
 function xshok_is_root () {
   if [ "$(uname -s)" = "SunOS" ] ; then
     id_bin="/usr/xpg4/bin/id"
@@ -113,7 +113,7 @@ function xshok_is_root () {
   fi
 }
 
-# Function to check if its a file, otherwise return false
+# Check if its a file, otherwise return false
 function xshok_is_file () { #"filepath"
   filepath="$1"
   if [ -f "${filepath}" ] ; then
@@ -123,7 +123,7 @@ function xshok_is_file () { #"filepath"
   fi
 }
 
-# Function to check if filepath is a subdir, otherwise return false
+# Check if filepath is a subdir, otherwise return false
 # Usage: xshok_is_subdir "filepath"
 # xshok_is_subdir "/root/" - false
 # xshok_is_subdir "/usr/local/etc" && echo "yes" - yes
@@ -141,7 +141,7 @@ function xshok_is_subdir () { # filepath
   fi
 }
 
-# Function to create a dir and set the ownership
+# Create a dir and set the ownership
 function xshok_mkdir_ownership () { #"path"
   if [ "$1" ] ; then
     mkdir -p "$1" 2>/dev/null
@@ -156,7 +156,7 @@ function xshok_mkdir_ownership () { #"path"
   fi
 }
 
-# Function to check if a user and group exists on the system otherwise return false
+# Check if a user and group exists on the system otherwise return false
 # Usage:
 # xshok_is_subdir "username" && echo "user found" || echo "no"
 # xshok_is_subdir "username" "groupname" && echo "user and group found" || echo "no"
@@ -188,7 +188,7 @@ function xshok_user_group_exists () { #"username" "groupname"
   fi
 }
 
-# Function to handle comments with/out borders and logging.
+# Handle comments with/out borders and logging.
 # Usage:
 # pretty_echo_and_log "one"
 # one
