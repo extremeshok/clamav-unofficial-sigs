@@ -288,7 +288,7 @@ function xshok_auto_update () { # version
   echo "Done."
 
   # Copy over modes from old version
-  OCTAL_MODE=$(stat -c '%a' $SELF)
+  OCTAL_MODE=$(stat -c "%a" $SELF)
   if ! chmod $OCTAL_MODE "$0.tmp" ; then
     echo "Failed: Error while trying to set mode on $0.tmp."
     exit 1
@@ -609,7 +609,7 @@ function decode_third_party_signature_by_signature_name () {
     cd "$clam_dbs" || exit
     sig=$($grep_bin "$input:" ./*.ndb)
     if [ -n "$sig" ] ; then
-      db_file=$(echo "$sig" | cut -d ':' -f1)
+      db_file=$(echo "$sig" | cut -d ":" -f 1)
       echo "$input found in: $db_file"
       echo "$input signature decodes to:"
       echo "$sig" | cut -d ":" -f5 | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
@@ -649,7 +649,7 @@ function hexadecimal_encode_formatted_input_string () {
 function gpg_verify_specific_sanesecurity_database_file () { # databasefile
   echo ""
   if [ "$1" ] ; then
-    db_file=$(echo "$1" | awk -F '/' '{print $NF}')
+    db_file=$(echo "$1" | awk -F "/" '{print $NF}')
     if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
       echo "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
       if [ -r "$work_dir_sanesecurity/$db_file".sig ] ; then
@@ -665,7 +665,7 @@ function gpg_verify_specific_sanesecurity_database_file () { # databasefile
           exit 0
         fi
       else
-        echo "Signature '$db_file.sig' cannot be found."
+        echo "Signature '${db_file}.sig' cannot be found."
       fi
     else
       echo "File '$db_file' cannot be found or is not a Sanesecurity database file."
@@ -782,7 +782,7 @@ function make_signature_database_from_ascii_file () {
       line_num=1
 
       while read -r line ; do
-        line_prefix=$(echo "$line" | awk -F ':' '{print $1}')
+        line_prefix=$(echo "$line" | awk -F ":" '{print $1}')
         if [ "$line_prefix" = "-" ] ; then
           echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
         elif [ "$line_prefix" = "=" ] ; then
@@ -896,7 +896,7 @@ function remove_script () {
 function clamscan_integrity_test_specific_database_file () { # databasefile
   echo ""
   if [ "$1" ] ; then
-    input=$(echo "$1" | awk -F '/' '{print $NF}')
+    input=$(echo "$1" | awk -F "/" '{print $NF}')
     db_file=$(find "$work_dir" -name "$input")
     if [ -r "$db_file" ] ; then
       echo "Clamscan integrity testing: $db_file"
@@ -1298,9 +1298,9 @@ if [ -t 1 ] ; then
   force_verbose="yes"
 else
   # Null fonts
-  BOLD=''
-  #REV=''
-  NORM=''
+  BOLD=""
+  #REV=""
+  NORM=""
   # Silence
   force_verbose="no"
 fi
@@ -1376,8 +1376,8 @@ for config_file in "${config_files[@]}" ; do
       clean_config=$(echo "$clean_config" | sed -e '/^\s*$/d') # Blank lines
     else
       # Delete lines beginning with #
-      # Delete from ' #' to end of the line
-      # Delete from '# ' to end of the line
+      # Delete from " #" to end of the line
+      # Delete from "# " to end of the line
       # Delete both trailing and leading whitespace
       # Delete all trailing whitespace
       # Delete all empty lines
@@ -1598,13 +1598,13 @@ else
   rsync_output_level="--progress"
 fi
 
-# If the local rsync client supports the '--no-motd' flag, then enable it.
-if $rsync_bin --help | $grep_bin 'no-motd' > /dev/null ; then
+# If the local rsync client supports the "--no-motd" flag, then enable it.
+if $rsync_bin --help | $grep_bin "no-motd" > /dev/null ; then
   no_motd="--no-motd"
 fi
 
-# If the local rsync client supports the '--contimeout' flag, then enable it.
-if $rsync_bin --help | $grep_bin 'contimeout' > /dev/null ; then
+# If the local rsync client supports the "--contimeout" flag, then enable it.
+if $rsync_bin --help | $grep_bin "contimeout" > /dev/null ; then
   connect_timeout="--contimeout=$rsync_connect_timeout"
 fi
 
@@ -1774,7 +1774,7 @@ if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
     fi
   else
     xshok_pretty_echo_and_log "WARNING: Cannot locate HAM directory: $ham_dir"
-    xshok_pretty_echo_and_log "Skipping initial whitelist file creation.  Fix 'ham_dir' path in config file"
+    xshok_pretty_echo_and_log "Skipping initial whitelist file creation. Fix 'ham_dir' path in config file"
   fi
 fi
 
@@ -1935,7 +1935,7 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
   if [ ! -s "$previous_dbs" ] ; then
     cp -f "$current_dbs" "$previous_dbs" 2>/dev/null
   fi
-  diff "$current_dbs" "$previous_dbs" 2>/dev/null | $grep_bin '>' | awk '{print $2}' > "$db_changes"
+  diff "$current_dbs" "$previous_dbs" 2>/dev/null | $grep_bin ">" | awk '{print $2}' > "$db_changes"
   if [ -r "$db_changes" ] ; then
     if $grep_bin -vq "bak" "$db_changes" 2>/dev/null ; then
       do_clamd_reload=2
@@ -2955,7 +2955,7 @@ if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt"
     if [ -n "$sig_new" ] ; then
       if [ "$sig_old" != "$sig_new" ] || [ "$entry" != "$sig_mon_new" ] ; then
         sig_name_new=$(echo "$sig_new" | tr -d "\r" | awk -F ":" '{print $1}')
-        sig_ign_new=$(echo "$sig_mon_new" | cut -d ":" -f1-3)
+        sig_ign_new=$(echo "$sig_mon_new" | cut -d ":" -f 1-3)
         perl -i -ne "print unless /$sig_ign_old/" "$work_dir_work_configs/monitor-ign.txt"
         echo "$sig_mon_new" >> "$work_dir_work_configs/monitor-ign.txt"
         perl -p -i -e "s/$sig_ign_old/$sig_ign_new/" "$work_dir_work_configs/local.ign"
