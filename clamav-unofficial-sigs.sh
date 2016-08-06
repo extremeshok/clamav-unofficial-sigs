@@ -59,11 +59,17 @@ function perms () {
 function xshok_prompt_confirm () { # optional_message
   message="${1:-Are you sure?}"
   while true; do
-    read -r -p "$message [y/N]" response  </dev/tty
-    case $response in
-      [yY]) return 0 ;;
-      [nN]) return 1 ;;
-      *) printf " \033[31m %s \n\033[0m" "invalid input"
+    read -r -p "$message [y/N]" response < /dev/tty
+    case "$response" in
+      [yY])
+        return 0
+        ;;
+      [nN])
+        return 1
+        ;;
+      *)
+        printf " \033[31m %s \n\033[0m" "invalid input"
+        ;;
     esac
   done
 }
@@ -1322,11 +1328,30 @@ fi
 # Generic command line options
 while true ; do
   case "$1" in
-    -c | --config ) xshok_check_s2 "$2"; custom_config="$2"; shift 2; break ;;
-    -F | --force ) force_updates="yes"; shift 1; break ;;
-    -v | --verbose ) force_verbose="yes"; shift 1; break ;;
-    -s | --silence ) force_verbose="no"; shift 1; break ;;
-    * ) break ;;
+    -c|--config)
+      xshok_check_s2 "$2"
+      custom_config="$2"
+      shift 2
+      break
+      ;;
+    -F|--force)
+      force_updates="yes"
+      shift 1
+      break
+      ;;
+    -v|--verbose)
+      force_verbose="yes"
+      shift 1
+      break
+      ;;
+    -s|--silence)
+      force_verbose="no"
+      shift 1
+      break
+      ;;
+    *)
+      break
+      ;;
   esac
 done
 
@@ -1355,9 +1380,17 @@ xshok_pretty_echo_and_log "" "#" "80"
 # Generic command line options
 while true ; do
   case "$1" in
-    -h | --help ) help_and_usage; exit; break ;;
-    -V | --version ) exit; break ;;
-    * ) break ;;
+    -h|--help)
+      help_and_usage
+      exit
+      ;;
+    -V|--version)
+      # FIXME
+      exit
+      ;;
+    *)
+      break
+      ;;
   esac
 done
 
@@ -1663,22 +1696,73 @@ fi
 
 while true; do
   case "$1" in
-    -d | --decode-sig ) decode_third_party_signature_by_signature_name; exit; break ;;
-    -e | --encode-string ) hexadecimal_encode_entire_input_string; exit; break ;;
-    -f | --encode-formatted ) hexadecimal_encode_formatted_input_string; exit; break ;;
-    -g | --gpg-verify ) xshok_check_s2 "$2"; gpg_verify_specific_sanesecurity_database_file "$2"; exit; break ;;
-    -i | --information ) output_system_configuration_information; exit; break ;;
-    -m | --make-database ) make_signature_database_from_ascii_file; exit; break ;;
-    -t | --test-database ) xshok_check_s2 "$2"; clamscan_integrity_test_specific_database_file "$2"; exit; break ;;
-    -o | --output-triggered ) output_signatures_triggered_during_ham_directory_scan; exit; break ;;
-    -w | --whitelist ) add_signature_whitelist_entry; exit; break ;;
-    --check-clamav ) check_clamav; exit; break ;;
-    --install-all ) install_cron; install_logrotate; install_man; exit; break ;;
-    --install-cron ) install_cron; exit; break ;;
-    --install-logrotate ) install_logrotate; exit; break ;;
-    --install-man ) install_man; exit; break ;;
-    --remove-script ) remove_script; exit; break ;;
-    * ) break ;;
+    -d|--decode-sig)
+      decode_third_party_signature_by_signature_name
+      exit
+      ;;
+    -e|--encode-string)
+      hexadecimal_encode_entire_input_string
+      exit
+      ;;
+    -f|--encode-formatted)
+      hexadecimal_encode_formatted_input_string
+      exit
+      ;;
+    -g|--gpg-verify)
+      xshok_check_s2 "$2"
+      gpg_verify_specific_sanesecurity_database_file "$2"
+      exit
+      ;;
+    -i|--information)
+      output_system_configuration_information
+      exit
+      ;;
+    -m|--make-database)
+      make_signature_database_from_ascii_file
+      exit
+      ;;
+    -t|--test-database)
+      xshok_check_s2 "$2"
+      clamscan_integrity_test_specific_database_file "$2"
+      exit
+      ;;
+    -o|--output-triggered)
+      output_signatures_triggered_during_ham_directory_scan
+      exit
+      ;;
+    -w|--whitelist)
+      add_signature_whitelist_entry
+      exit
+      ;;
+    --check-clamav)
+      check_clamav
+      exit
+      ;;
+    --install-all)
+      install_cron
+      install_logrotate
+      install_man
+      exit
+      ;;
+    --install-cron)
+      install_cron
+      exit
+      ;;
+    --install-logrotate)
+      install_logrotate
+      exit
+      ;;
+    --install-man)
+      install_man
+      exit
+      ;;
+    --remove-script)
+      remove_script
+      exit
+      ;;
+    *)
+      break
+      ;;
   esac
 done
 
@@ -2557,78 +2641,87 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
         case "$malwarepatrol_reloaded" in
           1) # Database was updated, need test and reload
-          xshok_pretty_echo_and_log "Testing updated MalwarePatrol database file: $malwarepatrol_db"
-          if $clamscan_bin --quiet -d "$work_dir_malwarepatrol/$malwarepatrol_db" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-            xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
-            true
-          else
-            xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
-            if [ "$remove_bad_database" == "yes" ] ; then
-              if rm -f "$work_dir_malwarepatrol/$malwarepatrol_db" ; then
-                xshok_pretty_echo_and_log "Removed invalid database: $work_dir_malwarepatrol/$malwarepatrol_db"
+            xshok_pretty_echo_and_log "Testing updated MalwarePatrol database file: $malwarepatrol_db"
+            if $clamscan_bin --quiet -d "$work_dir_malwarepatrol/$malwarepatrol_db" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
+              xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
+              true
+            else
+              xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
+              if [ "$remove_bad_database" == "yes" ] ; then
+                if rm -f "$work_dir_malwarepatrol/$malwarepatrol_db" ; then
+                  xshok_pretty_echo_and_log "Removed invalid database: $work_dir_malwarepatrol/$malwarepatrol_db"
+                fi
               fi
-            fi
-            false
-          fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ; then
-          perms chown -f "$clam_user:$clam_group" "$clam_dbs/$malwarepatrol_db"
-          if [ "$selinux_fixes" == "yes" ] ; then
-            restorecon "$clam_dbs/$malwarepatrol_db"
-          fi
-          xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
-          do_clamd_reload=1
-        else
-          xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
-        fi
-        ;; # The strange case when $? != 0 in the original
-        2)
-        $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_malwarepatrol/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
-        $clamscan_bin --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-        $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "*" -f2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
-        $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
-        mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
-        if $clamscan_bin --quiet -d "$test_dir/$malwarepatrol_db" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-          xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
-          true
-        else
-          xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
-          if [ "$remove_bad_database" == "yes" ] ; then
-            if rm -f "$test_dir/$malwarepatrol_db" ; then
-              xshok_pretty_echo_and_log "Removed invalid database: $test_dir/$malwarepatrol_db"
-            fi
-          fi
-          false
-        fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ; then
-        perms chown -f "$clam_user:$clam_group" "$clam_dbs/$malwarepatrol_db"
-        if [ "$selinux_fixes" == "yes" ] ; then
-          restorecon "$clam_dbs/$malwarepatrol_db"
-        fi
-        xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
-        do_clamd_reload=1
+              false
+            fi \
+              && (
+                test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
+                true
+              ) \
+              && if $rsync_bin -pcqt "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ; then
+                perms chown -f "$clam_user:$clam_group" "$clam_dbs/$malwarepatrol_db"
+                if [ "$selinux_fixes" == "yes" ] ; then
+                  restorecon "$clam_dbs/$malwarepatrol_db"
+                fi
+                xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
+                do_clamd_reload=1
+              else
+                xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
+              fi
+            ;; # The strange case when $? != 0 in the original
+          2)
+            $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_malwarepatrol/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
+            $clamscan_bin --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
+            $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "*" -f2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+            $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
+            mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
+            if $clamscan_bin --quiet -d "$test_dir/$malwarepatrol_db" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
+              xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
+              true
+            else
+              xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
+              if [ "$remove_bad_database" == "yes" ] ; then
+                if rm -f "$test_dir/$malwarepatrol_db" ; then
+                  xshok_pretty_echo_and_log "Removed invalid database: $test_dir/$malwarepatrol_db"
+                fi
+              fi
+              false
+            fi \
+              && (
+                test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
+                true
+              ) \
+              && if $rsync_bin -pcqt "$test_dir/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ; then
+                perms chown -f "$clam_user:$clam_group" "$clam_dbs/$malwarepatrol_db"
+                if [ "$selinux_fixes" == "yes" ] ; then
+                  restorecon "$clam_dbs/$malwarepatrol_db"
+                fi
+                xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
+                do_clamd_reload=1
+              else
+                xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
+              fi
+            ;;
+          0) # The database did not update
+            xshok_pretty_echo_and_log "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
+            ;;
+          -1) # Wget failed
+            xshok_pretty_echo_and_log "WARNING - Failed connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
+            ;;
+        esac
+
       else
-        xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
+        xshok_pretty_echo_and_log "MalwarePatrol Database File Update" "="
+
+        time_remaining=$((update_interval - time_interval))
+        hours_left=$((time_remaining / 3600))
+        minutes_left=$((time_remaining % 3600 / 60))
+        xshok_pretty_echo_and_log "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
+        xshok_pretty_echo_and_log "No database download was performed at this time" "-"
+        xshok_pretty_echo_and_log "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
       fi
-      ;;
-      0) # The database did not update
-      xshok_pretty_echo_and_log "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
-      ;;
-      -1) # Wget failed
-      xshok_pretty_echo_and_log "WARNING - Failed connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
-      ;;
-    esac
-
-  else
-
-    xshok_pretty_echo_and_log "MalwarePatrol Database File Update" "="
-
-    time_remaining=$((update_interval - time_interval))
-    hours_left=$((time_remaining / 3600))
-    minutes_left=$((time_remaining % 3600 / 60))
-    xshok_pretty_echo_and_log "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
-    xshok_pretty_echo_and_log "No database download was performed at this time" "-"
-    xshok_pretty_echo_and_log "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+    fi
   fi
-fi
-fi
 else
   if [ -n "$malwarepatrol_db" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
