@@ -4,10 +4,10 @@
 # You are free to use, modify and distribute, however you may not remove this notice.
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
 ################################################################################
-# 
+#
 # Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 #
-# Originially based on: 
+# Originially based on:
 # Script provide by Bill Landry (unofficialsigs@gmail.com).
 #
 # License: BSD (Berkeley Software Distribution)
@@ -15,19 +15,19 @@
 ################################################################################
 #
 #    THERE ARE NO USER CONFIGURABLE OPTIONS IN THIS SCRIPT
-#   ALL CONFIGURATION OPTIONS ARE LOCATED IN THE INCLUDED CONFIGURATION FILE 
+#   ALL CONFIGURATION OPTIONS ARE LOCATED IN THE INCLUDED CONFIGURATION FILE
 #
 ################################################################################
 
 ################################################################################
 
-    ######  #######    #     # ####### #######    ####### ######  ### ####### 
-    #     # #     #    ##    # #     #    #       #       #     #  #     #    
-    #     # #     #    # #   # #     #    #       #       #     #  #     #    
-    #     # #     #    #  #  # #     #    #       #####   #     #  #     #    
-    #     # #     #    #   # # #     #    #       #       #     #  #     #    
-    #     # #     #    #    ## #     #    #       #       #     #  #     #    
-    ######  #######    #     # #######    #       ####### ######  ###    #    
+    ######  #######    #     # ####### #######    ####### ######  ### #######
+    #     # #     #    ##    # #     #    #       #       #     #  #     #
+    #     # #     #    # #   # #     #    #       #       #     #  #     #
+    #     # #     #    #  #  # #     #    #       #####   #     #  #     #
+    #     # #     #    #   # # #     #    #       #       #     #  #     #
+    #     # #     #    #    ## #     #    #       #       #     #  #     #
+    ######  #######    #     # #######    #       ####### ######  ###    #
 
 ################################################################################
 
@@ -64,8 +64,8 @@ function xshok_prompt_confirm () { #optional_message
       [yY]) return 0 ;;
       [nN]) return 1 ;;
       *) printf " \033[31m %s \n\033[0m" "invalid input"
-    esac 
-  done  
+    esac
+  done
 }
 
 # Function to create a pid file
@@ -97,7 +97,7 @@ function xshok_cleanup () {
   wait
   xshok_pretty_echo_and_log "      Powered By https://eXtremeSHOK.com      " "#"
   return $?
-} 
+}
 
 # Function to check if the current running user is the root user, otherwise return false
 function xshok_is_root () {
@@ -120,7 +120,7 @@ function xshok_is_file () { #"filepath"
     return 0 ;
   else
     return 1 ;  #not a file
-  fi 
+  fi
 }
 
 # Function to check if filepath is a subdir, otherwise return false
@@ -157,7 +157,7 @@ function xshok_mkdir_ownership () { #"path"
 }
 
 # Function to check if a user and group exists on the system otherwise return false
-# Usage: 
+# Usage:
 # xshok_is_subdir "username" && echo "user found" || echo "no"
 # xshok_is_subdir "username" "groupname" && echo "user and group found" || echo "no"
 function xshok_user_group_exists () { #"username" "groupname"
@@ -190,9 +190,9 @@ function xshok_user_group_exists () { #"username" "groupname"
 
 # Function to handle comments with/out borders and logging.
 # Usage:
-# pretty_echo_and_log "one" 
+# pretty_echo_and_log "one"
 # one
-# pretty_echo_and_log "two" "-" 
+# pretty_echo_and_log "two" "-"
 # ---
 # two
 # ---
@@ -215,12 +215,12 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
       else
         mycount="${#1}"
       fi
-      for (( n = 0; n < mycount; n++ )) ; do 
+      for (( n = 0; n < mycount; n++ )) ; do
         myvar="$myvar$2"
       done
       if [ "$1" != "" ] ; then
         echo -e "$myvar\n$1\n$myvar"
-      else  
+      else
         echo -e "$myvar"
       fi
     fi
@@ -239,7 +239,7 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
       enable_log="no"
     else
       echo "$(date "+%b %d %T")" "$1" >> "$log_file_path/$log_file_name"
-    fi 
+    fi
   fi
 }
 
@@ -308,7 +308,7 @@ EOF
 
 
   echo -n "Inserting update process..."
-  
+
   #replaced with $0, so code will update and then call itself with the same parameters it had
   #exec /bin/bash xshok_update_script.sh
   exec "$0" "$@"
@@ -358,7 +358,7 @@ function xshok_database () { #database #rating
                 new_dbs="$new_dbs $db_name"
               elif [ "$current_rating" == "LOW" ] ; then
                 if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "LOWMEDIUM" ] ; then
-                  new_dbs="$new_dbs $db_name"   
+                  new_dbs="$new_dbs $db_name"
                 fi
               elif [ "$current_rating" == "MEDIUM" ] ; then
                 if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] || [ "$db_name_rating" == "LOWMEDIUM" ] ; then
@@ -395,7 +395,7 @@ function install_man () {
 
   echo ""
   echo "Generating man file for install...."
-  
+
   #Use defined varibles or attempt to use default varibles
 
   if [ ! -e "$man_dir/$man_filename" ] ; then
@@ -447,7 +447,7 @@ Originially based on Script provide by Bill Landry
 
 EOF
 
-  fi 
+  fi
   echo "Completed: man installed, as file: $man_dir/$man_filename"
 }
 
@@ -462,7 +462,7 @@ function install_logrotate () {
 
   echo ""
   echo "Generating logrotate file for install...."
-  
+
   #Use defined varibles or attempt to use default varibles
 
   if [ ! -n "$logrotate_user" ] ; then
@@ -494,8 +494,8 @@ function install_logrotate () {
 ##################
 #
 # Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
-# 
-# Originially based on: 
+#
+# Originially based on:
 # Script provide by Bill Landry (unofficialsigs@gmail.com).
 #
 # License: BSD (Berkeley Software Distribution)
@@ -520,7 +520,7 @@ $logrotate_log_file_full_path {
 
 EOF
 
-  fi 
+  fi
   echo "Completed: logrotate installed, as file: $logrotate_dir/$logrotate_filename"
 }
 
@@ -534,7 +534,7 @@ function install_cron () {
 
   echo ""
   echo "Generating cron file for install...."
-  
+
   #Use defined varibles or attempt to use default varibles
   if [ ! -n "$cron_minute" ] ; then
     cron_minute=$(( ( RANDOM % 59 )  + 1 ));
@@ -544,10 +544,10 @@ function install_cron () {
   fi
   if [ ! -n "$cron_bash" ] ; then
     cron_bash=$(which bash)
-  fi  
+  fi
   if [ ! -n "$cron_script_full_path" ] ; then
     cron_script_full_path="$this_script_full_path"
-  fi  
+  fi
 
   if [ ! -e "$cron_dir/$cron_filename" ] ; then
     mkdir -p "$cron_dir"
@@ -567,8 +567,8 @@ function install_cron () {
 ##################
 #
 # Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
-# 
-# Originially based on: 
+#
+# Originially based on:
 # Script provide by Bill Landry (unofficialsigs@gmail.com).
 #
 # License: BSD (Berkeley Software Distribution)
@@ -581,7 +581,7 @@ function install_cron () {
 # currently supports updating third-party signature databases provided
 # by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
 #
-# The script is set to run hourly, at a random minute past the hour, and the 
+# The script is set to run hourly, at a random minute past the hour, and the
 # script itself is set to randomize the actual execution time between
 # 60 - 600 seconds.  To Adjust the cron values, edit your configs and run
 # bash clamav-unofficial-sigs.sh --install-cron to generate a new file.
@@ -592,7 +592,7 @@ $cron_minute * * * * $cron_user [ -x $cron_script_full_path ] && $cron_bash $cro
 
 EOF
 
-  fi 
+  fi
   echo "Completed: cron installed, as file: $cron_dir/$cron_filename"
 }
 
@@ -846,7 +846,7 @@ function remove_script () {
     cron_file_full_path="$cron_dir/$cron_filename"
     logrotate_file_full_path="$logrotate_dir/$logrotate_filename"
     man_file_full_path="$man_dir/$man_filename"
-    
+
     echo "This will remove the workdir ($work_dir), logrotate file ($logrotate_file_full_path), cron file ($cron_file_full_path), man file ($man_file_full_path)"
     echo "Are you sure you want to remove the clamav-unofficial-sigs script and all of its associated files, third-party databases, and work directory from the system?"
     if xshok_prompt_confirm ; then
@@ -870,7 +870,7 @@ function remove_script () {
             xshok_is_file "$man_file_full_path" && rm -f "$man_file_full_path"
             echo "     Removed file: $man_file_full_path"
           fi
-          
+
           #rather keep the configs
           #rm -f -- "$default_config" && echo "     Removed file: $default_config"
           #rm -f -- "$0" && echo "     Removed file: $0"
@@ -915,10 +915,10 @@ function clamscan_integrity_test_specific_database_file () { #databasefile
 
       echo "=== Sanesecurity ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_sanesecurity"
-      
+
       echo "=== SecuriteInfo ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_securiteinfo"
-      
+
       echo "=== MalwarePatrol ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_malwarepatrol"
 
@@ -932,7 +932,7 @@ function clamscan_integrity_test_specific_database_file () { #databasefile
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_add"
 
       echo "Check the file name and try again..."
-    fi 
+    fi
   else
     xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
     exit 1
@@ -977,7 +977,7 @@ function add_signature_whitelist_entry () {
           if $rsync_bin -pcqt "$work_dir_work_configs/my-whitelist.ign2" "$clam_dbs" ; then
             perms chown -f "$clam_user:$clam_group" my-whitelist.ign2
 
-            if [ ! -s "$work_dir_work_configs/monitor-ign.txt" ] ; then 
+            if [ ! -s "$work_dir_work_configs/monitor-ign.txt" ] ; then
               # Create "monitor-ign.txt" file for clamscan database integrity testing.
               echo "This is the monitor ignore file..." > "$work_dir_work_configs/monitor-ign.txt"
             fi
@@ -1025,9 +1025,9 @@ function clamscan_reload_dbs () {
         xshok_pretty_echo_and_log "Update(s) detected, reloading ClamAV databases" "="
       elif [ "$do_clamd_reload" = "2" ] ; then
         xshok_pretty_echo_and_log "Database removal(s) detected, reloading ClamAV databases" "="
-      elif [ "$do_clamd_reload" = "3" ] ; then      
+      elif [ "$do_clamd_reload" = "3" ] ; then
         xshok_pretty_echo_and_log "File 'local.ign' has changed, reloading ClamAV databases" "="
-      elif [ "$do_clamd_reload" = "4" ] ; then      
+      elif [ "$do_clamd_reload" = "4" ] ; then
         xshok_pretty_echo_and_log "File 'my-whitelist.ign2' has changed, reloading ClamAV databases" "="
       else
         xshok_pretty_echo_and_log "Update(s) detected, reloading ClamAV databases" "="
@@ -1042,7 +1042,7 @@ function clamscan_reload_dbs () {
             xshok_pretty_echo_and_log "ClamAV databases Reloaded" "="
           else
             xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart" "-"
-            if [ -z "$clamd_restart_opt" ] ; then      
+            if [ -z "$clamd_restart_opt" ] ; then
               xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'" "*"
             else
               $clamd_restart_opt
@@ -1051,21 +1051,21 @@ function clamscan_reload_dbs () {
           fi
         else
           xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart" "="
-          if [ -z "$clamd_restart_opt" ] ; then      
+          if [ -z "$clamd_restart_opt" ] ; then
             xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'" "*"
           else
             $clamd_restart_opt
             xshok_pretty_echo_and_log "ClamAV Restarted" "="
           fi
-        fi   
+        fi
       else
         xshok_pretty_echo_and_log "ClamAV databases Reloaded" "="
       fi
-    else   
+    else
       xshok_pretty_echo_and_log "No updates detected, ClamAV databases were not reloaded" "="
     fi
-  else      
-    xshok_pretty_echo_and_log "Database reload has been disabled in the configuration file" "="  
+  else
+    xshok_pretty_echo_and_log "Database reload has been disabled in the configuration file" "="
   fi
 
 }
@@ -1145,7 +1145,7 @@ function check_new_version () {
 }
 
 #function for help and usage
-##usage: 
+##usage:
 # help_and_usage "1" - enables the man output formatting
 # help_and_usage - normal help output formatting
 function help_and_usage () {
@@ -1174,47 +1174,47 @@ helpcontents=$(cat << EOF
 $ofs Usage: $(basename "$0") $ofe [OPTION] [PATH|FILE]
 $ofb
 $ofs -c, --config $ofe Use a specific configuration file or directory $oft eg: '-c /your/dir' or ' -c /your/file.name'  $oft Note: If a directory is specified the directory must contain atleast:  $oft master.conf, os.conf or user.conf $oft Default Directory: $config_dir
-$ofb 
+$ofb
 $ofs -F, --force $ofe Force all databases to be downloaded, could cause ip to be blocked
-$ofb 
+$ofb
 $ofs -h, --help $ofe Display this script's help and usage information
-$ofb 
+$ofb
 $ofs -V, --version $ofe Output script version and date information
-$ofb 
+$ofb
 $ofs -v, --verbose $ofe Be verbose, enabled when not run under cron
-$ofb 
+$ofb
 $ofs -s, --silence $ofe Only output error messages, enabled when run under cron
-$ofb 
+$ofb
 $ofs -d, --decode-sig $ofe Decode a third-party signature either by signature name $oft (eg: Sanesecurity.Junk.15248) or hexadecimal string. $oft This flag will 'NOT' decode image signatures
-$ofb 
+$ofb
 $ofs -e, --encode-string $ofe Hexadecimal encode an entire input string that can $oft be used in any '*.ndb' signature database file
-$ofb 
+$ofb
 $ofs -f, --encode-formatted $ofe Hexadecimal encode a formatted input string containing $oft signature spacing fields '{}, (), *', without encoding $oft the spacing fields, so that the encoded signature $oft can be used in any '*.ndb' signature database file
-$ofb 
+$ofb
 $ofs -g, --gpg-verify $ofe GPG verify a specific Sanesecurity database file $oft eg: '-g filename.ext' (do not include file path)
-$ofb 
+$ofb
 $ofs -i, --information $ofe Output system and configuration information for $oft viewing or possible debugging purposes
-$ofb 
+$ofb
 $ofs -m, --make-database $ofe Make a signature database from an ascii file containing $oft data strings, with one data string per line.  Additional $oft information is provided when using this flag
-$ofb 
+$ofb
 $ofs -t, --test-database $ofe Clamscan integrity test a specific database file $oft eg: '-t filename.ext' (do not include file path)
-$ofb 
+$ofb
 $ofs -o, --output-triggered $ofe If HAM directory scanning is enabled in the script's $oft configuration file, then output names of any third-party $oft signatures that triggered during the HAM directory scan
-$ofb 
+$ofb
 $ofs -w, --whitelist $ofe Adds a signature whitelist entry in the newer ClamAV IGN2 $oft format to 'my-whitelist.ign2' in order to temporarily resolve $oft a false-positive issue with a specific third-party signature. $oft Script added whitelist entries will automatically be removed $oft if the original signature is either modified or removed from $oft the third-party signature database
-$ofb 
+$ofb
 $ofs --check-clamav $ofe If ClamD status check is enabled and the socket path is correctly $oft specifiedthen test to see if clamd is running or not
-$ofb 
+$ofb
 $ofs --install-all $ofe Install and generate the cron, logroate and man files, autodetects the values $oft based on your config files
 $ofb
 $ofs --install-cron $ofe Install and generate the cron file, autodetects the values $oft based on your config files
-$ofb 
+$ofb
 $ofs --install-logrotate $ofe Install and generate the logrotate file, autodetects the $oft values based on your config files
-$ofb 
+$ofb
 $ofs --install-man $ofe Install and generate the man file, autodetects the $oft values based on your config files
-$ofb 
+$ofb
 $ofs --remove-script $ofe Remove the clamav-unofficial-sigs script and all of $oft its associated files and databases from the system
-$ofb 
+$ofb
 EOF
   ) #this is very important...
 
@@ -1239,7 +1239,7 @@ minimum_yara_clamav_version="0.99"
 config_dir="/etc/clamav-unofficial-sigs"
 config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
 
-#Initialise 
+#Initialise
 config_version="0"
 do_clamd_reload="0"
 comment_silence="no"
@@ -1365,7 +1365,7 @@ for config_file in "${config_files[@]}" ; do
     #config stripping
     xshok_pretty_echo_and_log "Loading config: $config_file" "="
 
-   
+
 
     if [ "$(uname -s)" = "SunOS" ] ; then
       #Solaris FIXES only, i had issues with running with a single command..
@@ -1374,7 +1374,7 @@ for config_file in "${config_files[@]}" ; do
       clean_config=$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//') #comments at end of line
       clean_config=$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//') #trailing and leading whitespace
       clean_config=$(echo "$clean_config" | sed -e '/^\s*$/d') #blank lines
-    else 
+    else
       # delete lines beginning with #
       # delete from ' #' to end of the line
       # delete from '# ' to end of the line
@@ -1383,20 +1383,20 @@ for config_file in "${config_files[@]}" ; do
       # delete all empty lines
       clean_config=$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")
     fi
-    
+
     ### config error checking
     # check "" are an even number
     config_check="${clean_config//[^\"]}"
-    if [ $(( ${#config_check} % 2)) -eq 1 ] ; then 
-      xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every \" requires a closing \"" "="     
+    if [ $(( ${#config_check} % 2)) -eq 1 ] ; then
+      xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every \" requires a closing \"" "="
       exit 1
     fi
 
     # check there is an = for every set of "" #optional whitespace \s* between = and "
     config_check_vars=$(echo "$clean_config" | $grep_bin -c '=\s*\"' )
 
-    if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ] ; then 
-      xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\"" "="    
+    if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ] ; then
+      xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\"" "="
       exit 1
     fi
 
@@ -1507,14 +1507,14 @@ fi
 logrotate_dir=$(echo "$logrotate_dir" | sed 's:/*$::')
 if [ ! -n "$logrotate_filename" ] ; then
   logrotate_filename="clamav-unofficial-sigs"
-fi  
+fi
 if [ ! -n "$man_dir" ] ; then
   man_dir="/usr/share/man/man8"
 fi
 man_dir=$(echo "$man_dir" | sed 's:/*$::')
 if [ ! -n "$man_filename" ] ; then
   man_filename="clamav-unofficial-sigs.8"
-fi  
+fi
 if [ ! -n "$man_log_file_full_path" ] ; then
   man_log_file_full_path="$log_file_path/$log_file_name"
 fi
@@ -1555,8 +1555,8 @@ fi
 
 # Reset the update timers to force a full update.
 if [ "$force_updates" == "yes" ] ; then
-  xshok_pretty_echo_and_log "Force Updates: enabled" 
-  sanesecurity_update_hours="0"    
+  xshok_pretty_echo_and_log "Force Updates: enabled"
+  sanesecurity_update_hours="0"
   securiteinfo_update_hours="0"
   linuxmalwaredetect_update_hours="0"
   malwarepatrol_update_hours="0"
@@ -1572,7 +1572,7 @@ if [ "$enable_locking" == "yes" ] ; then
   if [ -f "$pid_file_fullpath" ] ; then
     pid_file_pid=$(cat "$pid_file_fullpath")
     ps -p "$pid_file_pid" > /dev/null 2>&1
-    if [ $? -eq 0 ] ; then 
+    if [ $? -eq 0 ] ; then
       xshok_pretty_echo_and_log "ERROR: Only one instance can run at the same time." "="
       exit 1
     else
@@ -1802,7 +1802,7 @@ if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
     #echo $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     ret="$?"
-  fi    
+  fi
   if [ "$ret" != "0" ] ; then
     xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
     exit 1
@@ -1873,7 +1873,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
     for db in $sanesecurity_dbs ; do
       echo "$db" >> "$sanesecurity_include_dbs"
       echo "$db.sig" >> "$sanesecurity_include_dbs"
-      
+
       echo "$work_dir_sanesecurity/$db" >> "$current_tmp"
       echo "$work_dir_sanesecurity/$db.sig" >> "$current_tmp"
       clamav_files
@@ -1950,7 +1950,7 @@ fi
 # Create "purge.txt" file for package maintainers to support package uninstall.
 purge="$work_dir_work_configs/purge.txt"
 cp -f "$current_dbs" "$purge"
-{ 
+{
 echo "$work_dir_work_configs/current-dbs.txt"
 echo "$work_dir_work_configs/db-changes.txt"
 echo "$work_dir_work_configs/last-mbl-update.txt"
@@ -1968,7 +1968,7 @@ echo "$work_dir_gpg/secring.gpg"
 echo "$work_dir_gpg/ss-keyring.gpg*"
 echo "$work_dir_gpg/trustdb.gpg"
 echo "$log_file_path/$log_file_name*"
-echo "$work_dir_work_configs/purge.txt" 
+echo "$work_dir_work_configs/purge.txt"
 } >> "$purge"
 
 # Check and save current system time since epoch for time related database downloads.
@@ -2035,13 +2035,13 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                     $gpg_bin --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null
                     ret="$?"
                   else
-                    ret="0"  
+                    ret="0"
                   fi
                   if [ "$ret" -eq "0" ] ; then
                     test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
                     true
                   else
-                    xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING" 
+                    xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING"
                     false
                   fi
                 if [ "$?" -eq "0" ] ; then
@@ -2168,10 +2168,10 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
         echo "$current_time" > "$work_dir_work_configs/last-si-update.txt"
         xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
         xshok_pretty_echo_and_log "Checking for SecuriteInfo updates..."
-        securiteinfo_updates="0" 
+        securiteinfo_updates="0"
         for db_file in $securiteinfo_dbs ; do
           if [ "$loop" = "1" ] ; then
-            xshok_pretty_echo_and_log "---"      
+            xshok_pretty_echo_and_log "---"
           fi
           xshok_pretty_echo_and_log "Checking for updated SecuriteInfo database file: $db_file"
           securiteinfo_db_update="0"
@@ -2253,7 +2253,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
       else
         xshok_pretty_echo_and_log "Failed connection to $securiteinfo_url - SKIPPED SecuriteInfo $db_file update"
       fi
-      if [ "$securiteinfo_db_update" != "1" ] ; then          
+      if [ "$securiteinfo_db_update" != "1" ] ; then
         xshok_pretty_echo_and_log "No updated SecuriteInfo $db_file database file found" "-"
       fi
     done
@@ -2293,7 +2293,7 @@ fi
 
 
 ##############################################################################################################################################
-# Check for updated linuxmalwaredetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
+# Check for updated linuxmalwaredetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
 ##############################################################################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
@@ -2318,7 +2318,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
       linuxmalwaredetect_updates="0"
       for db_file in $linuxmalwaredetect_dbs ; do
         if [ "$loop" = "1" ] ; then
-          xshok_pretty_echo_and_log "---"      
+          xshok_pretty_echo_and_log "---"
         fi
         xshok_pretty_echo_and_log "Checking for updated linuxmalwaredetect database file: $db_file"
 
@@ -2527,8 +2527,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
           fi # wget md5
         fi
 
-        case "$malwarepatrol_reloaded" in 
-          1) # database was updated, need test and reload 
+        case "$malwarepatrol_reloaded" in
+          1) # database was updated, need test and reload
           xshok_pretty_echo_and_log "Testing updated MalwarePatrol database file: $malwarepatrol_db"
           if $clamscan_bin --quiet -d "$work_dir_malwarepatrol/$malwarepatrol_db" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
             xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
@@ -2618,7 +2618,7 @@ else
 fi
 
 ##############################################################################################################################################
-# Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
+# Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
 ##############################################################################################################################################
 if [ "$yararulesproject_enabled" == "yes" ] ; then
   if [ -n "$yararulesproject_dbs" ] ; then
@@ -2648,7 +2648,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
         else yr_dir=""
         fi
         if [ "$loop" = "1" ] ; then
-          xshok_pretty_echo_and_log "---"      
+          xshok_pretty_echo_and_log "---"
         fi
         xshok_pretty_echo_and_log "Checking for updated yararulesproject database file: $db_file"
 
@@ -2769,7 +2769,7 @@ else
 fi
 
 ##############################################################################################################################################
-# Check for updated additional database files every set number of hours as defined in the "USER CONFIGURATION" section of this script 
+# Check for updated additional database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
 ##############################################################################################################################################
 if [ "$additional_enabled" == "yes" ] ; then
   if [ -n "$additional_dbs" ] ; then
@@ -2793,17 +2793,17 @@ if [ "$additional_enabled" == "yes" ] ; then
       xshok_pretty_echo_and_log "Checking for additional updates..."
       additional_updates="0"
       for db_url in $additional_dbs ; do
-        # left for future dir manipulation       
+        # left for future dir manipulation
         # if echo "$db_file" | $grep_bin -q "/"; then
         #   add_dir="/"$(echo "$db_file" | cut -d"/" -f1)
         #   db_file=$(echo "$db_file" | cut -d"/" -f2)
-        # else 
+        # else
         #   add_dir=""
         # fi
        db_file=$(basename "$db_url")
 
         if [ "$loop" = "1" ] ; then
-          xshok_pretty_echo_and_log "---"      
+          xshok_pretty_echo_and_log "---"
         fi
         xshok_pretty_echo_and_log "Checking for updated additional database file: $db_file"
 
@@ -3077,7 +3077,7 @@ if [ "$setmode" = "yes" ] ; then
   fi
 fi
 
-# Reload all clamd databases  
+# Reload all clamd databases
 clamscan_reload_dbs
 
 xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
