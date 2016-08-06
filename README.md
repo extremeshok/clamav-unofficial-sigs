@@ -30,8 +30,8 @@ Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, 
 
 ### Quick Install Guide
 * Download the files to /tmp/
-* Copy clamav-unofficial-sigs.sh to /usr/local/bin/
-* Set 755 permissions on  /usr/local/bin/clamav-unofficial-sigs.sh
+* Copy clamav-unofficial-sigs.sh to /usr/local/sbin/
+* Set 755 permissions on  /usr/local/sbin/clamav-unofficial-sigs.sh
 * Make the directory /etc/clamav-unofficial-sigs/
 * Copy the contents of config/ into /etc/clamav-unofficial-sigs/
 * Make the directory /var/log/clamav-unofficial-sigs/

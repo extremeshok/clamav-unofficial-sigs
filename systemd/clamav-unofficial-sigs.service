@@ -27,4 +27,4 @@ Description=Clamav Unofficial Sigs Update service
 Documentation=man:clamav-unofficial-sigs(8)
 
 [Service]
-ExecStart=/usr/local/bin/clamav-unofficial-sigs.sh
+ExecStart=/usr/local/sbin/clamav-unofficial-sigs.sh

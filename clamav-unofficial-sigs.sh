@@ -392,7 +392,6 @@ function install_man () {
     exit 1
   fi
 
-
   echo ""
   echo "Generating man file for install...."
 
@@ -515,7 +514,7 @@ $logrotate_log_file_full_path {
   missingok
   notifempty
   compress
-  create 0644 $logrotate_user $logrotate_group
+  create 0640 $logrotate_user $logrotate_group
 }
 
 EOF
@@ -874,7 +873,7 @@ function remove_script () {
           # Rather keep the configs
           #rm -f -- "$default_config" && echo "     Removed file: $default_config"
           #rm -f -- "$0" && echo "     Removed file: $0"
-          xshok_is_subdir "$work_dir" && rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
+          xshok_is_subdir "$work_dir" && rm -rf -- "${work_dir:?}" && echo "     Removed script working directories: $work_dir"
 
           echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
           echo "  databases, and work directories have been successfully removed from the system."
@@ -1140,6 +1139,20 @@ function check_new_version () {
   if [ "$latest_version" ] ; then
     if [ ! "$latest_version" == "$script_version" ] ; then
       xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
+    fi
+  fi
+}
+
+# Check for a new version
+function check_new_config_version () {
+  if [ "$wget_bin" != "" ] ; then
+    latest_config_version="$($wget_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O - 2> /dev/null | $grep_bin  "config_version=" | cut -d\" -f2)"
+  else
+    latest_config_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf 2> /dev/null | $grep_bin  "config_version=" | cut -d\" -f2)"
+  fi
+  if [ "$latest_config_version" ] ; then
+    if [ ! "$latest_config_version" == "$config_version" ] ; then
+      xshok_pretty_echo_and_log "New configversion : v$latest_config_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
     fi
   fi
 }
@@ -2132,11 +2145,16 @@ else
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled Sanesecurity Database files"
       for db_file in $sanesecurity_dbs ; do
+        if echo "$db_file" | $grep_bin -q "|"; then
+          db_file=$(echo "$db_file" | cut -d"|" -f1)
+        fi
         if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
-          rm -f "$work_dir_sanesecurity/$db_file"*
+          xshok_pretty_echo_and_log "Removing $work_dir_sanesecurity/$db_file"
+          rm -f "$work_dir_sanesecurity/$db_file"
           do_clamd_reload=1
         fi
         if [ -r "$clam_dbs/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $clam_dbs/$db_file"
           rm -f "$clam_dbs/$db_file"
           do_clamd_reload=1
         fi
@@ -2278,11 +2296,16 @@ else
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled SecuriteInfo Database files"
       for db_file in $securiteinfo_dbs ; do
+        if echo "$db_file" | $grep_bin -q "|"; then
+          db_file=$(echo "$db_file" | cut -d"|" -f1)
+        fi
         if [ -r "$work_dir_securiteinfo/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $work_dir_securiteinfo/$db_file"
           rm -f "$work_dir_securiteinfo/$db_file"
           do_clamd_reload=1
         fi
         if [ -r "$clam_dbs/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $clam_dbs/$db_file"
           rm -f "$clam_dbs/$db_file"
           do_clamd_reload=1
         fi
@@ -2423,11 +2446,16 @@ else
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled linuxmalwaredetect Database files"
       for db_file in $linuxmalwaredetect_dbs ; do
+        if echo "$db_file" | $grep_bin -q "|"; then
+          db_file=$(echo "$db_file" | cut -d"|" -f1)
+        fi
         if [ -r "$work_dir_linuxmalwaredetect/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $work_dir_linuxmalwaredetect/$db_file"
           rm -f "$work_dir_linuxmalwaredetect/$db_file"
           do_clamd_reload=1
         fi
         if [ -r "$clam_dbs/$db_file" ] ; then
+          xshok_pretty_echo_and_log "Removing $clam_dbs/$db_file"
           rm -f "$clam_dbs/$db_file"
           do_clamd_reload=1
         fi
@@ -2754,6 +2782,9 @@ else
       for db_file in $yararulesproject_dbs ; do
         if echo "$db_file" | $grep_bin -q "/"; then
           db_file=$(echo "$db_file" | cut -d"/" -f2)
+        fi
+        if echo "$db_file" | $grep_bin -q "|"; then
+          db_file=$(echo "$db_file" | cut -d"|" -f1)
         fi
         if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
           rm -f "$work_dir_yararulesproject/$db_file"
@@ -3084,6 +3115,8 @@ clamscan_reload_dbs
 xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
 
 check_new_version
+
+check_new_config_version
 
 xshok_cleanup
 
