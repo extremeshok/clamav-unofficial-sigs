@@ -1,41 +1,24 @@
-#language: shell
+language: bash
 
-# Required environment variables from repository settings
-#ci_securiteinfo_authorisation_signature=[secure]
-#ci_malwarepatrol_receipt_code=[secure]
-#ci_malwarepatrol_product_code=[secure]
-#ci_malwarepatrol_list=[secure]
-#ci_malwarepatrol_free=[secure]
-
-
-#Enable modern build platform, not container based.
+# Enable modern build platform, not container based.
 sudo: required
 dist: trusty
 
-# Apparently caching is disabled, since we used modern build platform as we require clamav and sudo ;/
-# caching the /var/lib/clamav/ will save +/-9mins of run time and allow the use of freshclam signatures
-
-#Enable Caching
-#cache:
-#  directories:
-#    - tmp/cache
-
+# Clamav 0.99 from Debian wheezy
 before_install:
-  - "sudo apt-get update -qq"
-  - "sudo apt-get install clamav-daemon -qq"
-  - "sudo apt-get install ca-certificates -qq"
-  - "sudo apt-get install wget rsync -qq"
-  # - "sudo mkdir -p tmp/cache/"
-  # - "ls -laFh tmp/cache/clamav-dbs"
-  # - "sudo rsync -rlptDv tmp/cache/  /var/lib/clamav/"
+  - "sudo apt-get -qq update"
+  - "sudo apt-get -qq install -y ca-certificates wget rsync"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/l/llvm-3.0/libllvm3.0_3.0-10_amd64.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/libf/libffi/libffi5_3.0.10-3_amd64.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/c/clamav/libclamav7_0.99+dfsg-0+deb7u2_amd64.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/c/clamav/clamav-base_0.99+dfsg-0+deb7u2_all.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/c/clamav/clamav-freshclam_0.99+dfsg-0+deb7u2_amd64.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/c/clamav/clamav-daemon_0.99+dfsg-0+deb7u2_amd64.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/c/clamav/clamav_0.99+dfsg-0+deb7u2_amd64.deb"
+  - "sudo dpkg -i *.deb"
+  - "sudo apt-get install -y -f"
   - "sudo cp -f .t/tests/bytecode.cvd /var/lib/clamav/bytecode.cvd"
   - "sudo chown -R clamav:clamav /var/lib/clamav"
-  # - "sudo freshclam"
-  # - "ls -laFh /var/lib/clamav/"
-  # - "sudo rsync -rlptDav /var/lib/clamav/ tmp/cache/"
-  # - "sudo chown -R travis:travis tmp/cache"
-  # - "sudo chmod -R 777 tmp/cache/"
-  # - "ls -laFh tmp/cache/clamav-dbs/"
   - "sudo service clamav-daemon start"
 
 install:
