@@ -37,7 +37,7 @@ if [ ! "$( tail -1 "$0" | head -1 | cut -c1-7 )" == "exit \$?" ] ; then
   exit 1
 fi
 
-# trap the keyboard interrupt (ctrl+c)
+# Trap the keyboard interrupt (ctrl+c)
 trap xshok_control_c SIGINT
 
 ################################################################################
@@ -51,12 +51,12 @@ function perms () {
   fi
 }
 
-# Function to prompt a user if they should complete an action with Y or N
-# usage: xshok_prompt_confirm
+# Prompt a user if they should complete an action with Y or N
+# Usage: xshok_prompt_confirm
 # if xshok_prompt_confirm; then
 # xshok_prompt_confirm && echo "accepted"
 # xshok_prompt_confirm && echo "yes" || echo "no"
-function xshok_prompt_confirm () { #optional_message
+function xshok_prompt_confirm () { # optional_message
   message="${1:-Are you sure?}"
   while true; do
     read -r -p "$message [y/N]" response  </dev/tty
@@ -69,7 +69,7 @@ function xshok_prompt_confirm () { #optional_message
 }
 
 # Function to create a pid file
-function xshok_create_pid_file () { #pid.file
+function xshok_create_pid_file () { # pid.file
   if [ "$1" ] ; then
     pidfile="$1"
     echo $$ > "$pidfile"
@@ -91,9 +91,9 @@ function xshok_control_c () {
   exit $?
 }
 
-# cleanup function
+# Cleanup function
 function xshok_cleanup () {
-  #wait for all processes to end
+  # Wait for all processes to end
   wait
   xshok_pretty_echo_and_log "      Powered By https://eXtremeSHOK.com      " "#"
   return $?
@@ -109,7 +109,7 @@ function xshok_is_root () {
   if [ "$($id_bin -u)" = 0 ] ; then
     return 0 ;
   else
-    return 1 ;  #not root
+    return 1 ; # Not root
   fi
 }
 
@@ -119,7 +119,7 @@ function xshok_is_file () { #"filepath"
   if [ -f "${filepath}" ] ; then
     return 0 ;
   else
-    return 1 ;  #not a file
+    return 1 ; # Not a file
   fi
 }
 
@@ -127,17 +127,17 @@ function xshok_is_file () { #"filepath"
 # Usage: xshok_is_subdir "filepath"
 # xshok_is_subdir "/root/" - false
 # xshok_is_subdir "/usr/local/etc" && echo "yes" - yes
-function xshok_is_subdir () { #filepath
+function xshok_is_subdir () { # filepath
   filepath=$(echo "$1" | sed 's:/*$::')
   if [ -d "$filepath" ] ; then
     res="${filepath//[^\/]}"
     if [ "${#res}" -gt 1 ] ; then
       return 0 ;
     else
-      return 1 ;  #not a subdir
+      return 1 ; # Not a subdir
     fi
   else
-    return 1 ;  #not a dir
+    return 1 ; # Not a dir
   fi
 }
 
@@ -172,15 +172,15 @@ function xshok_user_group_exists () { #"username" "groupname"
       if [ "$2" ] ; then
         $id_bin -g "$2" > /dev/null 2>&1
         if [ $? -eq 0 ]; then
-          return 0 ; #user and group exists
+          return 0 ; # User and group exists
         else
-          return 1 ;  #group does NOT exist
+          return 1 ;  # Group does NOT exist
         fi
        else
-          return 0 ; #user exists
+          return 0 ; # User exists
        fi
     else
-      return 1 ;  #user does NOT exist
+      return 1 ;  # User does NOT exist
     fi
   else
     xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
@@ -202,9 +202,9 @@ function xshok_user_group_exists () { #"username" "groupname"
 # ========
 # pretty_echo_and_log "" "/\" "7"
 # /\/\/\/\/\/\
-#type: e = error, w= warning ""
-function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
-  # handle comments
+# type: e = error, w= warning ""
+function xshok_pretty_echo_and_log () { # "string" "repeating" "count" "type"
+  # Handle comments
   if [ "$comment_silence" = "no" ] ; then
     if [ "${#@}" = "1" ] ; then
       echo "$1"
@@ -226,10 +226,10 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
     fi
   fi
 
-  # handle logging
+  # Handle logging
   if [ "$enable_log" == "yes" ] ; then
     if [ ! -e "$log_file_path/$log_file_name" ] ; then
-        #xshok_mkdir_ownership "$log_file_path"
+        # xshok_mkdir_ownership "$log_file_path"
         mkdir -p "$log_file_path"
         touch "$log_file_path/$log_file_name" 2>/dev/null
         perms chown -f "$clam_user:$clam_group" "$log_file_path/$log_file_name"
@@ -243,8 +243,8 @@ function xshok_pretty_echo_and_log () { #"string" "repeating" "count" "type"
   fi
 }
 
-# function to check if the $2 value is not null and does not start with -
-function xshok_check_s2 () { #value1 #value2
+# Check if the $2 value is not null and does not start with -
+function xshok_check_s2 () { # value1 value2
   if [ "$1" ] ; then
     if [[ "$1" =~ ^-.* ]] ; then
       xshok_pretty_echo_and_log "ERROR: Missing value for option or value begins with -" "="
@@ -256,13 +256,13 @@ function xshok_check_s2 () { #value1 #value2
   fi
 }
 
-# function to count array elements and output the total element count
+# Count array elements and output the total element count
 # required due to compound array assignment
 # Usage:
 # array=("one" "two" "three")
 # xshok_array_count $array
 # 3
-function xshok_array_count () { #array
+function xshok_array_count () { # array
   k_array=( "$@" )
   if [ -n "${k_array[*]}" ] ; then
     i="0"
@@ -274,8 +274,8 @@ function xshok_array_count () { #array
     echo "0"
   fi
 }
-# function to auto update
-function xshok_auto_update () { #version
+# Auto update
+function xshok_auto_update () { # version
   xshok_pretty_echo_and_log "Performing automatic update..."
 
   # Download new version
@@ -309,12 +309,12 @@ EOF
 
   echo -n "Inserting update process..."
 
-  #replaced with $0, so code will update and then call itself with the same parameters it had
+  # Replaced with $0, so code will update and then call itself with the same parameters it had
   #exec /bin/bash xshok_update_script.sh
   exec "$0" "$@"
 }
 
-#function to handle list of database files
+# Handle list of database files
 function clamav_files () {
   echo "$clam_dbs/$db" >> "$current_tmp"
   if [ "$keep_db_backup" = "yes" ] ; then
@@ -322,30 +322,30 @@ function clamav_files () {
   fi
 }
 
-# Function to manage the databases and allow multi-dimensions as well as global overrides
-# since the datbases are basically a multi-dimentional associative arrays in bash
+# Manage the databases and allow multi-dimensions as well as global overrides
+# Since the datbases are basically a multi-dimentional associative arrays in bash
 # ratings: LOW| MEDIUM| HIGH| REQUIRED| LOWONLY| MEDIUMONLY| LOWMEDIUMONLY | MEDIUMHIGHONLY | HIGHONLY| DISABLED
-function xshok_database () { #database #rating
+function xshok_database () { # database rating
 
-  # assign
+  # Assign
   current_dbs="$1"
   current_rating="$2"
-  # zero
+  # Zero
   new_dbs=""
 
   if [ -n "$current_dbs" ] ; then
     if [ "$(xshok_array_count "$current_dbs")" -ge "1" ] ; then
       for db_name in $current_dbs ; do
-        #checks
-        if [ "$enable_yararules" == "no" ] ; then #yararules are disabled
-            if [[ "$db_name" = *".yar"* ]] ; then # if it's the value you want to delete
-              continue # skip to the next value
+        # Checks
+        if [ "$enable_yararules" == "no" ] ; then # YARA rules are disabled
+            if [[ "$db_name" = *".yar"* ]] ; then # If it's the value you want to delete
+              continue # Skip to the next value
             fi
         fi
-        if [ "$current_rating" == "" ] ; then #yararules are disabled
+        if [ "$current_rating" == "" ] ; then # YARA rules are disabled
           new_dbs="$new_dbs $db_name"
         else
-          if [[ ! "$db_name" = *"|"* ]] ; then # this old format
+          if [[ ! "$db_name" = *"|"* ]] ; then # This old format
             new_dbs="$new_dbs $db_name"
           else
             db_name_rating=$(echo "$db_name" | cut -d "|" -f2)
@@ -375,7 +375,7 @@ function xshok_database () { #database #rating
       done
     fi
   fi
-  echo "$new_dbs" | xargs #remove extra whitespace
+  echo "$new_dbs" | xargs # Remove extra whitespace
 
 }
 
@@ -384,7 +384,7 @@ function xshok_database () { #database #rating
 ################################################################################
 
 
-#generates a man config and installs it
+# Generates a man config and installs it
 function install_man () {
 
   if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
@@ -396,7 +396,7 @@ function install_man () {
   echo ""
   echo "Generating man file for install...."
 
-  #Use defined varibles or attempt to use default varibles
+  # Use defined varibles or attempt to use default varibles
 
   if [ ! -e "$man_dir/$man_filename" ] ; then
     mkdir -p "$man_dir"
@@ -411,7 +411,7 @@ BOLD="\fB"
 NORM="\fR"
 manresult=$(help_and_usage "man")
 
-#Our template..
+# Our template..
   cat << EOF > "$man_dir/$man_filename"
 
 .\" Manual page for eXtremeSHOK.com ClamAV Unofficial Signature Updater
@@ -452,7 +452,7 @@ EOF
 }
 
 
-#generates a logrotate config and installs it
+# Generate a logrotate config and install it
 function install_logrotate () {
 
   if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
@@ -463,7 +463,7 @@ function install_logrotate () {
   echo ""
   echo "Generating logrotate file for install...."
 
-  #Use defined varibles or attempt to use default varibles
+  # Use defined varibles or attempt to use default varibles
 
   if [ ! -n "$logrotate_user" ] ; then
     logrotate_user="$clam_user";
@@ -483,7 +483,7 @@ function install_logrotate () {
   if [ ! -w "$logrotate_dir/$logrotate_filename" ] ; then
     echo "ERROR: logrotate install aborted, as file not writable: $logrotate_dir/$logrotate_filename"
   else
-#Our template..
+# Our template..
   cat << EOF > "$logrotate_dir/$logrotate_filename"
 # https://eXtremeSHOK.com ######################################################
 # This file contains the logrotate settings for clamav-unofficial-sigs.sh
@@ -524,7 +524,7 @@ EOF
   echo "Completed: logrotate installed, as file: $logrotate_dir/$logrotate_filename"
 }
 
-#generates a cron config and installs it
+# Generate a cron config and install it
 function install_cron () {
 
   if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
@@ -535,7 +535,7 @@ function install_cron () {
   echo ""
   echo "Generating cron file for install...."
 
-  #Use defined varibles or attempt to use default varibles
+  # Use defined varibles or attempt to use default varibles
   if [ ! -n "$cron_minute" ] ; then
     cron_minute=$(( ( RANDOM % 59 )  + 1 ));
   fi
@@ -556,7 +556,7 @@ function install_cron () {
   if [ ! -w "$cron_dir/$cron_filename" ] ; then
     echo "ERROR: cron install aborted, as file not writable: $cron_dir/$cron_filename"
   else
-#Our template..
+# Our template..
   cat << EOF > "$cron_dir/$cron_filename"
 # https://eXtremeSHOK.com ######################################################
 # This file contains the cron settings for clamav-unofficial-sigs.sh
@@ -597,7 +597,7 @@ EOF
 }
 
 
-#decode a third-party signature either by signature name
+# Decode a third-party signature either by signature name
 function decode_third_party_signature_by_signature_name () {
   echo ""
   echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
@@ -624,7 +624,7 @@ function decode_third_party_signature_by_signature_name () {
   fi
 }
 
-#Hexadecimal encode an entire input string
+# Hexadecimal encode an entire input string
 function hexadecimal_encode_entire_input_string () {
   echo ""
   echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
@@ -634,7 +634,7 @@ function hexadecimal_encode_entire_input_string () {
   echo "$input" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg'
 }
 
-#Hexadecimal encode a formatted input string
+# Hexadecimal encode a formatted input string
 function hexadecimal_encode_formatted_input_string () {
   echo ""
   echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
@@ -645,8 +645,8 @@ function hexadecimal_encode_formatted_input_string () {
   echo "$input" | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg'
 }
 
-#GPG verify a specific Sanesecurity database file
-function gpg_verify_specific_sanesecurity_database_file () { #databasefile
+# GPG verify a specific Sanesecurity database file
+function gpg_verify_specific_sanesecurity_database_file () { # databasefile
   echo ""
   if [ "$1" ] ; then
     db_file=$(echo "$1" | awk -F '/' '{print $NF}')
@@ -678,7 +678,7 @@ function gpg_verify_specific_sanesecurity_database_file () { #databasefile
   fi
 }
 
-#Output system and configuration information
+# Output system and configuration information
 function output_system_configuration_information () {
   echo ""
   echo "*** SCRIPT VERSION ***"
@@ -720,7 +720,7 @@ function output_system_configuration_information () {
   fi
 }
 
-#Make a signature database from an ascii file
+# Make a signature database from an ascii file
 function make_signature_database_from_ascii_file () {
   echo ""
   echo "
@@ -835,7 +835,7 @@ function make_signature_database_from_ascii_file () {
   fi
 }
 
-#Remove the clamav-unofficial-sigs script
+# Remove the clamav-unofficial-sigs script
 function remove_script () {
   echo ""
   if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
@@ -871,7 +871,7 @@ function remove_script () {
             echo "     Removed file: $man_file_full_path"
           fi
 
-          #rather keep the configs
+          # Rather keep the configs
           #rm -f -- "$default_config" && echo "     Removed file: $default_config"
           #rm -f -- "$0" && echo "     Removed file: $0"
           xshok_is_subdir "$work_dir" && rm -rf -- "$work_dir" && echo "     Removed script working directories: $work_dir"
@@ -892,8 +892,8 @@ function remove_script () {
   fi
 }
 
-#Clamscan integrity test a specific database file
-function clamscan_integrity_test_specific_database_file () { #databasefile
+# Clamscan integrity test a specific database file
+function clamscan_integrity_test_specific_database_file () { # databasefile
   echo ""
   if [ "$1" ] ; then
     input=$(echo "$1" | awk -F '/' '{print $NF}')
@@ -939,7 +939,7 @@ function clamscan_integrity_test_specific_database_file () { #databasefile
   fi
 }
 
-#output names of any third-party signatures that triggered during the HAM directory scan
+# Output names of any third-party signatures that triggered during the HAM directory scan
 function output_signatures_triggered_during_ham_directory_scan () {
   echo ""
   if [ -n "$ham_dir" ] ; then
@@ -955,7 +955,7 @@ function output_signatures_triggered_during_ham_directory_scan () {
   fi
 }
 
-#Adds a signature whitelist entry in the newer ClamAV IGN2 format
+# Adds a signature whitelist entry in the newer ClamAV IGN2 format
 function add_signature_whitelist_entry () {
   echo ""
   echo "Input a third-party signature name that you wish to whitelist due to false-positives"
@@ -1016,7 +1016,7 @@ function add_signature_whitelist_entry () {
   fi
 }
 
-#Clamscan reload database
+# Clamscan reload database
 function clamscan_reload_dbs () {
   # Reload all clamd databases if updates detected and $reload_dbs" is set to "yes"
   if [ "$reload_dbs" = "yes" ] ; then
@@ -1130,7 +1130,7 @@ function check_clamav () {
   fi
 }
 
-#function to check for a new version
+# Check for a new version
 function check_new_version () {
   if [ "$wget_bin" != "" ] ; then
     latest_version="$($wget_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin  "script""_version=" | cut -d\" -f2)"
@@ -1144,33 +1144,33 @@ function check_new_version () {
   fi
 }
 
-#function for help and usage
-##usage:
+# Display help and usage
+# Usage:
 # help_and_usage "1" - enables the man output formatting
 # help_and_usage - normal help output formatting
 function help_and_usage () {
 
   if [ "$1" ] ; then
-    #option_format_start
+    # option_format_start
     ofs="\fB"
-    #option_format_end
+    # option_format_end
     ofe="\fR"
-    #option_format_blankline
+    # option_format_blankline
     ofb=".TP"
-    #option_format_tab_line
+    # option_format_tab_line
     oft=" "
   else
-    #option_format_start
+    # option_format_start
     ofs="${BOLD}"
-    #option_format_end
+    # option_format_end
     ofe="${NORM}\t"
-    #option_format_blankline
+    # option_format_blankline
     ofb="\n"
-    #option_format_tab_line
+    # option_format_tab_line
     oft="\n\t"
   fi
 
-helpcontents=$(cat << EOF
+  helpcontents=$(cat << EOF
 $ofs Usage: $(basename "$0") $ofe [OPTION] [PATH|FILE]
 $ofb
 $ofs -c, --config $ofe Use a specific configuration file or directory $oft eg: '-c /your/dir' or ' -c /your/file.name'  $oft Note: If a directory is specified the directory must contain atleast:  $oft master.conf, os.conf or user.conf $oft Default Directory: $config_dir
@@ -1216,7 +1216,7 @@ $ofb
 $ofs --remove-script $ofe Remove the clamav-unofficial-sigs script and all of $oft its associated files and databases from the system
 $ofb
 EOF
-  ) #this is very important...
+  ) # This is very important
 
   if [ "$1" ] ; then
     echo "${helpcontents//-/\\-}"
@@ -1229,17 +1229,17 @@ EOF
 # MAIN PROGRAM
 ################################################################################
 
-#Script Info
+# Script Info
 script_version="5.4.1"
 script_version_date="20 July 2016"
 minimum_required_config_version="65"
 minimum_yara_clamav_version="0.99"
 
-#default config files
+# Default config files
 config_dir="/etc/clamav-unofficial-sigs"
 config_files=("$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf")
 
-#Initialise
+# Initialise
 config_version="0"
 do_clamd_reload="0"
 comment_silence="no"
@@ -1249,21 +1249,21 @@ enable_log="no"
 custom_config="no"
 we_have_a_config="0"
 
-## Solaris which function returns garbage when the program is not found
-## only define the new which function if running under Solaris
+# Solaris which function returns garbage when the program is not found
+# only define the new which function if running under Solaris
 if [ "$(uname -s)" = "SunOS" ] ; then
   which () {
-    # use the switch -p to ignore ksh internal commands
+    # Use the switch -p to ignore ksh internal commands
     ksh whence -p "$@"
   }
 fi
 
-#Default Binaries & Commands
+# Default Binaries & Commands
 clamd_reload_opt="clamdscan --reload"
 uname_bin=$(which uname)
 clamscan_bin=$(which clamscan)
 rsync_bin=$(which rsync)
-#detect support for wget
+# Detect support for wget
 if [ -x /usr/sfw/bin/wget ] ; then
   wget_bin="/usr/sfw/bin/wget"
 else
@@ -1272,7 +1272,7 @@ fi
 if [ "$wget_bin" == "" ] ; then
   curl_bin=$(which curl)
 fi
-#detect supprot for gnu grep
+# Detect supprot for gnu grep
 if [ -x /usr/gnu/bin/grep ] ; then
   grep_bin="/usr/gnu/bin/grep"
 else
@@ -1287,21 +1287,21 @@ if [ "$gpg_bin" == "" ] ; then
   gpg_bin=$(which gpg2)
 fi
 
-#Detect if terminal
+# Detect if terminal
 if [ -t 1 ] ; then
-  #Set fonts
-  ##Usage: echo "${BOLD}-a${NORM}"
+  # Set fonts
+  # Usage: echo "${BOLD}-a${NORM}"
   BOLD=$(tput bold)
   #REV=$(tput smso)
   NORM=$(tput sgr0)
-  #Verbose
+  # Verbose
   force_verbose="yes"
 else
-  #Null Fonts
+  # Null fonts
   BOLD=''
   #REV=''
   NORM=''
-  #silence
+  # Silence
   force_verbose="no"
 fi
 
@@ -1317,15 +1317,15 @@ while true ; do
   esac
 done
 
-#Set the verbosity
+# Set the verbosity
 if [ "$force_verbose" == "yes" ] ; then
-  #verbose
+  # Verbose
   downloader_silence="no"
   rsync_silence="no"
   gpg_silence="no"
   comment_silence="no"
 else
-  #silence
+  # Silence
   downloader_silence="yes"
   rsync_silence="yes"
   gpg_silence="yes"
@@ -1348,7 +1348,7 @@ while true ; do
   esac
 done
 
-## CONFIG LOADING AND ERROR CHECKING ##############################################
+# CONFIG LOADING AND ERROR CHECKING ##############################################
 if [ "$custom_config" != "no" ] ; then
   if [ -d "$custom_config" ] ; then
     # Assign the custom config dir and remove trailing / (removes / and //)
@@ -1360,39 +1360,39 @@ if [ "$custom_config" != "no" ] ; then
 fi
 
 for config_file in "${config_files[@]}" ; do
-  if [ -r "$config_file" ] ; then #exists and readable
+  if [ -r "$config_file" ] ; then #  exists and readable
     we_have_a_config="1"
-    #config stripping
+    # Config stripping
     xshok_pretty_echo_and_log "Loading config: $config_file" "="
 
 
 
     if [ "$(uname -s)" = "SunOS" ] ; then
-      #Solaris FIXES only, i had issues with running with a single command..
-      clean_config=$(command sed -e '/^#.*/d' "$config_file") # comment line
-      clean_config=$(echo "$clean_config" | sed -e 's/#[[:space:]].*//') # comment line (duplicated)
-      clean_config=$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//') #comments at end of line
-      clean_config=$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//') #trailing and leading whitespace
-      clean_config=$(echo "$clean_config" | sed -e '/^\s*$/d') #blank lines
+      # Solaris FIXES only, i had issues with running with a single command..
+      clean_config=$(command sed -e '/^#.*/d' "$config_file") # Comment line
+      clean_config=$(echo "$clean_config" | sed -e 's/#[[:space:]].*//') # Comment line (duplicated)
+      clean_config=$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//') # Comments at end of line
+      clean_config=$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//') # trailing and leading whitespace
+      clean_config=$(echo "$clean_config" | sed -e '/^\s*$/d') # Blank lines
     else
-      # delete lines beginning with #
-      # delete from ' #' to end of the line
-      # delete from '# ' to end of the line
-      # delete both trailing and leading whitespace
-      # delete all trailing whitespace
-      # delete all empty lines
+      # Delete lines beginning with #
+      # Delete from ' #' to end of the line
+      # Delete from '# ' to end of the line
+      # Delete both trailing and leading whitespace
+      # Delete all trailing whitespace
+      # Delete all empty lines
       clean_config=$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")
     fi
 
-    ### config error checking
-    # check "" are an even number
+    # Config error checking
+    # Check "" are an even number
     config_check="${clean_config//[^\"]}"
     if [ $(( ${#config_check} % 2)) -eq 1 ] ; then
       xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every \" requires a closing \"" "="
       exit 1
     fi
 
-    # check there is an = for every set of "" #optional whitespace \s* between = and "
+    # Check there is an = for every set of "" optional whitespace \s* between = and "
     config_check_vars=$(echo "$clean_config" | $grep_bin -c '=\s*\"' )
 
     if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ] ; then
@@ -1400,7 +1400,7 @@ for config_file in "${config_files[@]}" ; do
       exit 1
     fi
 
-    #config loading
+    # Config loading
     for i in "${clean_config[@]}" ; do
       eval "$(echo "${i}" | command sed -e 's/[[:space:]]*$//' 2> /dev/null)"
     done
@@ -1411,25 +1411,25 @@ done
 
 # Assign the log_file_path earlier and remove trailing / (removes / and //)
 log_file_path=$(echo "$log_file_path" | sed 's:/*$::')
-#Only start logging once all the configs have been loaded
+#  Only start logging once all the configs have been loaded
 if [ "$logging_enabled" == "yes" ] ; then
   enable_log="yes"
 fi
 
-## Make sure we have a readable config file
+# Make sure we have a readable config file
 if [ "$we_have_a_config" == "0" ] ; then
   xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
   exit 1
 fi
 
-#prevent some issues with an incomplete or only a user.conf being loaded
+# Prevent some issues with an incomplete or only a user.conf being loaded
 if [ $config_version  == "0" ] ; then
   xshok_pretty_echo_and_log "ERROR: Config file/s are missing important contents" "="
   xshok_pretty_echo_and_log "Note: Possible fix would be to point the script to the dir with the configs"
   exit 1
 fi
 
-#config version validation
+# Config version validation
 if [ $config_version -lt $minimum_required_config_version ] ; then
   xshok_pretty_echo_and_log "ERROR: Your config version $config_version is not compatible with the min required version $minimum_required_config_version" "="
   exit 1
@@ -1445,7 +1445,7 @@ fi
 # Assign the directories and remove trailing / (removes / and //)
 work_dir=$(echo "$work_dir" | sed 's:/*$::')
 
-#Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
+# Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
 if [ ! -n "$work_dir_sanesecurity" ] ; then
   work_dir_sanesecurity=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
 else
@@ -1519,8 +1519,8 @@ if [ ! -n "$man_log_file_full_path" ] ; then
   man_log_file_full_path="$log_file_path/$log_file_name"
 fi
 
-### SANITY checks
-#Check default Binaries & Commands are defined
+# SANITY checks
+# Check default Binaries & Commands are defined
 if [ "$clamd_reload_opt" == "" ] ; then
   xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt" "="
   exit 1
@@ -1547,7 +1547,7 @@ if [ "$gpg_bin" == "" ] ; then
   xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
   exit 1
 fi
-#Check default directories are defined
+#  Check default directories are defined
 if [ "$work_dir" == "" ] ; then
   xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not defined" "="
   exit 1
@@ -1581,7 +1581,7 @@ if [ "$enable_locking" == "yes" ] ; then
   else
       xshok_create_pid_file "$pid_file_fullpath"
   fi
-  # run this wehen the script exits
+  # Run this wehen the script exits
   trap -- "rm -f $pid_file_fullpath" EXIT
 fi
 
@@ -1617,7 +1617,7 @@ else
   curl_output_level=""
 fi
 
-#suppress ssl warnings
+# Suppress ssl warnings
 if [ "$downloader_ignore_ssl" = "yes" ] ; then
   wget_insecure="--no-check-certificate"
   curl_insecure="--insecure"
@@ -1631,7 +1631,7 @@ this_script_name="$(basename "$0")"
 this_script_path="$( cd "$(dirname "$0")" ; pwd -P )"
 this_script_full_path="$this_script_path/$this_script_name"
 
-#set the script to 755 permissions
+# Set the script to 755 permissions
 if xshok_is_root ; then
   if [ "$setmode" == "yes" ] ; then
     if [ ! -x "$this_script_path/$this_script_name" ] ; then
@@ -1640,7 +1640,7 @@ if xshok_is_root ; then
     fi
   fi
 else
-  #disable setmode
+  # Disable setmode
   setmode="no"
 fi
 
@@ -1675,8 +1675,8 @@ xshok_pretty_echo_and_log "Preparing Databases" "="
 if [ "$enable_yararules" == "yes" ] ; then
   current_clamav_version=$($clamscan_bin -V | cut -d " " -f2 | cut -d "/" -f1 | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')
   minimum_yara_clamav_version=$(echo "$minimum_yara_clamav_version" | awk -F. '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')
-  #Check current clamav version against the minimum required version for yara support
-  if [ "$current_clamav_version" -lt "$minimum_yara_clamav_version" ] ; then #older
+  # Check current clamav version against the minimum required version for yara support
+  if [ "$current_clamav_version" -lt "$minimum_yara_clamav_version" ] ; then # Older
     yararulesproject_enabled="no"
     enable_yararules="no"
     xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
@@ -1754,7 +1754,7 @@ if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
     $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir"/* | cut -d "*" -f2 | sort | uniq > "$work_dir_work_configs/whitelist.hex"
     cd "$test_dir" || exit
     for db_file in * ; do
-      [[ -e $db_file ]] || break # handle the case of no files
+      [[ -e $db_file ]] || break # Handle the case of no files
       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$db_file" > "$db_file-tmp"
       mv -f "$db_file-tmp" "$db_file"
       if $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
@@ -1928,7 +1928,7 @@ rm -f "$current_tmp"
 if [ "$remove_disabled_databases" == "yes" ] ; then
   previous_dbs="$work_dir_work_configs/previous-dbs.txt"
   sort "$current_dbs" > "$previous_dbs" 2>/dev/null
-  #do not remove the current_dbs
+  # Do not remove the current_dbs
   #rm -f "$current_dbs"
 
   db_changes="$work_dir_work_configs/db-changes.txt"
@@ -1992,7 +1992,7 @@ fi
 ################################################################
 if [ "$sanesecurity_enabled" == "yes" ] ; then
   if [ -n "$sanesecurity_dbs" ] ; then
-  ##if [ ${#sanesecurity_dbs[@]} -lt "1" ] ; then ##will not work due to compound array assignment
+  #if [ ${#sanesecurity_dbs[@]} -lt "1" ] ; then # Will not work due to compound array assignment
     if [ "$(xshok_array_count "$sanesecurity_dbs")" -lt "1" ] ; then
       xshok_pretty_echo_and_log "Failed sanesecurity_dbs config is invalid or not defined - SKIPPING"
     else
@@ -2010,7 +2010,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
         xshok_pretty_echo_and_log "Checking for Sanesecurity updates..."
 
         sanesecurity_mirror_ips=$(dig +ignore +short "$sanesecurity_url")
-        #add fallback to host if dig returns no records
+        # Add fallback to host if dig returns no records
         if [ "$(xshok_array_count  "$sanesecurity_mirror_ips")" -lt 1 ] ; then
           sanesecurity_mirror_ips=$(host -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')
         fi
@@ -2019,14 +2019,14 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
           for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
             sanesecurity_mirror_name=""
             sanesecurity_mirror_name=$(dig +short -x "$sanesecurity_mirror_ip" | command sed 's/\.$//')
-            #add fallback to host if dig returns no records
+            # Add fallback to host if dig returns no records
             if [ "$sanesecurity_mirror_name" == "" ] ; then
               sanesecurity_mirror_name=$(host "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')
             fi
             sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
             $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
-            if [ "$?" -eq "0" ] ; then #the correct way
+            if [ "$?" -eq "0" ] ; then # The correct way
               sanesecurity_rsync_success="1"
               for db_file in $sanesecurity_dbs ; do
                 if ! cmp -s "$work_dir_sanesecurity/$db_file" "$clam_dbs/$db_file" ; then
@@ -2081,7 +2081,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                       true
                     else
                       xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
-                      ##DO NOT KILL THIS DB
+                      # DO NOT KILL THIS DB
                       false
                     fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
                       perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
@@ -2458,7 +2458,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
         # format (mbl.ndb) database file instead.
         # test -e $clam_dbs/$malwarepatrol_db -o -e $clam_dbs/$malwarepatrol_db-bak && rm -f -- "$clam_dbs/mbl.d*"
 
-        # remove the .db is th new format if ndb and
+        # Remove the .db is the new format if ndb and
         # symetrically
         if [ "$malwarepatrol_db" == "malwarepatrol.db" ] && [ -f "$clam_dbs/malwarepatrol.ndb" ] ; then
           rm "$clam_dbs/malwarepatrol.ndb";
@@ -2487,7 +2487,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                 malwarepatrol_reloaded=2
               fi
             fi
-          else # wget failed
+          else # Wget failed
             malwarepatrol_reloaded=-1
           fi
 
@@ -2503,7 +2503,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             if [ -f "$clam_dbs/$malwarepatrol_db" ] ; then
               malwarepatrol_md5=$(openssl md5 -r "$clam_dbs/$malwarepatrol_db" 2>/dev/null | cut -d" " -f1)
               if [ ! "$malwarepatrol_md5" ] ; then
-                #fallback for missing -r option
+                # Fallback for missing -r option
                 malwarepatrol_md5=$(openssl md5 "$clam_dbs/$malwarepatrol_db" 2>/dev/null | cut -d" " -f2)
               fi
             fi
@@ -2518,17 +2518,17 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               fi
               if [ "$ret" -eq "0" ] ; then
                 malwarepatrol_reloaded=1
-              else # wget DB fail
+              else # Wget DB fail
                 malwarepatrol_reloaded=-1
-              fi # wget DB
+              fi # Wget DB
             fi # MD5 not equal
-          else # wget MD5 fail
+          else # Wget MD5 fail
             malwarepatrol_reloaded=-1
-          fi # wget md5
+          fi # Wget MD5
         fi
 
         case "$malwarepatrol_reloaded" in
-          1) # database was updated, need test and reload
+          1) # Database was updated, need test and reload
           xshok_pretty_echo_and_log "Testing updated MalwarePatrol database file: $malwarepatrol_db"
           if $clamscan_bin --quiet -d "$work_dir_malwarepatrol/$malwarepatrol_db" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
             xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
@@ -2583,7 +2583,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
       0) # The database did not update
       xshok_pretty_echo_and_log "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
       ;;
-      -1) # wget failed
+      -1) # Wget failed
       xshok_pretty_echo_and_log "WARNING - Failed connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
       ;;
     esac
@@ -2793,7 +2793,7 @@ if [ "$additional_enabled" == "yes" ] ; then
       xshok_pretty_echo_and_log "Checking for additional updates..."
       additional_updates="0"
       for db_url in $additional_dbs ; do
-        # left for future dir manipulation
+        # Left for future dir manipulation
         # if echo "$db_file" | $grep_bin -q "/"; then
         #   add_dir="/"$(echo "$db_file" | cut -d"/" -f1)
         #   db_file=$(echo "$db_file" | cut -d"/" -f2)
@@ -2822,7 +2822,8 @@ if [ "$additional_enabled" == "yes" ] ; then
           fi
         fi
 
-        ##this needs enhancement for rsync, as it will only work with single files... maybe better to process each file inside work_dir_add in its own for loop.
+        # This needs enhancement for rsync, as it will only work with single files...
+        # Maybe better to process each file inside work_dir_add in its own for loop.
         if [ "$ret" -eq "0" ] ; then
           loop="1"
           if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
