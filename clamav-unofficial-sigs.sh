@@ -91,7 +91,7 @@ function xshok_create_pid_file () { # pid.file
 
 # Intercept ctrl+c and calls the cleanup function
 function xshok_control_c () {
-  echo -en "\n"
+  echo
   xshok_pretty_echo_and_log "--------------| Exiting ... Please wait |--------------" "-"
   xshok_cleanup
   exit $?
@@ -107,15 +107,15 @@ function xshok_cleanup () {
 
 # Check if the current running user is the root user, otherwise return false
 function xshok_is_root () {
-  if [ "$(uname -s)" = "SunOS" ] ; then
+  if [ "$(uname -s)" == "SunOS" ] ; then
     id_bin="/usr/xpg4/bin/id"
   else
     id_bin="$(which id)"
   fi
-  if [ "$($id_bin -u)" = 0 ] ; then
-    return 0 ;
+  if [ "$($id_bin -u)" == 0 ] ; then
+    return 0
   else
-    return 1 ; # Not root
+    return 1 # Not root
   fi
 }
 
@@ -167,7 +167,7 @@ function xshok_mkdir_ownership () { # path
 # xshok_is_subdir "username" && echo "user found" || echo "no"
 # xshok_is_subdir "username" "groupname" && echo "user and group found" || echo "no"
 function xshok_user_group_exists () { # username groupname
-  if [ "$(uname -s)" = "SunOS" ] ; then
+  if [ "$(uname -s)" == "SunOS" ] ; then
     id_bin="/usr/xpg4/bin/id"
   else
     id_bin="$(which id)"
@@ -211,8 +211,8 @@ function xshok_user_group_exists () { # username groupname
 # type: e = error, w= warning ""
 function xshok_pretty_echo_and_log () { # "string" "repeating" "count" "type"
   # Handle comments
-  if [ "$comment_silence" = "no" ] ; then
-    if [ "${#@}" = "1" ] ; then
+  if [ "$comment_silence" == "no" ] ; then
+    if [ "${#@}" -eq 1 ] ; then
       echo "$1"
     else
       myvar=""
@@ -224,7 +224,7 @@ function xshok_pretty_echo_and_log () { # "string" "repeating" "count" "type"
       for (( n = 0; n < mycount; n++ )) ; do
         myvar="$myvar$2"
       done
-      if [ "$1" != "" ] ; then
+      if [ -n "$1" ] ; then
         echo -e "$myvar\n$1\n$myvar"
       else
         echo -e "$myvar"
@@ -323,7 +323,7 @@ EOF
 # Handle list of database files
 function clamav_files () {
   echo "$clam_dbs/$db" >> "$current_tmp"
-  if [ "$keep_db_backup" = "yes" ] ; then
+  if [ "$keep_db_backup" == "yes" ] ; then
     echo "$clam_dbs/$db-bak" >> "$current_tmp"
   fi
 }
@@ -340,15 +340,15 @@ function xshok_database () { # database rating
   new_dbs=""
 
   if [ -n "$current_dbs" ] ; then
-    if [ "$(xshok_array_count "$current_dbs")" -ge "1" ] ; then
+    if [ "$(xshok_array_count "$current_dbs")" -ge 1 ] ; then
       for db_name in $current_dbs ; do
         # Checks
         if [ "$enable_yararules" == "no" ] ; then # YARA rules are disabled
-            if [[ "$db_name" = *".yar"* ]] ; then # If it's the value you want to delete
+            if [[ "$db_name" == *".yar"* ]] ; then # If it's the value you want to delete
               continue # Skip to the next value
             fi
         fi
-        if [ "$current_rating" == "" ] ; then # YARA rules are disabled
+        if [ -z "$current_rating" ] ; then # YARA rules are disabled
           new_dbs="$new_dbs $db_name"
         else
           if [[ ! "$db_name" = *"|"* ]] ; then # This old format
@@ -470,13 +470,13 @@ function install_logrotate () {
 
   # Use defined varibles or attempt to use default varibles
 
-  if [ ! -n "$logrotate_user" ] ; then
+  if [ -z "$logrotate_user" ] ; then
     logrotate_user="$clam_user";
   fi
-  if [ ! -n "$logrotate_group" ] ; then
+  if [ -z "$logrotate_group" ] ; then
     logrotate_group="$clam_group";
   fi
-  if [ ! -n "$logrotate_log_file_full_path" ] ; then
+  if [ -z "$logrotate_log_file_full_path" ] ; then
     logrotate_log_file_full_path="$log_file_path/$log_file_name"
   fi
 
@@ -541,16 +541,16 @@ function install_cron () {
   echo "Generating cron file for install...."
 
   # Use defined varibles or attempt to use default varibles
-  if [ ! -n "$cron_minute" ] ; then
+  if [ -z "$cron_minute" ] ; then
     cron_minute=$(( ( RANDOM % 59 )  + 1 ));
   fi
-  if [ ! -n "$cron_user" ] ; then
+  if [ -z "$cron_user" ] ; then
     cron_user="$clam_user";
   fi
-  if [ ! -n "$cron_bash" ] ; then
+  if [ -z "$cron_bash" ] ; then
     cron_bash=$(which bash)
   fi
-  if [ ! -n "$cron_script_full_path" ] ; then
+  if [ -z "$cron_script_full_path" ] ; then
     cron_script_full_path="$this_script_full_path"
   fi
 
@@ -659,9 +659,9 @@ function gpg_verify_specific_sanesecurity_database_file () { # databasefile
       echo "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
       if [ -r "$work_dir_sanesecurity/$db_file".sig ] ; then
         "$gpg_bin" -q --trust-model always --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
-        if [ "$?" != "0" ]; then
+        if [ "$?" -ne 0 ]; then
           "$gpg_bin" -q --always-trust --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
-          if [ "$?" == "0" ]; then
+          if [ "$?" -eq 0 ]; then
             exit 0
           else
             exit 1
@@ -696,7 +696,7 @@ function output_system_configuration_information () {
   echo "*** RSYNC LOCATION & VERSION ***"
   echo "$rsync_bin"
   $rsync_bin --version | head -1
-  if [ "$wget_bin" != "" ] ; then
+  if [ -n "$wget_bin" ] ; then
     echo "*** WGET LOCATION & VERSION ***"
     echo "$wget_bin"
     $wget_bin --version | head -1
@@ -788,9 +788,9 @@ function make_signature_database_from_ascii_file () {
 
       while read -r line ; do
         line_prefix=$(echo "$line" | awk -F ":" '{print $1}')
-        if [ "$line_prefix" = "-" ] ; then
+        if [ "$line_prefix" == "-" ] ; then
           echo "$line" | cut -d ":" -f2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
-        elif [ "$line_prefix" = "=" ] ; then
+        elif [ "$line_prefix" == "=" ] ; then
           echo "$line" | cut -d ":" -f2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
         else
           echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
@@ -907,7 +907,7 @@ function clamscan_integrity_test_specific_database_file () { # databasefile
       echo "Clamscan integrity testing: $db_file"
 
       $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt"
-      if [ "$?" -eq "0" ]; then
+      if [ "$?" -eq 0 ]; then
         echo "Clamscan reports that '$input' database integrity tested GOOD"
         exit 0
       else
@@ -1024,15 +1024,15 @@ function add_signature_whitelist_entry () {
 # Clamscan reload database
 function clamscan_reload_dbs () {
   # Reload all clamd databases if updates detected and $reload_dbs" is set to "yes"
-  if [ "$reload_dbs" = "yes" ] ; then
+  if [ "$reload_dbs" == "yes" ] ; then
     if [ "$do_clamd_reload" != "0" ] ; then
-      if [ "$do_clamd_reload" = "1" ] ; then
+      if [ "$do_clamd_reload" == "1" ] ; then
         xshok_pretty_echo_and_log "Update(s) detected, reloading ClamAV databases" "="
-      elif [ "$do_clamd_reload" = "2" ] ; then
+      elif [ "$do_clamd_reload" == "2" ] ; then
         xshok_pretty_echo_and_log "Database removal(s) detected, reloading ClamAV databases" "="
-      elif [ "$do_clamd_reload" = "3" ] ; then
+      elif [ "$do_clamd_reload" == "3" ] ; then
         xshok_pretty_echo_and_log "File 'local.ign' has changed, reloading ClamAV databases" "="
-      elif [ "$do_clamd_reload" = "4" ] ; then
+      elif [ "$do_clamd_reload" == "4" ] ; then
         xshok_pretty_echo_and_log "File 'my-whitelist.ign2' has changed, reloading ClamAV databases" "="
       else
         xshok_pretty_echo_and_log "Update(s) detected, reloading ClamAV databases" "="
@@ -1043,7 +1043,7 @@ function clamscan_reload_dbs () {
         if [ -r "$clamd_pid" ] ; then
           mypid=$(cat "$clamd_pid")
           kill -USR2 "$mypid"
-          if [ $? -eq  0 ] ; then
+          if [ $? -eq 0 ] ; then
             xshok_pretty_echo_and_log "ClamAV databases Reloaded" "="
           else
             xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart" "-"
@@ -1083,7 +1083,7 @@ function check_clamav () {
     if [ -S "$clamd_socket" ] ; then
       if [ "$(perl -e 'use IO::Socket::UNIX; print $IO::Socket::UNIX::VERSION,"\n"' 2>/dev/null)" ] ; then
         io_socket1=1
-        if [ "$(perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null)" = "PONG" ] ; then
+        if [ "$(perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null)" == "PONG" ] ; then
           io_socket2=1
           xshok_pretty_echo_and_log "ClamD is running" "="
         fi
@@ -1091,7 +1091,7 @@ function check_clamav () {
         socat="$(which socat 2>/dev/null)"
         if [ -n "$socat" ] && [ -x "$socat" ] ; then
           socket_cat1=1
-          if [ "$( (echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null)" = "PONG" ] ; then
+          if [ "$( (echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null)" == "PONG" ] ; then
             socket_cat2=1
             xshok_pretty_echo_and_log "ClamD is running" "="
           fi
@@ -1116,7 +1116,7 @@ function check_clamav () {
             else
               if [ -n "$socket_cat1" ] ; then
                 $clamd_restart_opt > /dev/null && sleep 5
-                if [ "$( (echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null)" = "PONG" ] ; then
+                if [ "$( (echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null)" == "PONG" ] ; then
                   xshok_pretty_echo_and_log "ClamD was successfully started" "="
                 else
                   xshok_pretty_echo_and_log "ERROR: CLAMD FAILED TO START" "="
@@ -1137,7 +1137,7 @@ function check_clamav () {
 
 # Check for a new version
 function check_new_version () {
-  if [ "$wget_bin" != "" ] ; then
+  if [ -n "$wget_bin" ] ; then
     latest_version="$($wget_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin  "script""_version=" | cut -d\" -f2)"
   else
     latest_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin  "script""_version=" | cut -d\" -f2)"
@@ -1151,7 +1151,7 @@ function check_new_version () {
 
 # Check for a new version
 function check_new_config_version () {
-  if [ "$wget_bin" != "" ] ; then
+  if [ -n "$wget_bin" ] ; then
     latest_config_version="$($wget_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O - 2> /dev/null | $grep_bin  "config_version=" | cut -d\" -f2)"
   else
     latest_config_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf 2> /dev/null | $grep_bin  "config_version=" | cut -d\" -f2)"
@@ -1270,7 +1270,7 @@ we_have_a_config="0"
 
 # Solaris which function returns garbage when the program is not found
 # only define the new which function if running under Solaris
-if [ "$(uname -s)" = "SunOS" ] ; then
+if [ "$(uname -s)" == "SunOS" ] ; then
   which () {
     # Use the switch -p to ignore ksh internal commands
     ksh whence -p "$@"
@@ -1288,7 +1288,7 @@ if [ -x /usr/sfw/bin/wget ] ; then
 else
   wget_bin=$(which wget)
 fi
-if [ "$wget_bin" == "" ] ; then
+if [ -n "$wget_bin" ] ; then
   curl_bin=$(which curl)
 fi
 # Detect supprot for gnu grep
@@ -1302,7 +1302,7 @@ if [ -x /opt/csw/bin/gpg ] ; then
 else
   gpg_bin=$(which gpg)
 fi
-if [ "$gpg_bin" == "" ] ; then
+if [ -z "$gpg_bin" ] ; then
   gpg_bin=$(which gpg2)
 fi
 
@@ -1413,7 +1413,7 @@ for config_file in "${config_files[@]}" ; do
 
 
 
-    if [ "$(uname -s)" = "SunOS" ] ; then
+    if [ "$(uname -s)" == "SunOS" ] ; then
       # Solaris FIXES only, i had issues with running with a single command..
       clean_config=$(command sed -e '/^#.*/d' "$config_file") # Comment line
       clean_config=$(echo "$clean_config" | sed -e 's/#[[:space:]].*//') # Comment line (duplicated)
@@ -1441,7 +1441,7 @@ for config_file in "${config_files[@]}" ; do
     # Check there is an = for every set of "" optional whitespace \s* between = and "
     config_check_vars=$(echo "$clean_config" | $grep_bin -c '=\s*\"' )
 
-    if [ $(( ${#config_check} / 2)) -ne "$config_check_vars" ] ; then
+    if [ $(( ${#config_check} / 2 )) -ne "$config_check_vars" ] ; then
       xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\"" "="
       exit 1
     fi
@@ -1492,109 +1492,109 @@ fi
 work_dir=$(echo "$work_dir" | sed 's:/*$::')
 
 # Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
-if [ ! -n "$work_dir_sanesecurity" ] ; then
+if [ -z "$work_dir_sanesecurity" ] ; then
   work_dir_sanesecurity=$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')
 else
   work_dir_sanesecurity=$(echo "$work_dir_sanesecurity" | sed 's:/*$::')
 fi
-if [ ! -n "$work_dir_securiteinfo" ] ; then
+if [ -z "$work_dir_securiteinfo" ] ; then
   work_dir_securiteinfo=$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')
 else
   work_dir_securiteinfo=$(echo "$work_dir_securiteinfo" | sed 's:/*$::')
 fi
-if [ ! -n "$work_dir_linuxmalwaredetect" ] ; then
+if [ -z "$work_dir_linuxmalwaredetect" ] ; then
   work_dir_linuxmalwaredetect=$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')
 else
   work_dir_linuxmalwaredetect=$(echo "$work_dir_linuxmalwaredetect" | sed 's:/*$::')
 fi
-if [ ! -n "$work_dir_malwarepatrol" ] ; then
+if [ -z "$work_dir_malwarepatrol" ] ; then
   work_dir_malwarepatrol=$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')
 else
   work_dir_malwarepatrol=$(echo "$work_dir_malwarepatrol" | sed 's:/*$::')
 fi
-if [ ! -n "$work_dir_yararulesproject" ] ; then
+if [ -z "$work_dir_yararulesproject" ] ; then
   work_dir_yararulesproject=$(echo "$work_dir/$yararulesproject_dir" | sed 's:/*$::')
 else
   work_dir_yararulesproject=$(echo "$work_dir_yararulesproject" | sed 's:/*$::')
 fi
-if [ ! -n "$work_dir_add" ] ; then
+if [ -z "$work_dir_add" ] ; then
   work_dir_add=$(echo "$work_dir/$add_dir" | sed 's:/*$::')
 else
   work_dir_add=$(echo "$work_dir_add" | sed 's:/*$::')
 fi
-if [ ! -n "$work_dir_work_configs" ] ; then
+if [ -z "$work_dir_work_configs" ] ; then
   work_dir_work_configs=$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')
 else
   work_dir_work_configs=$(echo "$work_dir_work_configs" | sed 's:/*$::')
 fi
-if [ ! -n "$work_dir_gpg" ] ; then
+if [ -z "$work_dir_gpg" ] ; then
   work_dir_gpg=$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')
 else
   work_dir_gpg=$(echo "$work_dir_gpg" | sed 's:/*$::')
 fi
 
-if [ ! -n "$work_dir_pid" ] ; then
+if [ -z "$work_dir_pid" ] ; then
   work_dir_pid=$(echo "$work_dir/$pid_dir" | sed 's:/*$::')
 else
   work_dir_pid=$(echo "$work_dir_pid" | sed 's:/*$::')
 fi
 
 # Assign defaults if not defined
-if [ ! -n "$cron_dir" ] ; then
+if [ -z "$cron_dir" ] ; then
   cron_dir="/etc/cron.d"
 fi
 cron_dir=$(echo "$cron_dir" | sed 's:/*$::')
-if [ ! -n "$cron_filename" ] ; then
+if [ -z "$cron_filename" ] ; then
   cron_filename="clamav-unofficial-sigs"
 fi
-if [ ! -n "$logrotate_dir" ] ; then
+if [ -z "$logrotate_dir" ] ; then
   logrotate_dir="/etc/logrotate.d"
 fi
 logrotate_dir=$(echo "$logrotate_dir" | sed 's:/*$::')
-if [ ! -n "$logrotate_filename" ] ; then
+if [ -z "$logrotate_filename" ] ; then
   logrotate_filename="clamav-unofficial-sigs"
 fi
-if [ ! -n "$man_dir" ] ; then
+if [ -z "$man_dir" ] ; then
   man_dir="/usr/share/man/man8"
 fi
 man_dir=$(echo "$man_dir" | sed 's:/*$::')
-if [ ! -n "$man_filename" ] ; then
+if [ -z "$man_filename" ] ; then
   man_filename="clamav-unofficial-sigs.8"
 fi
-if [ ! -n "$man_log_file_full_path" ] ; then
+if [ -z "$man_log_file_full_path" ] ; then
   man_log_file_full_path="$log_file_path/$log_file_name"
 fi
 
 # SANITY checks
 # Check default Binaries & Commands are defined
-if [ "$clamd_reload_opt" == "" ] ; then
+if [ -z "$clamd_reload_opt" ] ; then
   xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt" "="
   exit 1
 fi
-if [ "$uname_bin" == "" ] ; then
+if [ -z "$uname_bin" ] ; then
   xshok_pretty_echo_and_log "ERROR: uname (uname_bin) not found" "="
   exit 1
 fi
-if [ "$clamscan_bin" == "" ] ; then
+if [ -z "$clamscan_bin" ] ; then
   xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found" "="
   exit 1
 fi
-if [ "$rsync_bin" == "" ] ; then
+if [ -z "$rsync_bin" ] ; then
   xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found" "="
   exit 1
 fi
-if [ "$wget_bin" == "" ] ; then
-  if [ "$curl_bin" == "" ] ; then
+if [ -z "$wget_bin" ] ; then
+  if [ -z "$curl_bin" ] ; then
     xshok_pretty_echo_and_log "ERROR: wget and curl binaries not found, script requires either wget or curl" "="
     exit 1
   fi
 fi
-if [ "$gpg_bin" == "" ] ; then
+if [ -z "$gpg_bin" ] ; then
   xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
   exit 1
 fi
 # Check default directories are defined
-if [ "$work_dir" == "" ] ; then
+if [ -z "$work_dir" ] ; then
   xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not defined" "="
   exit 1
 fi
@@ -1638,7 +1638,7 @@ if ! xshok_user_group_exists "$clam_user" "$clam_group" ; then
 fi
 
 # Silence rsync output and only report errors - useful if script is run via cron.
-if [ "$rsync_silence" = "yes" ] ; then
+if [ "$rsync_silence" == "yes" ] ; then
   rsync_output_level="--quiet"
 else
   rsync_output_level="--progress"
@@ -1655,7 +1655,7 @@ if $rsync_bin --help | $grep_bin "contimeout" > /dev/null ; then
 fi
 
 # Silence wget output and only report errors - useful if script is run via cron.
-if [ "$downloader_silence" = "yes" ] ; then
+if [ "$downloader_silence" == "yes" ] ; then
   wget_output_level="--quiet" #--quiet
   curl_output_level="--silent --show-error"
 else
@@ -1664,7 +1664,7 @@ else
 fi
 
 # Suppress ssl warnings
-if [ "$downloader_ignore_ssl" = "yes" ] ; then
+if [ "$downloader_ignore_ssl" == "yes" ] ; then
   wget_insecure="--no-check-certificate"
   curl_insecure="--insecure"
 else
@@ -1891,7 +1891,7 @@ perms chmod -f 0700 "$work_dir_gpg"
 
 # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
 if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
-  if [ "$wget_bin" != "" ] ; then
+  if [ -n "$wget_bin" ] ; then
     #echo $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     # shellcheck disable=SC2086
     $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
@@ -1902,7 +1902,7 @@ if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
     $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     ret="$?"
   fi
-  if [ "$ret" != "0" ] ; then
+  if [ "$ret" -ne 0 ] ; then
     xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
     exit 1
   else
@@ -1932,7 +1932,7 @@ fi
 
 # Database update check, time randomization section.  This script now
 # provides support for both bash and non-bash enabled system shells.
-if [ "$enable_random" = "yes" ] ; then
+if [ "$enable_random" == "yes" ] ; then
   if [ -n "$RANDOM" ] ; then
     sleep_time=$((RANDOM * $((max_sleep_time - min_sleep_time)) / 32767 + min_sleep_time))
   else
@@ -2091,8 +2091,8 @@ fi
 ################################################################
 if [ "$sanesecurity_enabled" == "yes" ] ; then
   if [ -n "$sanesecurity_dbs" ] ; then
-  #if [ ${#sanesecurity_dbs[@]} -lt "1" ] ; then # Will not work due to compound array assignment
-    if [ "$(xshok_array_count "$sanesecurity_dbs")" -lt "1" ] ; then
+  #if [ ${#sanesecurity_dbs[@]} -lt 1 ] ; then # Will not work due to compound array assignment
+    if [ "$(xshok_array_count "$sanesecurity_dbs")" -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed sanesecurity_dbs config is invalid or not defined - SKIPPING"
     else
       if [ -r "$work_dir_work_configs/last-ss-update.txt" ] ; then
@@ -2114,19 +2114,19 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
           sanesecurity_mirror_ips=$(host -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')
         fi
 
-        if [ "$(xshok_array_count  "$sanesecurity_mirror_ips")" -ge "1" ] ; then
+        if [ "$(xshok_array_count  "$sanesecurity_mirror_ips")" -ge 1 ] ; then
           for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
             sanesecurity_mirror_name=""
             sanesecurity_mirror_name=$(dig +short -x "$sanesecurity_mirror_ip" | command sed 's/\.$//')
             # Add fallback to host if dig returns no records
-            if [ "$sanesecurity_mirror_name" == "" ] ; then
+            if [ -z "$sanesecurity_mirror_name" ] ; then
               sanesecurity_mirror_name=$(host "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')
             fi
             sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
             # shellcheck disable=SC2086
             $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
-            if [ "$?" -eq "0" ] ; then # The correct way
+            if [ "$?" -eq 0 ] ; then # The correct way
               sanesecurity_rsync_success="1"
               for db_file in $sanesecurity_dbs ; do
                 if ! cmp -s "$work_dir_sanesecurity/$db_file" "$clam_dbs/$db_file" ; then
@@ -2137,14 +2137,14 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                   else
                     ret="0"
                   fi
-                  if [ "$ret" -eq "0" ] ; then
+                  if [ "$ret" -eq 0 ] ; then
                     test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
                     true
                   else
                     xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING"
                     false
                   fi
-                if [ "$?" -eq "0" ] ; then
+                if [ "$?" -eq 0 ] ; then
                   db_ext=$(echo "$db_file" | cut -d "." -f2)
                   if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
                     if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
@@ -2256,7 +2256,7 @@ fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
     if [ -n "$securiteinfo_dbs" ] ; then
-      if [ "$(xshok_array_count "$securiteinfo_dbs")" -lt "1" ] ; then
+      if [ "$(xshok_array_count "$securiteinfo_dbs")" -lt 1 ] ; then
         xshok_pretty_echo_and_log "Failed securiteinfo_dbs config is invalid or not defined - SKIPPING"
       else
       rm -f "$work_dir_securiteinfo/*.gz"
@@ -2275,12 +2275,12 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
         xshok_pretty_echo_and_log "Checking for SecuriteInfo updates..."
         securiteinfo_updates="0"
         for db_file in $securiteinfo_dbs ; do
-          if [ "$loop" = "1" ] ; then
+          if [ "$loop" == "1" ] ; then
             xshok_pretty_echo_and_log "---"
           fi
           xshok_pretty_echo_and_log "Checking for updated SecuriteInfo database file: $db_file"
           securiteinfo_db_update="0"
-          if [ "$wget_bin" != "" ] ; then
+          if [ -n "$wget_bin" ] ; then
             # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
             ret="$?"
@@ -2289,10 +2289,10 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
             ret="$?"
           fi
-          if [ "$ret" -eq "0" ] ; then
+          if [ "$ret" -eq 0 ] ; then
             loop="1"
             if ! cmp -s "$work_dir_securiteinfo/$db_file" "$clam_dbs/$db_file" ; then
-              if [ "$?" -eq "0" ] ; then
+              if [ "$?" -eq 0 ] ; then
                 db_ext=$(echo "$db_file" | cut -d "." -f2)
 
 
@@ -2409,7 +2409,7 @@ fi
 ##############################################################################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
-    if [ "$(xshok_array_count "$linuxmalwaredetect_dbs")" -lt "1" ] ; then
+    if [ "$(xshok_array_count "$linuxmalwaredetect_dbs")" -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed linuxmalwaredetect_dbs config is invalid or not defined - SKIPPING"
     else
     rm -f "$work_dir_linuxmalwaredetect/*.gz"
@@ -2429,13 +2429,13 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
       xshok_pretty_echo_and_log "Checking for linuxmalwaredetect updates..."
       linuxmalwaredetect_updates="0"
       for db_file in $linuxmalwaredetect_dbs ; do
-        if [ "$loop" = "1" ] ; then
+        if [ "$loop" == "1" ] ; then
           xshok_pretty_echo_and_log "---"
         fi
         xshok_pretty_echo_and_log "Checking for updated linuxmalwaredetect database file: $db_file"
 
         linuxmalwaredetect_db_update="0"
-        if [ "$wget_bin" != "" ] ; then
+        if [ -n "$wget_bin" ] ; then
           # shellcheck disable=SC2086
           $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
           ret="$?"
@@ -2444,11 +2444,11 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
           ret="$?"
         fi
-        if [ "$ret" -eq "0" ] ; then
+        if [ "$ret" -eq 0 ] ; then
           loop="1"
           if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
-            if [ "$?" -eq "0" ] ; then
-              db_ext=$(echo "$db_file" | cut -d "." -f2)
+            if [ "$?" -eq 0 ] ; then
+              db_ext=$(echo "$db_file" | cut -d "." -f 2)
 
               xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
               if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
@@ -2591,7 +2591,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
         malwarepatrol_reloaded=0
         if [ "$malwarepatrol_free" == "yes" ] ; then
-          if [ "$wget_bin" != "" ] ; then
+          if [ -n "$wget_bin" ] ; then
             # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
             ret="$?"
@@ -2600,9 +2600,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
             ret="$?"
           fi
-          if [ "$ret" -eq "0" ] ; then
+          if [ "$ret" -eq 0 ] ; then
             if ! cmp -s "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db" ; then
-              if [ "$?" -eq "0" ] ; then
+              if [ "$?" -eq 0 ] ; then
                 malwarepatrol_reloaded=1
               else
                 malwarepatrol_reloaded=2
@@ -2613,7 +2613,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
           fi
 
         else # The not free branch
-          if [ "$wget_bin" != "" ] ; then
+          if [ -n "$wget_bin" ] ; then
             # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
             ret="$?"
@@ -2622,7 +2622,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
             ret="$?"
           fi
-          if [ "$ret" -eq "0" ] ; then
+          if [ "$ret" -eq 0 ] ; then
             if [ -f "$clam_dbs/$malwarepatrol_db" ] ; then
               malwarepatrol_md5=$(openssl md5 -r "$clam_dbs/$malwarepatrol_db" 2>/dev/null | cut -d" " -f1)
               if [ ! "$malwarepatrol_md5" ] ; then
@@ -2632,7 +2632,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             fi
             malwarepatrol_md5_new=$(cat "$work_dir_malwarepatrol/$malwarepatrol_db.md5")
             if [ -n "$malwarepatrol_md5_new" ] && [ "$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ; then
-              if [ "$wget_bin" != "" ] ; then
+              if [ -n "$wget_bin" ] ; then
                 # shellcheck disable=SC2086
                 $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
                 ret="$?"
@@ -2641,7 +2641,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                 $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
                 ret="$?"
               fi
-              if [ "$ret" -eq "0" ] ; then
+              if [ "$ret" -eq 0 ] ; then
                 malwarepatrol_reloaded=1
               else # Wget DB fail
                 malwarepatrol_reloaded=-1
@@ -2756,7 +2756,7 @@ fi
 ##############################################################################################################################################
 if [ "$yararulesproject_enabled" == "yes" ] ; then
   if [ -n "$yararulesproject_dbs" ] ; then
-    if [ "$(xshok_array_count "$yararulesproject_dbs")" -lt "1" ] ; then
+    if [ "$(xshok_array_count "$yararulesproject_dbs")" -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
     else
     rm -f "$work_dir_yararulesproject/*.gz"
@@ -2781,13 +2781,13 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
           db_file=$(echo "$db_file" | cut -d"/" -f2)
         else yr_dir=""
         fi
-        if [ "$loop" = "1" ] ; then
+        if [ "$loop" == "1" ] ; then
           xshok_pretty_echo_and_log "---"
         fi
         xshok_pretty_echo_and_log "Checking for updated yararulesproject database file: $db_file"
 
         yararulesproject_db_update="0"
-          if [ "$wget_bin" != "" ] ; then
+          if [ -n "$wget_bin" ] ; then
             # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
             ret="$?"
@@ -2796,10 +2796,10 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
             ret="$?"
           fi
-          if [ "$ret" -eq "0" ] ; then
+          if [ "$ret" -eq 0 ] ; then
           loop="1"
           if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
-            if [ "$?" -eq "0" ] ; then
+            if [ "$?" -eq 0 ] ; then
               db_ext=$(echo "$db_file" | cut -d "." -f2)
 
               xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
@@ -2912,7 +2912,7 @@ fi
 ##############################################################################################################################################
 if [ "$additional_enabled" == "yes" ] ; then
   if [ -n "$additional_dbs" ] ; then
-    if [ "$(xshok_array_count "$additional_dbs")" -lt "1" ] ; then
+    if [ "$(xshok_array_count "$additional_dbs")" -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed additional_dbs config is invalid or not defined - SKIPPING"
     else
     rm -f "$work_dir_add/*.gz"
@@ -2941,19 +2941,19 @@ if [ "$additional_enabled" == "yes" ] ; then
         # fi
        db_file=$(basename "$db_url")
 
-        if [ "$loop" = "1" ] ; then
+        if [ "$loop" == "1" ] ; then
           xshok_pretty_echo_and_log "---"
         fi
         xshok_pretty_echo_and_log "Checking for updated additional database file: $db_file"
 
         additional_db_update="0"
 
-        if [ "$(echo "$db_url" | cut -d ":" -f 1)" = "rsync" ] ; then
+        if [ "$(echo "$db_url" | cut -d ":" -f 1)" == "rsync" ] ; then
           # shellcheck disable=SC2086
           $rsync_bin $rsync_output_level $no_motd -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
           ret="$?"
         else
-          if [ "$wget_bin" != "" ] ; then
+          if [ -n "$wget_bin" ] ; then
             # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_add/$db_file" "$db_url"
             ret="$?"
@@ -2966,10 +2966,10 @@ if [ "$additional_enabled" == "yes" ] ; then
 
         # This needs enhancement for rsync, as it will only work with single files...
         # Maybe better to process each file inside work_dir_add in its own for loop.
-        if [ "$ret" -eq "0" ] ; then
+        if [ "$ret" -eq 0 ] ; then
           loop="1"
           if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
-            if [ "$?" -eq "0" ] ; then
+            if [ "$?" -eq 0 ] ; then
               db_ext=$(echo "$db_file" | cut -d "." -f2)
 
               xshok_pretty_echo_and_log "Testing updated additional database file: $db_file"
@@ -3112,7 +3112,7 @@ if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt"
       ign_updated=1
     fi
   done < "$work_dir_work_configs/monitor-ign-old.txt"
-  if [ "$ign_updated" = "1" ] ; then
+  if [ "$ign_updated" == "1" ] ; then
     if $clamscan_bin --quiet -d "$work_dir_work_configs/local.ign" "$work_dir_work_configs/scan-test.txt"
       then
       if $rsync_bin -pcqt "$work_dir_work_configs/local.ign" "$clam_dbs"
@@ -3144,9 +3144,9 @@ if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.
   xshok_pretty_echo_and_log "" "=" "80"
 
   while read -r entry ; do
-    sig_file=$(echo "$entry" | cut -d ":" -f1)
-    sig_full=$(echo "$entry" | cut -d ":" -f2-)
-    sig_name=$(echo "$entry" | cut -d ":" -f2)
+    sig_file=$(echo "$entry" | cut -d ":" -f 1)
+    sig_full=$(echo "$entry" | cut -d ":" -f 2-)
+    sig_name=$(echo "$entry" | cut -d ":" -f 2)
     if ! $grep_bin -F "$sig_full" "$sig_file" > /dev/null 2>&1 ; then
       perl -i -ne "print unless /$sig_name$/" "$work_dir_work_configs/my-whitelist.ign2"
       perl -i -ne "print unless /:$sig_name:/" "$work_dir_work_configs/tracker-tmp.txt"
@@ -3158,7 +3158,7 @@ if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.
   mv -f "$work_dir_work_configs/tracker-tmp.txt" "$work_dir_work_configs/tracker.txt"
 
   xshok_pretty_echo_and_log "" "=" "80"
-  if [ "$ign2_updated" = "1" ]
+  if [ "$ign2_updated" == "1" ]
     then
     if $clamscan_bin --quiet -d "$work_dir_work_configs/my-whitelist.ign2" "$work_dir_work_configs/scan-test.txt"
       then
@@ -3198,7 +3198,7 @@ fi
 # Set appropriate directory and file permissions to all production signature files
 # and set file access mode to 0644 on all working directory files.
 
-if [ "$setmode" = "yes" ] ; then
+if [ "$setmode" == "yes" ] ; then
   xshok_pretty_echo_and_log "Setting permissions and ownership" "="
   perms chown -f -R "$clam_user:$clam_group" "$work_dir"
   if ! find "$work_dir" -type f -exec chmod -f 0644 {} + 2>/dev/null ; then
