@@ -69,7 +69,7 @@ function xshok_prompt_confirm () { #optional_message
 }
 
 # Function to create a pid file
-function xshok_create_pid_file { #pid.file
+function xshok_create_pid_file () { #pid.file
   if [ "$1" ] ; then
     pidfile="$1"
     echo $$ > "$pidfile"
@@ -275,7 +275,7 @@ function xshok_array_count () { #array
   fi
 }
 # function to auto update
-function xshok_auto_update() { #version
+function xshok_auto_update () { #version
   xshok_pretty_echo_and_log "Performing automatic update..."
 
   # Download new version
