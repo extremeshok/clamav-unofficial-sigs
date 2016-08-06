@@ -659,9 +659,9 @@ function gpg_verify_specific_sanesecurity_database_file () { # databasefile
       echo "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
       if [ -r "$work_dir_sanesecurity/$db_file".sig ] ; then
         "$gpg_bin" -q --trust-model always --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
-        if [ "$?" -ne 0 ]; then
+        if [ $? -ne 0 ]; then
           "$gpg_bin" -q --always-trust --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
-          if [ "$?" -eq 0 ]; then
+          if [ $? -eq 0 ]; then
             exit 0
           else
             exit 1
@@ -907,7 +907,7 @@ function clamscan_integrity_test_specific_database_file () { # databasefile
       echo "Clamscan integrity testing: $db_file"
 
       $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt"
-      if [ "$?" -eq 0 ]; then
+      if [ $? -eq 0 ]; then
         echo "Clamscan reports that '$input' database integrity tested GOOD"
         exit 0
       else
@@ -2126,7 +2126,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
             # shellcheck disable=SC2086
             $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
-            if [ "$?" -eq 0 ] ; then # The correct way
+            if [ $? -eq 0 ] ; then # The correct way
               sanesecurity_rsync_success="1"
               for db_file in $sanesecurity_dbs ; do
                 if ! cmp -s "$work_dir_sanesecurity/$db_file" "$clam_dbs/$db_file" ; then
@@ -2144,7 +2144,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                     xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING"
                     false
                   fi
-                if [ "$?" -eq 0 ] ; then
+                if [ $? -eq 0 ] ; then
                   db_ext=$(echo "$db_file" | cut -d "." -f2)
                   if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
                     if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
@@ -2292,7 +2292,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
           if [ "$ret" -eq 0 ] ; then
             loop="1"
             if ! cmp -s "$work_dir_securiteinfo/$db_file" "$clam_dbs/$db_file" ; then
-              if [ "$?" -eq 0 ] ; then
+              if [ $? -eq 0 ] ; then
                 db_ext=$(echo "$db_file" | cut -d "." -f2)
 
 
@@ -2447,7 +2447,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
         if [ "$ret" -eq 0 ] ; then
           loop="1"
           if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
-            if [ "$?" -eq 0 ] ; then
+            if [ $? -eq 0 ] ; then
               db_ext=$(echo "$db_file" | cut -d "." -f 2)
 
               xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
@@ -2602,7 +2602,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
           fi
           if [ "$ret" -eq 0 ] ; then
             if ! cmp -s "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db" ; then
-              if [ "$?" -eq 0 ] ; then
+              if [ $? -eq 0 ] ; then
                 malwarepatrol_reloaded=1
               else
                 malwarepatrol_reloaded=2
@@ -2799,7 +2799,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
           if [ "$ret" -eq 0 ] ; then
           loop="1"
           if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
-            if [ "$?" -eq 0 ] ; then
+            if [ $? -eq 0 ] ; then
               db_ext=$(echo "$db_file" | cut -d "." -f2)
 
               xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
@@ -2969,7 +2969,7 @@ if [ "$additional_enabled" == "yes" ] ; then
         if [ "$ret" -eq 0 ] ; then
           loop="1"
           if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
-            if [ "$?" -eq 0 ] ; then
+            if [ $? -eq 0 ] ; then
               db_ext=$(echo "$db_file" | cut -d "." -f2)
 
               xshok_pretty_echo_and_log "Testing updated additional database file: $db_file"
