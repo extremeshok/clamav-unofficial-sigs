@@ -286,7 +286,7 @@ function xshok_auto_update () { # version
 
   # Download new version
   echo -n "Downloading latest version..."
-  if ! wget --quiet --output-document="$0.tmp" $UPDATE_BASE/$SELF ; then
+  if ! wget --quiet --output-document="$0.tmp" "$UPDATE_BASE/$SELF" ; then
     echo "Failed: Error while trying to wget new version!"
     echo "File requested: $UPDATE_BASE/$SELF"
     exit 1
@@ -294,9 +294,9 @@ function xshok_auto_update () { # version
   echo "Done."
 
   # Copy over modes from old version
-  OCTAL_MODE=$(stat -c "%a" $SELF)
-  if ! chmod $OCTAL_MODE "$0.tmp" ; then
-    echo "Failed: Error while trying to set mode on $0.tmp."
+  OCTAL_MODE=$(stat -c "%a" "$SELF")
+  if ! chmod "$OCTAL_MODE" "${0}.tmp" ; then
+    echo "Failed: Error while trying to set mode on ${0}.tmp."
     exit 1
   fi
 
@@ -1893,10 +1893,12 @@ perms chmod -f 0700 "$work_dir_gpg"
 if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
   if [ "$wget_bin" != "" ] ; then
     #echo $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
+    # shellcheck disable=SC2086
     $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     ret="$?"
   else
     #echo $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
+    # shellcheck disable=SC2086
     $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
     ret="$?"
   fi
@@ -2122,6 +2124,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
             fi
             sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
+            # shellcheck disable=SC2086
             $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
             if [ "$?" -eq "0" ] ; then # The correct way
               sanesecurity_rsync_success="1"
@@ -2278,9 +2281,11 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
           xshok_pretty_echo_and_log "Checking for updated SecuriteInfo database file: $db_file"
           securiteinfo_db_update="0"
           if [ "$wget_bin" != "" ] ; then
+            # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
             ret="$?"
           else
+            # shellcheck disable=SC2086
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
             ret="$?"
           fi
@@ -2431,9 +2436,11 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 
         linuxmalwaredetect_db_update="0"
         if [ "$wget_bin" != "" ] ; then
+          # shellcheck disable=SC2086
           $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
           ret="$?"
         else
+          # shellcheck disable=SC2086
           $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
           ret="$?"
         fi
@@ -2585,9 +2592,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
         malwarepatrol_reloaded=0
         if [ "$malwarepatrol_free" == "yes" ] ; then
           if [ "$wget_bin" != "" ] ; then
+            # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
             ret="$?"
           else
+            # shellcheck disable=SC2086
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
             ret="$?"
           fi
@@ -2605,9 +2614,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
         else # The not free branch
           if [ "$wget_bin" != "" ] ; then
+            # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
             ret="$?"
           else
+            # shellcheck disable=SC2086
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db.md5" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code&hash=1"
             ret="$?"
           fi
@@ -2622,9 +2633,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             malwarepatrol_md5_new=$(cat "$work_dir_malwarepatrol/$malwarepatrol_db.md5")
             if [ -n "$malwarepatrol_md5_new" ] && [ "$malwarepatrol_md5" != "$malwarepatrol_md5_new" ] ; then
               if [ "$wget_bin" != "" ] ; then
+                # shellcheck disable=SC2086
                 $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
                 ret="$?"
               else
+                # shellcheck disable=SC2086
                 $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_malwarepatrol/$malwarepatrol_db" "$malwarepatrol_url&receipt=$malwarepatrol_receipt_code"
                 ret="$?"
               fi
@@ -2775,9 +2788,11 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 
         yararulesproject_db_update="0"
           if [ "$wget_bin" != "" ] ; then
+            # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
             ret="$?"
           else
+            # shellcheck disable=SC2086
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
             ret="$?"
           fi
@@ -2933,14 +2948,17 @@ if [ "$additional_enabled" == "yes" ] ; then
 
         additional_db_update="0"
 
-        if [ "$(echo "$db_url" | cut -d ":" -f1)" = "rsync" ] ; then
+        if [ "$(echo "$db_url" | cut -d ":" -f 1)" = "rsync" ] ; then
+          # shellcheck disable=SC2086
           $rsync_bin $rsync_output_level $no_motd -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
           ret="$?"
         else
           if [ "$wget_bin" != "" ] ; then
+            # shellcheck disable=SC2086
             $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_add/$db_file" "$db_url"
             ret="$?"
           else
+            # shellcheck disable=SC2086
             $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_add/$db_file" "$db_url"
             ret="$?"
           fi
