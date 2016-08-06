@@ -4,10 +4,18 @@ language: bash
 sudo: required
 dist: trusty
 
+# Clamav 0.99 from Debian wheezy
 before_install:
-  - "sudo add-apt-repository ppa:teward/clamav -y"
   - "sudo apt-get -qq update"
-  - "sudo apt-get install -qq ca-certificates wget rsync clamav-daemon"
+  - "sudo apt-get install -qq -y ca-certificates wget rsync"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/l/llvm-3.0/libllvm3.0_3.0-10_amd64.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/libf/libffi/libffi5_3.0.10-3_amd64.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/c/clamav/libclamav7_0.99+dfsg-0+deb7u2_amd64.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/c/clamav/clamav-base_0.99+dfsg-0+deb7u2_all.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/c/clamav/clamav-freshclam_0.99+dfsg-0+deb7u2_amd64.deb"
+  - "sudo wget -nv http://ftp.debian.org/debian/pool/main/c/clamav/clamav-daemon_0.99+dfsg-0+deb7u2_amd64.deb"
+  - "sudo dpkg -i *.deb"
+  - "sudo apt-get install -y -f"
   - "sudo cp -f .t/tests/bytecode.cvd /var/lib/clamav/bytecode.cvd"
   - "sudo chown -R clamav:clamav /var/lib/clamav"
   - "sudo service clamav-daemon start"
