@@ -114,7 +114,7 @@ function xshok_is_root () {
 }
 
 # Check if its a file, otherwise return false
-function xshok_is_file () { #"filepath"
+function xshok_is_file () { # filepath
   filepath="$1"
   if [ -f "${filepath}" ] ; then
     return 0 ;
@@ -142,7 +142,7 @@ function xshok_is_subdir () { # filepath
 }
 
 # Create a dir and set the ownership
-function xshok_mkdir_ownership () { #"path"
+function xshok_mkdir_ownership () { # path
   if [ "$1" ] ; then
     mkdir -p "$1" 2>/dev/null
     if [ $? -ne 0 ] ;  then
@@ -160,7 +160,7 @@ function xshok_mkdir_ownership () { #"path"
 # Usage:
 # xshok_is_subdir "username" && echo "user found" || echo "no"
 # xshok_is_subdir "username" "groupname" && echo "user and group found" || echo "no"
-function xshok_user_group_exists () { #"username" "groupname"
+function xshok_user_group_exists () { # username groupname
   if [ "$(uname -s)" = "SunOS" ] ; then
     id_bin="/usr/xpg4/bin/id"
   else
@@ -1360,7 +1360,7 @@ if [ "$custom_config" != "no" ] ; then
 fi
 
 for config_file in "${config_files[@]}" ; do
-  if [ -r "$config_file" ] ; then #  exists and readable
+  if [ -r "$config_file" ] ; then # Exists and readable
     we_have_a_config="1"
     # Config stripping
     xshok_pretty_echo_and_log "Loading config: $config_file" "="
@@ -1411,7 +1411,7 @@ done
 
 # Assign the log_file_path earlier and remove trailing / (removes / and //)
 log_file_path=$(echo "$log_file_path" | sed 's:/*$::')
-#  Only start logging once all the configs have been loaded
+# Only start logging once all the configs have been loaded
 if [ "$logging_enabled" == "yes" ] ; then
   enable_log="yes"
 fi
@@ -1547,7 +1547,7 @@ if [ "$gpg_bin" == "" ] ; then
   xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
   exit 1
 fi
-#  Check default directories are defined
+# Check default directories are defined
 if [ "$work_dir" == "" ] ; then
   xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not defined" "="
   exit 1
