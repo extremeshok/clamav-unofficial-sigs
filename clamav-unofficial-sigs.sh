@@ -32,12 +32,12 @@
 ################################################################################
 
 # Detect to make sure the entire script is avilable, fail if the script is missing contents
-if [ ! "$( tail -1 "$0" | head -1 | cut -c 1-7 )" == "exit \$?" ] ; then
+if [ "$(tail -n 1 "$0" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
   echo "FATAL ERROR: Script is incomplete, please redownload"
   exit 1
 fi
 
-# Trap the keyboard interrupt (ctrl+c)
+# Trap the keyboard interrupt (Ctrl + C)
 trap xshok_control_c SIGINT
 
 ################################################################################
@@ -79,7 +79,7 @@ function xshok_create_pid_file () { # pid.file
   if [ "$1" ] ; then
     pidfile="$1"
     echo $$ > "$pidfile"
-    if [ $? -ne 0 ] ;  then
+    if [ $? -ne 0 ] ; then
       xshok_pretty_echo_and_log "ERROR: Could not create PID file: $pidfile"
       exit 1
     fi
@@ -151,7 +151,7 @@ function xshok_is_subdir () { # filepath
 function xshok_mkdir_ownership () { # path
   if [ "$1" ] ; then
     mkdir -p "$1" 2>/dev/null
-    if [ $? -ne 0 ] ;  then
+    if [ $? -ne 0 ] ; then
       xshok_pretty_echo_and_log "ERROR: Could not create directory: $1"
       exit 1
     fi
@@ -180,13 +180,13 @@ function xshok_user_group_exists () { # username groupname
         if [ $? -eq 0 ]; then
           return 0 ; # User and group exists
         else
-          return 1 ;  # Group does NOT exist
+          return 1 ; # Group does NOT exist
         fi
        else
           return 0 ; # User exists
        fi
     else
-      return 1 ;  # User does NOT exist
+      return 1 ; # User does NOT exist
     fi
   else
     xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
@@ -363,7 +363,7 @@ function xshok_database () { # database rating
               elif [ "$db_name_rating" == "REQUIRED" ] ; then
                 new_dbs="$new_dbs $db_name"
               elif [ "$current_rating" == "LOW" ] ; then
-                if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "LOWMEDIUM" ] ; then
+                if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ] || [ "$db_name_rating" == "LOWMEDIUM" ] ; then
                   new_dbs="$new_dbs $db_name"
                 fi
               elif [ "$current_rating" == "MEDIUM" ] ; then
@@ -1433,7 +1433,7 @@ for config_file in "${config_files[@]}" ; do
     # Config error checking
     # Check "" are an even number
     config_check="${clean_config//[^\"]}"
-    if [ "$(( ${#config_check} % 2))" -eq 1 ] ; then
+    if [ "$(( ${#config_check} % 2 ))" -eq 1 ] ; then
       xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every \" requires a closing \"" "="
       exit 1
     fi
@@ -2251,7 +2251,7 @@ else
 fi
 
 ##############################################################################################################################################
-# Check for updated SecuriteInfo database files every set number of  hours as defined in the "USER CONFIGURATION" section of this script #
+# Check for updated SecuriteInfo database files every set number of hours as defined in the "USER CONFIGURATION" section of this script      #
 ##############################################################################################################################################
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
@@ -2492,7 +2492,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
                   fi
                 fi
                 false
-              fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ;  then
+              fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
               perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
               if [ "$selinux_fixes" == "yes" ] ; then
                 restorecon "$clam_dbs/$db_file"
@@ -2556,7 +2556,7 @@ fi
 
 
 ##########################################################################################################################################
-# Download MalwarePatrol database file every set number of hours as defined in the "USER CONFIGURATION" section of this script.    #
+# Download MalwarePatrol database file every set number of hours as defined in the "USER CONFIGURATION" section of this script.          #
 ##########################################################################################################################################
 if [ "$malwarepatrol_enabled" == "yes" ] ; then
   if [ "$malwarepatrol_receipt_code" != "YOUR-RECEIPT-NUMBER" ] ; then
