@@ -19,6 +19,10 @@
 #
 ################################################################################
 
+#force and exit, as this code is not completed.
+#todo: xshok_database to work with declared arrays so that one can generate a filelist with out the false false-positive rating.
+exit
+
 ################################################################################
 
     ######  #######    #     # ####### #######    ####### ######  ### #######
@@ -315,8 +319,8 @@ function xshok_database () { # database rating
   # Zero
   new_dbs=""
   if [ -n "$current_dbs" ] ; then
-    if [ "${#current_dbs}" -ge 1 ] ; then 
-      for db_name in $current_dbs ; do
+    if [ ${#current_dbs} -ge 1 ] ; then 
+      for db_name in ${current_dbs[@]} ; do
         # Checks
         if [ "$enable_yararules" == "no" ] ; then # YARA rules are disabled
             if [[ "$db_name" == *".yar"* ]] ; then # If it's the value you want to delete
@@ -1686,36 +1690,36 @@ fi
 if [ "$sanesecurity_enabled" == "yes" ] ; then
   if [ -n "$sanesecurity_dbs" ] ; then
     if [ -n "$sanesecurity_dbs_rating" ] ; then
-      sanesecurity_dbs="$(xshok_database "$sanesecurity_dbs" "$sanesecurity_dbs_rating")"
+      sanesecurity_dbs="$(xshok_database "${sanesecurity_dbs[@]}" "$sanesecurity_dbs_rating")"
     else
-      sanesecurity_dbs="$(xshok_database "$sanesecurity_dbs" "$default_dbs_rating")"
+      sanesecurity_dbs="$(xshok_database "${sanesecurity_dbs[@]}" "$default_dbs_rating")"
     fi
   fi
 fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_dbs" ] ; then
     if [ -n "$securiteinfo_dbs_rating" ] ; then
-      securiteinfo_dbs="$(xshok_database "$securiteinfo_dbs" "$securiteinfo_dbs_rating")"
+      securiteinfo_dbs="$(xshok_database "${securiteinfo_dbs[@]}" "$securiteinfo_dbs_rating")"
     else
-      securiteinfo_dbs="$(xshok_database "$securiteinfo_dbs" "$default_dbs_rating")"
+      securiteinfo_dbs="$(xshok_database "${securiteinfo_dbs[@]}" "$default_dbs_rating")"
     fi
   fi
 fi
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
     if [ -n "$linuxmalwaredetect_dbs_rating" ] ; then
-      linuxmalwaredetect_dbs="$(xshok_database "$linuxmalwaredetect_dbs" "$linuxmalwaredetect_dbs_rating")"
+      linuxmalwaredetect_dbs="$(xshok_database "${linuxmalwaredetect_dbs[@]}" "$linuxmalwaredetect_dbs_rating")"
     else
-      linuxmalwaredetect_dbs="$(xshok_database "$linuxmalwaredetect_dbs" "$default_dbs_rating")"
+      linuxmalwaredetect_dbs="$(xshok_database "${linuxmalwaredetect_dbs[@]}" "$default_dbs_rating")"
     fi
   fi
 fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
   if [ -n "$yararulesproject_dbs" ] ; then
     if [ -n "$yararulesproject_dbs_rating" ] ; then
-      yararulesproject_dbs="$(xshok_database "$yararulesproject_dbs" "$yararulesproject_dbs_rating")"
+      yararulesproject_dbs="$(xshok_database "${yararulesproject_dbs[@]}" "$yararulesproject_dbs_rating")"
     else
-      yararulesproject_dbs="$(xshok_database "$yararulesproject_dbs" "$default_dbs_rating")"
+      yararulesproject_dbs="$(xshok_database "${yararulesproject_dbs[@]}" "$default_dbs_rating")"
     fi
   fi
 fi
@@ -1868,7 +1872,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
   sanesecurity_include_dbs="$work_dir_work_configs/ss-include-dbs.txt"
   if [ -n "$sanesecurity_dbs" ] ; then
     rm -f -- "$sanesecurity_include_dbs" "$work_dir_sanesecurity/*.sha256"
-    for db in $sanesecurity_dbs ; do
+    for db in ${sanesecurity_dbs[@]} ; do
       echo "$db" >> "$sanesecurity_include_dbs"
       echo "$db.sig" >> "$sanesecurity_include_dbs"
 
@@ -1880,7 +1884,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_dbs" ] ; then
-    for db in $securiteinfo_dbs ; do
+    for db in ${securiteinfo_dbs[@]} ; do
       echo "$work_dir_securiteinfo/$db" >> "$current_tmp"
       clamav_files
     done
@@ -1888,7 +1892,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 fi
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
-    for db in $linuxmalwaredetect_dbs ; do
+    for db in ${linuxmalwaredetect_dbs[@]} ; do
       echo "$work_dir_linuxmalwaredetect/$db" >> "$current_tmp"
       clamav_files
     done
@@ -1902,7 +1906,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
   if [ -n "$yararulesproject_dbs" ] ; then
-    for db in $yararulesproject_dbs ; do
+    for db in ${yararulesproject_dbs[@]} ; do
       if echo "$db" | $grep_bin -q "/"; then
         db="$(echo "$db" | cut -d "/" -f 2)"
       fi
@@ -1913,7 +1917,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 fi
 if [ "$additional_enabled" == "yes" ] ; then
   if [ -n "$additional_dbs" ] ; then
-    for db in $additional_dbs ; do
+    for db in ${additional_dbs[@]} ; do
       echo "$work_dir_add/$db" >> "$current_tmp"
       clamav_files
     done
@@ -2024,10 +2028,12 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
             sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
             # shellcheck disable=SC2086
-            $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
+            echo $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
+            
+exit
             if [ $? -eq 0 ] ; then # The correct way
               sanesecurity_rsync_success="1"
-              for db_file in $sanesecurity_dbs ; do
+              for db_file in ${sanesecurity_dbs[@]} ; do
                 if ! cmp -s "$work_dir_sanesecurity/$db_file" "$clam_dbs/$db_file" ; then
                   xshok_pretty_echo_and_log "Testing updated Sanesecurity database file: $db_file"
                   if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null ; then
@@ -2130,7 +2136,7 @@ else
   if [ -n "$sanesecurity_dbs" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled Sanesecurity Database files"
-      for db_file in $sanesecurity_dbs ; do
+      for db_file in ${sanesecurity_dbs[@]} ; do
         if echo "$db_file" | $grep_bin -q "|"; then
           db_file="$(echo "$db_file" | cut -d "|" -f 1)"
         fi
@@ -2173,7 +2179,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
         xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
         xshok_pretty_echo_and_log "Checking for SecuriteInfo updates..."
         securiteinfo_updates="0"
-        for db_file in $securiteinfo_dbs ; do
+        for db_file in ${securiteinfo_dbs[@]} ; do
           if [ "$loop" == "1" ] ; then
             xshok_pretty_echo_and_log "---"
           fi
@@ -2282,7 +2288,7 @@ else
   if [ -n "$securiteinfo_dbs" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled SecuriteInfo Database files"
-      for db_file in $securiteinfo_dbs ; do
+      for db_file in ${securiteinfo_dbs[@]} ; do
         if echo "$db_file" | $grep_bin -q "|"; then
           db_file="$(echo "$db_file" | cut -d "|" -f 1)"
         fi
@@ -2326,7 +2332,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
       xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
       xshok_pretty_echo_and_log "Checking for linuxmalwaredetect updates..."
       linuxmalwaredetect_updates="0"
-      for db_file in $linuxmalwaredetect_dbs ; do
+      for db_file in ${linuxmalwaredetect_dbs[@]} ; do
         if [ "$loop" == "1" ] ; then
           xshok_pretty_echo_and_log "---"
         fi
@@ -2434,7 +2440,7 @@ else
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled linuxmalwaredetect Database files"
-      for db_file in $linuxmalwaredetect_dbs ; do
+      for db_file in ${linuxmalwaredetect_dbs[@]} ; do
         if echo "$db_file" | $grep_bin -q "|"; then
           db_file="$(echo "$db_file" | cut -d "|" -f 1)"
         fi
@@ -2673,7 +2679,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
       xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
       xshok_pretty_echo_and_log "Checking for yararulesproject updates..."
       yararulesproject_updates="0"
-      for db_file in $yararulesproject_dbs ; do
+      for db_file in ${yararulesproject_dbs[@]} ; do
         if echo "$db_file" | $grep_bin -q "/"; then
           yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
           db_file="$(echo "$db_file" | cut -d "/" -f 2)"
@@ -2785,7 +2791,7 @@ else
   if [ -n "$yararulesproject_dbs" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled yararulesproject Database files"
-      for db_file in $yararulesproject_dbs ; do
+      for db_file in ${yararulesproject_dbs[@]} ; do
         if echo "$db_file" | $grep_bin -q "/"; then
           db_file="$(echo "$db_file" | cut -d "/" -f 2)"
         fi
@@ -2829,7 +2835,7 @@ if [ "$additional_enabled" == "yes" ] ; then
       xshok_pretty_echo_and_log "Additional Database File Updates" "="
       xshok_pretty_echo_and_log "Checking for additional updates..."
       additional_updates="0"
-      for db_url in $additional_dbs ; do
+      for db_url in ${additional_dbs[@]} ; do
         # Left for future dir manipulation
         # if echo "$db_file" | $grep_bin -q "/"; then
         #   add_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
@@ -2955,7 +2961,7 @@ else
   if [ -n "$additional_dbs" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled additional Database files"
-      for db_file in $additional_dbs ; do
+      for db_file in ${additional_dbs[@]} ; do
         if echo "$db_file" | $grep_bin -q "/"; then
           db_file="$(echo "$db_file" | cut -d "/" -f 2)"
         fi
