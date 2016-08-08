@@ -18,6 +18,9 @@
 #   ALL CONFIGURATION OPTIONS ARE LOCATED IN THE INCLUDED CONFIGURATION FILE
 #
 ################################################################################
+# TO FIX:
+# $(echo "$db_name" | cut -d "|" -f2) ---> ${db_name#*|}
+# man_dir=$(echo "$man_dir" | sed 's:/*$::') ---> shopt -s extglob; man_dir="${man_dir%%+(/)}"
 
 ################################################################################
 
@@ -128,7 +131,7 @@ function xshok_is_file () { # filepath
 # xshok_is_subdir "/root/" - false
 # xshok_is_subdir "/usr/local/etc" && echo "yes" - yes
 function xshok_is_subdir () { # filepath
-  filepath="$(echo "$1" | sed 's:/*$::')"
+  shopt -s extglob; filepath="${filepath%%+(/)}"
   if [ -d "$filepath" ] ; then
     res="${filepath//[^\/]}"
     if [ "${#res}" -gt 1 ] ; then
@@ -328,7 +331,7 @@ function xshok_database () { # rating database_array
           if [[ ! "$db_name" = *"|"* ]] ; then # This old format
             new_dbs+=( "$db_name" )
           else
-            db_name_rating="$(echo "$db_name" | cut -d "|" -f 2)"
+            db_name_rating="${db_name#*|}"
             db_name="$(echo "$db_name" | cut -d "|" -f 1)"
 
             if [ "$db_name_rating" != "DISABLED" ] ; then
@@ -1344,7 +1347,7 @@ done
 if [ "$custom_config" != "no" ] ; then
   if [ -d "$custom_config" ] ; then
     # Assign the custom config dir and remove trailing / (removes / and //)
-    config_dir="$(echo "$custom_config" | sed 's:/*$::')"
+    shopt -s extglob; custom_config="${custom_config%%+(/)}"
     config_files=( "$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf" )
   else
     config_files=( "$custom_config" )
@@ -1404,7 +1407,7 @@ done
 
 
 # Assign the log_file_path earlier and remove trailing / (removes / and //)
-log_file_path="$(echo "$log_file_path" | sed 's:/*$::')"
+shopt -s extglob; log_file_path="${log_file_path%%+(/)}"
 # Only start logging once all the configs have been loaded
 if [ "$logging_enabled" == "yes" ] ; then
   enable_log="yes"
@@ -1437,75 +1440,75 @@ if [ "$user_configuration_complete" != "yes" ] ; then
 fi
 
 # Assign the directories and remove trailing / (removes / and //)
-work_dir="$(echo "$work_dir" | sed 's:/*$::')"
+shopt -s extglob; work_dir="${work_dir%%+(/)}"
 
 # Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
 if [ -z "$work_dir_sanesecurity" ] ; then
   work_dir_sanesecurity="$(echo "$work_dir/$sanesecurity_dir" | sed 's:/*$::')"
 else
-  work_dir_sanesecurity="$(echo "$work_dir_sanesecurity" | sed 's:/*$::')"
+  shopt -s extglob; work_dir_sanesecurity="${work_dir_sanesecurity%%+(/)}"
 fi
 if [ -z "$work_dir_securiteinfo" ] ; then
   work_dir_securiteinfo="$(echo "$work_dir/$securiteinfo_dir" | sed 's:/*$::')"
 else
-  work_dir_securiteinfo="$(echo "$work_dir_securiteinfo" | sed 's:/*$::')"
+  shopt -s extglob; work_dir_securiteinfo="${work_dir_securiteinfo%%+(/)}"
 fi
 if [ -z "$work_dir_linuxmalwaredetect" ] ; then
   work_dir_linuxmalwaredetect="$(echo "$work_dir/$linuxmalwaredetect_dir" | sed 's:/*$::')"
 else
-  work_dir_linuxmalwaredetect="$(echo "$work_dir_linuxmalwaredetect" | sed 's:/*$::')"
+  shopt -s extglob; work_dir_malwarepatrol="${work_dir_malwarepatrol%%+(/)}"
 fi
 if [ -z "$work_dir_malwarepatrol" ] ; then
   work_dir_malwarepatrol="$(echo "$work_dir/$malwarepatrol_dir" | sed 's:/*$::')"
 else
-  work_dir_malwarepatrol="$(echo "$work_dir_malwarepatrol" | sed 's:/*$::')"
+  shopt -s extglob; work_dir_malwarepatrol="${work_dir_malwarepatrol%%+(/)}"
 fi
 if [ -z "$work_dir_yararulesproject" ] ; then
   work_dir_yararulesproject="$(echo "$work_dir/$yararulesproject_dir" | sed 's:/*$::')"
 else
-  work_dir_yararulesproject="$(echo "$work_dir_yararulesproject" | sed 's:/*$::')"
+  shopt -s extglob; work_dir_yararulesproject="${work_dir_yararulesproject%%+(/)}"
 fi
 if [ -z "$work_dir_add" ] ; then
   work_dir_add="$(echo "$work_dir/$add_dir" | sed 's:/*$::')"
 else
-  work_dir_add="$(echo "$work_dir_add" | sed 's:/*$::')"
+  shopt -s extglob; work_dir_add="${work_dir_add%%+(/)}"
 fi
 if [ -z "$work_dir_work_configs" ] ; then
   work_dir_work_configs="$(echo "$work_dir/$work_dir_configs" | sed 's:/*$::')"
 else
-  work_dir_work_configs="$(echo "$work_dir_work_configs" | sed 's:/*$::')"
+  shopt -s extglob; work_dir_work_configs="${work_dir_work_configs%%+(/)}"
 fi
 if [ -z "$work_dir_gpg" ] ; then
   work_dir_gpg="$(echo "$work_dir/$gpg_dir" | sed 's:/*$::')"
 else
-  work_dir_gpg="$(echo "$work_dir_gpg" | sed 's:/*$::')"
+  shopt -s extglob; work_dir_gpg="${work_dir_gpg%%+(/)}"
 fi
 
 if [ -z "$work_dir_pid" ] ; then
   work_dir_pid="$(echo "$work_dir/$pid_dir" | sed 's:/*$::')"
 else
-  work_dir_pid="$(echo "$work_dir_pid" | sed 's:/*$::')"
+  shopt -s extglob; work_dir_pid="${work_dir_pid%%+(/)}"
 fi
 
 # Assign defaults if not defined
 if [ -z "$cron_dir" ] ; then
   cron_dir="/etc/cron.d"
 fi
-cron_dir="$(echo "$cron_dir" | sed 's:/*$::')"
+shopt -s extglob; cron_dir="${cron_dir%%+(/)}"
 if [ -z "$cron_filename" ] ; then
   cron_filename="clamav-unofficial-sigs"
 fi
 if [ -z "$logrotate_dir" ] ; then
   logrotate_dir="/etc/logrotate.d"
 fi
-logrotate_dir="$(echo "$logrotate_dir" | sed 's:/*$::')"
+shopt -s extglob; logrotate_dir="${logrotate_dir%%+(/)}"
 if [ -z "$logrotate_filename" ] ; then
   logrotate_filename="clamav-unofficial-sigs"
 fi
 if [ -z "$man_dir" ] ; then
   man_dir="/usr/share/man/man8"
 fi
-man_dir="$(echo "$man_dir" | sed 's:/*$::')"
+shopt -s extglob; man_dir="${man_dir%%+(/)}"
 if [ -z "$man_filename" ] ; then
   man_filename="clamav-unofficial-sigs.8"
 fi
@@ -1593,12 +1596,12 @@ else
 fi
 
 # If the local rsync client supports the "--no-motd" flag, then enable it.
-if $rsync_bin --help | $grep_bin "no-motd" > /dev/null ; then
+if $rsync_bin --help | $grep_bin -q "no-motd" > /dev/null ; then
   no_motd="--no-motd"
 fi
 
 # If the local rsync client supports the "--contimeout" flag, then enable it.
-if $rsync_bin --help | $grep_bin "contimeout" > /dev/null ; then
+if $rsync_bin --help | $grep_bin -q "contimeout" > /dev/null ; then
   connect_timeout="--contimeout=$rsync_connect_timeout"
 fi
 
