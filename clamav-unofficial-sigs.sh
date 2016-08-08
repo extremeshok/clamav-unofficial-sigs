@@ -274,6 +274,12 @@ function xshok_array_count () { # array
     echo "0"
   fi
 }
+
+# Count array elements and output the total element count
+function array_count () { # array
+  echo "$#"
+}
+
 # Auto update
 function xshok_auto_update () { # version
   xshok_pretty_echo_and_log "Performing automatic update..."
@@ -334,7 +340,7 @@ function xshok_database () { # database rating
   new_dbs=""
 
   if [ -n "$current_dbs" ] ; then
-    if [ "$(xshok_array_count "$current_dbs")" -ge 1 ] ; then
+    if [ "$(array_count "$current_dbs")" -ge 1 ] ; then
       for db_name in $current_dbs ; do
         # Checks
         if [ "$enable_yararules" == "no" ] ; then # YARA rules are disabled
@@ -2008,7 +2014,7 @@ fi
 if [ "$sanesecurity_enabled" == "yes" ] ; then
   if [ -n "$sanesecurity_dbs" ] ; then
   #if [ "${#sanesecurity_dbs[@]}" -lt 1 ] ; then # Will not work due to compound array assignment
-    if [ "$(xshok_array_count "$sanesecurity_dbs")" -lt 1 ] ; then
+    if [ "$(array_count "$sanesecurity_dbs")" -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed sanesecurity_dbs config is invalid or not defined - SKIPPING"
     else
       if [ -r "$work_dir_work_configs/last-ss-update.txt" ] ; then
@@ -2026,11 +2032,11 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 
         sanesecurity_mirror_ips="$(dig +ignore +short "$sanesecurity_url")"
         # Add fallback to host if dig returns no records
-        if [ "$(xshok_array_count "$sanesecurity_mirror_ips")" -lt 1 ] ; then
+        if [ "$(array_count "$sanesecurity_mirror_ips")" -lt 1 ] ; then
           sanesecurity_mirror_ips="$(host -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')"
         fi
 
-        if [ "$(xshok_array_count "$sanesecurity_mirror_ips")" -ge 1 ] ; then
+        if [ "$(array_count "$sanesecurity_mirror_ips")" -ge 1 ] ; then
           for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
             sanesecurity_mirror_name=""
             sanesecurity_mirror_name="$(dig +short -x "$sanesecurity_mirror_ip" | command sed 's/\.$//')"
@@ -2172,7 +2178,7 @@ fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
     if [ -n "$securiteinfo_dbs" ] ; then
-      if [ "$(xshok_array_count "$securiteinfo_dbs")" -lt 1 ] ; then
+      if [ "$(array_count "$securiteinfo_dbs")" -lt 1 ] ; then
         xshok_pretty_echo_and_log "Failed securiteinfo_dbs config is invalid or not defined - SKIPPING"
       else
       rm -f "$work_dir_securiteinfo/*.gz"
@@ -2324,7 +2330,7 @@ fi
 ##############################################################################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
-    if [ "$(xshok_array_count "$linuxmalwaredetect_dbs")" -lt 1 ] ; then
+    if [ "$(array_count "$linuxmalwaredetect_dbs")" -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed linuxmalwaredetect_dbs config is invalid or not defined - SKIPPING"
     else
     rm -f "$work_dir_linuxmalwaredetect/*.gz"
@@ -2671,7 +2677,7 @@ fi
 ##############################################################################################################################################
 if [ "$yararulesproject_enabled" == "yes" ] ; then
   if [ -n "$yararulesproject_dbs" ] ; then
-    if [ "$(xshok_array_count "$yararulesproject_dbs")" -lt 1 ] ; then
+    if [ "$(array_count "$yararulesproject_dbs")" -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
     else
     rm -f "$work_dir_yararulesproject/*.gz"
@@ -2827,7 +2833,7 @@ fi
 ##############################################################################################################################################
 if [ "$additional_enabled" == "yes" ] ; then
   if [ -n "$additional_dbs" ] ; then
-    if [ "$(xshok_array_count "$additional_dbs")" -lt 1 ] ; then
+    if [ "$(array_count "$additional_dbs")" -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed additional_dbs config is invalid or not defined - SKIPPING"
     else
     rm -f "$work_dir_add/*.gz"
