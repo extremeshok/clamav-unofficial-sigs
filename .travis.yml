@@ -1,6 +1,6 @@
-#language: shell
+language: bash
 
-# Required environment variables from repository settings
+# Required travis ci environment variables
 #ci_securiteinfo_authorisation_signature=[secure]
 #ci_malwarepatrol_receipt_code=[secure]
 #ci_malwarepatrol_product_code=[secure]
@@ -22,21 +22,16 @@ dist: trusty
 
 before_install:
   - "sudo apt-get update -qq"
-  - "sudo apt-get install clamav-daemon -qq"
-  - "sudo apt-get install ca-certificates -qq"
-  - "sudo apt-get install wget rsync -qq"
+  - "sudo apt-get install ca-certificates wget rsync -qq"
   # - "sudo mkdir -p tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs"
   # - "sudo rsync -rlptDv tmp/cache/  /var/lib/clamav/"
-  - "sudo cp -f .t/tests/bytecode.cvd /var/lib/clamav/bytecode.cvd"
-  - "sudo chown -R clamav:clamav /var/lib/clamav"
   # - "sudo freshclam"
   # - "ls -laFh /var/lib/clamav/"
   # - "sudo rsync -rlptDav /var/lib/clamav/ tmp/cache/"
   # - "sudo chown -R travis:travis tmp/cache"
   # - "sudo chmod -R 777 tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs/"
-  - "sudo service clamav-daemon start"
 
 install:
   - "sudo mkdir -p /etc/clamav-unofficial-sigs"
@@ -46,6 +41,10 @@ install:
   - "sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs"
 
 script:
+  - sudo sh -e .t/ci-install-clam-default.sh
+  - sudo sh -e .t/ci-test.sh
+  - sudo sh -e .t/ci-clean.sh
+  - sudo sh -e .t/ci-install-clam-wheezy.sh
   - sudo sh -e .t/ci-test.sh
 
 addons:
