@@ -4,7 +4,7 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/lo
 
 pwd
 
-echo "Cleanign CI enviroment"
+echo "Cleaning CI enviroment"
 
 sudo apt-get purge clamav* -qq
 sudo rm -rf /var/lib/clamav
