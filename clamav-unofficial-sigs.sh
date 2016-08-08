@@ -61,15 +61,9 @@ function xshok_prompt_confirm () { # optional_message
   while true; do
     read -r -p "$message [y/N]" response < /dev/tty
     case "$response" in
-      [yY])
-        return 0
-        ;;
-      [nN])
-        return 1
-        ;;
-      *)
-        printf " \033[31m %s \n\033[0m" "invalid input"
-        ;;
+      [yY]) return 0 ;;
+      [nN]) return 1 ;;
+      *) printf " \033[31m %s \n\033[0m" "invalid input"
     esac
   done
 }
@@ -1328,30 +1322,11 @@ fi
 # Generic command line options
 while true ; do
   case "$1" in
-    -c|--config)
-      xshok_check_s2 "$2"
-      custom_config="$2"
-      shift 2
-      break
-      ;;
-    -F|--force)
-      force_updates="yes"
-      shift 1
-      break
-      ;;
-    -v|--verbose)
-      force_verbose="yes"
-      shift 1
-      break
-      ;;
-    -s|--silence)
-      force_verbose="no"
-      shift 1
-      break
-      ;;
-    *)
-      break
-      ;;
+    -c|--config) xshok_check_s2 "$2"; custom_config="$2"; shift 2; break ;;
+    -F|--force) force_updates="yes"; shift 1; break ;;
+    -v|--verbose) force_verbose="yes"; shift 1; break ;;
+    -s|--silence) force_verbose="no"; shift 1; break ;;
+    *) break ;;
   esac
 done
 
@@ -1380,17 +1355,9 @@ xshok_pretty_echo_and_log "" "#" "80"
 # Generic command line options
 while true ; do
   case "$1" in
-    -h|--help)
-      help_and_usage
-      exit
-      ;;
-    -V|--version)
-      # FIXME
-      exit
-      ;;
-    *)
-      break
-      ;;
+    -h|--help) help_and_usage; exit ;;
+    -V|--version) exit ;; # FIXME
+    *) break ;;
   esac
 done
 
@@ -1696,73 +1663,22 @@ fi
 
 while true; do
   case "$1" in
-    -d|--decode-sig)
-      decode_third_party_signature_by_signature_name
-      exit
-      ;;
-    -e|--encode-string)
-      hexadecimal_encode_entire_input_string
-      exit
-      ;;
-    -f|--encode-formatted)
-      hexadecimal_encode_formatted_input_string
-      exit
-      ;;
-    -g|--gpg-verify)
-      xshok_check_s2 "$2"
-      gpg_verify_specific_sanesecurity_database_file "$2"
-      exit
-      ;;
-    -i|--information)
-      output_system_configuration_information
-      exit
-      ;;
-    -m|--make-database)
-      make_signature_database_from_ascii_file
-      exit
-      ;;
-    -t|--test-database)
-      xshok_check_s2 "$2"
-      clamscan_integrity_test_specific_database_file "$2"
-      exit
-      ;;
-    -o|--output-triggered)
-      output_signatures_triggered_during_ham_directory_scan
-      exit
-      ;;
-    -w|--whitelist)
-      add_signature_whitelist_entry
-      exit
-      ;;
-    --check-clamav)
-      check_clamav
-      exit
-      ;;
-    --install-all)
-      install_cron
-      install_logrotate
-      install_man
-      exit
-      ;;
-    --install-cron)
-      install_cron
-      exit
-      ;;
-    --install-logrotate)
-      install_logrotate
-      exit
-      ;;
-    --install-man)
-      install_man
-      exit
-      ;;
-    --remove-script)
-      remove_script
-      exit
-      ;;
-    *)
-      break
-      ;;
+    -d|--decode-sig) decode_third_party_signature_by_signature_name; exit ;;
+    -e|--encode-string) hexadecimal_encode_entire_input_string; exit ;;
+    -f|--encode-formatted) hexadecimal_encode_formatted_input_string; exit ;;
+    -g|--gpg-verify) xshok_check_s2 "$2"; gpg_verify_specific_sanesecurity_database_file "$2"; exit ;;
+    -i|--information) output_system_configuration_information; exit ;;
+    -m|--make-database) make_signature_database_from_ascii_file; exit ;;
+    -t|--test-database) xshok_check_s2 "$2"; clamscan_integrity_test_specific_database_file "$2"; exit ;;
+    -o|--output-triggered) output_signatures_triggered_during_ham_directory_scan; exit ;;
+    -w|--whitelist) add_signature_whitelist_entry; exit ;;
+    --check-clamav) check_clamav; exit ;;
+    --install-all) install_cron; install_logrotate; install_man; exit ;;
+    --install-cron) install_cron; exit ;;
+    --install-logrotate) install_logrotate; exit ;;
+    --install-man) install_man; exit ;;
+    --remove-script) remove_script; exit ;;
+    *) break ;;
   esac
 done
 
