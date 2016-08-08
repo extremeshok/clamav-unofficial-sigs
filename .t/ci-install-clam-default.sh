@@ -6,7 +6,7 @@ pwd
 
 echo "Installing default Clamav"
 
-sudo apt-get install clamav-daemon -qq
+sudo apt-get install libclamav6 clamav-base clamav-freshclam clamav clamav-daemon -qq
 sudo mkdir -p /var/lib/clamav
 sudo cp -f .t/tests/bytecode.cvd /var/lib/clamav/bytecode.cvd
 sudo chown -R clamav:clamav /var/lib/clamav

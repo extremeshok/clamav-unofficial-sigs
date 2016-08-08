@@ -6,7 +6,7 @@ pwd
 
 echo "Cleaning CI enviroment"
 
-sudo apt-get purge clamav* -qq
+sudo apt-get purge libclamav6 clamav-base clamav-freshclam clamav clamav-daemon -qq
 sudo rm -rf /var/lib/clamav
 sudo rm -rf /var/lib/clamav-unofficial-sigs
 sudo rm -f /etc/cron.d/clamav-unofficial-sigs
