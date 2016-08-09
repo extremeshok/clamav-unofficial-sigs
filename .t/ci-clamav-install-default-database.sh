@@ -4,11 +4,7 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/lo
 
 pwd
 
-echo "Downloading latest clamav databases"
-
-wget -nv -t 9 http://database.clamav.net/bytecode.cvd
-wget -nv -t 9 http://database.clamav.net/daily.cvd
-wget -nv -t 9  http://database.clamav.net/main.cvd
+echo "Installing latest clamav databases"
 
 mkdir -p /var/lib/clamav
 cp -f bytecode.cvd /var/lib/clamav/bytecode.cvd
