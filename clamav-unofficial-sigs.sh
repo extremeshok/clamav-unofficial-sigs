@@ -2824,7 +2824,7 @@ fi
 ##############################################################################################################################################
 if [ "$additional_enabled" == "yes" ] ; then
   if [ -n "$additional_dbs" ] ; then
-    if [ ${#$additional_dbs} -lt 1 ] ; then
+    if [ ${#additional_dbs} -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed additional_dbs config is invalid or not defined - SKIPPING"
     else
     rm -f "$work_dir_add/*.gz"
