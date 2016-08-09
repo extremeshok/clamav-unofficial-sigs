@@ -47,14 +47,14 @@ install:
   - sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs
 
 script:
-  - shellcheck clamav-unofficial-sigs.sh
+  - sudo sh -e .t/ci-shellcheck.sh
   #- bashate clamav-unofficial-sigs.sh
   - sudo sh -e .t/ci-clamav-download-default-databases.sh
   - sudo sh -e .t/ci-clamav-install-default.sh  
   - sudo sh -e .t/ci-clamav-install-default-database.sh
   - sudo sh -e .t/ci-test.sh
   - sudo sh -e .t/ci-clean.sh
-  - sudo sh -e .t/ci-install-clam-wheezy.sh
+  - sudo sh -e .t/ci-clamav-install-wheezy.sh
   - sudo sh -e .t/ci-clamav-install-default-database.sh
   - sudo sh -e .t/ci-test.sh
 
