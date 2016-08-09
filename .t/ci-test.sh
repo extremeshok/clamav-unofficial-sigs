@@ -90,3 +90,12 @@ else
 	exit 1
 fi
 
+echo "check clamav-daemon service will start"
+service clamav-daemon stop
+service clamav-daemon start
+if [ "$?" -eq "0" ] ; then
+	echo .. OK
+else
+ 	echo .. ERROR
+  exit 1
+fi
