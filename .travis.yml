@@ -24,11 +24,11 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install ca-certificates wget rsync -qq
   - sudo apt-add-repository "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse"
-  - sudo apt-get -qq update
-  - sudo apt-get -t trusty-backports install shellcheck
+  - sudo apt-get update -qq
+  - sudo apt-get -t trusty-backports install shellcheck -qq
   #- sudo pip install bashate
   - sudo apt-add-repository -r "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse"
-  - sudo apt-get -qq update
+  - sudo apt-get update -qq
   # - "sudo mkdir -p tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs"
   # - "sudo rsync -rlptDv tmp/cache/  /var/lib/clamav/"
