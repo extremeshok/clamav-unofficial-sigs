@@ -1225,9 +1225,9 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="5.4.1"
-script_version_date="20 July 2016"
-minimum_required_config_version="65"
+script_version="5.5"
+script_version_date="XX August 2016"
+minimum_required_config_version="70"
 minimum_yara_clamav_version="0.99"
 
 # Default config files
@@ -1378,6 +1378,9 @@ for config_file in "${config_files[@]}" ; do
       # Delete all empty lines
       clean_config="$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")"
     fi
+
+    #fix eval of |
+    clean_config=${clean_config//|/\\|}
 
     # Config error checking
     # Check "" are an even number
@@ -1691,8 +1694,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${sanesecurity_dbs[@]}")"
     fi
-		sanesecurity_dbs=( )
-		sanesecurity_dbs=( $temp_db )
+    sanesecurity_dbs=( )
+    sanesecurity_dbs=( $temp_db )
   fi
 fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
@@ -1702,8 +1705,8 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${securiteinfo_dbs[@]}")"
     fi
-		securiteinfo_dbs=( )
-		securiteinfo_dbs=( $temp_db )
+    securiteinfo_dbs=( )
+    securiteinfo_dbs=( $temp_db )
   fi
 fi
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
@@ -1713,8 +1716,8 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
     fi
-		linuxmalwaredetect_dbs=( )
-		linuxmalwaredetect_dbs=( $temp_db )
+    linuxmalwaredetect_dbs=( )
+    linuxmalwaredetect_dbs=( $temp_db )
   fi
 fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
@@ -1724,8 +1727,8 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${yararulesproject_dbs[@]}")"
     fi
-		yararulesproject_dbs=( )
-		yararulesproject_dbs=( $temp_db )
+    yararulesproject_dbs=( )
+    yararulesproject_dbs=( $temp_db )
   fi
 fi
 
