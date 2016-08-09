@@ -26,7 +26,7 @@ before_install:
   - sudo apt-add-repository "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse"
   - sudo apt-get -qq update
   - sudo apt-get -t trusty-backports install shellcheck
-  - sudo pip install bashate
+  #- sudo pip install bashate
   - sudo apt-add-repository -r "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse"
   - sudo apt-get -qq update
   # - "sudo mkdir -p tmp/cache/"
@@ -48,7 +48,7 @@ install:
 
 script:
   - shellcheck clamav-unofficial-sigs.sh
-  - bashate clamav-unofficial-sigs.sh
+  #- bashate clamav-unofficial-sigs.sh
   - sudo sh -e .t/ci-install-clam-default.sh
   - sudo sh -e .t/ci-test.sh
   - sudo sh -e .t/ci-clean.sh
