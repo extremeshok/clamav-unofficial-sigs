@@ -1114,9 +1114,9 @@ function check_clamav () {
 # Check for a new version
 function check_new_version () {
   if [ -n "$wget_bin" ] ; then
-    latest_version="$($wget_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
+    latest_version="$($wget_bin $wget_proxy_https $wget_proxy_http https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
   else
-    latest_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
+    latest_version="$($curl_bin $curl_proxy https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
   fi
   if [ "$latest_version" ] ; then
     if [ ! "$latest_version" == "$script_version" ] ; then
