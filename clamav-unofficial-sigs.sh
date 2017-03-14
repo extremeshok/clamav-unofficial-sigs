@@ -268,8 +268,17 @@ function xshok_auto_update () { # version
 
   # Download new version
   echo -n "Downloading latest version..."
-  if ! wget --quiet --output-document="$0.tmp" "$UPDATE_BASE/$SELF" ; then
-    echo "Failed: Error while trying to wget new version!"
+
+  if [ -n "$wget_bin" ] ; then
+    $wget_bin "$wget_proxy_https" "$wget_proxy_http" --output-document="$0.tmp" "$UPDATE_BASE/$SELF"
+    result=$?
+  else
+    $curl_bin "$curl_proxy" --output "$0.tmp" "$UPDATE_BASE/$SELF"
+    result=$?
+  fi
+
+if [ "$result" -ne 0 ]; then
+    echo "Failed: Error while trying to get new version!"
     echo "File requested: $UPDATE_BASE/$SELF"
     exit 1
   fi
@@ -1215,9 +1224,6 @@ $ofs --remove-script $ofe Remove the clamav-unofficial-sigs script and all of $o
 $ofb
 EOF
   )" # This is very important
-
-  if [ "$1" ] ; then
-    echo "${helpcontents//-/\\-}"
   else
     echo -e "$helpcontents"
   fi
