@@ -109,7 +109,7 @@ function xshok_is_root () {
   if [ "$(uname -s)" == "SunOS" ] ; then
     id_bin="/usr/xpg4/bin/id"
   else
-    id_bin="$(which id 2> /deb/null)"
+    id_bin="$(which id 2> /dev/null)"
   fi
   if [ "$($id_bin -u)" == 0 ] ; then
     return 0
@@ -169,9 +169,9 @@ function xshok_user_group_exists () { # username groupname
   if [ "$(uname -s)" == "SunOS" ] ; then
     id_bin="/usr/xpg4/bin/id"
   else
-    id_bin="$(which id 2> /deb/null)"
+    id_bin="$(which id 2> /dev/null)"
   fi
-  getent_bin="$(which getent 2> /deb/null)"
+  getent_bin="$(which getent 2> /dev/null)"
   if [ "$1" ] ; then
     $id_bin -u "$1" > /dev/null 2>&1
     if [ $? -eq 0 ]; then
@@ -536,7 +536,7 @@ function install_cron () {
     cron_user="$clam_user";
   fi
   if [ -z "$cron_bash" ] ; then
-    cron_bash="$(which bash 2> /deb/null)"
+    cron_bash="$(which bash 2> /dev/null)"
   fi
   if [ -z "$cron_script_full_path" ] ; then
     cron_script_full_path="$this_script_full_path"
@@ -1266,17 +1266,17 @@ fi
 
 # Default Binaries & Commands
 clamd_reload_opt="clamdscan --reload"
-uname_bin="$(which uname 2> /deb/null)"
-clamscan_bin="$(which clamscan 2> /deb/null)"
-rsync_bin="$(which rsync 2> /deb/null)"
+uname_bin="$(which uname 2> /dev/null)"
+clamscan_bin="$(which clamscan 2> /dev/null)"
+rsync_bin="$(which rsync 2> /dev/null)"
 # Detect support for wget
 if [ -x /usr/sfw/bin/wget ] ; then
   wget_bin="/usr/sfw/bin/wget"
 else
-  wget_bin="$(which wget 2> /deb/null)"
+  wget_bin="$(which wget 2> /dev/null)"
 fi
 if [ -z "$wget_bin" ] ; then
-  curl_bin="$(which curl 2> /deb/null)"
+  curl_bin="$(which curl 2> /dev/null)"
   if [ -z "$curl_bin" ] ; then
     xshok_pretty_echo_and_log "ERROR: both wget and curl commands are missing, One of them is required" "="
     exit 1
@@ -1287,20 +1287,20 @@ fi
 if [ -x /usr/gnu/bin/grep ] ; then
   grep_bin="/usr/gnu/bin/grep"
 else
-  grep_bin="$(which grep 2> /deb/null)"
+  grep_bin="$(which grep 2> /dev/null)"
 fi
 if [ -x /opt/csw/bin/gpg ] ; then
   gpg_bin="/opt/csw/bin/gpg"
 else
-  gpg_bin="$(which gpg 2> /deb/null)"
+  gpg_bin="$(which gpg 2> /dev/null)"
 fi
 if [ -z "$gpg_bin" ] ; then
-  gpg_bin="$(which gpg2 2> /deb/null)"
+  gpg_bin="$(which gpg2 2> /dev/null)"
 fi
 
-dig_bin="$(which dig 2> /deb/null)"
+dig_bin="$(which dig 2> /dev/null)"
 if [ -z "$dig_bin" ] ; then
-  host_bin="$(which host 2> /deb/null)"
+  host_bin="$(which host 2> /dev/null)"
   if [ -z "$host_bin" ] ; then
     xshok_pretty_echo_and_log "ERROR: both dig and host commands are missing, One of them is required" "="
     exit 1
