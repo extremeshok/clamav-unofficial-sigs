@@ -26,13 +26,13 @@
 
 ################################################################################
 
-    ######  #######    #     # ####### #######    ####### ######  ### #######
-    #     # #     #    ##    # #     #    #       #       #     #  #     #
-    #     # #     #    # #   # #     #    #       #       #     #  #     #
-    #     # #     #    #  #  # #     #    #       #####   #     #  #     #
-    #     # #     #    #   # # #     #    #       #       #     #  #     #
-    #     # #     #    #    ## #     #    #       #       #     #  #     #
-    ######  #######    #     # #######    #       ####### ######  ###    #
+######  #######    #     # ####### #######    ####### ######  ### #######
+#     # #     #    ##    # #     #    #       #       #     #  #     #
+#     # #     #    # #   # #     #    #       #       #     #  #     #
+#     # #     #    #  #  # #     #    #       #####   #     #  #     #
+#     # #     #    #   # # #     #    #       #       #     #  #     #
+#     # #     #    #    ## #     #    #       #       #     #  #     #
+######  #######    #     # #######    #       ####### ######  ###    #
 
 ################################################################################
 
@@ -181,9 +181,9 @@ function xshok_user_group_exists () { # username groupname
         else
           return 1 ; # Group does NOT exist
         fi
-       else
-          return 0 ; # User exists
-       fi
+      else
+        return 0 ; # User exists
+      fi
     else
       return 1 ; # User does NOT exist
     fi
@@ -234,10 +234,10 @@ function xshok_pretty_echo_and_log () { # "string" "repeating" "count" "type"
   # Handle logging
   if [ "$enable_log" == "yes" ] ; then
     if [ ! -e "$log_file_path/$log_file_name" ] ; then
-        # xshok_mkdir_ownership "$log_file_path"
-        mkdir -p "$log_file_path"
-        touch "$log_file_path/$log_file_name" 2>/dev/null
-        perms chown -f "$clam_user:$clam_group" "$log_file_path/$log_file_name"
+      # xshok_mkdir_ownership "$log_file_path"
+      mkdir -p "$log_file_path"
+      touch "$log_file_path/$log_file_name" 2>/dev/null
+      perms chown -f "$clam_user:$clam_group" "$log_file_path/$log_file_name"
     fi
     if [ ! -w "$log_file_path/$log_file_name" ] ; then
       echo "Warning: Logging Disabled, as file not writable: $log_file_path/$log_file_name"
@@ -323,9 +323,9 @@ function xshok_database () { # rating database_array
       for db_name in "${current_dbs[@]}" ; do
         # Checks
         if [ "$enable_yararules" == "no" ] ; then # YARA rules are disabled
-            if [[ "$db_name" == *".yar"* ]] ; then # If it's the value you want to delete
-              continue # Skip to the next value
-            fi
+          if [[ "$db_name" == *".yar"* ]] ; then # If it's the value you want to delete
+            continue # Skip to the next value
+          fi
         fi
         if [ -z "$current_rating" ] ; then # YARA rules are disabled
           new_dbs+=( "$db_name" )
@@ -389,13 +389,13 @@ function install_man () {
     echo "ERROR: man install aborted, as file not writable: $man_dir/$man_filename"
   else
 
-BOLD="\fB"
-#REV=""
-NORM="\fR"
-manresult="$(help_and_usage "man")"
+    BOLD="\fB"
+    #REV=""
+    NORM="\fR"
+    manresult="$(help_and_usage "man")"
 
-# Our template..
-  cat << EOF > "$man_dir/$man_filename"
+    # Our template..
+    cat << EOF > "$man_dir/$man_filename"
 
 .\" Manual page for eXtremeSHOK.com ClamAV Unofficial Signature Updater
 .TH clamav-unofficial-sigs 8 "$script_version_date" "Version: $script_version" "SCRIPT COMMANDS"
@@ -466,8 +466,8 @@ function install_logrotate () {
   if [ ! -w "$logrotate_dir/$logrotate_filename" ] ; then
     echo "ERROR: logrotate install aborted, as file not writable: $logrotate_dir/$logrotate_filename"
   else
-# Our template..
-  cat << EOF > "$logrotate_dir/$logrotate_filename"
+    # Our template..
+    cat << EOF > "$logrotate_dir/$logrotate_filename"
 # https://eXtremeSHOK.com ######################################################
 # This file contains the logrotate settings for clamav-unofficial-sigs.sh
 ###################
@@ -539,8 +539,8 @@ function install_cron () {
   if [ ! -w "$cron_dir/$cron_filename" ] ; then
     echo "ERROR: cron install aborted, as file not writable: $cron_dir/$cron_filename"
   else
-# Our template..
-  cat << EOF > "$cron_dir/$cron_filename"
+    # Our template..
+    cat << EOF > "$cron_dir/$cron_filename"
 # https://eXtremeSHOK.com ######################################################
 # This file contains the cron settings for clamav-unofficial-sigs.sh
 ###################
@@ -1583,7 +1583,7 @@ if [ "$enable_locking" == "yes" ] ; then
       xshok_create_pid_file "$pid_file_fullpath"
     fi
   else
-      xshok_create_pid_file "$pid_file_fullpath"
+    xshok_create_pid_file "$pid_file_fullpath"
   fi
   # Run this wehen the script exits
   trap -- "rm -f $pid_file_fullpath" EXIT
@@ -1964,24 +1964,24 @@ fi
 purge="$work_dir_work_configs/purge.txt"
 cp -f "$current_dbs" "$purge"
 {
-echo "$work_dir_work_configs/current-dbs.txt"
-echo "$work_dir_work_configs/db-changes.txt"
-echo "$work_dir_work_configs/last-mbl-update.txt"
-echo "$work_dir_work_configs/last-si-update.txt"
-echo "$work_dir_work_configs/local.ign"
-echo "$work_dir_work_configs/monitor-ign.txt"
-echo "$work_dir_work_configs/my-whitelist.ign2"
-echo "$work_dir_work_configs/tracker.txt"
-echo "$work_dir_work_configs/previous-dbs.txt"
-echo "$work_dir_work_configs/scan-test.txt"
-echo "$work_dir_work_configs/ss-include-dbs.txt"
-echo "$work_dir_work_configs/whitelist.hex"
-echo "$work_dir_gpg/publickey.gpg"
-echo "$work_dir_gpg/secring.gpg"
-echo "$work_dir_gpg/ss-keyring.gpg*"
-echo "$work_dir_gpg/trustdb.gpg"
-echo "$log_file_path/$log_file_name*"
-echo "$work_dir_work_configs/purge.txt"
+  echo "$work_dir_work_configs/current-dbs.txt"
+  echo "$work_dir_work_configs/db-changes.txt"
+  echo "$work_dir_work_configs/last-mbl-update.txt"
+  echo "$work_dir_work_configs/last-si-update.txt"
+  echo "$work_dir_work_configs/local.ign"
+  echo "$work_dir_work_configs/monitor-ign.txt"
+  echo "$work_dir_work_configs/my-whitelist.ign2"
+  echo "$work_dir_work_configs/tracker.txt"
+  echo "$work_dir_work_configs/previous-dbs.txt"
+  echo "$work_dir_work_configs/scan-test.txt"
+  echo "$work_dir_work_configs/ss-include-dbs.txt"
+  echo "$work_dir_work_configs/whitelist.hex"
+  echo "$work_dir_gpg/publickey.gpg"
+  echo "$work_dir_gpg/secring.gpg"
+  echo "$work_dir_gpg/ss-keyring.gpg*"
+  echo "$work_dir_gpg/trustdb.gpg"
+  echo "$log_file_path/$log_file_name*"
+  echo "$work_dir_work_configs/purge.txt"
 } >> "$purge"
 
 # Check and save current system time since epoch for time related database downloads.
@@ -2059,59 +2059,59 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                     xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING"
                     false
                   fi
-                if [ $? -eq 0 ] ; then
-                  db_ext="$(echo "$db_file" | cut -d "." -f 2)"
-                  if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
-                    if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-                      xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
-                      true
-                    else
-                      xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
-                      if [ "$remove_bad_database" == "yes" ] ; then
-                        if rm -f "$work_dir_sanesecurity/$db_file" ; then
-                          xshok_pretty_echo_and_log "Removed invalid database: $work_dir_sanesecurity/$db_file"
+                  if [ $? -eq 0 ] ; then
+                    db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+                    if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
+                      if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
+                        xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
+                        true
+                      else
+                        xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
+                        if [ "$remove_bad_database" == "yes" ] ; then
+                          if rm -f "$work_dir_sanesecurity/$db_file" ; then
+                            xshok_pretty_echo_and_log "Removed invalid database: $work_dir_sanesecurity/$db_file"
+                          fi
                         fi
+                        false
+                        fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_sanesecurity/$db_file" "$clam_dbs" 2>/dev/null ; then
+                        perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                        if [ "$selinux_fixes" == "yes" ] ; then
+                          restorecon "$clam_dbs/$db_file"
+                        fi
+                        xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
+                        sanesecurity_update=1
+                        do_clamd_reload=1
+                      else
+                        xshok_pretty_echo_and_log "Failed to successfully update Sanesecurity production database file: $db_file - SKIPPING"
+                        false
                       fi
-                      false
-                    fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_sanesecurity/$db_file" "$clam_dbs" 2>/dev/null ; then
-                      perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-                      if [ "$selinux_fixes" == "yes" ] ; then
-                        restorecon "$clam_dbs/$db_file"
+                    else
+                      $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_sanesecurity/$db_file" > "$test_dir/$db_file"
+                      $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
+                      $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+                      $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
+                      mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
+                      if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
+                        xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
+                        true
+                      else
+                        xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
+                        # DO NOT KILL THIS DB
+                        false
+                        fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+                        perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                        if [ "$selinux_fixes" == "yes" ] ; then
+                          restorecon "$clam_dbs/$db_file"
+                        fi
+                        xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
+                        sanesecurity_update=1
+                        do_clamd_reload=1
+                      else
+                        xshok_pretty_echo_and_log "Failed to successfully update Sanesecurity production database file: $db_file - SKIPPING"
                       fi
-                      xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
-                      sanesecurity_update=1
-                      do_clamd_reload=1
-                    else
-                      xshok_pretty_echo_and_log "Failed to successfully update Sanesecurity production database file: $db_file - SKIPPING"
-                      false
-                    fi
-                  else
-                    $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_sanesecurity/$db_file" > "$test_dir/$db_file"
-                    $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-                    $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
-                    $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
-                    mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-                    if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-                      xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
-                      true
-                    else
-                      xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
-                      # DO NOT KILL THIS DB
-                      false
-                    fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-                      perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-                      if [ "$selinux_fixes" == "yes" ] ; then
-                        restorecon "$clam_dbs/$db_file"
-                      fi
-                      xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
-                      sanesecurity_update=1
-                      do_clamd_reload=1
-                    else
-                      xshok_pretty_echo_and_log "Failed to successfully update Sanesecurity production database file: $db_file - SKIPPING"
                     fi
                   fi
                 fi
-              fi
               done
               if [ "$sanesecurity_update" != "1" ] ; then
                 xshok_pretty_echo_and_log "No Sanesecurity database file updates found" "-"
@@ -2174,125 +2174,125 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
       if [ ${#securiteinfo_dbs} -lt 1 ] ; then
         xshok_pretty_echo_and_log "Failed securiteinfo_dbs config is invalid or not defined - SKIPPING"
       else
-      rm -f "$work_dir_securiteinfo/*.gz"
-      if [ -r "$work_dir_work_configs/last-si-update.txt" ] ; then
-        last_securiteinfo_update="$(cat "$work_dir_work_configs/last-si-update.txt")"
-      else
-        last_securiteinfo_update="0"
-      fi
-      db_file=""
-      loop=""
-      update_interval="$((securiteinfo_update_hours * 3600))"
-      time_interval="$((current_time - last_securiteinfo_update))"
-      if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
-        echo "$current_time" > "$work_dir_work_configs/last-si-update.txt"
-        xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
-        xshok_pretty_echo_and_log "Checking for SecuriteInfo updates..."
-        securiteinfo_updates="0"
-        for db_file in "${securiteinfo_dbs[@]}" ; do
-          if [ "$loop" == "1" ] ; then
-            xshok_pretty_echo_and_log "---"
-          fi
-          xshok_pretty_echo_and_log "Checking for updated SecuriteInfo database file: $db_file"
-          securiteinfo_db_update="0"
-          if [ -n "$wget_bin" ] ; then
-            # shellcheck disable=SC2086
-            $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
-            ret="$?"
-          else
-            # shellcheck disable=SC2086
-            $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
-            ret="$?"
-          fi
-          if [ "$ret" -eq 0 ] ; then
-            loop="1"
-            if ! cmp -s "$work_dir_securiteinfo/$db_file" "$clam_dbs/$db_file" ; then
-              if [ $? -eq 0 ] ; then
-                db_ext="$(echo "$db_file" | cut -d "." -f 2)"
-
-                xshok_pretty_echo_and_log "Testing updated SecuriteInfo database file: $db_file"
-                if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ]
-                  then
-                  if $clamscan_bin --quiet -d "$work_dir_securiteinfo/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-                    then
-                    xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
-                    true
-                  else
-                    xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD"
-                    if [ "$remove_bad_database" == "yes" ] ; then
-                      if rm -f "$work_dir_securiteinfo/$db_file" ; then
-                        xshok_pretty_echo_and_log "Removed invalid database: $work_dir_securiteinfo/$db_file"
-                      fi
-                    fi
-                    false
-                  fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_securiteinfo/$db_file" "$clam_dbs" 2>/dev/null ; then
-                  perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-                  if [ "$selinux_fixes" == "yes" ] ; then
-                    restorecon "$clam_dbs/$db_file"
-                  fi
-                  xshok_pretty_echo_and_log "Successfully updated SecuriteInfo production database file: $db_file"
-                  securiteinfo_updates=1
-                  securiteinfo_db_update=1
-                  do_clamd_reload=1
-                else
-                  xshok_pretty_echo_and_log "Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
-                fi
-              else
-                $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_securiteinfo/$db_file" > "$test_dir/$db_file"
-                $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-                $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
-                $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
-                mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-                if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-                  then
-                  xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
-                  true
-                else
-                  xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD"
-                  rm -f "$work_dir_securiteinfo/$db_file"
-                  if [ "$remove_bad_database" == "yes" ] ; then
-                    if rm -f "$work_dir_securiteinfo/$db_file" ; then
-                      xshok_pretty_echo_and_log "Removed invalid database: $work_dir_securiteinfo/$db_file"
-                    fi
-                  fi
-                  false
-                fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-                perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-                if [ "$selinux_fixes" == "yes" ] ; then
-                  restorecon "$clam_dbs/$db_file"
-                fi
-                xshok_pretty_echo_and_log "Successfully updated SecuriteInfo production database file: $db_file"
-                securiteinfo_updates=1
-                securiteinfo_db_update=1
-                do_clamd_reload=1
-              else
-                xshok_pretty_echo_and_log "Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
-              fi
-            fi
-          fi
+        rm -f "$work_dir_securiteinfo/*.gz"
+        if [ -r "$work_dir_work_configs/last-si-update.txt" ] ; then
+          last_securiteinfo_update="$(cat "$work_dir_work_configs/last-si-update.txt")"
+        else
+          last_securiteinfo_update="0"
         fi
-      else
-        xshok_pretty_echo_and_log "Failed connection to $securiteinfo_url - SKIPPED SecuriteInfo $db_file update"
-      fi
-      if [ "$securiteinfo_db_update" != "1" ] ; then
-        xshok_pretty_echo_and_log "No updated SecuriteInfo $db_file database file found" "-"
-      fi
-    done
-    if [ "$securiteinfo_updates" != "1" ] ; then
-      xshok_pretty_echo_and_log "No SecuriteInfo database file updates found" "-"
-    fi
-  else
-    xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
+        db_file=""
+        loop=""
+        update_interval="$((securiteinfo_update_hours * 3600))"
+        time_interval="$((current_time - last_securiteinfo_update))"
+        if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
+          echo "$current_time" > "$work_dir_work_configs/last-si-update.txt"
+          xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
+          xshok_pretty_echo_and_log "Checking for SecuriteInfo updates..."
+          securiteinfo_updates="0"
+          for db_file in "${securiteinfo_dbs[@]}" ; do
+            if [ "$loop" == "1" ] ; then
+              xshok_pretty_echo_and_log "---"
+            fi
+            xshok_pretty_echo_and_log "Checking for updated SecuriteInfo database file: $db_file"
+            securiteinfo_db_update="0"
+            if [ -n "$wget_bin" ] ; then
+              # shellcheck disable=SC2086
+              $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
+              ret="$?"
+            else
+              # shellcheck disable=SC2086
+              $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_securiteinfo/$db_file" "$securiteinfo_url/$securiteinfo_authorisation_signature/$db_file"
+              ret="$?"
+            fi
+            if [ "$ret" -eq 0 ] ; then
+              loop="1"
+              if ! cmp -s "$work_dir_securiteinfo/$db_file" "$clam_dbs/$db_file" ; then
+                if [ $? -eq 0 ] ; then
+                  db_ext="$(echo "$db_file" | cut -d "." -f 2)"
 
-    time_remaining="$((update_interval - time_interval))"
-    hours_left="$((time_remaining / 3600))"
-    minutes_left="$((time_remaining % 3600 / 60))"
-    xshok_pretty_echo_and_log "$securiteinfo_update_hours hours have not yet elapsed since the last SecuriteInfo update check"
-    xshok_pretty_echo_and_log "No update check was performed at this time" "-"
-    xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
-  fi
-  fi
-  fi
+                  xshok_pretty_echo_and_log "Testing updated SecuriteInfo database file: $db_file"
+                  if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ]
+                  then
+                    if $clamscan_bin --quiet -d "$work_dir_securiteinfo/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
+                    then
+                      xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
+                      true
+                    else
+                      xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD"
+                      if [ "$remove_bad_database" == "yes" ] ; then
+                        if rm -f "$work_dir_securiteinfo/$db_file" ; then
+                          xshok_pretty_echo_and_log "Removed invalid database: $work_dir_securiteinfo/$db_file"
+                        fi
+                      fi
+                      false
+                      fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_securiteinfo/$db_file" "$clam_dbs" 2>/dev/null ; then
+                      perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                      if [ "$selinux_fixes" == "yes" ] ; then
+                        restorecon "$clam_dbs/$db_file"
+                      fi
+                      xshok_pretty_echo_and_log "Successfully updated SecuriteInfo production database file: $db_file"
+                      securiteinfo_updates=1
+                      securiteinfo_db_update=1
+                      do_clamd_reload=1
+                    else
+                      xshok_pretty_echo_and_log "Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
+                    fi
+                  else
+                    $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_securiteinfo/$db_file" > "$test_dir/$db_file"
+                    $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
+                    $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+                    $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
+                    mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
+                    if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
+                    then
+                      xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
+                      true
+                    else
+                      xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested BAD"
+                      rm -f "$work_dir_securiteinfo/$db_file"
+                      if [ "$remove_bad_database" == "yes" ] ; then
+                        if rm -f "$work_dir_securiteinfo/$db_file" ; then
+                          xshok_pretty_echo_and_log "Removed invalid database: $work_dir_securiteinfo/$db_file"
+                        fi
+                      fi
+                      false
+                      fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+                      perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                      if [ "$selinux_fixes" == "yes" ] ; then
+                        restorecon "$clam_dbs/$db_file"
+                      fi
+                      xshok_pretty_echo_and_log "Successfully updated SecuriteInfo production database file: $db_file"
+                      securiteinfo_updates=1
+                      securiteinfo_db_update=1
+                      do_clamd_reload=1
+                    else
+                      xshok_pretty_echo_and_log "Failed to successfully update SecuriteInfo production database file: $db_file - SKIPPING"
+                    fi
+                  fi
+                fi
+              fi
+            else
+              xshok_pretty_echo_and_log "Failed connection to $securiteinfo_url - SKIPPED SecuriteInfo $db_file update"
+            fi
+            if [ "$securiteinfo_db_update" != "1" ] ; then
+              xshok_pretty_echo_and_log "No updated SecuriteInfo $db_file database file found" "-"
+            fi
+          done
+          if [ "$securiteinfo_updates" != "1" ] ; then
+            xshok_pretty_echo_and_log "No SecuriteInfo database file updates found" "-"
+          fi
+        else
+          xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
+
+          time_remaining="$((update_interval - time_interval))"
+          hours_left="$((time_remaining / 3600))"
+          minutes_left="$((time_remaining % 3600 / 60))"
+          xshok_pretty_echo_and_log "$securiteinfo_update_hours hours have not yet elapsed since the last SecuriteInfo update check"
+          xshok_pretty_echo_and_log "No update check was performed at this time" "-"
+          xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+        fi
+      fi
+    fi
   fi
 else
   if [ -n "$securiteinfo_dbs" ] ; then
@@ -2326,126 +2326,126 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
     if [ ${#linuxmalwaredetect_dbs} -lt 1 ] ; then
       xshok_pretty_echo_and_log "Failed linuxmalwaredetect_dbs config is invalid or not defined - SKIPPING"
     else
-    rm -f "$work_dir_linuxmalwaredetect/*.gz"
-    if [ -r "$work_dir_work_configs/last-linuxmalwaredetect-update.txt" ] ; then
-      last_linuxmalwaredetect_update="$(cat "$work_dir_work_configs/last-linuxmalwaredetect-update.txt")"
-    else
-      last_linuxmalwaredetect_update="0"
-    fi
-    db_file=""
-    loop=""
-    update_interval="$((linuxmalwaredetect_update_hours * 3600))"
-    time_interval="$((current_time - last_linuxmalwaredetect_update))"
-    if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
-      echo "$current_time" > "$work_dir_work_configs/last-linuxmalwaredetect-update.txt"
-
-      xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
-      xshok_pretty_echo_and_log "Checking for linuxmalwaredetect updates..."
-      linuxmalwaredetect_updates="0"
-      for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
-        if [ "$loop" == "1" ] ; then
-          xshok_pretty_echo_and_log "---"
-        fi
-        xshok_pretty_echo_and_log "Checking for updated linuxmalwaredetect database file: $db_file"
-
-        linuxmalwaredetect_db_update="0"
-        if [ -n "$wget_bin" ] ; then
-          # shellcheck disable=SC2086
-          $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
-          ret="$?"
-        else
-          # shellcheck disable=SC2086
-          $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
-          ret="$?"
-        fi
-        if [ "$ret" -eq 0 ] ; then
-          loop="1"
-          if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
-            if [ $? -eq 0 ] ; then
-              db_ext="$(echo "$db_file" | cut -d "." -f 2)"
-
-              xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
-              if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
-                if $clamscan_bin --quiet -d "$work_dir_linuxmalwaredetect/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-                  then
-                  xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
-                  true
-                else
-                  xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD"
-                  if [ "$remove_bad_database" == "yes" ] ; then
-                    if rm -f "$work_dir_linuxmalwaredetect/$db_file" ; then
-                      xshok_pretty_echo_and_log "Removed invalid database: $work_dir_linuxmalwaredetect/$db_file"
-                    fi
-                  fi
-                  false
-                fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs" 2>/dev/null ; then
-                perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-                if [ "$selinux_fixes" == "yes" ] ; then
-                  restorecon "$clam_dbs/local.ign"
-                fi
-                xshok_pretty_echo_and_log "Successfully updated linuxmalwaredetect production database file: $db_file"
-                linuxmalwaredetect_updates=1
-                linuxmalwaredetect_db_update=1
-                do_clamd_reload=1
-              else
-                xshok_pretty_echo_and_log "Failed to successfully update linuxmalwaredetect production database file: $db_file - SKIPPING"
-              fi
-            else
-              $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_linuxmalwaredetect/$db_file" > "$test_dir/$db_file"
-              $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-              $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
-              $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
-              mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-              if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-                xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
-                true
-              else
-                xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD"
-                if [ "$remove_bad_database" == "yes" ] ; then
-                  if rm -f "$work_dir_linuxmalwaredetect/$db_file" ; then
-                    xshok_pretty_echo_and_log "Removed invalid database: $work_dir_linuxmalwaredetect/$db_file"
-                  fi
-                fi
-                false
-              fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-              perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-              if [ "$selinux_fixes" == "yes" ] ; then
-                restorecon "$clam_dbs/$db_file"
-              fi
-              xshok_pretty_echo_and_log "Successfully updated linuxmalwaredetect production database file: $db_file"
-              linuxmalwaredetect_updates=1
-              linuxmalwaredetect_db_update=1
-              do_clamd_reload=1
-            else
-              xshok_pretty_echo_and_log "Failed to successfully update linuxmalwaredetect production database file: $db_file - SKIPPING"
-            fi
-          fi
-        fi
+      rm -f "$work_dir_linuxmalwaredetect/*.gz"
+      if [ -r "$work_dir_work_configs/last-linuxmalwaredetect-update.txt" ] ; then
+        last_linuxmalwaredetect_update="$(cat "$work_dir_work_configs/last-linuxmalwaredetect-update.txt")"
+      else
+        last_linuxmalwaredetect_update="0"
       fi
-    else
-      xshok_pretty_echo_and_log "WARNING: Failed connection to $linuxmalwaredetect_url - SKIPPED linuxmalwaredetect $db_file update"
-    fi
-    if [ "$linuxmalwaredetect_db_update" != "1" ] ; then
+      db_file=""
+      loop=""
+      update_interval="$((linuxmalwaredetect_update_hours * 3600))"
+      time_interval="$((current_time - last_linuxmalwaredetect_update))"
+      if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
+        echo "$current_time" > "$work_dir_work_configs/last-linuxmalwaredetect-update.txt"
 
-      xshok_pretty_echo_and_log "No updated linuxmalwaredetect $db_file database file found"
+        xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
+        xshok_pretty_echo_and_log "Checking for linuxmalwaredetect updates..."
+        linuxmalwaredetect_updates="0"
+        for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
+          if [ "$loop" == "1" ] ; then
+            xshok_pretty_echo_and_log "---"
+          fi
+          xshok_pretty_echo_and_log "Checking for updated linuxmalwaredetect database file: $db_file"
+
+          linuxmalwaredetect_db_update="0"
+          if [ -n "$wget_bin" ] ; then
+            # shellcheck disable=SC2086
+            $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
+            ret="$?"
+          else
+            # shellcheck disable=SC2086
+            $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_linuxmalwaredetect/$db_file" "$linuxmalwaredetect_url/$db_file"
+            ret="$?"
+          fi
+          if [ "$ret" -eq 0 ] ; then
+            loop="1"
+            if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
+              if [ $? -eq 0 ] ; then
+                db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+
+                xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
+                if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
+                  if $clamscan_bin --quiet -d "$work_dir_linuxmalwaredetect/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
+                  then
+                    xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
+                    true
+                  else
+                    xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD"
+                    if [ "$remove_bad_database" == "yes" ] ; then
+                      if rm -f "$work_dir_linuxmalwaredetect/$db_file" ; then
+                        xshok_pretty_echo_and_log "Removed invalid database: $work_dir_linuxmalwaredetect/$db_file"
+                      fi
+                    fi
+                    false
+                    fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs" 2>/dev/null ; then
+                    perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                    if [ "$selinux_fixes" == "yes" ] ; then
+                      restorecon "$clam_dbs/local.ign"
+                    fi
+                    xshok_pretty_echo_and_log "Successfully updated linuxmalwaredetect production database file: $db_file"
+                    linuxmalwaredetect_updates=1
+                    linuxmalwaredetect_db_update=1
+                    do_clamd_reload=1
+                  else
+                    xshok_pretty_echo_and_log "Failed to successfully update linuxmalwaredetect production database file: $db_file - SKIPPING"
+                  fi
+                else
+                  $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_linuxmalwaredetect/$db_file" > "$test_dir/$db_file"
+                  $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
+                  $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+                  $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
+                  mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
+                  if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
+                    xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
+                    true
+                  else
+                    xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested BAD"
+                    if [ "$remove_bad_database" == "yes" ] ; then
+                      if rm -f "$work_dir_linuxmalwaredetect/$db_file" ; then
+                        xshok_pretty_echo_and_log "Removed invalid database: $work_dir_linuxmalwaredetect/$db_file"
+                      fi
+                    fi
+                    false
+                    fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+                    perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                    if [ "$selinux_fixes" == "yes" ] ; then
+                      restorecon "$clam_dbs/$db_file"
+                    fi
+                    xshok_pretty_echo_and_log "Successfully updated linuxmalwaredetect production database file: $db_file"
+                    linuxmalwaredetect_updates=1
+                    linuxmalwaredetect_db_update=1
+                    do_clamd_reload=1
+                  else
+                    xshok_pretty_echo_and_log "Failed to successfully update linuxmalwaredetect production database file: $db_file - SKIPPING"
+                  fi
+                fi
+              fi
+            fi
+          else
+            xshok_pretty_echo_and_log "WARNING: Failed connection to $linuxmalwaredetect_url - SKIPPED linuxmalwaredetect $db_file update"
+          fi
+          if [ "$linuxmalwaredetect_db_update" != "1" ] ; then
+
+            xshok_pretty_echo_and_log "No updated linuxmalwaredetect $db_file database file found"
+          fi
+        done
+        if [ "$linuxmalwaredetect_updates" != "1" ] ; then
+          xshok_pretty_echo_and_log "No linuxmalwaredetect database file updates found" "-"
+        fi
+      else
+
+        xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
+
+        time_remaining="$((update_interval - time_interval))"
+        hours_left="$((time_remaining / 3600))"
+        minutes_left="$((time_remaining % 3600 / 60))"
+        xshok_pretty_echo_and_log "$linuxmalwaredetect_update_hours hours have not yet elapsed since the last linux malware detect update check"
+        xshok_pretty_echo_and_log "No update check was performed at this time" "-"
+        xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+      fi
     fi
-  done
-  if [ "$linuxmalwaredetect_updates" != "1" ] ; then
-    xshok_pretty_echo_and_log "No linuxmalwaredetect database file updates found" "-"
   fi
-else
-
-  xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
-
-  time_remaining="$((update_interval - time_interval))"
-  hours_left="$((time_remaining / 3600))"
-  minutes_left="$((time_remaining % 3600 / 60))"
-  xshok_pretty_echo_and_log "$linuxmalwaredetect_update_hours hours have not yet elapsed since the last linux malware detect update check"
-  xshok_pretty_echo_and_log "No update check was performed at this time" "-"
-  xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
-fi
-fi
-fi
 else
   if [ -n "${linuxmalwaredetect_dbs[0]}" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
@@ -2582,564 +2582,564 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               false
             fi \
               && (
-                test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
-                true
+              test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
+              true
               ) \
               && if $rsync_bin -pcqt "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ; then
-                perms chown -f "$clam_user:$clam_group" "$clam_dbs/$malwarepatrol_db"
-                if [ "$selinux_fixes" == "yes" ] ; then
-                  restorecon "$clam_dbs/$malwarepatrol_db"
+                  perms chown -f "$clam_user:$clam_group" "$clam_dbs/$malwarepatrol_db"
+                  if [ "$selinux_fixes" == "yes" ] ; then
+                    restorecon "$clam_dbs/$malwarepatrol_db"
+                  fi
+                  xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
+                  do_clamd_reload=1
+                else
+                  xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
                 fi
-                xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
-                do_clamd_reload=1
-              else
-                xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
-              fi
-            ;; # The strange case when $? != 0 in the original
-          2)
-            $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_malwarepatrol/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
-            $clamscan_bin --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-            $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
-            $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
-            mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
-            if $clamscan_bin --quiet -d "$test_dir/$malwarepatrol_db" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-              xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
-              true
-            else
-              xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
-              if [ "$remove_bad_database" == "yes" ] ; then
-                if rm -f "$test_dir/$malwarepatrol_db" ; then
-                  xshok_pretty_echo_and_log "Removed invalid database: $test_dir/$malwarepatrol_db"
-                fi
-              fi
-              false
-            fi \
+                ;; # The strange case when $? != 0 in the original
+              2)
+                $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_malwarepatrol/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
+                $clamscan_bin --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
+                $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+                $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
+                mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
+                if $clamscan_bin --quiet -d "$test_dir/$malwarepatrol_db" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
+                  xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested good"
+                  true
+                else
+                  xshok_pretty_echo_and_log "Clamscan reports MalwarePatrol $malwarepatrol_db database integrity tested BAD"
+                  if [ "$remove_bad_database" == "yes" ] ; then
+                    if rm -f "$test_dir/$malwarepatrol_db" ; then
+                      xshok_pretty_echo_and_log "Removed invalid database: $test_dir/$malwarepatrol_db"
+                    fi
+                  fi
+                  false
+                fi \
               && (
-                test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
-                true
-              ) \
+                  test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
+                  true
+                  ) \
               && if $rsync_bin -pcqt "$test_dir/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ; then
-                perms chown -f "$clam_user:$clam_group" "$clam_dbs/$malwarepatrol_db"
-                if [ "$selinux_fixes" == "yes" ] ; then
-                  restorecon "$clam_dbs/$malwarepatrol_db"
-                fi
-                xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
-                do_clamd_reload=1
-              else
-                xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
-              fi
-            ;;
-          0) # The database did not update
-            xshok_pretty_echo_and_log "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
-            ;;
-          -1) # Wget failed
-            xshok_pretty_echo_and_log "WARNING - Failed connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
-            ;;
-        esac
-
-      else
-        xshok_pretty_echo_and_log "MalwarePatrol Database File Update" "="
-
-        time_remaining="$((update_interval - time_interval))"
-        hours_left="$((time_remaining / 3600))"
-        minutes_left="$((time_remaining % 3600 / 60))"
-        xshok_pretty_echo_and_log "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
-        xshok_pretty_echo_and_log "No database download was performed at this time" "-"
-        xshok_pretty_echo_and_log "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
-      fi
-    fi
-  fi
-else
-  if [ -n "$malwarepatrol_db" ] ; then
-    if [ "$remove_disabled_databases" == "yes" ] ; then
-      xshok_pretty_echo_and_log "Removing disabled MalwarePatrol Database file"
-      if [ -r "$work_dir_malwarepatrol/$malwarepatrol_db" ] ; then
-        rm -f "$work_dir_malwarepatrol/$malwarepatrol_db"
-        do_clamd_reload=1
-      fi
-      if [ -r "$clam_dbs/$malwarepatrol_db" ] ; then
-        rm -f "$clam_dbs/$malwarepatrol_db"
-        do_clamd_reload=1
-      fi
-    fi
-  fi
-fi
-
-##############################################################################################################################################
-# Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
-##############################################################################################################################################
-if [ "$yararulesproject_enabled" == "yes" ] ; then
-  if [ -n "${yararulesproject_dbs[0]}" ] ; then
-    if [ ${#yararulesproject_dbs} -lt 1 ] ; then
-      xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
-    else
-    rm -f "$work_dir_yararulesproject/*.gz"
-    if [ -r "$work_dir_work_configs/last-yararulesproject-update.txt" ] ; then
-      last_yararulesproject_update="$(cat "$work_dir_work_configs/last-yararulesproject-update.txt")"
-    else
-      last_yararulesproject_update="0"
-    fi
-    db_file=""
-    loop=""
-    update_interval="$((yararulesproject_update_hours * 3600))"
-    time_interval="$((current_time - last_yararulesproject_update))"
-    if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
-      echo "$current_time" > "$work_dir_work_configs/last-yararulesproject-update.txt"
-
-      xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
-      xshok_pretty_echo_and_log "Checking for yararulesproject updates..."
-      yararulesproject_updates="0"
-      for db_file in "${yararulesproject_dbs[@]}" ; do
-        if echo "$db_file" | $grep_bin -q "/"; then
-          yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
-          db_file="$(echo "$db_file" | cut -d "/" -f 2)"
-        else yr_dir=""
-        fi
-        if [ "$loop" == "1" ] ; then
-          xshok_pretty_echo_and_log "---"
-        fi
-        xshok_pretty_echo_and_log "Checking for updated yararulesproject database file: $db_file"
-
-        yararulesproject_db_update="0"
-          if [ -n "$wget_bin" ] ; then
-            # shellcheck disable=SC2086
-            $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
-            ret="$?"
-          else
-            # shellcheck disable=SC2086
-            $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
-            ret="$?"
-          fi
-          if [ "$ret" -eq 0 ] ; then
-          loop="1"
-          if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
-            if [ $? -eq 0 ] ; then
-              db_ext="$(echo "$db_file" | cut -d "." -f 2)"
-
-              xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
-              if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
-                if $clamscan_bin --quiet -d "$work_dir_yararulesproject/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-                  then
-                  xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested good"
-                  true
-                else
-                  xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested BAD"
-                  if [ "$remove_bad_database" == "yes" ] ; then
-                    if rm -f "$work_dir_yararulesproject/$db_file" ; then
-                      xshok_pretty_echo_and_log "Removed invalid database: $work_dir_yararulesproject/$db_file"
+                      perms chown -f "$clam_user:$clam_group" "$clam_dbs/$malwarepatrol_db"
+                      if [ "$selinux_fixes" == "yes" ] ; then
+                        restorecon "$clam_dbs/$malwarepatrol_db"
+                      fi
+                      xshok_pretty_echo_and_log "Successfully updated MalwarePatrol production database file: $malwarepatrol_db"
+                      do_clamd_reload=1
+                    else
+                      xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: $malwarepatrol_db - SKIPPING"
                     fi
-                  fi
-                  false
-                fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_yararulesproject/$db_file" "$clam_dbs" 2>/dev/null ; then
-                perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-                if [ "$selinux_fixes" == "yes" ] ; then
-                  restorecon "$clam_dbs/$db_file"
-                fi
-                xshok_pretty_echo_and_log "Successfully updated yararulesproject production database file: $db_file"
-                yararulesproject_updates=1
-                yararulesproject_db_update=1
-                do_clamd_reload=1
-              else
-                xshok_pretty_echo_and_log "Failed to successfully update yararulesproject production database file: $db_file - SKIPPING"
-              fi
-            else
-              $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_yararulesproject/$db_file" > "$test_dir/$db_file"
-              $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-              $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
-              $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
-              mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-              if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-                xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested good"
-                true
-              else
-                xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested BAD"
-                if [ "$remove_bad_database" == "yes" ] ; then
-                  if rm -f "$work_dir_yararulesproject/$db_file" ; then
-                    xshok_pretty_echo_and_log "Removed invalid database: $work_dir_yararulesproject/$db_file"
-                  fi
-                fi
-                false
-              fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-              perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-              if [ "$selinux_fixes" == "yes" ] ; then
-                restorecon "$clam_dbs/$db_file"
-              fi
-              xshok_pretty_echo_and_log "Successfully updated yararulesproject production database file: $db_file"
-              yararulesproject_updates=1
-              yararulesproject_db_update=1
-              do_clamd_reload=1
-            else
-              xshok_pretty_echo_and_log "Failed to successfully update yararulesproject production database file: $db_file - SKIPPING"
-            fi
+                    ;;
+                  0) # The database did not update
+                    xshok_pretty_echo_and_log "MalwarePatrol signature database ($malwarepatrol_db) did not change - skipping"
+                    ;;
+                  -1) # Wget failed
+                    xshok_pretty_echo_and_log "WARNING - Failed connection to $malwarepatrol_url - SKIPPED MalwarePatrol $malwarepatrol_db update"
+                    ;;
+            esac
+
+          else
+            xshok_pretty_echo_and_log "MalwarePatrol Database File Update" "="
+
+            time_remaining="$((update_interval - time_interval))"
+            hours_left="$((time_remaining / 3600))"
+            minutes_left="$((time_remaining % 3600 / 60))"
+            xshok_pretty_echo_and_log "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
+            xshok_pretty_echo_and_log "No database download was performed at this time" "-"
+            xshok_pretty_echo_and_log "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
           fi
         fi
       fi
     else
-      xshok_pretty_echo_and_log "WARNING: Failed connection to $yararulesproject_url - SKIPPED yararulesproject $db_file update"
+      if [ -n "$malwarepatrol_db" ] ; then
+        if [ "$remove_disabled_databases" == "yes" ] ; then
+          xshok_pretty_echo_and_log "Removing disabled MalwarePatrol Database file"
+          if [ -r "$work_dir_malwarepatrol/$malwarepatrol_db" ] ; then
+            rm -f "$work_dir_malwarepatrol/$malwarepatrol_db"
+            do_clamd_reload=1
+          fi
+          if [ -r "$clam_dbs/$malwarepatrol_db" ] ; then
+            rm -f "$clam_dbs/$malwarepatrol_db"
+            do_clamd_reload=1
+          fi
+        fi
+      fi
     fi
-    if [ "$yararulesproject_db_update" != "1" ] ; then
-      xshok_pretty_echo_and_log "No updated yararulesproject $db_file database file found"
-    fi
-  done
-  if [ "$yararulesproject_updates" != "1" ] ; then
-    xshok_pretty_echo_and_log "No yararulesproject database file updates found" "-"
-  fi
-else
 
-  xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
-
-  time_remaining="$((update_interval - time_interval))"
-  hours_left="$((time_remaining / 3600))"
-  minutes_left="$((time_remaining % 3600 / 60))"
-  xshok_pretty_echo_and_log "$yararulesproject_update_hours hours have not yet elapsed since the last yararulesproject database update check"
-  xshok_pretty_echo_and_log "No update check was performed at this time" "-"
-  xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
-fi
-fi
-fi
-else
-  if [ -n "${yararulesproject_dbs[0]}" ] ; then
-    if [ "$remove_disabled_databases" == "yes" ] ; then
-      xshok_pretty_echo_and_log "Removing disabled yararulesproject Database files"
-      for db_file in "${yararulesproject_dbs[@]}" ; do
-        if echo "$db_file" | $grep_bin -q "/"; then
-          db_file="$(echo "$db_file" | cut -d "/" -f 2)"
-        fi
-        if echo "$db_file" | $grep_bin -q "|"; then
-          db_file="$(echo "$db_file" | cut -d "|" -f 1)"
-        fi
-        if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
-          rm -f "$work_dir_yararulesproject/$db_file"
-          do_clamd_reload="1"
-        fi
-        if [ -r "$clam_dbs/$db_file" ] ; then
-          rm -f "$clam_dbs/$db_file"
-          do_clamd_reload=1
-        fi
-      done
-    fi
-  fi
-fi
-
-##############################################################################################################################################
-# Check for updated additional database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
-##############################################################################################################################################
-if [ "$additional_enabled" == "yes" ] ; then
-  if [ -n "$additional_dbs" ] ; then
-    if [ ${#additional_dbs} -lt 1 ] ; then
-      xshok_pretty_echo_and_log "Failed additional_dbs config is invalid or not defined - SKIPPING"
-    else
-    rm -f "$work_dir_add/*.gz"
-    if [ -r "$work_dir_work_configs/last-additional-update.txt" ] ; then
-      last_additional_update="$(cat "$work_dir_work_configs/last-additional-update.txt")"
-    else
-      last_additional_update="0"
-    fi
-    db_file=""
-    loop=""
-    update_interval="$((additional_update_hours * 3600))"
-    time_interval="$((current_time - last_additional_update))"
-    if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
-      echo "$current_time" > "$work_dir_work_configs/last-additional-update.txt"
-
-      xshok_pretty_echo_and_log "Additional Database File Updates" "="
-      xshok_pretty_echo_and_log "Checking for additional updates..."
-      additional_updates="0"
-      for db_url in "${additional_dbs[@]}" ; do
-        # Left for future dir manipulation
-        # if echo "$db_file" | $grep_bin -q "/"; then
-        #   add_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
-        #   db_file="$(echo "$db_file" | cut -d "/" -f 2)"
-        # else
-        #   add_dir=""
-        # fi
-       db_file="$(basename "$db_url")"
-
-        if [ "$loop" == "1" ] ; then
-          xshok_pretty_echo_and_log "---"
-        fi
-        xshok_pretty_echo_and_log "Checking for updated additional database file: $db_file"
-
-        additional_db_update="0"
-
-        if [ "$(echo "$db_url" | cut -d ":" -f 1)" == "rsync" ] ; then
-          # shellcheck disable=SC2086
-          $rsync_bin $rsync_output_level $no_motd -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
-          ret="$?"
+    ##############################################################################################################################################
+    # Check for updated yararulesproject database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
+    ##############################################################################################################################################
+    if [ "$yararulesproject_enabled" == "yes" ] ; then
+      if [ -n "${yararulesproject_dbs[0]}" ] ; then
+        if [ ${#yararulesproject_dbs} -lt 1 ] ; then
+          xshok_pretty_echo_and_log "Failed yararulesproject_dbs config is invalid or not defined - SKIPPING"
         else
-          if [ -n "$wget_bin" ] ; then
-            # shellcheck disable=SC2086
-            $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_add/$db_file" "$db_url"
-            ret="$?"
+          rm -f "$work_dir_yararulesproject/*.gz"
+          if [ -r "$work_dir_work_configs/last-yararulesproject-update.txt" ] ; then
+            last_yararulesproject_update="$(cat "$work_dir_work_configs/last-yararulesproject-update.txt")"
           else
-            # shellcheck disable=SC2086
-            $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_add/$db_file" "$db_url"
-            ret="$?"
+            last_yararulesproject_update="0"
           fi
-        fi
+          db_file=""
+          loop=""
+          update_interval="$((yararulesproject_update_hours * 3600))"
+          time_interval="$((current_time - last_yararulesproject_update))"
+          if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
+            echo "$current_time" > "$work_dir_work_configs/last-yararulesproject-update.txt"
 
-        # This needs enhancement for rsync, as it will only work with single files...
-        # Maybe better to process each file inside work_dir_add in its own for loop.
-        if [ "$ret" -eq 0 ] ; then
-          loop="1"
-          if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
-            if [ $? -eq 0 ] ; then
-              db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+            xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
+            xshok_pretty_echo_and_log "Checking for yararulesproject updates..."
+            yararulesproject_updates="0"
+            for db_file in "${yararulesproject_dbs[@]}" ; do
+              if echo "$db_file" | $grep_bin -q "/"; then
+                yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
+                db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+              else yr_dir=""
+              fi
+              if [ "$loop" == "1" ] ; then
+                xshok_pretty_echo_and_log "---"
+              fi
+              xshok_pretty_echo_and_log "Checking for updated yararulesproject database file: $db_file"
 
-              xshok_pretty_echo_and_log "Testing updated additional database file: $db_file"
-              if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
-                if $clamscan_bin --quiet -d "$work_dir_add/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-                  then
-                  xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested good"
-                  true
-                else
-                  xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested BAD"
-                  if [ "$remove_bad_database" == "yes" ] ; then
-                    if rm -f "$work_dir_add/$db_file" ; then
-                      xshok_pretty_echo_and_log "Removed invalid database: $work_dir_add/$db_file"
+              yararulesproject_db_update="0"
+              if [ -n "$wget_bin" ] ; then
+                # shellcheck disable=SC2086
+                $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
+                ret="$?"
+              else
+                # shellcheck disable=SC2086
+                $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
+                ret="$?"
+              fi
+              if [ "$ret" -eq 0 ] ; then
+                loop="1"
+                if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
+                  if [ $? -eq 0 ] ; then
+                    db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+
+                    xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
+                    if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
+                      if $clamscan_bin --quiet -d "$work_dir_yararulesproject/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
+                      then
+                        xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested good"
+                        true
+                      else
+                        xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested BAD"
+                        if [ "$remove_bad_database" == "yes" ] ; then
+                          if rm -f "$work_dir_yararulesproject/$db_file" ; then
+                            xshok_pretty_echo_and_log "Removed invalid database: $work_dir_yararulesproject/$db_file"
+                          fi
+                        fi
+                        false
+                        fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_yararulesproject/$db_file" "$clam_dbs" 2>/dev/null ; then
+                        perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                        if [ "$selinux_fixes" == "yes" ] ; then
+                          restorecon "$clam_dbs/$db_file"
+                        fi
+                        xshok_pretty_echo_and_log "Successfully updated yararulesproject production database file: $db_file"
+                        yararulesproject_updates=1
+                        yararulesproject_db_update=1
+                        do_clamd_reload=1
+                      else
+                        xshok_pretty_echo_and_log "Failed to successfully update yararulesproject production database file: $db_file - SKIPPING"
+                      fi
+                    else
+                      $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_yararulesproject/$db_file" > "$test_dir/$db_file"
+                      $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
+                      $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+                      $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
+                      mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
+                      if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
+                        xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested good"
+                        true
+                      else
+                        xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested BAD"
+                        if [ "$remove_bad_database" == "yes" ] ; then
+                          if rm -f "$work_dir_yararulesproject/$db_file" ; then
+                            xshok_pretty_echo_and_log "Removed invalid database: $work_dir_yararulesproject/$db_file"
+                          fi
+                        fi
+                        false
+                        fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+                        perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                        if [ "$selinux_fixes" == "yes" ] ; then
+                          restorecon "$clam_dbs/$db_file"
+                        fi
+                        xshok_pretty_echo_and_log "Successfully updated yararulesproject production database file: $db_file"
+                        yararulesproject_updates=1
+                        yararulesproject_db_update=1
+                        do_clamd_reload=1
+                      else
+                        xshok_pretty_echo_and_log "Failed to successfully update yararulesproject production database file: $db_file - SKIPPING"
+                      fi
                     fi
                   fi
-                  false
-                fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_add/$db_file" "$clam_dbs" 2>/dev/null ; then
-                perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-                if [ "$selinux_fixes" == "yes" ] ; then
-                  restorecon "$clam_dbs/$db_file"
                 fi
-                xshok_pretty_echo_and_log "Successfully updated additional production database file: $db_file"
-                additional_updates=1
-                additional_db_update=1
-                do_clamd_reload=1
               else
-                xshok_pretty_echo_and_log "Failed to successfully update additional production database file: $db_file - SKIPPING"
+                xshok_pretty_echo_and_log "WARNING: Failed connection to $yararulesproject_url - SKIPPED yararulesproject $db_file update"
               fi
-            else
-              $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_add/$db_file" > "$test_dir/$db_file"
-              $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-              $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
-              $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
-              mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-              if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
-                xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested good"
-                true
-              else
-                xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested BAD"
-                if [ "$remove_bad_database" == "yes" ] ; then
-                  if rm -f "$work_dir_add/$db_file" ; then
-                    xshok_pretty_echo_and_log "Removed invalid database: $work_dir_add/$db_file"
-                  fi
-                fi
-                false
-              fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-              perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
-              if [ "$selinux_fixes" == "yes" ] ; then
-                restorecon "$clam_dbs/$db_file"
+              if [ "$yararulesproject_db_update" != "1" ] ; then
+                xshok_pretty_echo_and_log "No updated yararulesproject $db_file database file found"
               fi
-              xshok_pretty_echo_and_log "Successfully updated additional production database file: $db_file"
-              additional_updates=1
-              additional_db_update=1
-              do_clamd_reload=1
-            else
-              xshok_pretty_echo_and_log "Failed to successfully update additional production database file: $db_file - SKIPPING"
+            done
+            if [ "$yararulesproject_updates" != "1" ] ; then
+              xshok_pretty_echo_and_log "No yararulesproject database file updates found" "-"
             fi
+          else
+
+            xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
+
+            time_remaining="$((update_interval - time_interval))"
+            hours_left="$((time_remaining / 3600))"
+            minutes_left="$((time_remaining % 3600 / 60))"
+            xshok_pretty_echo_and_log "$yararulesproject_update_hours hours have not yet elapsed since the last yararulesproject database update check"
+            xshok_pretty_echo_and_log "No update check was performed at this time" "-"
+            xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
           fi
         fi
       fi
     else
-      xshok_pretty_echo_and_log "WARNING: Failed connection to $additional_url - SKIPPED additional $db_file update"
-    fi
-    if [ "$additional_db_update" != "1" ] ; then
-      xshok_pretty_echo_and_log "No updated additional $db_file database file found"
-    fi
-  done
-  if [ "$additional_updates" != "1" ] ; then
-    xshok_pretty_echo_and_log "No additional database file updates found" "-"
-  fi
-else
-
-  xshok_pretty_echo_and_log "Additional Database File Updates" "="
-
-  time_remaining="$((update_interval - time_interval))"
-  hours_left="$((time_remaining / 3600))"
-  minutes_left="$((time_remaining % 3600 / 60))"
-  xshok_pretty_echo_and_log "$additional_update_hours hours have not yet elapsed since the last additional database update check"
-  xshok_pretty_echo_and_log "No update check was performed at this time" "-"
-  xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
-fi
-fi
-fi
-else
-  if [ -n "$additional_dbs" ] ; then
-    if [ "$remove_disabled_databases" == "yes" ] ; then
-      xshok_pretty_echo_and_log "Removing disabled additional Database files"
-      for db_file in "${additional_dbs[@]}" ; do
-        if echo "$db_file" | $grep_bin -q "/"; then
-          db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+      if [ -n "${yararulesproject_dbs[0]}" ] ; then
+        if [ "$remove_disabled_databases" == "yes" ] ; then
+          xshok_pretty_echo_and_log "Removing disabled yararulesproject Database files"
+          for db_file in "${yararulesproject_dbs[@]}" ; do
+            if echo "$db_file" | $grep_bin -q "/"; then
+              db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+            fi
+            if echo "$db_file" | $grep_bin -q "|"; then
+              db_file="$(echo "$db_file" | cut -d "|" -f 1)"
+            fi
+            if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
+              rm -f "$work_dir_yararulesproject/$db_file"
+              do_clamd_reload="1"
+            fi
+            if [ -r "$clam_dbs/$db_file" ] ; then
+              rm -f "$clam_dbs/$db_file"
+              do_clamd_reload=1
+            fi
+          done
         fi
-        if [ -r "$work_dir_add/$db_file" ] ; then
-          rm -f "$work_dir_add/$db_file"
-          do_clamd_reload=1
-        fi
-        if [ -r "$clam_dbs/$db_file" ] ; then
-          rm -f "$clam_dbs/$db_file"
-          do_clamd_reload=1
-        fi
-      done
+      fi
     fi
-  fi
-fi
 
-###################################################
-# Generate whitelists
-###################################################
-# Check to see if the local.ign file exists, and if it does, check to see if any of the script
-# added bypass entries can be removed due to offending signature modifications or removals.
-if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt" ] ; then
-  ign_updated=0
-  cd "$clam_dbs" || exit
-  cp -f local.ign "$work_dir_work_configs/local.ign"
-  cp -f "$work_dir_work_configs/monitor-ign.txt" "$work_dir_work_configs/monitor-ign-old.txt"
+    ##############################################################################################################################################
+    # Check for updated additional database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
+    ##############################################################################################################################################
+    if [ "$additional_enabled" == "yes" ] ; then
+      if [ -n "$additional_dbs" ] ; then
+        if [ ${#additional_dbs} -lt 1 ] ; then
+          xshok_pretty_echo_and_log "Failed additional_dbs config is invalid or not defined - SKIPPING"
+        else
+          rm -f "$work_dir_add/*.gz"
+          if [ -r "$work_dir_work_configs/last-additional-update.txt" ] ; then
+            last_additional_update="$(cat "$work_dir_work_configs/last-additional-update.txt")"
+          else
+            last_additional_update="0"
+          fi
+          db_file=""
+          loop=""
+          update_interval="$((additional_update_hours * 3600))"
+          time_interval="$((current_time - last_additional_update))"
+          if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
+            echo "$current_time" > "$work_dir_work_configs/last-additional-update.txt"
 
-  xshok_pretty_echo_and_log "" "=" "80"
-  while read -r entry ; do
-    sig_file="$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $1}')"
-    sig_hex="$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $NF}')"
-    sig_name_old="$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $3}')"
-    sig_ign_old="$($grep_bin ":$sig_name_old" "$work_dir_work_configs/local.ign")"
-    sig_old="$(echo "$entry" | tr -d "\r" | cut -d ":" -f 3-)"
-    sig_new="$($grep_bin -hwF ":$sig_hex" "$sig_file" | tr -d "\r" 2>/dev/null)"
-    sig_mon_new="$($grep_bin -HwF -n ":$sig_hex" "$sig_file" | tr -d "\r")"
-    if [ -n "$sig_new" ] ; then
-      if [ "$sig_old" != "$sig_new" ] || [ "$entry" != "$sig_mon_new" ] ; then
-        sig_name_new="$(echo "$sig_new" | tr -d "\r" | awk -F ":" '{print $1}')"
-        sig_ign_new="$(echo "$sig_mon_new" | cut -d ":" -f 1-3)"
-        perl -i -ne "print unless /$sig_ign_old/" "$work_dir_work_configs/monitor-ign.txt"
-        echo "$sig_mon_new" >> "$work_dir_work_configs/monitor-ign.txt"
-        perl -p -i -e "s/$sig_ign_old/$sig_ign_new/" "$work_dir_work_configs/local.ign"
-        xshok_pretty_echo_and_log "$sig_name_old hexadecimal signature is unchanged, however signature name and/or line placement"
-        xshok_pretty_echo_and_log "in $sig_file has changed to $sig_name_new - updated local.ign to reflect this change."
-        ign_updated=1
+            xshok_pretty_echo_and_log "Additional Database File Updates" "="
+            xshok_pretty_echo_and_log "Checking for additional updates..."
+            additional_updates="0"
+            for db_url in "${additional_dbs[@]}" ; do
+              # Left for future dir manipulation
+              # if echo "$db_file" | $grep_bin -q "/"; then
+              #   add_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
+              #   db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+              # else
+              #   add_dir=""
+              # fi
+              db_file="$(basename "$db_url")"
+
+              if [ "$loop" == "1" ] ; then
+                xshok_pretty_echo_and_log "---"
+              fi
+              xshok_pretty_echo_and_log "Checking for updated additional database file: $db_file"
+
+              additional_db_update="0"
+
+              if [ "$(echo "$db_url" | cut -d ":" -f 1)" == "rsync" ] ; then
+                # shellcheck disable=SC2086
+                $rsync_bin $rsync_output_level $no_motd -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
+                ret="$?"
+              else
+                if [ -n "$wget_bin" ] ; then
+                  # shellcheck disable=SC2086
+                  $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$work_dir_add/$db_file" "$db_url"
+                  ret="$?"
+                else
+                  # shellcheck disable=SC2086
+                  $curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" --output "$work_dir_add/$db_file" "$db_url"
+                  ret="$?"
+                fi
+              fi
+
+              # This needs enhancement for rsync, as it will only work with single files...
+              # Maybe better to process each file inside work_dir_add in its own for loop.
+              if [ "$ret" -eq 0 ] ; then
+                loop="1"
+                if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
+                  if [ $? -eq 0 ] ; then
+                    db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+
+                    xshok_pretty_echo_and_log "Testing updated additional database file: $db_file"
+                    if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
+                      if $clamscan_bin --quiet -d "$work_dir_add/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
+                      then
+                        xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested good"
+                        true
+                      else
+                        xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested BAD"
+                        if [ "$remove_bad_database" == "yes" ] ; then
+                          if rm -f "$work_dir_add/$db_file" ; then
+                            xshok_pretty_echo_and_log "Removed invalid database: $work_dir_add/$db_file"
+                          fi
+                        fi
+                        false
+                        fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_add/$db_file" "$clam_dbs" 2>/dev/null ; then
+                        perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                        if [ "$selinux_fixes" == "yes" ] ; then
+                          restorecon "$clam_dbs/$db_file"
+                        fi
+                        xshok_pretty_echo_and_log "Successfully updated additional production database file: $db_file"
+                        additional_updates=1
+                        additional_db_update=1
+                        do_clamd_reload=1
+                      else
+                        xshok_pretty_echo_and_log "Failed to successfully update additional production database file: $db_file - SKIPPING"
+                      fi
+                    else
+                      $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_add/$db_file" > "$test_dir/$db_file"
+                      $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
+                      $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+                      $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
+                      mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
+                      if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
+                        xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested good"
+                        true
+                      else
+                        xshok_pretty_echo_and_log "Clamscan reports additional $db_file database integrity tested BAD"
+                        if [ "$remove_bad_database" == "yes" ] ; then
+                          if rm -f "$work_dir_add/$db_file" ; then
+                            xshok_pretty_echo_and_log "Removed invalid database: $work_dir_add/$db_file"
+                          fi
+                        fi
+                        false
+                        fi && (test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$db_file" "$clam_dbs/$db_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+                        perms chown -f "$clam_user:$clam_group" "$clam_dbs/$db_file"
+                        if [ "$selinux_fixes" == "yes" ] ; then
+                          restorecon "$clam_dbs/$db_file"
+                        fi
+                        xshok_pretty_echo_and_log "Successfully updated additional production database file: $db_file"
+                        additional_updates=1
+                        additional_db_update=1
+                        do_clamd_reload=1
+                      else
+                        xshok_pretty_echo_and_log "Failed to successfully update additional production database file: $db_file - SKIPPING"
+                      fi
+                    fi
+                  fi
+                fi
+              else
+                xshok_pretty_echo_and_log "WARNING: Failed connection to $additional_url - SKIPPED additional $db_file update"
+              fi
+              if [ "$additional_db_update" != "1" ] ; then
+                xshok_pretty_echo_and_log "No updated additional $db_file database file found"
+              fi
+            done
+            if [ "$additional_updates" != "1" ] ; then
+              xshok_pretty_echo_and_log "No additional database file updates found" "-"
+            fi
+          else
+
+            xshok_pretty_echo_and_log "Additional Database File Updates" "="
+
+            time_remaining="$((update_interval - time_interval))"
+            hours_left="$((time_remaining / 3600))"
+            minutes_left="$((time_remaining % 3600 / 60))"
+            xshok_pretty_echo_and_log "$additional_update_hours hours have not yet elapsed since the last additional database update check"
+            xshok_pretty_echo_and_log "No update check was performed at this time" "-"
+            xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+          fi
+        fi
       fi
     else
-      perl -i -ne "print unless /$sig_ign_old/" "$work_dir_work_configs/monitor-ign.txt" "$work_dir_work_configs/local.ign"
-
-      xshok_pretty_echo_and_log "$sig_name_old signature has been removed from $sig_file, entry removed from local.ign."
-      ign_updated=1
+      if [ -n "$additional_dbs" ] ; then
+        if [ "$remove_disabled_databases" == "yes" ] ; then
+          xshok_pretty_echo_and_log "Removing disabled additional Database files"
+          for db_file in "${additional_dbs[@]}" ; do
+            if echo "$db_file" | $grep_bin -q "/"; then
+              db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+            fi
+            if [ -r "$work_dir_add/$db_file" ] ; then
+              rm -f "$work_dir_add/$db_file"
+              do_clamd_reload=1
+            fi
+            if [ -r "$clam_dbs/$db_file" ] ; then
+              rm -f "$clam_dbs/$db_file"
+              do_clamd_reload=1
+            fi
+          done
+        fi
+      fi
     fi
-  done < "$work_dir_work_configs/monitor-ign-old.txt"
-  if [ "$ign_updated" == "1" ] ; then
-    if $clamscan_bin --quiet -d "$work_dir_work_configs/local.ign" "$work_dir_work_configs/scan-test.txt"
-      then
-      if $rsync_bin -pcqt "$work_dir_work_configs/local.ign" "$clam_dbs"
+
+    ###################################################
+    # Generate whitelists
+    ###################################################
+    # Check to see if the local.ign file exists, and if it does, check to see if any of the script
+    # added bypass entries can be removed due to offending signature modifications or removals.
+    if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt" ] ; then
+      ign_updated=0
+      cd "$clam_dbs" || exit
+      cp -f local.ign "$work_dir_work_configs/local.ign"
+      cp -f "$work_dir_work_configs/monitor-ign.txt" "$work_dir_work_configs/monitor-ign-old.txt"
+
+      xshok_pretty_echo_and_log "" "=" "80"
+      while read -r entry ; do
+        sig_file="$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $1}')"
+        sig_hex="$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $NF}')"
+        sig_name_old="$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $3}')"
+        sig_ign_old="$($grep_bin ":$sig_name_old" "$work_dir_work_configs/local.ign")"
+        sig_old="$(echo "$entry" | tr -d "\r" | cut -d ":" -f 3-)"
+        sig_new="$($grep_bin -hwF ":$sig_hex" "$sig_file" | tr -d "\r" 2>/dev/null)"
+        sig_mon_new="$($grep_bin -HwF -n ":$sig_hex" "$sig_file" | tr -d "\r")"
+        if [ -n "$sig_new" ] ; then
+          if [ "$sig_old" != "$sig_new" ] || [ "$entry" != "$sig_mon_new" ] ; then
+            sig_name_new="$(echo "$sig_new" | tr -d "\r" | awk -F ":" '{print $1}')"
+            sig_ign_new="$(echo "$sig_mon_new" | cut -d ":" -f 1-3)"
+            perl -i -ne "print unless /$sig_ign_old/" "$work_dir_work_configs/monitor-ign.txt"
+            echo "$sig_mon_new" >> "$work_dir_work_configs/monitor-ign.txt"
+            perl -p -i -e "s/$sig_ign_old/$sig_ign_new/" "$work_dir_work_configs/local.ign"
+            xshok_pretty_echo_and_log "$sig_name_old hexadecimal signature is unchanged, however signature name and/or line placement"
+            xshok_pretty_echo_and_log "in $sig_file has changed to $sig_name_new - updated local.ign to reflect this change."
+            ign_updated=1
+          fi
+        else
+          perl -i -ne "print unless /$sig_ign_old/" "$work_dir_work_configs/monitor-ign.txt" "$work_dir_work_configs/local.ign"
+
+          xshok_pretty_echo_and_log "$sig_name_old signature has been removed from $sig_file, entry removed from local.ign."
+          ign_updated=1
+        fi
+      done < "$work_dir_work_configs/monitor-ign-old.txt"
+      if [ "$ign_updated" == "1" ] ; then
+        if $clamscan_bin --quiet -d "$work_dir_work_configs/local.ign" "$work_dir_work_configs/scan-test.txt"
         then
-        perms chown -f "$clam_user:$clam_group" "$clam_dbs/local.ign"
-        perms chmod -f 0644 "$clam_dbs/local.ign" "$work_dir_work_configs/monitor-ign.txt"
-        if [ "$selinux_fixes" == "yes" ] ; then
-          restorecon "$clam_dbs/local.ign"
+          if $rsync_bin -pcqt "$work_dir_work_configs/local.ign" "$clam_dbs"
+          then
+            perms chown -f "$clam_user:$clam_group" "$clam_dbs/local.ign"
+            perms chmod -f 0644 "$clam_dbs/local.ign" "$work_dir_work_configs/monitor-ign.txt"
+            if [ "$selinux_fixes" == "yes" ] ; then
+              restorecon "$clam_dbs/local.ign"
+            fi
+            do_clamd_reload=3
+          else
+            xshok_pretty_echo_and_log "Failed to successfully update local.ign file - SKIPPING"
+          fi
+        else
+          xshok_pretty_echo_and_log "Clamscan reports local.ign database integrity is bad - SKIPPING"
         fi
-        do_clamd_reload=3
       else
-        xshok_pretty_echo_and_log "Failed to successfully update local.ign file - SKIPPING"
+        xshok_pretty_echo_and_log "No whitelist signature changes found in local.ign" "="
       fi
-    else
-      xshok_pretty_echo_and_log "Clamscan reports local.ign database integrity is bad - SKIPPING"
     fi
-  else
-    xshok_pretty_echo_and_log "No whitelist signature changes found in local.ign" "="
-  fi
-fi
 
-# Check to see if my-whitelist.ign2 file exists, and if it does, check to see if any of the script
-# added whitelist entries can be removed due to offending signature modifications or removals.
-if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.txt" ] ; then
-  ign2_updated=0
-  cd "$clam_dbs" || exit
-  cp -f my-whitelist.ign2 "$work_dir_work_configs/my-whitelist.ign2"
+    # Check to see if my-whitelist.ign2 file exists, and if it does, check to see if any of the script
+    # added whitelist entries can be removed due to offending signature modifications or removals.
+    if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.txt" ] ; then
+      ign2_updated=0
+      cd "$clam_dbs" || exit
+      cp -f my-whitelist.ign2 "$work_dir_work_configs/my-whitelist.ign2"
 
-  xshok_pretty_echo_and_log "" "=" "80"
+      xshok_pretty_echo_and_log "" "=" "80"
 
-  while read -r entry ; do
-    sig_file="$(echo "$entry" | cut -d ":" -f 1)"
-    sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
-    sig_name="$(echo "$entry" | cut -d ":" -f 2)"
-    if ! $grep_bin -F "$sig_full" "$sig_file" > /dev/null 2>&1 ; then
-      perl -i -ne "print unless /$sig_name$/" "$work_dir_work_configs/my-whitelist.ign2"
-      perl -i -ne "print unless /:$sig_name:/" "$work_dir_work_configs/tracker-tmp.txt"
+      while read -r entry ; do
+        sig_file="$(echo "$entry" | cut -d ":" -f 1)"
+        sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
+        sig_name="$(echo "$entry" | cut -d ":" -f 2)"
+        if ! $grep_bin -F "$sig_full" "$sig_file" > /dev/null 2>&1 ; then
+          perl -i -ne "print unless /$sig_name$/" "$work_dir_work_configs/my-whitelist.ign2"
+          perl -i -ne "print unless /:$sig_name:/" "$work_dir_work_configs/tracker-tmp.txt"
 
-      xshok_pretty_echo_and_log "$sig_name signature no longer exists in $sig_file, whitelist entry removed from my-whitelist.ign2"
-      ign2_updated="1"
-    fi
-  done < "$work_dir_work_configs/tracker.txt"
-  mv -f "$work_dir_work_configs/tracker-tmp.txt" "$work_dir_work_configs/tracker.txt"
+          xshok_pretty_echo_and_log "$sig_name signature no longer exists in $sig_file, whitelist entry removed from my-whitelist.ign2"
+          ign2_updated="1"
+        fi
+      done < "$work_dir_work_configs/tracker.txt"
+      mv -f "$work_dir_work_configs/tracker-tmp.txt" "$work_dir_work_configs/tracker.txt"
 
-  xshok_pretty_echo_and_log "" "=" "80"
-  if [ "$ign2_updated" == "1" ]
-    then
-    if $clamscan_bin --quiet -d "$work_dir_work_configs/my-whitelist.ign2" "$work_dir_work_configs/scan-test.txt"
+      xshok_pretty_echo_and_log "" "=" "80"
+      if [ "$ign2_updated" == "1" ]
       then
-      if $rsync_bin -pcqt "$work_dir_work_configs/my-whitelist.ign2" "$clam_dbs"
+        if $clamscan_bin --quiet -d "$work_dir_work_configs/my-whitelist.ign2" "$work_dir_work_configs/scan-test.txt"
         then
-        perms chown -f "$clam_user:$clam_group" "$clam_dbs/my-whitelist.ign2"
-        perms chmod -f 0644 "$clam_dbs/my-whitelist.ign2" "$work_dir_work_configs/tracker.txt"
-        if [ "$selinux_fixes" == "yes" ] ; then
-          restorecon "$clam_dbs/my-whitelist.ign2"
-          restorecon "$work_dir_work_configs/tracker.txt"
+          if $rsync_bin -pcqt "$work_dir_work_configs/my-whitelist.ign2" "$clam_dbs"
+          then
+            perms chown -f "$clam_user:$clam_group" "$clam_dbs/my-whitelist.ign2"
+            perms chmod -f 0644 "$clam_dbs/my-whitelist.ign2" "$work_dir_work_configs/tracker.txt"
+            if [ "$selinux_fixes" == "yes" ] ; then
+              restorecon "$clam_dbs/my-whitelist.ign2"
+              restorecon "$work_dir_work_configs/tracker.txt"
+            fi
+            do_clamd_reload=4
+          else
+            xshok_pretty_echo_and_log "Failed to successfully update my-whitelist.ign2 file - SKIPPING"
+          fi
+        else
+          xshok_pretty_echo_and_log "Clamscan reports my-whitelist.ign2 database integrity is bad - SKIPPING"
         fi
-        do_clamd_reload=4
       else
-        xshok_pretty_echo_and_log "Failed to successfully update my-whitelist.ign2 file - SKIPPING"
+        xshok_pretty_echo_and_log "No whitelist signature changes found in my-whitelist.ign2"
       fi
-    else
-      xshok_pretty_echo_and_log "Clamscan reports my-whitelist.ign2 database integrity is bad - SKIPPING"
     fi
-  else
-    xshok_pretty_echo_and_log "No whitelist signature changes found in my-whitelist.ign2"
-  fi
-fi
 
-# Check for non-matching whitelist.hex signatures and remove them from the whitelist file (signature modified or removed).
-if [ -n "$ham_dir" ] ; then
-  if [ -r "$work_dir_work_configs/whitelist.hex" ] ; then
-    $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$work_dir"/*/*.ndb | cut -d "*" -f 2 | tr -d "\r" | sort | uniq > "$work_dir_work_configs/whitelist.tmp"
-    mv -f "$work_dir_work_configs/whitelist.tmp" "$work_dir_work_configs/whitelist.hex"
-    rm -f "$work_dir_work_configs/whitelist.txt"
-    rm -f "$test_dir"/*.*
-    xshok_pretty_echo_and_log "WARNING: Signature(s) triggered on HAM directory scan - signature(s) removed" "*"
-  else
-    xshok_pretty_echo_and_log "No signatures triggered on HAM directory scan" "="
-  fi
-fi
-
-# Set appropriate directory and file permissions to all production signature files
-# and set file access mode to 0644 on all working directory files.
-
-if [ "$setmode" == "yes" ] ; then
-  xshok_pretty_echo_and_log "Setting permissions and ownership" "="
-  perms chown -f -R "$clam_user:$clam_group" "$work_dir"
-  if ! find "$work_dir" -type f -exec chmod -f 0644 "{}" "+" 2>/dev/null ; then
-    if ! find "$work_dir" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
-      find "$work_dir" -type f -exec chmod -f 0644 "{}" ";"
+    # Check for non-matching whitelist.hex signatures and remove them from the whitelist file (signature modified or removed).
+    if [ -n "$ham_dir" ] ; then
+      if [ -r "$work_dir_work_configs/whitelist.hex" ] ; then
+        $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$work_dir"/*/*.ndb | cut -d "*" -f 2 | tr -d "\r" | sort | uniq > "$work_dir_work_configs/whitelist.tmp"
+        mv -f "$work_dir_work_configs/whitelist.tmp" "$work_dir_work_configs/whitelist.hex"
+        rm -f "$work_dir_work_configs/whitelist.txt"
+        rm -f "$test_dir"/*.*
+        xshok_pretty_echo_and_log "WARNING: Signature(s) triggered on HAM directory scan - signature(s) removed" "*"
+      else
+        xshok_pretty_echo_and_log "No signatures triggered on HAM directory scan" "="
+      fi
     fi
-  fi
 
-# If enabled, set file access mode for all production signature database files to 0644.
-  perms chown -f -R "$clam_user:$clam_group" "$clam_dbs"
-  if ! find "$clam_dbs" -type f -exec chmod -f 0644 "{}" "+" 2>/dev/null ; then
-    if ! find "$clam_dbs" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
-       find "$clam_dbs" -type f -exec chmod -f 0644 "{}" ";"
+    # Set appropriate directory and file permissions to all production signature files
+    # and set file access mode to 0644 on all working directory files.
+
+    if [ "$setmode" == "yes" ] ; then
+      xshok_pretty_echo_and_log "Setting permissions and ownership" "="
+      perms chown -f -R "$clam_user:$clam_group" "$work_dir"
+      if ! find "$work_dir" -type f -exec chmod -f 0644 "{}" "+" 2>/dev/null ; then
+        if ! find "$work_dir" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
+          find "$work_dir" -type f -exec chmod -f 0644 "{}" ";"
+        fi
+      fi
+
+      # If enabled, set file access mode for all production signature database files to 0644.
+      perms chown -f -R "$clam_user:$clam_group" "$clam_dbs"
+      if ! find "$clam_dbs" -type f -exec chmod -f 0644 "{}" "+" 2>/dev/null ; then
+        if ! find "$clam_dbs" -type f -print0 | xargs -0 chmod -f 0644 2>/dev/null ; then
+          find "$clam_dbs" -type f -exec chmod -f 0644 "{}" ";"
+        fi
+      fi
     fi
-  fi
-fi
 
-# Reload all clamd databases
-clamscan_reload_dbs
+    # Reload all clamd databases
+    clamscan_reload_dbs
 
-xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
+    xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
 
-check_new_version
+    check_new_version
 
-check_new_config_version
+    check_new_config_version
 
-xshok_cleanup
+    xshok_cleanup
 
-# And lastly we exit, Note: the exit is always on the 2nd last line
-exit $?
+    # And lastly we exit, Note: the exit is always on the 2nd last line
+    exit $?
