@@ -6,7 +6,7 @@ pwd
 
 echo "Downloading latest clamav databases"
 
-wget -nv -t 9 http://database.clamav.net/bytecode.cvd --output-file=.t/databases/bytecode.cvd
+wget -nv -t 9 http://database.clamav.net/bytecode.cvd
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
@@ -14,7 +14,7 @@ else
   exit 1
 fi
 
-wget -nv -t 9 http://database.clamav.net/daily.cvd --output-file=.t/databases/daily.cvd
+wget -nv -t 9 http://database.clamav.net/daily.cvd
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
@@ -22,10 +22,12 @@ else
   exit 1
 fi
 
-wget -nv -t 9  http://database.clamav.net/main.cvd --output-file=.t/databases/main.cvd
+wget -nv -t 9  http://database.clamav.net/main.cvd
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
  	echo .. ERROR
   exit 1
 fi
+
+
