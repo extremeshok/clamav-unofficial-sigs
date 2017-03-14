@@ -1236,8 +1236,8 @@ else
 ################################################################################
 
 # Script Info
-script_version="5.5"
-script_version_date="XX August 2016"
+script_version="5.6"
+script_version_date="XX March 2017"
 minimum_required_config_version="70"
 minimum_yara_clamav_version="0.99"
 
