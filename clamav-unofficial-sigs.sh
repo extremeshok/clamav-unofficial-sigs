@@ -171,11 +171,12 @@ function xshok_user_group_exists () { # username groupname
   else
     id_bin="$(which id)"
   fi
+  getent_bin="$(which getent)"
   if [ "$1" ] ; then
     $id_bin -u "$1" > /dev/null 2>&1
     if [ $? -eq 0 ]; then
       if [ "$2" ] ; then
-        $id_bin -g "$2" > /dev/null 2>&1
+        getent_bin group "$2" >/dev/null
         if [ $? -eq 0 ]; then
           return 0 ; # User and group exists
         else
