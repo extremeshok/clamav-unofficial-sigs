@@ -3159,16 +3159,16 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
       fi
     fi
 
-    # Reload all clamd databases
-    clamscan_reload_dbs
+# Reload all clamd databases
+clamscan_reload_dbs
 
-    xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
+xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
 
-    check_new_version
+check_new_version
 
-    check_new_config_version
+check_new_config_version
 
-    xshok_cleanup
+xshok_cleanup
 
-    # And lastly we exit, Note: the exit is always on the 2nd last line
-    exit $?
+# And lastly we exit, Note: the exit is always on the 2nd last line
+exit $?
