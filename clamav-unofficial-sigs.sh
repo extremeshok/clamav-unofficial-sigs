@@ -1119,7 +1119,7 @@ function check_new_version () {
     latest_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
   fi
   if [ "$latest_version" ] ; then
-    if [ "$latest_version" != "$script_version" ] ; then
+    if [ ! "$latest_version" == "$script_version" ] ; then
       xshok_pretty_echo_and_log "New version : v$latest_version @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
     fi
   fi
@@ -1133,7 +1133,7 @@ function check_new_config_version () {
     latest_config_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
   fi
   if [ "$latest_config_version" ] ; then
-    if [ "$latest_config_version" != "$config_version" ] ; then
+    if [ ! "$latest_config_version" == "$config_version" ] ; then
       xshok_pretty_echo_and_log "New configversion : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
     fi
   fi
