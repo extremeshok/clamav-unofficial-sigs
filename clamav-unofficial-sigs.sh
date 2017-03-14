@@ -1,4 +1,6 @@
 #!/bin/bash
+# shellcheck disable=SC2154
+# shellcheck disable=SC2128
 ################################################################################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
@@ -21,6 +23,9 @@
 # TO FIX:
 # $(echo "$db_name" | cut -d "|" -f2) ---> ${db_name#*|}
 # man_dir=$(echo "$man_dir" | sed 's:/*$::') ---> shopt -s extglob; man_dir="${man_dir%%+(/)}"
+
+
+
 
 ################################################################################
 
@@ -317,7 +322,7 @@ function xshok_database () { # rating database_array
   # Zero
   declare -a new_dbs=( )
   if [ -n "${current_dbs[0]}" ] ; then
-    if [ ${#current_dbs} -ge 1 ] ; then 
+    if [ ${#current_dbs} -ge 1 ] ; then
       for db_name in "${current_dbs[@]}" ; do
         # Checks
         if [ "$enable_yararules" == "no" ] ; then # YARA rules are disabled
@@ -1630,7 +1635,7 @@ fi
 
 # This scripts name and path
 this_script_name="$(basename "$0")"
-this_script_path="$( cd "$(dirname "$0")" ; pwd -P )"
+this_script_path="$( cd "$(dirname "$0")" || exit ; pwd -P )"
 this_script_full_path="$this_script_path/$this_script_name"
 
 # Set the script to 755 permissions
@@ -2038,7 +2043,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
             # shellcheck disable=SC2086
             $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
-            
+
             if [ $? -eq 0 ] ; then # The correct way
               sanesecurity_rsync_success="1"
               for db_file in "${sanesecurity_dbs[@]}" ; do
