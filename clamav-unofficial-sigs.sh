@@ -1442,7 +1442,9 @@ fi
 # Check to see if the script's "USER CONFIGURATION FILE" has been completed.
 if [ "$user_configuration_complete" != "yes" ] ; then
   xshok_pretty_echo_and_log "WARNING: SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED" "*"
-  xshok_pretty_echo_and_log "Please review the script configuration files."
+  xshok_pretty_echo_and_log "Please review the script configuration files"
+  xshok_pretty_echo_and_log "and uncomment the following line in user.conf"
+  xshok_pretty_echo_and_log "#user_configuration_complete=\"yes\""
   exit 1
 fi
 
