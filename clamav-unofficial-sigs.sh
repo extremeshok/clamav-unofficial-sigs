@@ -1269,7 +1269,12 @@ else
 fi
 if [ -n "$wget_bin" ] ; then
   curl_bin="$(which curl)"
+  if [ -n "$curl_bin" ] ; then
+    xshok_pretty_echo_and_log "ERROR: both wget and curl commands are missing, One of them is required" "="
+    exit 1
+  fi
 fi
+
 # Detect supprot for gnu grep
 if [ -x /usr/gnu/bin/grep ] ; then
   grep_bin="/usr/gnu/bin/grep"
@@ -1284,6 +1289,18 @@ fi
 if [ -z "$gpg_bin" ] ; then
   gpg_bin="$(which gpg2)"
 fi
+
+dig_bin="$(which dig)"
+if [ -n "$dig_bin" ] ; then
+  host_bin="$(which host)"
+  if [ -n "$host_bin" ] ; then
+    xshok_pretty_echo_and_log "ERROR: both dig and host commands are missing, One of them is required" "="
+    exit 1
+  fi
+fi
+
+
+
 
 # Detect if terminal
 if [ -t 1 ] ; then
