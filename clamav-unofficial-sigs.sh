@@ -344,7 +344,7 @@ function xshok_database () { # rating database_array
             new_dbs+=( "$db_name" )
           else
             db_name_rating="${db_name#*|}"
-            db_name="$(echo "$db_name" | cut -d "|" -f 1)"
+            db_name="${db_name%|*}"
 
             if [ "$db_name_rating" != "DISABLED" ] ; then
               if [ "$db_name_rating" == "$current_rating" ] ; then
@@ -602,7 +602,7 @@ function decode_third_party_signature_by_signature_name () {
     cd "$clam_dbs" || exit
     sig="$($grep_bin "$input:" ./*.ndb)"
     if [ -n "$sig" ] ; then
-      db_file="$(echo "$sig" | cut -d ":" -f 1)"
+      db_file="${sig%:*}"
       echo "$input found in: $db_file"
       echo "$input signature decodes to:"
       echo "$sig" | cut -d ":" -f 5 | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
@@ -2089,7 +2089,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                     false
                   fi
                   if [ $? -eq 0 ] ; then
-                    db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+                    db_ext="${db_file#*.}"
                     if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
                       if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
                         xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested good"
@@ -2177,7 +2177,7 @@ else
       xshok_pretty_echo_and_log "Removing disabled Sanesecurity Database files"
       for db_file in "${sanesecurity_dbs[@]}" ; do
         if echo "$db_file" | $grep_bin -q "|"; then
-          db_file="$(echo "$db_file" | cut -d "|" -f 1)"
+          db_file="${db_file%|*}"
         fi
         if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
           xshok_pretty_echo_and_log "Removing $work_dir_sanesecurity/$db_file"
@@ -2237,7 +2237,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
               loop="1"
               if ! cmp -s "$work_dir_securiteinfo/$db_file" "$clam_dbs/$db_file" ; then
                 if [ $? -eq 0 ] ; then
-                  db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+                  db_ext="${db_file#*.}"
 
                   xshok_pretty_echo_and_log "Testing updated SecuriteInfo database file: $db_file"
                   if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ]
@@ -2329,7 +2329,7 @@ else
       xshok_pretty_echo_and_log "Removing disabled SecuriteInfo Database files"
       for db_file in "${securiteinfo_dbs[@]}" ; do
         if echo "$db_file" | $grep_bin -q "|"; then
-          db_file="$(echo "$db_file" | cut -d "|" -f 1)"
+          db_file="${db_file%|*}"
         fi
         if [ -r "$work_dir_securiteinfo/$db_file" ] ; then
           xshok_pretty_echo_and_log "Removing $work_dir_securiteinfo/$db_file"
@@ -2391,7 +2391,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
             loop="1"
             if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs/$db_file" ; then
               if [ $? -eq 0 ] ; then
-                db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+                db_ext="${db_file#*.}"
 
                 xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
                 if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
@@ -2481,7 +2481,7 @@ else
       xshok_pretty_echo_and_log "Removing disabled linuxmalwaredetect Database files"
       for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
         if echo "$db_file" | $grep_bin -q "|"; then
-          db_file="$(echo "$db_file" | cut -d "|" -f 1)"
+          db_file="${db_file%|*}"
         fi
         if [ -r "$work_dir_linuxmalwaredetect/$db_file" ] ; then
           xshok_pretty_echo_and_log "Removing $work_dir_linuxmalwaredetect/$db_file"
@@ -2743,7 +2743,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                 loop="1"
                 if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
                   if [ $? -eq 0 ] ; then
-                    db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+                    db_ext="${db_file#*.}"
 
                     xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
                     if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
@@ -2835,7 +2835,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               db_file="$(echo "$db_file" | cut -d "/" -f 2)"
             fi
             if echo "$db_file" | $grep_bin -q "|"; then
-              db_file="$(echo "$db_file" | cut -d "|" -f 1)"
+              db_file="${db_file%|*}"
             fi
             if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
               rm -f "$work_dir_yararulesproject/$db_file"
@@ -2913,7 +2913,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                 loop="1"
                 if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
                   if [ $? -eq 0 ] ; then
-                    db_ext="$(echo "$db_file" | cut -d "." -f 2)"
+                    db_ext="${db_file#*.}"
 
                     xshok_pretty_echo_and_log "Testing updated additional database file: $db_file"
                     if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
