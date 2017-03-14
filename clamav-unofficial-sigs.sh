@@ -176,7 +176,7 @@ function xshok_user_group_exists () { # username groupname
     $id_bin -u "$1" > /dev/null 2>&1
     if [ $? -eq 0 ]; then
       if [ "$2" ] ; then
-        getent_bin group "$2" >/dev/null
+        $getent_bin group "$2" >/dev/null
         if [ $? -eq 0 ]; then
           return 0 ; # User and group exists
         else
@@ -1224,7 +1224,9 @@ $ofs --remove-script $ofe Remove the clamav-unofficial-sigs script and all of $o
 $ofb
 EOF
   )" # This is very important
-  else
+if [ "$1" ] ; then
+  echo "${helpcontents//-/\\-}"
+else
     echo -e "$helpcontents"
   fi
 }
@@ -1903,7 +1905,8 @@ fi
 # Create $current_dbsfiles containing lists of current and previously active 3rd-party databases
 # so that databases and/or backup files that are no longer being used can be removed.
 current_tmp="$work_dir_work_configs/current-dbs.tmp"
-current_dbs="$work_dir_work_configs/current-dbs.txt"
+
+current_dbs_file="$work_dir_work_configs/current-dbs.txt"
 
 if [ "$sanesecurity_enabled" == "yes" ] ; then
   # Create the Sanesecurity rsync "include" file (defines which files to download).
@@ -1960,21 +1963,21 @@ if [ "$additional_enabled" == "yes" ] ; then
     done
   fi
 fi
-sort "$current_tmp" > "$current_dbs" 2>/dev/null
+sort "$current_tmp" > "$current_dbs_file" 2>/dev/null
 rm -f "$current_tmp"
 
 # Remove 3rd-party databases and/or backup files that are no longer being used.
 if [ "$remove_disabled_databases" == "yes" ] ; then
   previous_dbs="$work_dir_work_configs/previous-dbs.txt"
-  sort "$current_dbs" > "$previous_dbs" 2>/dev/null
-  # Do not remove the current_dbs
-  #rm -f "$current_dbs"
+  sort "$current_dbs_file" > "$previous_dbs" 2>/dev/null
+  # Do not remove the current_dbs_file
+  #rm -f "$current_dbs_file"
 
   db_changes="$work_dir_work_configs/db-changes.txt"
   if [ ! -s "$previous_dbs" ] ; then
-    cp -f "$current_dbs" "$previous_dbs" 2>/dev/null
+    cp -f "$current_dbs_file" "$previous_dbs" 2>/dev/null
   fi
-  diff "$current_dbs" "$previous_dbs" 2>/dev/null | $grep_bin ">" | awk '{print $2}' > "$db_changes"
+  diff "$current_dbs_file" "$previous_dbs" 2>/dev/null | $grep_bin ">" | awk '{print $2}' > "$db_changes"
   if [ -r "$db_changes" ] ; then
     if $grep_bin -vq "bak" "$db_changes" 2>/dev/null ; then
       do_clamd_reload="2"
@@ -1988,7 +1991,7 @@ fi
 
 # Create "purge.txt" file for package maintainers to support package uninstall.
 purge="$work_dir_work_configs/purge.txt"
-cp -f "$current_dbs" "$purge"
+cp -f "$current_dbs_file" "$purge"
 {
   echo "$work_dir_work_configs/current-dbs.txt"
   echo "$work_dir_work_configs/db-changes.txt"
@@ -2021,8 +2024,8 @@ if [ -n "${securiteinfo_dbs[0]}" ] || [ -n "$malwarepatrol_db" ] ; then
   fi
   if [ "$current_time" -le 0 ] ; then
     xshok_pretty_echo_and_log "WARNING: No support for 'date +%s' or 'perl' was not found , SecuriteInfo and MalwarePatrol updates bypassed" "="
-    securiteinfo_dbs=""
-    malwarepatrol_db=""
+    securiteinfo_dbs=()
+    malwarepatrol_db=()
   fi
 fi
 
