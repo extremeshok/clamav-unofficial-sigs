@@ -20,11 +20,6 @@
 #   ALL CONFIGURATION OPTIONS ARE LOCATED IN THE INCLUDED CONFIGURATION FILE
 #
 ################################################################################
-# TO FIX:
-# $(echo "$db_name" | cut -d "|" -f2) ---> ${db_name#*|}
-# man_dir=$(echo "$man_dir" | sed 's:/*$::') ---> shopt -s extglob; man_dir="${man_dir%%+(/)}"
-
-################################################################################
 
 ######  #######    #     # ####### #######    ####### ######  ### #######
 #     # #     #    ##    # #     #    #       #       #     #  #     #
@@ -993,7 +988,10 @@ function add_signature_whitelist_entry () {
           if $rsync_bin -pcqt "$work_dir_work_configs/my-whitelist.ign2" "$clam_dbs" ; then
             perms chown -f "$clam_user:$clam_group" my-whitelist.ign2
 
-            if [ ! -s "$work_dir_
+            if [ ! -s "$work_dir_work_configs/monitor-ign.txt" ] ; then
+              # Create "monitor-ign.txt" file for clamscan database integrity testing.
+              echo "This is the monitor ignore file..." > "$work_dir_work_configs/monitor-ign.txt"
+            fi
 
             perms chmod -f 0644 my-whitelist.ign2 "$work_dir_work_configs/monitor-ign.txt"
             if [ "$selinux_fixes" == "yes" ] ; then
