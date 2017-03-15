@@ -1598,7 +1598,7 @@ if [ -z "$wget_bin" ] ; then
   fi
 fi
 if [ -z "$gpg_bin" ] ; then
-  if [ "disable_gpg" == "yes" ] ; then
+  if [ "$disable_gpg" == "yes" ] ; then
     xshok_pretty_echo_and_log "Warning: GnuPG / signature verification disabled" "="
   else
     xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
