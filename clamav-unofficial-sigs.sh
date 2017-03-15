@@ -2834,6 +2834,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                 $rsync_bin $rsync_output_level $no_motd -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
                 ret="$?"
               else
+                echo "WOOF: there be crickets"
+                echo xshok_file_download "$work_dir_add/$db_file" "$db_url"
                 xshok_file_download "$work_dir_add/$db_file" "$db_url"
                 ret="$?"
               fi
@@ -3011,7 +3013,6 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
       xshok_pretty_echo_and_log "" "=" "80"
 
       while read -r entry ; do
-        echo "$entry"
         sig_file="$(echo "$entry" | cut -d ":" -f 1)"
         sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
         sig_name="$(echo "$entry" | cut -d ":" -f 2)"
