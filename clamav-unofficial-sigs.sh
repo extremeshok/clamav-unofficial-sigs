@@ -993,10 +993,7 @@ function add_signature_whitelist_entry () {
           if $rsync_bin -pcqt "$work_dir_work_configs/my-whitelist.ign2" "$clam_dbs" ; then
             perms chown -f "$clam_user:$clam_group" my-whitelist.ign2
 
-            if [ ! -s "$work_dir_work_configs/monitor-ign.txt" ] ; then
-              # Create "monitor-ign.txt" file for clamscan database integrity testing.
-              echo "This is the monitor ignore file..." > "$work_dir_work_configs/monitor-ign.txt"
-            fi
+            if [ ! -s "$work_dir_
 
             perms chmod -f 0644 my-whitelist.ign2 "$work_dir_work_configs/monitor-ign.txt"
             if [ "$selinux_fixes" == "yes" ] ; then
@@ -1149,9 +1146,11 @@ function check_clamav () {
 # Check for a new version
 function check_new_version () {
   if [ -n "$wget_bin" ] ; then
-    latest_version="$($wget_bin "$wget_proxy_https" "$wget_proxy_http" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
+    # shellcheck disable=SC2086
+    latest_version="$($wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
   else
-    latest_version="$($curl_bin "$curl_proxy" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
+    # shellcheck disable=SC2086
+    latest_version="$($curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
   fi
   if [ "$latest_version" ] ; then
     if [ "$latest_version" != "$script_version" ] ; then
@@ -1163,9 +1162,11 @@ function check_new_version () {
 # Check for a new version
 function check_new_config_version () {
   if [ -n "$wget_bin" ] ; then
-    latest_config_version="$($wget_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O - 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
+    # shellcheck disable=SC2086
+    latest_config_version="$($wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O - 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
   else
-    latest_config_version="$($curl_bin https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
+    # shellcheck disable=SC2086
+    latest_config_version="$($curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "$downloader_connect_timeout" --remote-time --location --retry "$downloader_tries" --max-time "$downloader_max_time" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
   fi
   if [ "$latest_config_version" ] ; then
     if [ "$latest_config_version" != "$config_version" ] ; then
