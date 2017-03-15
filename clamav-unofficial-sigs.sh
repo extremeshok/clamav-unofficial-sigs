@@ -2829,7 +2829,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
               additional_db_update="0"
 
-              if [ "$(echo "$db_url" | cut -d ":" -f 1)" == "rsync" ] ; then
+              if [ "${db_url%:*}" == "rsync" ] ; then
                 # shellcheck disable=SC2086
                 $rsync_bin $rsync_output_level $no_motd -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
                 ret="$?"
@@ -3011,6 +3011,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
       xshok_pretty_echo_and_log "" "=" "80"
 
       while read -r entry ; do
+        echo "$entry"
         sig_file="$(echo "$entry" | cut -d ":" -f 1)"
         sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
         sig_name="$(echo "$entry" | cut -d ":" -f 2)"
