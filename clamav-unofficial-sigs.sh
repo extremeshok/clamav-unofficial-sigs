@@ -262,6 +262,17 @@ function xshok_check_s2 () { # value1 value2
   fi
 }
 
+# Time remaining function
+function xshok_draw_time_remaining () { #time_remaining #update_hours #name
+  if [ "$1" ] && [ "$2" ]; then
+    time_remaining="$1"
+    hours_left="$((time_remaining / 3600))"
+    minutes_left="$((time_remaining % 3600 / 60))"
+    xshok_pretty_echo_and_log "$2 hours have not yet elapsed since the last $3 update check"
+    xshok_pretty_echo_and_log "No update check was performed at this time" "-"
+    xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+  fi
+}
 # Auto update
 function xshok_auto_update () { # version
   xshok_pretty_echo_and_log "Performing automatic update..."
@@ -2162,13 +2173,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
         fi
       else
         xshok_pretty_echo_and_log "Sanesecurity Database File Updates" "="
-
-        time_remaining="$((update_interval - time_interval))"
-        hours_left="$((time_remaining / 3600))"
-        minutes_left="$((time_remaining % 3600 / 60))"
-        xshok_pretty_echo_and_log "$sanesecurity_update_hours hours have not yet elapsed since the last sanesecurity update check"
-        xshok_pretty_echo_and_log "No update check was performed at this time" "-"
-        xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+        xshok_draw_time_remaining "$((update_interval - time_interval))" "$sanesecurity_update_hours" "sanesecurity"
       fi
     fi
   fi
@@ -2313,13 +2318,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
           fi
         else
           xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
-
-          time_remaining="$((update_interval - time_interval))"
-          hours_left="$((time_remaining / 3600))"
-          minutes_left="$((time_remaining % 3600 / 60))"
-          xshok_pretty_echo_and_log "$securiteinfo_update_hours hours have not yet elapsed since the last SecuriteInfo update check"
-          xshok_pretty_echo_and_log "No update check was performed at this time" "-"
-          xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+          xshok_draw_time_remaining "$((update_interval - time_interval))" "$securiteinfo_update_hours" "SecuriteInfo"
         fi
       fi
     fi
@@ -2464,15 +2463,8 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           xshok_pretty_echo_and_log "No linuxmalwaredetect database file updates found" "-"
         fi
       else
-
         xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
-
-        time_remaining="$((update_interval - time_interval))"
-        hours_left="$((time_remaining / 3600))"
-        minutes_left="$((time_remaining % 3600 / 60))"
-        xshok_pretty_echo_and_log "$linuxmalwaredetect_update_hours hours have not yet elapsed since the last linux malware detect update check"
-        xshok_pretty_echo_and_log "No update check was performed at this time" "-"
-        xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+        xshok_draw_time_remaining "$((update_interval - time_interval))" "$linuxmalwaredetect_update_hours" "linuxmalwaredetect"
       fi
     fi
   fi
@@ -2669,13 +2661,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
           else
             xshok_pretty_echo_and_log "MalwarePatrol Database File Update" "="
-
-            time_remaining="$((update_interval - time_interval))"
-            hours_left="$((time_remaining / 3600))"
-            minutes_left="$((time_remaining % 3600 / 60))"
-            xshok_pretty_echo_and_log "$malwarepatrol_update_hours hours have not yet elapsed since the last MalwarePatrol download"
-            xshok_pretty_echo_and_log "No database download was performed at this time" "-"
-            xshok_pretty_echo_and_log "Next download will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+            xshok_draw_time_remaining "$((update_interval - time_interval))" "$malwarepatrol_update_hours" "MalwarePatrol"
           fi
         fi
       fi
@@ -2817,13 +2803,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
           else
 
             xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
-
-            time_remaining="$((update_interval - time_interval))"
-            hours_left="$((time_remaining / 3600))"
-            minutes_left="$((time_remaining % 3600 / 60))"
-            xshok_pretty_echo_and_log "$yararulesproject_update_hours hours have not yet elapsed since the last yararulesproject database update check"
-            xshok_pretty_echo_and_log "No update check was performed at this time" "-"
-            xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+            xshok_draw_time_remaining "$((update_interval - time_interval))" "$yararulesproject_update_hours" "yararulesproject"
           fi
         fi
       fi
@@ -2985,15 +2965,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               xshok_pretty_echo_and_log "No additional database file updates found" "-"
             fi
           else
-
             xshok_pretty_echo_and_log "Additional Database File Updates" "="
-
-            time_remaining="$((update_interval - time_interval))"
-            hours_left="$((time_remaining / 3600))"
-            minutes_left="$((time_remaining % 3600 / 60))"
-            xshok_pretty_echo_and_log "$additional_update_hours hours have not yet elapsed since the last additional database update check"
-            xshok_pretty_echo_and_log "No update check was performed at this time" "-"
-            xshok_pretty_echo_and_log "Next check will be performed in approximately $hours_left hour(s), $minutes_left minute(s)"
+            xshok_draw_time_remaining "$((update_interval - time_interval))" "$additional_update_hours" "additionaldatabaseupdate"
           fi
         fi
       fi
