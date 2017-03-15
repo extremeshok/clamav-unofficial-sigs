@@ -1401,7 +1401,7 @@ for config_file in "${config_files[@]}" ; do
 
 
 
-    if [ "$(uname -s)" == "SunOS" ] ; then
+    if [ "$(uname -s)" == "SunOS" ] || [ "$(uname -s)" == "Darwin" ] ; then
       # Solaris FIXES only, i had issues with running with a single command..
       clean_config="$(command sed -e '/^#.*/d' "$config_file")" # Comment line
       #clean_config="$(echo "$clean_config" | sed -e 's/#[[:space:]].*//')" # Comment line (duplicated)
