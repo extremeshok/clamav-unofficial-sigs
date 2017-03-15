@@ -2820,6 +2820,10 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               # else
               #   add_dir=""
               # fi
+
+              #cleanup any leading and trailing whitespace.
+              db_url="$(echo -e "${db_url}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+
               db_file="$(basename "$db_url")"
 
               if [ "$loop" == "1" ] ; then
@@ -2834,8 +2838,6 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                 $rsync_bin $rsync_output_level $no_motd -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>/dev/null
                 ret="$?"
               else
-                echo "WOOF: there be crickets"
-                echo xshok_file_download "$work_dir_add/$db_file" "$db_url"
                 xshok_file_download "$work_dir_add/$db_file" "$db_url"
                 ret="$?"
               fi
@@ -2907,7 +2909,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                   fi
                 fi
               else
-                xshok_pretty_echo_and_log "WARNING: Failed connection to $additional_url - SKIPPED additional $db_file update"
+                xshok_pretty_echo_and_log "WARNING: Failed connection to $db_url - SKIPPED additional $db_file update"
               fi
               if [ "$additional_db_update" != "1" ] ; then
                 xshok_pretty_echo_and_log "No updated additional $db_file database file found"
