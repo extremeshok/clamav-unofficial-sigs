@@ -22,7 +22,7 @@ dist: trusty
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install ca-certificates wget rsync -qq
+  - sudo apt-get install ca-certificates wget rsync p7zip -qq
   - sudo apt-add-repository "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse"
   - sudo apt-get update -qq
   - sudo apt-get -t trusty-backports install shellcheck -qq
@@ -49,8 +49,8 @@ install:
 script:
   - sudo sh -e .t/ci-shellcheck.sh
   #- bashate clamav-unofficial-sigs.sh
-  - sudo sh -e .t/ci-clamav-download-default-databases.sh
-  - sudo sh -e .t/ci-clamav-install-default.sh  
+  - sudo sh -e .t/ci-clamav-download-default-databases-git.sh
+  - sudo sh -e .t/ci-clamav-install-default.sh
   - sudo sh -e .t/ci-clamav-install-default-database.sh
   - sudo sh -e .t/ci-test.sh
   - sudo sh -e .t/ci-clamav-clean.sh
