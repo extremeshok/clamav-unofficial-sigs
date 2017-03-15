@@ -658,32 +658,37 @@ function hexadecimal_encode_formatted_input_string () {
 # GPG verify a specific Sanesecurity database file
 function gpg_verify_specific_sanesecurity_database_file () { # databasefile
   echo ""
-  if [ "$1" ] ; then
-    db_file="$(echo "$1" | awk -F "/" '{print $NF}')"
-    if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
-      echo "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
-      if [ -r "$work_dir_sanesecurity/$db_file".sig ] ; then
-        "$gpg_bin" -q --trust-model always --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
-        if [ $? -ne 0 ]; then
-          "$gpg_bin" -q --always-trust --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
-          if [ $? -eq 0 ]; then
-            exit 0
+  if [ "$disable_gpg" == "yes" ] ; then
+    xshok_pretty_echo_and_log "Warning: GnuPG / signature verification disabled"
+  else
+    if [ "$1" ] ; then
+      db_file="$(echo "$1" | awk -F "/" '{print $NF}')"
+      if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
+        echo "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
+        if [ -r "$work_dir_sanesecurity/$db_file".sig ] ; then
+          "$gpg_bin" -q --trust-model always --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
+          if [ $? -ne 0 ]; then
+            "$gpg_bin" -q --always-trust --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
+            if [ $? -eq 0 ]; then
+              exit 0
+            else
+              exit 1
+            fi
           else
-            exit 1
+            exit 0
           fi
         else
-          exit 0
+          echo "Signature '${db_file}.sig' cannot be found."
         fi
       else
-        echo "Signature '${db_file}.sig' cannot be found."
+        echo "File '$db_file' cannot be found or is not a Sanesecurity database file."
+        echo "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
+        ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_sanesecurity"
       fi
     else
-      echo "File '$db_file' cannot be found or is not a Sanesecurity database file."
-      echo "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
-      ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_sanesecurity"
+      xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+      exit 1
     fi
-  else
-    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
     exit 1
   fi
 }
@@ -710,9 +715,11 @@ function output_system_configuration_information () {
     echo "$curl_bin"
     $curl_bin --version | head -1
   fi
-  echo "*** GPG LOCATION & VERSION ***"
-  echo "$gpg_bin"
-  $gpg_bin --version | head -1
+  if [ "$disable_gpg" != "yes" ] ; then
+    echo "*** GPG LOCATION & VERSION ***"
+    echo "$gpg_bin"
+    $gpg_bin --version | head -1
+  fi
   echo "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
   echo "$work_dir"
   echo "*** CLAMAV DIRECTORY INFORMATION ***"
@@ -1310,13 +1317,15 @@ if [ -x /usr/gnu/bin/grep ] ; then
 else
   grep_bin="$(which grep 2> /dev/null)"
 fi
-if [ -x /opt/csw/bin/gpg ] ; then
-  gpg_bin="/opt/csw/bin/gpg"
-else
-  gpg_bin="$(which gpg 2> /dev/null)"
-fi
-if [ -z "$gpg_bin" ] ; then
-  gpg_bin="$(which gpg2 2> /dev/null)"
+if [ "$disable_gpg" != "yes" ] ; then
+  if [ -x /opt/csw/bin/gpg ] ; then
+    gpg_bin="/opt/csw/bin/gpg"
+  else
+    gpg_bin="$(which gpg 2> /dev/null)"
+  fi
+  if [ -z "$gpg_bin" ] ; then
+    gpg_bin="$(which gpg2 2> /dev/null)"
+  fi
 fi
 
 dig_bin="$(which dig 2> /dev/null)"
@@ -1597,14 +1606,14 @@ if [ -z "$wget_bin" ] ; then
     exit 1
   fi
 fi
-if [ -z "$gpg_bin" ] ; then
-  if [ "$disable_gpg" == "yes" ] ; then
+if [ "$disable_gpg" == "yes" ] ; then
     xshok_pretty_echo_and_log "Warning: GnuPG / signature verification disabled" "="
   else
-    xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
-    xshok_pretty_echo_and_log "Install gnupg or add the following to your user.conf"
-    xshok_pretty_echo_and_log "disable_gpg=\"yes\""
-    exit 1
+    if [ -z "$gpg_bin" ] ; then
+      xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
+      xshok_pretty_echo_and_log "Install gnupg or add the following to your user.conf"
+      xshok_pretty_echo_and_log "disable_gpg=\"yes\""
+      exit 1
   fi
 fi
 # Check default directories are defined
@@ -1860,35 +1869,37 @@ xshok_mkdir_ownership "$work_dir_add"
 # Set secured access permissions to the GPG directory
 perms chmod -f 0700 "$work_dir_gpg"
 
-# If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
-if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
-  xshok_file_download "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
-  ret="$?"
-  if [ "$ret" -ne 0 ] ; then
-    xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
-    exit 1
-  else
-    xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully downloaded"
+if [ "$disable_gpg" != "yes" ] ; then
+  # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
+  if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
+    xshok_file_download "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
+    ret="$?"
+    if [ "$ret" -ne 0 ] ; then
+      xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
+      exit 1
+    else
+      xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully downloaded"
+      rm -f -- "$work_dir_gpg/ss-keyring.gp*"
+      if ! $gpg_bin -q --no-options --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --import "$work_dir_gpg/publickey.gpg" 2>/dev/null ; then
+        xshok_pretty_echo_and_log "ALERT: could not import Sanesecurity public GPG key to custom keyring" "*"
+        exit 1
+      else
+        chmod -f 0644 "$work_dir_gpg/*.*"
+        xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully imported to custom keyring"
+      fi
+    fi
+  fi
+
+  # If custom keyring is missing, try to re-import Sanesecurity public GPG key.
+  if [ ! -s "$work_dir_gpg/ss-keyring.gpg" ] ; then
     rm -f -- "$work_dir_gpg/ss-keyring.gp*"
     if ! $gpg_bin -q --no-options --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --import "$work_dir_gpg/publickey.gpg" 2>/dev/null ; then
-      xshok_pretty_echo_and_log "ALERT: could not import Sanesecurity public GPG key to custom keyring" "*"
+      xshok_pretty_echo_and_log "ALERT: Custom keyring MISSING or CORRUPT!  Could not import Sanesecurity public GPG key to custom keyring" "*"
       exit 1
     else
       chmod -f 0644 "$work_dir_gpg/*.*"
-      xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully imported to custom keyring"
+      xshok_pretty_echo_and_log "Sanesecurity custom keyring MISSING!  GPG key successfully re-imported to custom keyring"
     fi
-  fi
-fi
-
-# If custom keyring is missing, try to re-import Sanesecurity public GPG key.
-if [ ! -s "$work_dir_gpg/ss-keyring.gpg" ] ; then
-  rm -f -- "$work_dir_gpg/ss-keyring.gp*"
-  if ! $gpg_bin -q --no-options --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --import "$work_dir_gpg/publickey.gpg" 2>/dev/null ; then
-    xshok_pretty_echo_and_log "ALERT: Custom keyring MISSING or CORRUPT!  Could not import Sanesecurity public GPG key to custom keyring" "*"
-    exit 1
-  else
-    chmod -f 0644 "$work_dir_gpg/*.*"
-    xshok_pretty_echo_and_log "Sanesecurity custom keyring MISSING!  GPG key successfully re-imported to custom keyring"
   fi
 fi
 
@@ -2094,20 +2105,21 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
               for db_file in "${sanesecurity_dbs[@]}" ; do
                 if ! cmp -s "$work_dir_sanesecurity/$db_file" "$clam_dbs/$db_file" ; then
                   xshok_pretty_echo_and_log "Testing updated Sanesecurity database file: $db_file"
-                  if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null ; then
-                    $gpg_bin --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null
-                    ret="$?"
-                  else
-                    ret="0"
+
+                  if [ "$disable_gpg" != "yes" ] ; then
+                    if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null ; then
+                      $gpg_bin --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null
+                      ret="$?"
+                    else
+                      ret="0"
+                    fi
+                    if [ "$ret" -eq 0 ] ; then
+                      test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
+                    else
+                      xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING"
+                    fi
                   fi
                   if [ "$ret" -eq 0 ] ; then
-                    test "$gpg_silence" = "no" && xshok_pretty_echo_and_log "Sanesecurity GPG Signature tested good on $db_file database"
-                    true
-                  else
-                    xshok_pretty_echo_and_log "Sanesecurity GPG Signature test FAILED on $db_file database - SKIPPING"
-                    false
-                  fi
-                  if [ $? -eq 0 ] ; then
                     db_ext="${db_file#*.}"
                     if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
                       if $clamscan_bin --quiet -d "$work_dir_sanesecurity/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
