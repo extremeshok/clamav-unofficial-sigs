@@ -53,7 +53,7 @@ clamav-unofficial-sigs.sh
 # Step 7
 Cron helper Script
 ```
-cat <<EOF > /etc/rc.clamav-unofficial-sigs.sh.sh
+cat <<EOF > /etc/rc.clamav-unofficial-sigs.sh
 #!/bin/sh
 SHELL=/bin/sh
 PATH=/usr/local/bin:$PATH
