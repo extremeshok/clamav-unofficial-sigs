@@ -22,7 +22,7 @@ dist: trusty
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install ca-certificates wget rsync p7zip -qq
+  - sudo apt-get install ca-certificates wget rsync p7zip-full -qq
   - sudo apt-add-repository "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse"
   - sudo apt-get update -qq
   - sudo apt-get -t trusty-backports install shellcheck -qq
