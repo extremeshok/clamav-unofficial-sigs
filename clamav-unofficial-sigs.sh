@@ -1598,8 +1598,14 @@ if [ -z "$wget_bin" ] ; then
   fi
 fi
 if [ -z "$gpg_bin" ] ; then
-  xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
-  exit 1
+  if [ "disable_gpg" == "yes" ] ; then
+    xshok_pretty_echo_and_log "Warning: GnuPG / signature verification disabled" "="
+  else
+    xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
+    xshok_pretty_echo_and_log "Install gnupg or add the following to your user.conf"
+    xshok_pretty_echo_and_log "disable_gpg=\"yes\""
+    exit 1
+  fi
 fi
 # Check default directories are defined
 if [ -z "$work_dir" ] ; then
