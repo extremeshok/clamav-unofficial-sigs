@@ -1,6 +1,4 @@
 #!/bin/bash
-# shellcheck disable=SC2154
-# shellcheck disable=SC2128
 ################################################################################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
@@ -10,8 +8,7 @@
 # Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 #
 # Originially based on:
-# Script provide by Bill Landry (unofficialsigs@gmail.com).
-#
+# Script provided by Bill Landry (unofficialsigs@gmail.com).
 # License: BSD (Berkeley Software Distribution)
 #
 ################################################################################
@@ -30,6 +27,8 @@
 ######  #######    #     # #######    #       ####### ######  ###    #
 
 ################################################################################
+# shellcheck disable=SC2154
+# shellcheck disable=SC2128
 
 # Detect to make sure the entire script is avilable, fail if the script is missing contents
 if [ "$(tail -n 1 "$0" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
@@ -2822,7 +2821,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               # fi
 
               #cleanup any leading and trailing whitespace.
-              db_url="$(echo -e "${db_url}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+              db_url="$(echo -e "$db_url" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 
               db_file="$(basename "$db_url")"
 
