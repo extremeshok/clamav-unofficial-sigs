@@ -1449,6 +1449,7 @@ fi
 # Make sure we have a readable config file
 if [ "$we_have_a_config" == "0" ] ; then
   xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
+  xshok_pretty_echo_and_log "Note: Possible fix would be to checkl the config dir $config_dir exists and contains config files"
   exit 1
 fi
 
