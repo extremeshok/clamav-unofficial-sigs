@@ -7,7 +7,7 @@ pwd
 echo "Downloading latest clamav databases"
 
 wget -nv -t 9 https://github.com/extremeshok/clamav-sample-db/raw/master/bytecode.cvd.7z
-7za bytecode.cvd.7z
+7za e bytecode.cvd.7z
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
