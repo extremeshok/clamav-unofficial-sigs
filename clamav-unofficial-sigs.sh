@@ -2070,8 +2070,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: $sanesecurity_mirror_site_info"
             # shellcheck disable=SC2086
             $rsync_bin $rsync_output_level $no_motd --files-from="$sanesecurity_include_dbs" -ctuz $connect_timeout --timeout="$rsync_max_time" "rsync://$sanesecurity_mirror_ip/sanesecurity" "$work_dir_sanesecurity" 2>/dev/null
-
-            if [ $? -eq 0 ] ; then # The correct way
+            ret="$?"
+            if [ "$ret" -eq 0 ] || [ "$ret" -eq 23 ] ; then # The correct way, 23 is some files were not transfered, can be ignored and we can assume a success
               sanesecurity_rsync_success="1"
               for db_file in "${sanesecurity_dbs[@]}" ; do
                 if ! cmp -s "$work_dir_sanesecurity/$db_file" "$clam_dbs/$db_file" ; then
@@ -2143,7 +2143,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                   fi
                 fi
               done
-              if [ "$sanesecurity_update" != "1" ] ; then
+              if [ ! "$sanesecurity_update" == "1" ] ; then
                 xshok_pretty_echo_and_log "No Sanesecurity database file updates found" "-"
                 break
               else
@@ -2153,7 +2153,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
               xshok_pretty_echo_and_log "Connection to $sanesecurity_mirror_site_info failed - Trying next mirror site..."
             fi
           done
-          if [ "$sanesecurity_rsync_success" != "1" ] ; then
+          if [ ! "$sanesecurity_rsync_success" == "1" ] ; then
             xshok_pretty_echo_and_log "Access to all Sanesecurity mirror sites failed - Check for connectivity issues"
             xshok_pretty_echo_and_log "or signature database name(s) misspelled in the script's configuration file."
           fi
