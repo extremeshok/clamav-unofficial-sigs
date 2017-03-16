@@ -165,13 +165,24 @@ function xshok_user_group_exists () { # username groupname
   else
     id_bin="$(which id 2> /dev/null)"
   fi
-  getent_bin="$(which getent 2> /dev/null)"
+
+  if [ "$2" ] ; then
+    if [ "$(uname -s)" == "Darwin" ] ; then
+      #use ruby, as this is the best way. Ruby is always avilable as brew uses ruby
+      ruby -e 'require "etc"; puts Etc::getgrnam("_clamav").gid' > /dev/null 2>&1
+      ret="$?"
+    else
+      getent_bin="$(which getent 2> /dev/null)"
+      $getent_bin group "$2" >/dev/null 2>&1
+      ret="$?"
+    fi
+  fi
+
   if [ "$1" ] ; then
     $id_bin -u "$1" > /dev/null 2>&1
     if [ $? -eq 0 ]; then
       if [ "$2" ] ; then
-        $getent_bin group "$2" >/dev/null
-        if [ $? -eq 0 ]; then
+        if [ "$ret" -eq 0 ]; then
           return 0 ; # User and group exists
         else
           return 1 ; # Group does NOT exist
