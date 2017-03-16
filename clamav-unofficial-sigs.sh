@@ -1329,19 +1329,6 @@ if [ -x /usr/gnu/bin/grep ] ; then
 else
   grep_bin="$(which grep 2> /dev/null)"
 fi
-if [ "$enable_gpg" == "yes" ] ; then
-  if [ -x /opt/csw/bin/gpg ] ; then
-    gpg_bin="/opt/csw/bin/gpg"
-  else
-    gpg_bin="$(which gpg 2> /dev/null)"
-  fi
-  if [ -z "$gpg_bin" ] ; then
-    gpg_bin="$(which gpg2 2> /dev/null)"
-  fi
-  if [ -z "$gpg_bin" ] ; then
-    enable_gpg="no"
-  fi
-fi
 
 dig_bin="$(which dig 2> /dev/null)"
 if [ -z "$dig_bin" ] ; then
@@ -1635,15 +1622,27 @@ if [ -z "$wget_bin" ] ; then
     exit 1
   fi
 fi
+# Check if GPG is enabled and the binary is found
 if [ "$enable_gpg" == "yes" ] ; then
   if [ -z "$gpg_bin" ] ; then
-    xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
-    xshok_pretty_echo_and_log "Install gnupg or add the following to your user.conf"
-    xshok_pretty_echo_and_log "disable_gpg=\"yes\""
-    exit 1
+    if [ -x /opt/csw/bin/gpg ] ; then
+      gpg_bin="/opt/csw/bin/gpg"
+    else
+      gpg_bin="$(which gpg 2> /dev/null)"
+    fi
+    if [ -z "$gpg_bin" ] ; then
+      gpg_bin="$(which gpg2 2> /dev/null)"
+    fi
   fi
-else
-  xshok_pretty_echo_and_log "Notice: GnuPG / signature verification disabled" "-"
+  if [ -z "$gpg_bin" ] ; then
+    enable_gpg="no"
+  fi
+  if [ -x "$gpg_bin" ] ; then
+    enable_gpg="no"
+  fi
+fi
+if [ "$enable_gpg" != "yes" ] ; then
+  xshok_pretty_echo_and_log "Notice: GnuPG / signature verification disabled" "+"
 fi
 # Check default directories are defined
 if [ -z "$work_dir" ] ; then
