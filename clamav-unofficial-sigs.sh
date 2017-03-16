@@ -1306,7 +1306,6 @@ if [ "$(uname -s)" == "SunOS" ] ; then
 fi
 
 # Default Binaries & Commands
-clamd_reload_opt="clamdscan --reload"
 uname_bin="$(which uname 2> /dev/null)"
 clamscan_bin="$(which clamscan 2> /dev/null)"
 rsync_bin="$(which rsync 2> /dev/null)"
