@@ -1,4 +1,6 @@
 #!/bin/bash
+# shellcheck disable=SC2154
+# shellcheck disable=SC2128
 ################################################################################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
@@ -27,8 +29,7 @@
 ######  #######    #     # #######    #       ####### ######  ###    #
 
 ################################################################################
-# shellcheck disable=SC2154
-# shellcheck disable=SC2128
+
 
 # Detect to make sure the entire script is avilable, fail if the script is missing contents
 if [ "$(tail -n 1 "$0" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
@@ -55,6 +56,7 @@ function perms () {
 # if xshok_prompt_confirm; then
 # xshok_prompt_confirm && echo "accepted"
 # xshok_prompt_confirm && echo "yes" || echo "no"
+# shellcheck disable=SC2120
 function xshok_prompt_confirm () { # optional_message
   message="${1:-Are you sure?}"
   while true; do
