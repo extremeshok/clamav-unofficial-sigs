@@ -4,6 +4,11 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/lo
 
 pwd
 
+echo "Remove test signature if it exists. "
+if [ -e "/var/lib/clamav/sanesecurity.ftm" ] ; then
+	rm -f /var/lib/clamav/sanesecurity.ftm
+fi
+
 echo "running script as root"
 sudo bash /usr/sbin/clamav-unofficial-sigs
 if [ "$?" -eq "0" ] ; then
@@ -28,14 +33,6 @@ if [ -e "/var/lib/clamav/sanesecurity.ftm" ] ; then
 else
 	echo .. ERROR
 	exit 1
-fi
-
-echo "check gpg file was downloaded"
-if [ -e "/var/lib/clamav-unofficial-sigs/gpg-key/publickey.gpg" ] ; then
-	echo .. OK
-else
-	echo .. ERROR
-  exit 1
 fi
 
 echo "check cron file generation"
