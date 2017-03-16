@@ -1651,9 +1651,11 @@ if [ -z "$clam_dbs" ] ; then
   exit 1
 fi
 # Check default directories are writable
-if [ ! -w "$work_dir" ] ; then
-  xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not writable" "="
-  exit 1
+if [ -e "$work_dir" ] ; then
+  if [ ! -w "$work_dir" ] ; then
+    xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not writable" "="
+    exit 1
+  fi
 fi
 if [ ! -w "$clam_dbs" ] ; then
   xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not writable" "="
