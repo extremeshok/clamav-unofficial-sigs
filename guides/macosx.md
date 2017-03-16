@@ -28,7 +28,7 @@ exit
 # Step 4
 set your user options
 ```
-sudo vi /etc/clamav-unofficial-sigs/user.conf
+sudo pico /etc/clamav-unofficial-sigs/user.conf
 ```
 
 # Step 5
