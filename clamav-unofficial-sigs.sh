@@ -1080,7 +1080,7 @@ function clamscan_reload_dbs () {
             fi
           fi
         else
-          xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart" "="
+          xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart" "-"
           if [ -z "$clamd_restart_opt" ] ; then
             xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'" "*"
           else
@@ -1609,9 +1609,11 @@ shopt -s extglob; clam_dbs="${clam_dbs%%+(/)}"
 
 # SANITY checks
 # Check default Binaries & Commands are defined
-if [ -z "$clamd_reload_opt" ] ; then
-  xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt" "="
-  exit 1
+if [ "$reload_dbs" == "yes" ] ; then
+  if [ -z "$clamd_reload_opt" ] ; then
+    xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt" "="
+    exit 1
+  fi
 fi
 if [ -z "$uname_bin" ] ; then
   xshok_pretty_echo_and_log "ERROR: uname (uname_bin) not found" "="
