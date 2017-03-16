@@ -2161,6 +2161,9 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                         if [ "$selinux_fixes" == "yes" ] ; then
                           restorecon "$clam_dbs/$db_file"
                         fi
+
+                        echo $rsync_bin -pcqt "$work_dir_sanesecurity/$db_file" "$clam_dbs" 2>/dev/null
+
                         xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
                         sanesecurity_update=1
                         do_clamd_reload=1
