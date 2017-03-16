@@ -58,6 +58,4 @@ cat <<EOF > /Library/LaunchDaemons/com.clamav-unofficial-sigs.plist
 </plist>
 EOF
 exit
-chmod 777 /etc/rc.clamav-unofficial-sigs.sh
-echo -e "*/5 * * * * root /etc/rc.clamav-unofficial-sigs.sh\n\n" >> /etc/crontab
 ```
