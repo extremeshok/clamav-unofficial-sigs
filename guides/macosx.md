@@ -28,12 +28,10 @@ exit
 # Step 4
 set your user options
 ```
-sudo su
-vi /etc/clamav-unofficial-sigs/user.conf
-exit
+sudo vi /etc/clamav-unofficial-sigs/user.conf
 ```
 
-# Stpe 5
+# Step 5
 Console (shell)
 ```
 clamav-unofficial-sigs.sh

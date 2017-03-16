@@ -44,7 +44,7 @@ Console (shell)
 reboot
 ```
 
-# Stpe 6
+# Step 6
 Console (shell)
 ```
 clamav-unofficial-sigs.sh
