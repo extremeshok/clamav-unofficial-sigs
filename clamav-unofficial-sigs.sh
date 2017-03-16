@@ -1063,7 +1063,7 @@ function clamscan_reload_dbs () {
         xshok_pretty_echo_and_log "Update(s) detected, reloading ClamAV databases" "="
       fi
 
-      if [[ $($clamd_reload_opt 2>&1) = *"ERROR"* ]] ; then
+      if [[ "$($clamd_reload_opt 2>&1)" = *"ERROR"* ]] ; then
         xshok_pretty_echo_and_log "ERROR: Failed to reload, trying again" "-"
         if [ -r "$clamd_pid" ] ; then
           mypid="$(cat "$clamd_pid")"
@@ -1075,8 +1075,12 @@ function clamscan_reload_dbs () {
             if [ -z "$clamd_restart_opt" ] ; then
               xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'" "*"
             else
-              $clamd_restart_opt
-              xshok_pretty_echo_and_log "ClamAV Restarted" "="
+              $clamd_restart_opt > /dev/null
+              if [ $? -eq 0 ] ; then
+                xshok_pretty_echo_and_log "ClamAV Restarted" "="
+              else
+                xshok_pretty_echo_and_log "ClamAV NOT Restarted" "-"
+              fi
             fi
           fi
         else
@@ -1084,8 +1088,12 @@ function clamscan_reload_dbs () {
           if [ -z "$clamd_restart_opt" ] ; then
             xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'" "*"
           else
-            $clamd_restart_opt
-            xshok_pretty_echo_and_log "ClamAV Restarted" "="
+            $clamd_restart_opt > /dev/null
+            if [ $? -eq 0 ] ; then
+              xshok_pretty_echo_and_log "ClamAV Restarted" "="
+            else
+              xshok_pretty_echo_and_log "ClamAV NOT Restarted" "-"
+            fi
           fi
         fi
       else
