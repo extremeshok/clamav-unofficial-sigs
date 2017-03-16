@@ -1642,7 +1642,7 @@ if [ "$enable_gpg" == "yes" ] ; then
   fi
 fi
 if [ "$enable_gpg" != "yes" ] ; then
-  xshok_pretty_echo_and_log "Notice: GnuPG / signature verification disabled" "+"
+  xshok_pretty_echo_and_log "Notice: GnuPG / signature verification disabled" "-"
 fi
 # Check default directories are defined
 if [ -z "$work_dir" ] ; then
@@ -1656,12 +1656,12 @@ fi
 # Check default directories are writable
 if [ -e "$work_dir" ] ; then
   if [ ! -w "$work_dir" ] ; then
-    xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not writable" "="
+    xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not writable $work_dir" "="
     exit 1
   fi
 fi
 if [ ! -w "$clam_dbs" ] ; then
-  xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not writable" "="
+  xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not writable $clam_dbs" "="
   exit 1
 fi
 
