@@ -22,9 +22,17 @@ else
   exit 1
 fi
 
+echo "check signature placed correctly"
+if [ -e "/var/lib/clamav/sanesecurity.ftm" ] ; then
+	echo .. OK
+else
+	echo .. ERROR
+	exit 1
+fi
+
 echo "check gpg file was downloaded"
 if [ -e "/var/lib/clamav-unofficial-sigs/gpg-key/publickey.gpg" ] ; then
-	echo .. OK	
+	echo .. OK
 else
 	echo .. ERROR
   exit 1
@@ -34,7 +42,7 @@ echo "check cron file generation"
 bash clamav-unofficial-sigs.sh --install-cron
 if [ "$?" -eq "0" ] ; then
 	if [ -e "/etc/cron.d/clamav-unofficial-sigs" ] ; then
-		echo .. OK	
+		echo .. OK
 	else
 		echo .. ERROR
   	exit 1
@@ -48,7 +56,7 @@ echo "check logrotate file generation"
 bash clamav-unofficial-sigs.sh --install-logrotate
 if [ "$?" -eq "0" ] ; then
 	if [ -e "/etc/logrotate.d/clamav-unofficial-sigs" ] ; then
-		echo .. OK	
+		echo .. OK
 	else
 		echo .. ERROR
   	exit 1
@@ -62,7 +70,7 @@ echo "check man file generation"
 bash clamav-unofficial-sigs.sh --install-man
 if [ "$?" -eq "0" ] ; then
 	if [ -e "/usr/share/man/man8/clamav-unofficial-sigs.8" ] ; then
-		echo .. OK	
+		echo .. OK
 	else
 		echo .. ERROR
   	exit 1
@@ -75,7 +83,7 @@ fi
 echo "check database integrity test"
 bash clamav-unofficial-sigs.sh --test-database sanesecurity.ftm
 if [ "$?" -eq "0" ] ; then
-	echo .. OK	
+	echo .. OK
 else
 	echo .. ERROR
 	exit 1
@@ -84,7 +92,7 @@ fi
 echo "check gpg verify test"
 bash clamav-unofficial-sigs.sh --gpg-verify scam.ndb
 if [ "$?" -eq "0" ] ; then
-	echo .. OK	
+	echo .. OK
 else
 	echo .. ERROR
 	exit 1
