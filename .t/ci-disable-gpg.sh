@@ -5,7 +5,7 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/lo
 pwd
 
 echo "Disabling GPG support"
-echo "disable_gpg=\"yes\"" >> /etc/clamav-unofficial-sigs/user.conf
+echo "enable_gpg=\"no\"" >> /etc/clamav-unofficial-sigs/user.conf
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
