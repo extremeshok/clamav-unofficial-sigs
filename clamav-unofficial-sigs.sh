@@ -1420,7 +1420,7 @@ for config_file in "${config_files[@]}" ; do
 
 
 
-    if [ "$(uname -s)" == "SunOS" ] || [ "$(uname -s)" == "Darwin" ] ; then
+    if [ "$(uname -s)" == "SunOS" ] ; then
       # Solaris FIXES only, i had issues with running with a single command..
       clean_config="$(command sed -e '/^#.*/d' "$config_file")" # Comment line
       #clean_config="$(echo "$clean_config" | sed -e 's/#[[:space:]].*//')" # Comment line (duplicated)
@@ -1429,6 +1429,16 @@ for config_file in "${config_files[@]}" ; do
       #clean_config="$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
       clean_config="$(echo "$clean_config" | xargs)"
       clean_config="$(echo "$clean_config" | sed -e '/^\s*$/d')" # Blank lines
+
+    elif [ "$(uname -s)" == "Darwin" ] ; then
+      # MacOS / OS X fixes, had issues with running with a single command and with SunOS work around..
+      clean_config="$(command sed -e '/^#.*/d' "$config_file")" # Comment line
+      clean_config="$(echo "$clean_config" | sed -e 's/#[[:space:]].*//')" # Comment line (duplicated)
+      clean_config="$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
+      #clean_config="$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
+      #clean_config="$(echo "$clean_config" | xargs)"
+      clean_config="$(echo "$clean_config" | sed -e '/^\s*$/d')" # Blank lines
+
     else
       # Delete lines beginning with #
       # Delete from " #" to end of the line
