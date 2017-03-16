@@ -1450,7 +1450,7 @@ for config_file in "${config_files[@]}" ; do
     fi
 
     #fix eval of |
-    clean_config=${clean_config//|/\\|}
+    clean_config="${clean_config//|/\\|}"
 
     # Config error checking
     # Check "" are an even number
@@ -1469,7 +1469,7 @@ for config_file in "${config_files[@]}" ; do
     fi
 
     # backslash pipe
-    clean_config="${clean_config//|/\|}"
+    #clean_config="${clean_config//|/\|}"
 
     # Config loading
     for i in "${clean_config[@]}" ; do
