@@ -1604,6 +1604,8 @@ fi
 if [ -z "$man_log_file_full_path" ] ; then
   man_log_file_full_path="$log_file_path/$log_file_name"
 fi
+# dont assign , but remove trailing /
+shopt -s extglob; clam_dbs="${clam_dbs%%+(/)}"
 
 # SANITY checks
 # Check default Binaries & Commands are defined
@@ -1642,6 +1644,19 @@ fi
 # Check default directories are defined
 if [ -z "$work_dir" ] ; then
   xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not defined" "="
+  exit 1
+fi
+if [ -z "$clam_dbs" ] ; then
+  xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not defined" "="
+  exit 1
+fi
+# Check default directories are writable
+if [ ! -w "$work_dir" ] ; then
+  xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not writable" "="
+  exit 1
+fi
+if [ ! -w "$clam_dbs" ] ; then
+  xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not writable" "="
   exit 1
 fi
 
@@ -2161,8 +2176,6 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                         if [ "$selinux_fixes" == "yes" ] ; then
                           restorecon "$clam_dbs/$db_file"
                         fi
-
-                        echo $rsync_bin -pcqt "$work_dir_sanesecurity/$db_file" "$clam_dbs" 2>/dev/null
 
                         xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
                         sanesecurity_update=1
