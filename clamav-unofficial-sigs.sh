@@ -671,8 +671,8 @@ function hexadecimal_encode_formatted_input_string () {
 # GPG verify a specific Sanesecurity database file
 function gpg_verify_specific_sanesecurity_database_file () { # databasefile
   echo ""
-  if [ "$disable_gpg" == "yes" ] ; then
-    xshok_pretty_echo_and_log "Warning: GnuPG / signature verification disabled"
+  if [ "$enable_gpg" == "no" ] ; then
+    xshok_pretty_echo_and_log "Notice: GnuPG / signature verification disabled" "-"
   else
     if [ "$1" ] ; then
       db_file="$(echo "$1" | awk -F "/" '{print $NF}')"
@@ -728,7 +728,7 @@ function output_system_configuration_information () {
     echo "$curl_bin"
     $curl_bin --version | head -1
   fi
-  if [ "$disable_gpg" != "yes" ] ; then
+  if [ "$enable_gpg" == "yes" ] ; then
     echo "*** GPG LOCATION & VERSION ***"
     echo "$gpg_bin"
     $gpg_bin --version | head -1
@@ -1329,7 +1329,7 @@ if [ -x /usr/gnu/bin/grep ] ; then
 else
   grep_bin="$(which grep 2> /dev/null)"
 fi
-if [ "$disable_gpg" != "yes" ] ; then
+if [ "$enable_gpg" == "yes" ] ; then
   if [ -x /opt/csw/bin/gpg ] ; then
     gpg_bin="/opt/csw/bin/gpg"
   else
@@ -1337,6 +1337,9 @@ if [ "$disable_gpg" != "yes" ] ; then
   fi
   if [ -z "$gpg_bin" ] ; then
     gpg_bin="$(which gpg2 2> /dev/null)"
+  fi
+  if [ -z "$gpg_bin" ] ; then
+    enable_gpg="no"
   fi
 fi
 
@@ -1632,15 +1635,15 @@ if [ -z "$wget_bin" ] ; then
     exit 1
   fi
 fi
-if [ "$disable_gpg" == "yes" ] ; then
-    xshok_pretty_echo_and_log "Warning: GnuPG / signature verification disabled" "="
-  else
-    if [ -z "$gpg_bin" ] ; then
-      xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
-      xshok_pretty_echo_and_log "Install gnupg or add the following to your user.conf"
-      xshok_pretty_echo_and_log "disable_gpg=\"yes\""
-      exit 1
+if [ "$enable_gpg" == "yes" ] ; then
+  if [ -z "$gpg_bin" ] ; then
+    xshok_pretty_echo_and_log "ERROR: gpg binary (gpg_bin) not found" "="
+    xshok_pretty_echo_and_log "Install gnupg or add the following to your user.conf"
+    xshok_pretty_echo_and_log "disable_gpg=\"yes\""
+    exit 1
   fi
+else
+  xshok_pretty_echo_and_log "Notice: GnuPG / signature verification disabled" "-"
 fi
 # Check default directories are defined
 if [ -z "$work_dir" ] ; then
@@ -1910,7 +1913,7 @@ xshok_mkdir_ownership "$work_dir_add"
 # Set secured access permissions to the GPG directory
 perms chmod -f 0700 "$work_dir_gpg"
 
-if [ "$disable_gpg" != "yes" ] ; then
+if [ "$enable_gpg" == "yes" ] ; then
   # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
   if [ ! -s "$work_dir_gpg/publickey.gpg" ] ; then
     xshok_file_download "$work_dir_gpg/publickey.gpg" "$sanesecurity_gpg_url"
@@ -2147,7 +2150,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                 if ! cmp -s "$work_dir_sanesecurity/$db_file" "$clam_dbs/$db_file" ; then
                   xshok_pretty_echo_and_log "Testing updated Sanesecurity database file: $db_file"
 
-                  if [ "$disable_gpg" != "yes" ] ; then
+                  if [ "$enable_gpg" == "yes" ] ; then
                     if ! $gpg_bin --trust-model always -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null ; then
                       $gpg_bin --always-trust -q --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg/ss-keyring.gpg" --verify "$work_dir_sanesecurity/$db_file.sig" "$work_dir_sanesecurity/$db_file" 2>/dev/null
                       ret="$?"
