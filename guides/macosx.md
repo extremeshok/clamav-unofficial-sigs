@@ -50,7 +50,7 @@ cat <<EOF > /Library/LaunchDaemons/com.clamav-unofficial-sigs.plist
 	<string>Clamav Unofficial Sigs update</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/local/bin/clamav-unofficial-sigs.sh</string>
+		<string>bash /usr/local/bin/clamav-unofficial-sigs.sh</string>
 	</array>
 	<key>StartInterval</key>
 	<integer>3600</integer>
