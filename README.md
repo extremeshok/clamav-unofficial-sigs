@@ -173,6 +173,12 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### Version 5.6.1 (updated 2017-03-18)
+ - eXtremeSHOK.com Maintenance
+ - Packers/Javascript_exploit_and_obfuscation.yar false posirtive rating increased to HIGH
+ - Codeclimate fixes
+ - Incremented the config to version 73
+
 ### Version 5.6 (updated 2017-03-17)
  - eXtremeSHOK.com Maintenance
  - PGP is now optional and no longer a requirement and pgp support is auto-detected
