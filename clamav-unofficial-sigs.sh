@@ -1405,7 +1405,7 @@ xshok_pretty_echo_and_log "" "#" "80"
 while true ; do
   case "$1" in
     -h|--help) help_and_usage; exit ;;
-    -V|--version) exit ;; # FIXME
+    -V|--version) exit ;;
     *) break ;;
   esac
 done
