@@ -26,7 +26,7 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * wget/curl : TCP port 443
 
 ### Supported Operating Systems
-Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS), pfSense and derivative systems  
+Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS), pfSense, Zimbra and derivative systems  
 
 ### Quick Install Guide
 * Download the files to /tmp/
@@ -178,6 +178,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - PGP is now optional and no longer a requirement and pgp support is auto-detected
  - Full support for MacOS / OS X and added clamav install guide
  - Full support for pfSense and added clamav install guide
+ - Added os configs for Zimbra and Debian 8 with systemd
  - Much better error messages with possible solutions given
  - Better checking of possible issues
  - Update all SANESECURITY signature databases
