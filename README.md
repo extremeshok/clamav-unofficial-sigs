@@ -88,7 +88,7 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
  - 3. Login and navigate to your customer account : https://www.securiteinfo.com/clients/customers/account
  - 4. Click on the Setup tab
  - 5. You will need to get your unique identifier from one of the download links, they are individual for every user
- - 5.1. The 128 character string is after the http://www.securiteinfo.com/get/signatures/ 
+ - 5.1. The 128 character string is after the http://www.securiteinfo.com/get/signatures/
  - 5.2. Example https://www.securiteinfo.com/get/signatures/your_unique_and_very_long_random_string_of_characters/securiteinfo.hdb
    Your 128 character authorisation signature would be : your_unique_and_very_long_random_string_of_characters
  - 6. Enter the authorisation signature into the config securiteinfo_authorisation_signature: replacing YOUR-SIGNATURE-NUMBER with your authorisation signature from the link
@@ -173,19 +173,39 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ## Change Log
 
-### Version 5.4.1 (updated 2016-06-20)
+### Version 5.6 (updated 2017-03-17)
+ - eXtremeSHOK.com Maintenance
+ - pgp is now optional and no longer a requirement
+ - Full support for MacOS / OS X and added clamav install guide
+ - Full support for pfSense and added clamav install guide
+ - Much better error messages with possible solutions given
+ - Better checking of possible issues
+ - Update all SANESECURITY signature databases
+ - Support for clamav-devel 
+ - Added full proxy support to wget and curl
+ - replace allot of "echo | cut | sed" with bash substitutions
+ - Added fallbacks/substitutions for various commands
+ - xshok_file_download and xshok_draw_time_remaining functions added to replace redundant code blocks
+ - removed SANESECURITY mbl.ndb as this file is not showing up on the rsync mirrors
+ - allow exit code 23 for rsync
+ - Major refactoring : Normalize comments, quotes, functions, conditions
+ - Protect various arguments and "POSIX-ize" script integrity
+ - Enhanced testing with travis-ci, including clamav 0.99
+ - Incremented the config to version 72
+
+### Version 5.4.1
  - eXtremeSHOK.com Maintenance
  - Disable installation when either pkg_mgr or pkg_rm is defined.
  - Minor refactoring
- - Update master.conf with the new Yara-rules project file names 
+ - Update master.conf with the new Yara-rules project file names
  - Incremented the config to version 69
- 
+
 ### Version 5.4
  - eXtremeSHOK.com Maintenance
  - Added Solaris 10 and 11 configs
  - When under Solaris we define our own which function
  - Define grep_bin variable, use gnu grep on sun os
- - Fallback to gpg2 if gpg not found, 
+ - Fallback to gpg2 if gpg not found,
  - Added support for csw gnupg on solaris
  - Trap the keyboard interrupt (ctrl+c) and gracefully exit
  - Added CentOS 7 Atomic config @deajan
@@ -256,7 +276,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Minor fix: yararulesproject_enabled not yararulesproject_enable
 
 ### Version 5.2.0
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Refactor some functions
  - Added --install-man this will automatically generate and install the man (help) file
  - Yararules and yararulesproject enabled by default
@@ -276,7 +296,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Bump config to 62
 
 ### Version 5.1.1
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Added OS X and openbsd configs
  - Fixed host fallback sed issues by @MichaelKuch
  - Suppress most error messages of chmod and chown
@@ -289,11 +309,11 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Bump config to 61
 
 ### Version 5.1.0
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Added --install-cron this will automatically generate and install the cron file
  - Added --install-logrotate this will automatically generate and install the logrotate file
  - Change official URL of SecuriteInfo signatures
- - Added a new database (securiteinfoandroid.hdb) for SecuriteInfo 
+ - Added a new database (securiteinfoandroid.hdb) for SecuriteInfo
  - Remove database files after disabling a database group by @reneschuster
  - Updated Gentoo OS config by @orlitzky
  - Regroup functiuons
@@ -302,12 +322,12 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Bump config to 60
 
 ### Version 5.0.6
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Updated winnow databases as per information from Tom @ OITC
  - Bump config to 58
 
 ### Version 5.0.5
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Add support for specifying a custom config dir or file with (--config) -c option
  - Removed default_config
  - Added travis-ci build testing
@@ -328,7 +348,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Added script version checks
 
 ### Version 5.0.4
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Added/Updated OS configs: CentOS 7, FreeBSD, Slackware
  - Added clamd_reload_opt to fix issues with centos7 conf
  - Fix --remove-script should call remove_script() function by @IdahoPL
@@ -343,38 +363,38 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Config updated to 56 due to changes
 
 ### Version 5.0.3
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Added OS configs: OpenSUSE, Archlinux, Gentoo, Raspbian, FreeBSD
  - Fixed config option enable_logging -> logging_enabled
 
 ### Version 5.0.2
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Detect if the entire script is available/complete
  - Fix for Missing space between "]
 
 ### Version 5.0.1
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Disable logging if the log file is not writable.
  - Do not attempt to log before a config is loaded
 
 ### Version 5.0.0
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Added porcupine.hsb : Sha256 Hashes of VBS and JSE malware Database from sanesecurity
  - Fix for missing $ for clamd_pid an incorrect variable definition
- - Fixes for not removing dirs by @msapiro 
+ - Fixes for not removing dirs by @msapiro
  - Updates to account for changed names and addition of sub-directories for Yara-Rules by @msapiro
  - Use MD5 with MalwarePatrol by @olivier2557
  - Suppress the header and config loading message if running via cron
  - Added systemd files by @falon
  - Added config option remove_bad_database,  a database with a BAD integrity check will be removed
  - Fixed broken whitelisting of malwarepatrol signatures
- - Replaced Version command option -v with -V 
+ - Replaced Version command option -v with -V
  - Added command option -v (--verbose) to force verbose output
  - Removed config options: silence_ssl, curl_silence, rsync_silence, gpg_silence, comment_silence
  - Added ignore_ssl option to supress ssl errors and warnings, ie operate in insecure mode.
  - Replaced test-database command option -s with -t
  - Replaced output-triggered command option -t with -o
- - Added command option -s (--silence) to force silenced output 
+ - Added command option -s (--silence) to force silenced output
  - Default verbose for terminal and silence for cron
  - Added RHEL/Centos 7 config settings
  - Added short option (-F) to Force all databases to be downloaded, could cause ip to be blocked"
@@ -387,23 +407,23 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - minor code refactoring and reindenting
 
 ### Version 4.9.3
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Various Bug Fixes
  - Last release of 4.x.x base
  - minor code refactoring
 
 ### Version 4.9.2
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Added function xshok_check_s2 to prevent possible errors with -c and no configfile path
  - minor code refactoring
 
 ### Version 4.9.1
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - OS X compatibility fix by stewardle
  - missing $ in $yararules_enabled
 
 ### Version 4.9
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Code Refactoring
  - New function clamscan_reload_dbs, will first try and reload the clam database, if reload fails will restart clamd
  - Added Function xshok_pretty_echo_and_log, far easier and cleaner way to output and log information
@@ -416,7 +436,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Config updated to 53 due to changes
 
 ### Version 4.8
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Added long option (--force) to Force all databases to be downloaded, could cause ip to be blocked"
  - added config option:  malwarepatrol_free="yes", set to "no" to enable commercial subscription url
  - added support for commercial malwarepatrol subscription
@@ -426,7 +446,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Config updated to 52 due to changes
 
 ### Version 4.7
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Code Refactoring
  - Complete rewrite of the main case selector (program options)
  - Added long options (--decode-sig, --encode-string, --encode-formatted, --gpg-verify, --information, --make-database, --remove-script, --test-database, --output-triggered)
@@ -435,7 +455,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Config updated to 51 due to changes
 
 ### Version 4.6.1
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Code Refactoring
  - Added generic options (--help --version --config)
  - Correctly handle generic options before the main case selector
@@ -444,7 +464,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Removed the version information code as this is always printed
 
 ### Version 4.6
- - eXtremeSHOK.com Maintenance 
+ - eXtremeSHOK.com Maintenance
  - Code Refactoring
  - Removed custom config forced to use the same filename as the default config
  - Change file checks from exists to exists and is readable
@@ -481,7 +501,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ### Version 4.4.5
  - eXtremeSHOK.com Maintenance
- - Updated SecuriteInfo setup instructions 
+ - Updated SecuriteInfo setup instructions
 
 ### Version 4.4.4
  - eXtremeSHOK.com Maintenance
@@ -508,7 +528,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ### Version 4.4.0
  - eXtremeSHOK.com Maintenance
- - Code refactoring: 
+ - Code refactoring:
  - Added full support for Linux Malware Detect clamav databases
  - Config updated to 4.4
 
@@ -551,7 +571,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Remove: invalid config values (eg. EXPORT path)
  - Fix: correctly check if rsync was successful
 
-## Script updates can be found at: 
+## Script updates can be found at:
 ### https://github.com/extremeshok/clamav-unofficial-sigs
 
 Original Script can be found at: http://sourceforge.net/projects/unofficial-sigs
