@@ -1,16 +1,11 @@
-# ClamAV Unofficial Signature Databases Update Cron File
 ###################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+# License: BSD (Berkeley Software Distribution)
 ##################
 #
-# Originially based on:
-# Script provide by Bill Landry (unofficialsigs@gmail.com).
-#
 # Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
-#
-# License: BSD (Berkeley Software Distribution)
 #
 ##################
 # This cron file will execute the clamav-unofficial-sigs.sh script that
@@ -27,4 +22,4 @@ Description=Clamav Unofficial Sigs Update service
 Documentation=man:clamav-unofficial-sigs(8)
 
 [Service]
-ExecStart=/usr/local/bin/clamav-unofficial-sigs.sh
+ExecStart=/usr/local/sbin/clamav-unofficial-sigs.sh
