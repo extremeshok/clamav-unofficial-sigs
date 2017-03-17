@@ -63,7 +63,7 @@ script:
   - sudo sh -e .t/ci-clamav-install-wheezy.sh
   - sudo sh -e .t/ci-clamav-install-default-database.sh
   - sudo sh -e .t/ci-disable-gpg.sh
- - sudo cp -f .t/tests/user2.conf /etc/clamav-unofficial-sigs/user.conf
+  - sudo cp -f .t/tests/user2.conf /etc/clamav-unofficial-sigs/user.conf
   - sudo sh -e .t/ci-test.sh
 
 addons:
