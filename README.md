@@ -26,7 +26,7 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 * wget/curl : TCP port 443
 
 ### Supported Operating Systems
-Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS) and derivative systems  
+Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS), pfSense and derivative systems  
 
 ### Quick Install Guide
 * Download the files to /tmp/
@@ -175,19 +175,19 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ### Version 5.6 (updated 2017-03-17)
  - eXtremeSHOK.com Maintenance
- - pgp is now optional and no longer a requirement
+ - PGP is now optional and no longer a requirement and pgp support is auto-detected
  - Full support for MacOS / OS X and added clamav install guide
  - Full support for pfSense and added clamav install guide
  - Much better error messages with possible solutions given
  - Better checking of possible issues
  - Update all SANESECURITY signature databases
- - Support for clamav-devel 
+ - Support for clamav-devel (clamav compiled from source)
  - Added full proxy support to wget and curl
- - replace allot of "echo | cut | sed" with bash substitutions
+ - Replace allot of "echo | cut | sed" with bash substitutions
  - Added fallbacks/substitutions for various commands
  - xshok_file_download and xshok_draw_time_remaining functions added to replace redundant code blocks
- - removed SANESECURITY mbl.ndb as this file is not showing up on the rsync mirrors
- - allow exit code 23 for rsync
+ - Removed SANESECURITY mbl.ndb as this file is not showing up on the rsync mirrors
+ - Allow exit code 23 for rsync
  - Major refactoring : Normalize comments, quotes, functions, conditions
  - Protect various arguments and "POSIX-ize" script integrity
  - Enhanced testing with travis-ci, including clamav 0.99

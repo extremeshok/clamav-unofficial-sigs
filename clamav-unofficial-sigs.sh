@@ -5,13 +5,12 @@
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+# License: BSD (Berkeley Software Distribution)
 ################################################################################
 #
 # Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 #
-# Originially based on:
-# Script provided by Bill Landry (unofficialsigs@gmail.com).
-# License: BSD (Berkeley Software Distribution)
+# Originially based on Script provided by Bill Landry (unofficialsigs@gmail.com).
 #
 ################################################################################
 #
