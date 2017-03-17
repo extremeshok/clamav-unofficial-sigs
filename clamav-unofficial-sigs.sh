@@ -1284,8 +1284,8 @@ else
 ################################################################################
 
 # Script Info
-script_version="5.6"
-script_version_date="2017-03-17"
+script_version="5.6.1"
+script_version_date="2017-03-18"
 minimum_required_config_version="72"
 minimum_yara_clamav_version="0.99"
 
@@ -1405,7 +1405,7 @@ xshok_pretty_echo_and_log "" "#" "80"
 while true ; do
   case "$1" in
     -h|--help) help_and_usage; exit ;;
-    -V|--version) exit ;; # FIXME
+    -V|--version) exit ;;
     *) break ;;
   esac
 done

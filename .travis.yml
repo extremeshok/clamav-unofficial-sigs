@@ -49,7 +49,6 @@ install:
   - sudo mkdir -p /etc/clamav-unofficial-sigs
   - sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf
   - sudo cp -f config/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
-  - sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
   - sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs
 
 script:
@@ -58,11 +57,13 @@ script:
   - sudo sh -e .t/ci-clamav-download-default-databases-git.sh
   - sudo sh -e .t/ci-clamav-install-default.sh
   - sudo sh -e .t/ci-clamav-install-default-database.sh
+  - sudo cp -f .t/tests/user1.conf /etc/clamav-unofficial-sigs/user.conf
   - sudo sh -e .t/ci-test.sh
   - sudo sh -e .t/ci-clamav-clean.sh
   - sudo sh -e .t/ci-clamav-install-wheezy.sh
   - sudo sh -e .t/ci-clamav-install-default-database.sh
   - sudo sh -e .t/ci-disable-gpg.sh
+  - sudo cp -f .t/tests/user2.conf /etc/clamav-unofficial-sigs/user.conf
   - sudo sh -e .t/ci-test.sh
 
 addons:
