@@ -1284,8 +1284,8 @@ else
 ################################################################################
 
 # Script Info
-script_version="5.6.1"
-script_version_date="2017-03-18"
+script_version="5.6.2"
+script_version_date="2017-03-19"
 minimum_required_config_version="72"
 minimum_yara_clamav_version="0.99"
 
@@ -1644,7 +1644,7 @@ if [ "$enable_gpg" == "yes" ] ; then
   if [ -z "$gpg_bin" ] ; then
     enable_gpg="no"
   fi
-  if [ -x "$gpg_bin" ] ; then
+  if [ ! -x "$gpg_bin" ] ; then
     enable_gpg="no"
   fi
 fi

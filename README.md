@@ -168,13 +168,17 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ## Change Log
 
-### Version 5.6.1 (updated 2017-03-18)
+### Version 5.6.2 (updated 2017-03-19)
+ - eXtremeSHOK.com Maintenance
+ - Bug Fix GPG always being disabled, thanks @orlitzky
+
+### Version 5.6.1
  - eXtremeSHOK.com Maintenance
  - Packers/Javascript_exploit_and_obfuscation.yar false positive rating increased to HIGH
  - Codeclimate fixes
  - Incremented the config to version 73
 
-### Version 5.6 (updated 2017-03-17)
+### Version 5.6
  - eXtremeSHOK.com Maintenance
  - PGP is now optional and no longer a requirement and pgp support is auto-detected
  - Full support for MacOS / OS X and added clamav install guide
