@@ -1795,7 +1795,7 @@ if [ "$enable_yararules" == "yes" ] ; then
   current_clamav_version="$($clamscan_bin -V | cut -d " " -f 2 | cut -d "/" -f 1 | awk -F "." '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')"
   minimum_yara_clamav_version="$(echo "$minimum_yara_clamav_version" | awk -F "." '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')"
   # Check current clamav version against the minimum required version for yara support
-  if [ "$current_clamav_version" -le "$minimum_yara_clamav_version" ] ; then # Older
+  if [ "$current_clamav_version" -lt "$minimum_yara_clamav_version" ] ; then # Older
     yararulesproject_enabled="no"
     enable_yararules="no"
     xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
