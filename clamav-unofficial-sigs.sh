@@ -240,17 +240,21 @@ function xshok_pretty_echo_and_log () { # "string" "repeating" "count" "type"
 
   # Handle logging
   if [ "$enable_log" == "yes" ] ; then
-    if [ ! -e "$log_file_path/$log_file_name" ] ; then
-      # xshok_mkdir_ownership "$log_file_path"
-      mkdir -p "$log_file_path"
-      touch "$log_file_path/$log_file_name" 2>/dev/null
-      perms chown -f "$clam_user:$clam_group" "$log_file_path/$log_file_name"
-    fi
-    if [ ! -w "$log_file_path/$log_file_name" ] ; then
-      echo "Warning: Logging Disabled, as file not writable: $log_file_path/$log_file_name"
-      enable_log="no"
+    if [ ! -z "$log_pipe_cmd" ] ; then
+      echo "$1" | "$log_pipe_cmd"
     else
-      echo "$(date "+%b %d %T")" "$1" >> "$log_file_path/$log_file_name"
+      if [ ! -e "$log_file_path/$log_file_name" ] ; then
+        # xshok_mkdir_ownership "$log_file_path"
+        mkdir -p "$log_file_path"
+        touch "$log_file_path/$log_file_name" 2>/dev/null
+        perms chown -f "$clam_user:$clam_group" "$log_file_path/$log_file_name"
+      fi
+      if [ ! -w "$log_file_path/$log_file_name" ] ; then
+        echo "Warning: Logging Disabled, as file not writable: $log_file_path/$log_file_name"
+        enable_log="no"
+      else
+        echo "$(date "+%b %d %T")" "$1" >> "$log_file_path/$log_file_name"
+      fi
     fi
   fi
 }
