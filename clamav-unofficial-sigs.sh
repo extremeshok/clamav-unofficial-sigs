@@ -740,7 +740,7 @@ function output_system_configuration_information () {
   if [ "$custom_config" != "no" ] ; then
     if [ -d "$custom_config" ] ; then
       # Assign the custom config dir and remove trailing / (removes / and //)
-      echo "Custom Configuration Directory: $config_dir"
+      echo "Custom Configuration Directory: $custom_config"
     else
       echo "Custom Configuration File: $custom_config"
     fi
@@ -1415,6 +1415,7 @@ if [ "$custom_config" != "no" ] ; then
   if [ -d "$custom_config" ] ; then
     # Assign the custom config dir and remove trailing / (removes / and //)
     shopt -s extglob; custom_config="${custom_config%%+(/)}"
+    config_dir="$custom_config"
     config_files=( "$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf" )
   else
     config_files=( "$custom_config" )
