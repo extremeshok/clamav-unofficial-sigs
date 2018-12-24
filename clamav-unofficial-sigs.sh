@@ -976,6 +976,7 @@ function output_signatures_triggered_during_ham_directory_scan () {
       echo "The following third-party signatures triggered hits during the HAM Directory scan:"
 
       $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$work_dir"/*/*.ndb | cut -d ":" -f 1
+      $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$work_dir"/*/*.db | cut -d "=" -f 1
     else
       echo "No third-party signatures have triggered hits during the HAM Directory scan."
     fi
@@ -1877,8 +1878,10 @@ if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
   if [ -d "$ham_dir" ] ; then
     xshok_mkdir_ownership "$test_dir"
     cp -f "$work_dir"/*/*.ndb "$test_dir"
+    cp -f "$work_dir"/*/*.db "$test_dir"
     $clamscan_bin --infected --no-summary -d "$test_dir" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "$work_dir_work_configs/whitelist.txt"
     $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir"/* | cut -d "*" -f 2 | sort | uniq > "$work_dir_work_configs/whitelist.hex"
+    $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir"/* | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
     cd "$test_dir" || exit
     for db_file in * ; do
       [[ -e $db_file ]] || break # Handle the case of no files
@@ -2199,7 +2202,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                     else
                       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_sanesecurity/$db_file" > "$test_dir/$db_file"
                       $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-                      $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+                      $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
                       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
                       mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
                       if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
@@ -2654,7 +2657,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               2)
                 $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_malwarepatrol/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
                 $clamscan_bin --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-                $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+		if [[ "$test_dir/$malwarepatrol_db" == *.db ]]; then
+                    $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+		else
+                    $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+		fi
                 $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db-tmp"
                 mv -f "$test_dir/$malwarepatrol_db-tmp" "$test_dir/$malwarepatrol_db"
                 if $clamscan_bin --quiet -d "$test_dir/$malwarepatrol_db" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
@@ -2947,7 +2954,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                     else
                       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_add/$db_file" > "$test_dir/$db_file"
                       $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-                      $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+		      if [[ "$work_dir_add/$db_file" == *.db ]]; then
+			  $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' |sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+		      else
+			  $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "=" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+		      fi
                       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
                       mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
                       if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
@@ -3125,6 +3136,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
     if [ -n "$ham_dir" ] ; then
       if [ -r "$work_dir_work_configs/whitelist.hex" ] ; then
         $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$work_dir"/*/*.ndb | cut -d "*" -f 2 | tr -d "\r" | sort | uniq > "$work_dir_work_configs/whitelist.tmp"
+	$grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$work_dir"/*/*.db | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' | sort | uniq >> "$work_dir_work_configs/whitelist.tmp"
         mv -f "$work_dir_work_configs/whitelist.tmp" "$work_dir_work_configs/whitelist.hex"
         rm -f "$work_dir_work_configs/whitelist.txt"
         rm -f "$test_dir"/*.*
