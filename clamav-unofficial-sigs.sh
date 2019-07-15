@@ -740,7 +740,7 @@ function output_system_configuration_information () {
   if [ "$custom_config" != "no" ] ; then
     if [ -d "$custom_config" ] ; then
       # Assign the custom config dir and remove trailing / (removes / and //)
-      echo "Custom Configuration Directory: $config_dir"
+      echo "Custom Configuration Directory: $custom_config"
     else
       echo "Custom Configuration File: $custom_config"
     fi
@@ -1415,6 +1415,7 @@ if [ "$custom_config" != "no" ] ; then
   if [ -d "$custom_config" ] ; then
     # Assign the custom config dir and remove trailing / (removes / and //)
     shopt -s extglob; custom_config="${custom_config%%+(/)}"
+    config_dir="$custom_config"
     config_files=( "$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf" )
   else
     config_files=( "$custom_config" )
@@ -1795,7 +1796,7 @@ if [ "$enable_yararules" == "yes" ] ; then
   current_clamav_version="$($clamscan_bin -V | cut -d " " -f 2 | cut -d "/" -f 1 | awk -F "." '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')"
   minimum_yara_clamav_version="$(echo "$minimum_yara_clamav_version" | awk -F "." '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')"
   # Check current clamav version against the minimum required version for yara support
-  if [ "$current_clamav_version" -le "$minimum_yara_clamav_version" ] ; then # Older
+  if [ "$current_clamav_version" -lt "$minimum_yara_clamav_version" ] ; then # Older
     yararulesproject_enabled="no"
     enable_yararules="no"
     xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
