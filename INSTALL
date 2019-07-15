@@ -31,7 +31,7 @@ Download the latest archive
   wget -q --no-check-certificate https://github.com/extremeshok/clamav-unofficial-sigs/archive/master.zip -O /tmp/clamav-unofficial-sigs.zip
 
 Uncompress/Unpackage the archive:
-   unzip -j -qq -o /tmp/clamav-unofficial-sigs.zip -d /tmp/clamav-unofficial-sigs/
+   unzip -qq -o /tmp/clamav-unofficial-sigs.zip -d /tmp/clamav-unofficial-sigs/
 
 ### Quick Install Guide
 * Download the files to /tmp/
