@@ -40,7 +40,7 @@ Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, 
 * Run the script once as your superuser to set all the permissions and create the relevant directories
 
 ### Systemd
-* Copy the contents of systemd/ into to /etc/systemd/
+* Copy the contents of systemd/ into to /etc/systemd/system/
 
 ### Advanced Config Overrides
 * Default configs are loaded in the following order if they exist:

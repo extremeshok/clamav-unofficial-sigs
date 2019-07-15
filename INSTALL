@@ -54,7 +54,7 @@ Install:
 * cp -f /tmp/clamav-unofficial-sigs/config/*.* /etc/clamav-unofficial-sigs/
 
 Install Systemd configs:
-* cp -f /tmp/clamav-unofficial-sigs/systemd/*.* /etc/systemd/
+* cp -f /tmp/clamav-unofficial-sigs/systemd/*.* /etc/systemd/system/
 
 Configure:
 * Rename the /etc/clamav-unofficial-sigs/os.your-distro.conf to os.conf
