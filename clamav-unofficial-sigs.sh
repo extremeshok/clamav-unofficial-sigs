@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # shellcheck disable=SC2154
 # shellcheck disable=SC2128
 ################################################################################
@@ -326,7 +326,7 @@ function xshok_auto_update () { # version
 
   # Generate the update script
   cat > xshok_update_script.sh << EOF
-#!/bin/bash
+#!/usr/bin/env bash
 # Overwrite old file with new
 if mv "$0.tmp" "$0"; then
   echo "Done. Update complete."
