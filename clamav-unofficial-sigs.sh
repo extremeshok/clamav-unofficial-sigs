@@ -3156,4 +3156,4 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 		xshok_cleanup
 
 		# And lastly we exit, Note: the exit is always on the 2nd last line
-		exit $?
+exit $?
