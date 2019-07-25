@@ -1444,8 +1444,7 @@ done
 if [ "$custom_config" != "no" ] ; then
 	if [ -d "$custom_config" ] ; then
 		# Assign the custom config dir and remove trailing / (removes / and //)
-		shopt -s extglob; custom_config="${custom_config%%+(/)}"
-		config_dir="$custom_config"
+		shopt -s extglob; config_dir="${custom_config%%+(/)}"
 		config_files=( "$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf" )
 	else
 		config_files=( "$custom_config" )
