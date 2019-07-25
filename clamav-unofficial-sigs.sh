@@ -1290,6 +1290,16 @@ script_version_date="2017-03-19"
 minimum_required_config_version="72"
 minimum_yara_clamav_version="0.99"
 
+# TODO , allow for other negatives besides no.
+#disabled_values_array=("0 no No NO false False FALSE off Off OFF disable Disable DISABLE disabled Disabled DISABLED")
+# if [[ " ${disabled_values_array[@]} " =~ " ${value} " ]]; then
+#     # whatever you want to do when arr contains value
+# fi
+#
+# if [[ ! " ${disabled_values_array[@]} " =~ " ${value} " ]]; then
+#     # whatever you want to do when arr doesn't contain value
+# fi
+
 # Attempt to scan for a valid config dir
 if [ -f "/etc/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/etc/clamav-unofficial-sigs"
@@ -3106,7 +3116,10 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 					ign2_updated="1"
 				fi
 			done < "$work_dir_work_configs/tracker.txt"
-			mv -f "$work_dir_work_configs/tracker-tmp.txt" "$work_dir_work_configs/tracker.txt"
+      if [ -f "$work_dir_work_configs/tracker-tmp.txt" ] ; then
+			     mv -f "$work_dir_work_configs/tracker-tmp.txt" "$work_dir_work_configs/tracker.txt"
+      fi
+
 
 			xshok_pretty_echo_and_log "" "=" "80"
 			if [ "$ign2_updated" == "1" ] ; then
