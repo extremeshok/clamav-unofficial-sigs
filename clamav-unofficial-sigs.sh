@@ -1000,7 +1000,7 @@ function add_signature_whitelist_entry() {
 		sig_name="$(echo "$sig_full" | cut -d ":" -f 2)"
 		if [ -n "$sig_name" ] ; then
 			if ! $grep_bin "$sig_name" my-whitelist.ign2 > /dev/null 2>&1 ; then
-				cp -f my-whitelist.ign2 "$work_dir_work_configs" 2>/dev/null
+				cp -f -p my-whitelist.ign2 "$work_dir_work_configs" 2>/dev/null
 				echo "$sig_name" >> "$work_dir_work_configs/my-whitelist.ign2"
 				echo "$sig_full" >> "$work_dir_work_configs/tracker.txt"
 				if $clamscan_bin --quiet -d "$work_dir_work_configs/my-whitelist.ign2" "$work_dir_work_configs/scan-test.txt" ; then
@@ -1728,7 +1728,7 @@ fi
 
 # Silence wget output and only report errors - useful if script is run via cron.
 if [ "$downloader_silence" == "yes" ] ; then
-	wget_output_level="--quiet" #--quiet
+	wget_output_level="--no-verbose" #--quiet
 	curl_output_level="--silent --show-error"
 else
 	wget_output_level="--no-verbose"
@@ -1875,8 +1875,8 @@ test_dir="$work_dir/test"
 if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
 	if [ -d "$ham_dir" ] ; then
 		xshok_mkdir_ownership "$test_dir"
-		cp -f "$work_dir"/*/*.ndb "$test_dir"
-		cp -f "$work_dir"/*/*.db "$test_dir"
+		cp -f -p "$work_dir"/*/*.ndb "$test_dir"
+		cp -f -p "$work_dir"/*/*.db "$test_dir"
 		$clamscan_bin --infected --no-summary -d "$test_dir" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "$work_dir_work_configs/whitelist.txt"
 		$grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir"/*.ndb | cut -d "*" -f 2 | sort | uniq > "$work_dir_work_configs/whitelist.hex"
 		$grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir"/*.db | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
@@ -2056,7 +2056,7 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
 
 	db_changes="$work_dir_work_configs/db-changes.txt"
 	if [ ! -s "$previous_dbs" ] ; then
-		cp -f "$current_dbs_file" "$previous_dbs" 2>/dev/null
+		cp -f -p "$current_dbs_file" "$previous_dbs" 2>/dev/null
 	fi
 	diff "$current_dbs_file" "$previous_dbs" 2>/dev/null | $grep_bin ">" | awk '{print $2}' > "$db_changes"
 	if [ -r "$db_changes" ] ; then
@@ -2072,7 +2072,7 @@ fi
 
 # Create "purge.txt" file for package maintainers to support package uninstall.
 purge="$work_dir_work_configs/purge.txt"
-cp -f "$current_dbs_file" "$purge"
+cp -f -p "$current_dbs_file" "$purge"
 {
 	echo "$work_dir_work_configs/current-dbs.txt"
 	echo "$work_dir_work_configs/db-changes.txt"
@@ -2184,7 +2184,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 													fi
 												fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${work_dir_sanesecurity}/${db_file}" "$clam_dbs" 2>/dev/null ; then
+												fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${work_dir_sanesecurity}/${db_file}" "$clam_dbs" 2>/dev/null ; then
 												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
 													restorecon "${clam_dbs}/${db_file}"
@@ -2211,7 +2211,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 												xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
 												# DO NOT KILL THIS DB
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+												fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
 												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
 													restorecon "${clam_dbs}/${db_file}"
@@ -2322,7 +2322,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 											fi
 										fi
 										false
-										fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_securiteinfo/$db_file" "$clam_dbs" 2>/dev/null ; then
+										fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_securiteinfo/$db_file" "$clam_dbs" 2>/dev/null ; then
 										perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 										if [ "$selinux_fixes" == "yes" ] ; then
 											restorecon "${clam_dbs}/${db_file}"
@@ -2352,7 +2352,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 											fi
 										fi
 										false
-										fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+										fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
 										perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 										if [ "$selinux_fixes" == "yes" ] ; then
 											restorecon "${clam_dbs}/${db_file}"
@@ -2457,7 +2457,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-									fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs" 2>/dev/null ; then
+									fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs" 2>/dev/null ; then
 									perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 									if [ "$selinux_fixes" == "yes" ] ; then
 										restorecon "$clam_dbs/local.ign"
@@ -2486,7 +2486,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-									fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+									fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
 									perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 									if [ "$selinux_fixes" == "yes" ] ; then
 										restorecon "${clam_dbs}/${db_file}"
@@ -2629,7 +2629,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							false
 						fi \
 							&& (
-							test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
+							test "$keep_db_backup" = "yes" && cp -f -p  "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
 							true
 						) \
 								&& if $rsync_bin -pcqt "$work_dir_malwarepatrol/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ; then
@@ -2666,7 +2666,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 								false
 							fi \
 								&& (
-								test "$keep_db_backup" = "yes" && cp -f "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
+								test "$keep_db_backup" = "yes" && cp -f -p  "$clam_dbs/$malwarepatrol_db" "$clam_dbs/$malwarepatrol_db-bak" 2>/dev/null
 								true
 							) \
 									&& if $rsync_bin -pcqt "$test_dir/$malwarepatrol_db" "$clam_dbs" 2>/dev/null ; then
@@ -2762,7 +2762,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 													fi
 												fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_yararulesproject/$db_file" "$clam_dbs" 2>/dev/null ; then
+												fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_yararulesproject/$db_file" "$clam_dbs" 2>/dev/null ; then
 												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
 													restorecon "${clam_dbs}/${db_file}"
@@ -2791,7 +2791,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 													fi
 												fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+												fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
 												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
 													restorecon "${clam_dbs}/${db_file}"
@@ -2920,7 +2920,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 													fi
                         fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_add/$db_file" "$clam_dbs" 2>/dev/null ; then
+												fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_add/$db_file" "$clam_dbs" 2>/dev/null ; then
 												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
 													restorecon "${clam_dbs}/${db_file}"
@@ -2955,7 +2955,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 													fi
 												fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+												fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
 												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
 													restorecon "${clam_dbs}/${db_file}"
@@ -3014,8 +3014,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 		if [ -r "$clam_dbs/local.ign" ] && [ -s "$work_dir_work_configs/monitor-ign.txt" ] ; then
 			ign_updated=0
 			cd "$clam_dbs" || exit
-			cp -f local.ign "$work_dir_work_configs/local.ign"
-			cp -f "$work_dir_work_configs/monitor-ign.txt" "$work_dir_work_configs/monitor-ign-old.txt"
+			cp -f -p local.ign "$work_dir_work_configs/local.ign"
+			cp -f -p "$work_dir_work_configs/monitor-ign.txt" "$work_dir_work_configs/monitor-ign-old.txt"
 
 			xshok_pretty_echo_and_log "" "=" "80"
 			while read -r entry ; do
@@ -3069,7 +3069,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 		if [ -r "$clam_dbs/my-whitelist.ign2" ] && [ -s "$work_dir_work_configs/tracker.txt" ] ; then
 			ign2_updated=0
 			cd "$clam_dbs" || exit
-			cp -f my-whitelist.ign2 "$work_dir_work_configs/my-whitelist.ign2"
+			cp -f -p my-whitelist.ign2 "$work_dir_work_configs/my-whitelist.ign2"
 
 			xshok_pretty_echo_and_log "" "=" "80"
 
