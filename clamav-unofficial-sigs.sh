@@ -1290,8 +1290,18 @@ script_version_date="2017-03-19"
 minimum_required_config_version="72"
 minimum_yara_clamav_version="0.99"
 
+# Attempt to scan for a valid config dir
+if [ -f "/etc/clamav-unofficial-sigs/master.conf" ] ; then
+  config_dir="/etc/clamav-unofficial-sigs"
+elif [ -f "/usr/local/etc/clamav-unofficial-sigs/master.conf" ] ; then
+  config_dir="/usr/local/etc/clamav-unofficial-sigs/"
+elif [ -f "/opt/zimbra/conf/clamav-unofficial-sigs/master.conf" ] ; then
+  config_dir="/opt/zimbra/conf/clamav-unofficial-sigs/"
+else
+  xshok_pretty_echo_and_log "ERROR: config_dir (/etc/clamav-unofficial-sigs/master.conf) could not be found" "="
+  exit 1
+fi
 # Default config files
-config_dir="/etc/clamav-unofficial-sigs"
 config_files=( "$config_dir/master.conf" "$config_dir/os.conf" "$config_dir/user.conf" )
 
 # Initialise
