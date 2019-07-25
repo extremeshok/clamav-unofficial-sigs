@@ -2207,7 +2207,8 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                     else
                       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_sanesecurity/$db_file" > "$test_dir/$db_file"
                       $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-                      $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+                      $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex-tmp"
+                      mv -f "$work_dir_work_configs/whitelist.hex-tmp" "$work_dir_work_configs/whitelist.hex"
                       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
                       mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
                       if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
@@ -2954,9 +2955,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_add/$db_file" > "$test_dir/$db_file"
                       $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
 		      if [[ "$work_dir_add/$db_file" == *.db ]]; then
-			  $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' |sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+			  $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' |sort | uniq >> "$work_dir_work_configs/whitelist.hex-tmp"
+        mv -f "$work_dir_work_configs/whitelist.hex-tmp" "$work_dir_work_configs/whitelist.hex"
 		      else
-			  $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "=" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
+			  $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "=" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex-tmp"
+        mv -f "$work_dir_work_configs/whitelist.hex-tmp" "$work_dir_work_configs/whitelist.hex"
 		      fi
                       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
                       mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"

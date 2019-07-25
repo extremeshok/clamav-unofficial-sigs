@@ -16,7 +16,7 @@ language: bash
 
 #Enable modern build platform, not container based.
 sudo: required
-dist: trusty
+dist: bionic
 
 # Apparently caching is disabled, since we used modern build platform as we require clamav and sudo ;/
 # caching the /var/lib/clamav/ will save +/-9mins of run time and allow the use of freshclam signatures
@@ -28,13 +28,8 @@ dist: trusty
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install ca-certificates wget rsync p7zip-full -qq
-  - sudo apt-add-repository "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse"
-  - sudo apt-get update -qq
-  - sudo apt-get -t trusty-backports install shellcheck -qq
+  - sudo apt-get install -y ca-certificates wget rsync p7zip-full shellcheck -qq
   #- sudo pip install bashate
-  - sudo apt-add-repository -r "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse"
-  - sudo apt-get update -qq
   # - "sudo mkdir -p tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs"
   # - "sudo rsync -rlptDv tmp/cache/  /var/lib/clamav/"
@@ -57,12 +52,7 @@ script:
   - sudo sh -e .t/ci-clamav-download-default-databases-git.sh
   - sudo sh -e .t/ci-clamav-install-default.sh
   - sudo sh -e .t/ci-clamav-install-default-database.sh
-  - sudo cp -f .t/tests/user1.conf /etc/clamav-unofficial-sigs/user.conf
-  - sudo sh -e .t/ci-test.sh
-  - sudo sh -e .t/ci-clamav-clean.sh
-  - sudo sh -e .t/ci-clamav-install-wheezy.sh
-  - sudo sh -e .t/ci-clamav-install-default-database.sh
-  - sudo cp -f .t/tests/user2.conf /etc/clamav-unofficial-sigs/user.conf
+  - sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
   - sudo sh -e .t/ci-test.sh
 
 addons:
