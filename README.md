@@ -168,6 +168,16 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### UNDER DEV : Version 6.0 (Started July 2019)
+ - eXtremeSHOK.com Maintenance & Refactoring
+ - Fix: version comparison of minimum Yara @bytesplit
+ - Use custom config directory @Amish
+ - unzip option -j was removed @wotomg
+ - ZCS 8.7 updates @tonster
+ - Logic fixes @Claus-Justus Heine
+ - Specify correct path for systemd units @SlothOfAnarchy
+ - Avoid hardcoded path to BASH @rseichter
+
 ### Version 5.6.2 (updated 2017-03-19)
  - eXtremeSHOK.com Maintenance
  - Bug Fix GPG always being disabled, thanks @orlitzky
