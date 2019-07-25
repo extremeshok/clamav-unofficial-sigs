@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2119
+# shellcheck disable=SC2120
 # shellcheck disable=SC2154
 # shellcheck disable=SC2128
 ################################################################################
@@ -52,7 +54,7 @@ function perms () {
 
 # Prompt a user if they should complete an action with Y or N
 # Usage: xshok_prompt_confirm
-# if xshok_prompt_confirm; then
+# if xshok_prompt_confirm ; then
 # xshok_prompt_confirm && echo "accepted"
 # xshok_prompt_confirm && echo "yes" || echo "no"
 # shellcheck disable=SC2120
@@ -180,7 +182,7 @@ function xshok_user_group_exists () { # username groupname
   if [ "$1" ] ; then
     if $id_bin -u "$1" > /dev/null 2>&1 ; then
       if [ "$2" ] ; then
-        if [ "$ret" -eq 0 ]; then
+        if [ "$ret" -eq 0 ] ; then
           return 0 ; # User and group exists
         else
           return 1 ; # Group does NOT exist
@@ -271,7 +273,7 @@ function xshok_check_s2 () { # value1 value2
 
 # Time remaining information function
 function xshok_draw_time_remaining () { #time_remaining #update_hours #name
-  if [ "$1" ] && [ "$2" ]; then
+  if [ "$1" ] && [ "$2" ] ; then
     time_remaining="$1"
     hours_left="$((time_remaining / 3600))"
     minutes_left="$((time_remaining % 3600 / 60))"
@@ -283,7 +285,7 @@ function xshok_draw_time_remaining () { #time_remaining #update_hours #name
 
 # Download function
 function xshok_file_download () { #outputfile #url
- if [ "$1" ] && [ "$2" ]; then
+ if [ "$1" ] && [ "$2" ] ; then
   if [ -n "$wget_bin" ] ; then
     # shellcheck disable=SC2086
     $wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="$downloader_connect_timeout" --random-wait --tries="$downloader_tries" --timeout="$downloader_max_time" --output-document="$1" "$2"
@@ -307,7 +309,7 @@ function xshok_auto_update () { # version
     xshok_file_download "$0.tmp" "$UPDATE_BASE/$SELF"
     result=$?
 
-  if [ "$result" -ne 0 ]; then
+  if [ "$result" -ne 0 ] ; then
     echo "Failed: Error while trying to get new version!"
     echo "File requested: $UPDATE_BASE/$SELF"
     exit 1
@@ -325,7 +327,7 @@ function xshok_auto_update () { # version
   cat > xshok_update_script.sh << EOF
 #!/usr/bin/env bash
 # Overwrite old file with new
-if mv "$0.tmp" "$0"; then
+if mv "$0.tmp" "$0" ; then
   echo "Done. Update complete."
   rm \$0
 else
@@ -2026,7 +2028,7 @@ fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
   if [ -n "${yararulesproject_dbs[0]}" ] ; then
     for db in "${yararulesproject_dbs[@]}" ; do
-      if echo "$db" | $grep_bin -q "/"; then
+      if echo "$db" | $grep_bin -q "/" ; then
         db="$(echo "$db" | cut -d "/" -f 2)"
       fi
       echo "$work_dir_yararulesproject/$db" >> "$current_tmp"
@@ -2252,7 +2254,7 @@ else
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled Sanesecurity Database files"
       for db_file in "${sanesecurity_dbs[@]}" ; do
-        if echo "$db_file" | $grep_bin -q "|"; then
+        if echo "$db_file" | $grep_bin -q "|" ; then
           db_file="${db_file%|*}"
         fi
         if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
@@ -2308,10 +2310,8 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
                   db_ext="${db_file#*.}"
 
                   xshok_pretty_echo_and_log "Testing updated SecuriteInfo database file: $db_file"
-                  if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ]
-                  then
-                    if $clamscan_bin --quiet -d "$work_dir_securiteinfo/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-                    then
+                  if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
+                    if $clamscan_bin --quiet -d "$work_dir_securiteinfo/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
                       xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
                       true
                     else
@@ -2340,8 +2340,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
                     $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$db_file" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
                     $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" > "$test_dir/$db_file-tmp"
                     mv -f "$test_dir/$db_file-tmp" "$test_dir/$db_file"
-                    if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-                    then
+                    if $clamscan_bin --quiet -d "$test_dir/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
                       xshok_pretty_echo_and_log "Clamscan reports SecuriteInfo $db_file database integrity tested good"
                       true
                     else
@@ -2389,7 +2388,7 @@ else
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled SecuriteInfo Database files"
       for db_file in "${securiteinfo_dbs[@]}" ; do
-        if echo "$db_file" | $grep_bin -q "|"; then
+        if echo "$db_file" | $grep_bin -q "|" ; then
           db_file="${db_file%|*}"
         fi
         if [ -r "$work_dir_securiteinfo/$db_file" ] ; then
@@ -2447,8 +2446,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 
                 xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
                 if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
-                  if $clamscan_bin --quiet -d "$work_dir_linuxmalwaredetect/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-                  then
+                  if $clamscan_bin --quiet -d "$work_dir_linuxmalwaredetect/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
                     xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect $db_file database integrity tested good"
                     true
                   else
@@ -2524,7 +2522,7 @@ else
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled linuxmalwaredetect Database files"
       for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
-        if echo "$db_file" | $grep_bin -q "|"; then
+        if echo "$db_file" | $grep_bin -q "|" ; then
           db_file="${db_file%|*}"
         fi
         if [ -r "$work_dir_linuxmalwaredetect/$db_file" ] ; then
@@ -2648,7 +2646,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
           2)
               $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_malwarepatrol/$malwarepatrol_db" > "$test_dir/$malwarepatrol_db"
               $clamscan_bin --infected --no-summary -d "$test_dir/$malwarepatrol_db" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-	      if [[ "$test_dir/$malwarepatrol_db" == *.db ]]; then
+	      if [[ "$test_dir/$malwarepatrol_db" == *.db ]] ; then
                   $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
 	      else
                   $grep_bin -h -f "$work_dir_work_configs/whitelist.txt" "$test_dir/$malwarepatrol_db" | cut -d "*" -f 2 | sort | uniq >> "$work_dir_work_configs/whitelist.hex"
@@ -2737,7 +2735,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "Checking for yararulesproject updates..."
             yararulesproject_updates="0"
             for db_file in "${yararulesproject_dbs[@]}" ; do
-              if echo "$db_file" | $grep_bin -q "/"; then
+              if echo "$db_file" | $grep_bin -q "/" ; then
                 yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
                 db_file="$(echo "$db_file" | cut -d "/" -f 2)"
               else yr_dir=""
@@ -2754,8 +2752,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                     db_ext="${db_file#*.}"
                     xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
                     if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
-                      if $clamscan_bin --quiet -d "$work_dir_yararulesproject/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
-                      then
+                      if $clamscan_bin --quiet -d "$work_dir_yararulesproject/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
                         xshok_pretty_echo_and_log "Clamscan reports yararulesproject $db_file database integrity tested good"
                         true
                       else
@@ -2832,10 +2829,10 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
         if [ "$remove_disabled_databases" == "yes" ] ; then
           xshok_pretty_echo_and_log "Removing disabled yararulesproject Database files"
           for db_file in "${yararulesproject_dbs[@]}" ; do
-            if echo "$db_file" | $grep_bin -q "/"; then
+            if echo "$db_file" | $grep_bin -q "/" ; then
               db_file="$(echo "$db_file" | cut -d "/" -f 2)"
             fi
-            if echo "$db_file" | $grep_bin -q "|"; then
+            if echo "$db_file" | $grep_bin -q "|" ; then
               db_file="${db_file%|*}"
             fi
             if [ -r "$work_dir_yararulesproject/$db_file" ] ; then
@@ -2877,7 +2874,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             additional_updates="0"
             for db_url in "${additional_dbs[@]}" ; do
               # Left for future dir manipulation
-              # if echo "$db_file" | $grep_bin -q "/"; then
+              # if echo "$db_file" | $grep_bin -q "/" ; then
               #   add_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
               #   db_file="$(echo "$db_file" | cut -d "/" -f 2)"
               # else
@@ -2941,7 +2938,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                     else
                       $grep_bin -h -v -f "$work_dir_work_configs/whitelist.hex" "$work_dir_add/$db_file" > "$test_dir/$db_file"
                       $clamscan_bin --infected --no-summary -d "$test_dir/$db_file" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "$work_dir_work_configs/whitelist.txt"
-		      if [[ "$work_dir_add/$db_file" == *.db ]]; then
+		      if [[ "$work_dir_add/$db_file" == *.db ]] ; then
 			  $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$test_dir/$db_file" | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' |sort | uniq >> "$work_dir_work_configs/whitelist.hex-tmp"
         mv -f "$work_dir_work_configs/whitelist.hex-tmp" "$work_dir_work_configs/whitelist.hex"
 		      else
@@ -2997,7 +2994,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
         if [ "$remove_disabled_databases" == "yes" ] ; then
           xshok_pretty_echo_and_log "Removing disabled additional Database files"
           for db_file in "${additional_dbs[@]}" ; do
-            if echo "$db_file" | $grep_bin -q "/"; then
+            if echo "$db_file" | $grep_bin -q "/" ; then
               db_file="$(echo "$db_file" | cut -d "/" -f 2)"
             fi
             if [ -r "$work_dir_add/$db_file" ] ; then
@@ -3052,10 +3049,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
         fi
       done < "$work_dir_work_configs/monitor-ign-old.txt"
       if [ "$ign_updated" == "1" ] ; then
-        if $clamscan_bin --quiet -d "$work_dir_work_configs/local.ign" "$work_dir_work_configs/scan-test.txt"
-        then
-          if $rsync_bin -pcqt "$work_dir_work_configs/local.ign" "$clam_dbs"
-          then
+        if $clamscan_bin --quiet -d "$work_dir_work_configs/local.ign" "$work_dir_work_configs/scan-test.txt" ; then
+          if $rsync_bin -pcqt "$work_dir_work_configs/local.ign" "$clam_dbs" ; then
             perms chown -f "$clam_user:$clam_group" "$clam_dbs/local.ign"
             perms chmod -f 0644 "$clam_dbs/local.ign" "$work_dir_work_configs/monitor-ign.txt"
             if [ "$selinux_fixes" == "yes" ] ; then
@@ -3097,12 +3092,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
       mv -f "$work_dir_work_configs/tracker-tmp.txt" "$work_dir_work_configs/tracker.txt"
 
       xshok_pretty_echo_and_log "" "=" "80"
-      if [ "$ign2_updated" == "1" ]
-      then
-        if $clamscan_bin --quiet -d "$work_dir_work_configs/my-whitelist.ign2" "$work_dir_work_configs/scan-test.txt"
-        then
-          if $rsync_bin -pcqt "$work_dir_work_configs/my-whitelist.ign2" "$clam_dbs"
-          then
+      if [ "$ign2_updated" == "1" ] ; then
+        if $clamscan_bin --quiet -d "$work_dir_work_configs/my-whitelist.ign2" "$work_dir_work_configs/scan-test.txt" ; then
+          if $rsync_bin -pcqt "$work_dir_work_configs/my-whitelist.ign2" "$clam_dbs" ; then
             perms chown -f "$clam_user:$clam_group" "$clam_dbs/my-whitelist.ign2"
             perms chmod -f 0644 "$clam_dbs/my-whitelist.ign2" "$work_dir_work_configs/tracker.txt"
             if [ "$selinux_fixes" == "yes" ] ; then
@@ -3125,7 +3117,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
     if [ -n "$ham_dir" ] ; then
       if [ -r "$work_dir_work_configs/whitelist.hex" ] ; then
         $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$work_dir"/*/*.ndb | cut -d "*" -f 2 | tr -d "\r" | sort | uniq > "$work_dir_work_configs/whitelist.tmp"
-	$grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$work_dir"/*/*.db | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' | sort | uniq >> "$work_dir_work_configs/whitelist.tmp"
+	      $grep_bin -h -f "$work_dir_work_configs/whitelist.hex" "$work_dir"/*/*.db | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' | sort | uniq >> "$work_dir_work_configs/whitelist.tmp"
         mv -f "$work_dir_work_configs/whitelist.tmp" "$work_dir_work_configs/whitelist.hex"
         rm -f "$work_dir_work_configs/whitelist.txt"
         rm -f "$test_dir"/*.*
