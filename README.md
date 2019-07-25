@@ -72,7 +72,7 @@ Current limitations of clamav support : http://blog.clamav.net/search/label/yara
 
 ### MalwarePatrol Free/Delayed list support (as of May 2015)
 Usage of MalwarePatrol 2015 free clamav signatures : https://www.malwarepatrol.net
- - 1. Sign up for a free account : https://www.malwarepatrol.net/signup-free.shtml
+ - 1. Sign up for a free account : https://www.malwarepatrol.net/free-guard-upgrade-option/
  - 2. You will recieve an email containing your password/receipt number
  - 3. Enter the receipt number into the config malwarepatrol_receipt_code: replacing YOUR-RECEIPT-NUMBER with your receipt number from the email
 
