@@ -2748,7 +2748,6 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							if xshok_file_download "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file" ; then
 								loop="1"
 								if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
-									if [ $? -eq 0 ] ; then
 										db_ext="${db_file#*.}"
 										xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
 										if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
@@ -2805,7 +2804,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 												xshok_pretty_echo_and_log "Failed to successfully update yararulesproject production database file: $db_file - SKIPPING"
 											fi
 										fi
-									fi
+
 								fi
 							else
 								xshok_pretty_echo_and_log "WARNING: Failed connection to $yararulesproject_url - SKIPPED yararulesproject $db_file update"
@@ -2907,8 +2906,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							if [ "$ret" -eq 0 ] ; then
 								loop="1"
 								if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
-									if [ $? -eq 0 ] ; then
-										db_ext="${db_file#*.}"
+                  db_ext="${db_file#*.}"
 										xshok_pretty_echo_and_log "Testing updated additional database file: $db_file"
 										if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
 											if $clamscan_bin --quiet -d "$work_dir_add/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
@@ -2970,8 +2968,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 												xshok_pretty_echo_and_log "Failed to successfully update additional production database file: $db_file - SKIPPING"
 											fi
 										fi
-									fi
-								fi
+																	fi
 							else
 								xshok_pretty_echo_and_log "WARNING: Failed connection to $db_url - SKIPPED additional $db_file update"
 							fi
