@@ -168,8 +168,11 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ## Change Log
 
-### UNDER DEV : Version 6.0 (Started July 2019)
+### UNDER DEV : Version 6.0 (Started July 2019
  - eXtremeSHOK.com Maintenance & Refactoring
+ - Add timestamp support
+ - Added SECURITEINFO  securiteinfoold.hdb
+ - wget and curl downloads use compression
  - Fix: version comparison of minimum Yara @bytesplit
  - Use custom config directory @Amish
  - unzip option -j was removed @wotomg

@@ -288,7 +288,7 @@ function xshok_file_download() { #outputfile #url
 	if [ "${1}" ] && [ "${2}" ] ; then
 		if [ -n "$wget_bin" ] ; then
 			# shellcheck disable=SC2086
-			$wget_bin --header 'Accept-Encoding: gzip' $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"
+			$wget_bin $wget_compressionion $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"
 			result=$?
 		else
 			# shellcheck disable=SC2086
@@ -1170,7 +1170,7 @@ function check_clamav() {
 function check_new_version() {
 	if [ -n "$wget_bin" ] ; then
 		# shellcheck disable=SC2086
-		latest_version="$($wget_bin --header 'Accept-Encoding: gzip' $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
+		latest_version="$($wget_bin $wget_compression $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
 	else
 		# shellcheck disable=SC2086
 		latest_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
@@ -1186,7 +1186,7 @@ function check_new_version() {
 function check_new_config_version() {
 	if [ -n "$wget_bin" ] ; then
 		# shellcheck disable=SC2086
-		latest_config_version="$($wget_bin --header 'Accept-Encoding: gzip' $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O - 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
+		latest_config_version="$($wget_bin $wget_compression $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O - 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
 	else
 		# shellcheck disable=SC2086
 		latest_config_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
@@ -1315,6 +1315,14 @@ fi
 uname_bin="$(which uname 2> /dev/null)"
 clamscan_bin="$(which clamscan 2> /dev/null)"
 rsync_bin="$(which rsync 2> /dev/null)"
+
+# Detect supprot for gnu grep
+if [ -x /usr/gnu/bin/grep ] ; then
+	grep_bin="/usr/gnu/bin/grep"
+else
+	grep_bin="$(which grep 2> /dev/null)"
+fi
+
 # Detect support for wget
 if [ -x /usr/sfw/bin/wget ] ; then
 	wget_bin="/usr/sfw/bin/wget"
@@ -1327,15 +1335,16 @@ if [ -z "$wget_bin" ] ; then
 		xshok_pretty_echo_and_log "ERROR: both wget and curl commands are missing, One of them is required" "="
 		exit 1
 	fi
-fi
-
-# Detect supprot for gnu grep
-if [ -x /usr/gnu/bin/grep ] ; then
-	grep_bin="/usr/gnu/bin/grep"
 else
-	grep_bin="$(which grep 2> /dev/null)"
+  # wget compression support
+  if $wget_bin --help | $grep_bin -q "compression=TYPE" ; then
+    wget_compression="--compression=auto"
+  else
+    wget_compression=""
+  fi
 fi
 
+# Detect support for dig or host
 dig_bin="$(which dig 2> /dev/null)"
 if [ -z "$dig_bin" ] ; then
 	host_bin="$(which host 2> /dev/null)"
