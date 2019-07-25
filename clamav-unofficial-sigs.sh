@@ -574,7 +574,7 @@ function install_cron() {
 		cron_script_full_path="$this_script_full_path"
 	fi
   if [ "$cron_sudo" == "yes" ] ; then
-    $cron_sudo="sudo -u"
+    cron_sudo="sudo -u"
   fi
 	if [ ! -e "${cron_dir}/${cron_filename}" ] ; then
 		mkdir -p "$cron_dir"
