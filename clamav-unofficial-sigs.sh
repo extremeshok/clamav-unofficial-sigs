@@ -72,8 +72,7 @@ function xshok_prompt_confirm () { # optional_message
 function xshok_create_pid_file () { # pid.file
   if [ "$1" ] ; then
     pidfile="$1"
-    echo $$ > "$pidfile"
-    if [ $? -ne 0 ] ; then
+    if ! echo $$ > "$pidfile" ; then
       xshok_pretty_echo_and_log "ERROR: Could not create PID file: $pidfile"
       exit 1
     fi
@@ -144,8 +143,7 @@ function xshok_is_subdir () { # filepath
 # Create a dir and set the ownership
 function xshok_mkdir_ownership () { # path
   if [ "$1" ] ; then
-    mkdir -p "$1" 2>/dev/null
-    if [ $? -ne 0 ] ; then
+    if ! mkdir -p "$1" 2>/dev/null ; then
       xshok_pretty_echo_and_log "ERROR: Could not create directory: $1"
       exit 1
     fi
@@ -180,8 +178,7 @@ function xshok_user_group_exists () { # username groupname
   fi
 
   if [ "$1" ] ; then
-    $id_bin -u "$1" > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
+    if $id_bin -u "$1" > /dev/null 2>&1 ; then
       if [ "$2" ] ; then
         if [ "$ret" -eq 0 ]; then
           return 0 ; # User and group exists
@@ -682,10 +679,8 @@ function gpg_verify_specific_sanesecurity_database_file () { # databasefile
       if [ -r "$work_dir_sanesecurity/$db_file" ] ; then
         echo "GPG signature testing database file: $work_dir_sanesecurity/$db_file"
         if [ -r "$work_dir_sanesecurity/$db_file".sig ] ; then
-          "$gpg_bin" -q --trust-model always --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
-          if [ $? -ne 0 ]; then
-            "$gpg_bin" -q --always-trust --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file"
-            if [ $? -eq 0 ]; then
+          if ! "$gpg_bin" -q --trust-model always --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" ; then
+            if "$gpg_bin" -q --always-trust --no-default-keyring --homedir "$work_dir_gpg" --keyring "$work_dir_gpg"/ss-keyring.gpg --verify "$work_dir_sanesecurity"/"$db_file".sig "$work_dir_sanesecurity"/"$db_file" ; then
               exit 0
             else
               exit 1
@@ -934,8 +929,7 @@ function clamscan_integrity_test_specific_database_file () { # databasefile
     if [ -r "$db_file" ] ; then
       echo "Clamscan integrity testing: $db_file"
 
-      $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt"
-      if [ $? -eq 0 ]; then
+      if ! $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt" ; then
         echo "Clamscan reports that '$input' database integrity tested GOOD"
         exit 0
       else
@@ -1071,16 +1065,15 @@ function clamscan_reload_dbs () {
         xshok_pretty_echo_and_log "ERROR: Failed to reload, trying again" "-"
         if [ -r "$clamd_pid" ] ; then
           mypid="$(cat "$clamd_pid")"
-          kill -USR2 "$mypid"
-          if [ $? -eq 0 ] ; then
+
+          if kill -USR2 "$mypid" ; then
             xshok_pretty_echo_and_log "ClamAV databases Reloaded" "="
           else
             xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart" "-"
             if [ -z "$clamd_restart_opt" ] ; then
               xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'" "*"
             else
-              $clamd_restart_opt > /dev/null
-              if [ $? -eq 0 ] ; then
+              if $clamd_restart_opt > /dev/null ; then
                 xshok_pretty_echo_and_log "ClamAV Restarted" "="
               else
                 xshok_pretty_echo_and_log "ClamAV NOT Restarted" "-"
@@ -1092,8 +1085,7 @@ function clamscan_reload_dbs () {
           if [ -z "$clamd_restart_opt" ] ; then
             xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'" "*"
           else
-            $clamd_restart_opt > /dev/null
-            if [ $? -eq 0 ] ; then
+            if $clamd_restart_opt > /dev/null ; then
               xshok_pretty_echo_and_log "ClamAV Restarted" "="
             else
               xshok_pretty_echo_and_log "ClamAV NOT Restarted" "-"
@@ -1696,8 +1688,7 @@ if [ "$enable_locking" == "yes" ] ; then
   pid_file_fullpath="$work_dir_pid/clamav-unofficial-sigs.pid"
   if [ -f "$pid_file_fullpath" ] ; then
     pid_file_pid="$(cat "$pid_file_fullpath")"
-    ps -p "$pid_file_pid" > /dev/null 2>&1
-    if [ $? -eq 0 ] ; then
+    if ps -p "$pid_file_pid" > /dev/null 2>&1 ; then
       xshok_pretty_echo_and_log "ERROR: Only one instance can run at the same time." "="
       exit 1
     else
@@ -2756,14 +2747,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               fi
               xshok_pretty_echo_and_log "Checking for updated yararulesproject database file: $db_file"
               yararulesproject_db_update="0"
-              xshok_file_download "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file"
-              ret="$?"
-              if [ "$ret" -eq 0 ] ; then
+              if xshok_file_download "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file" ; then
                 loop="1"
                 if ! cmp -s "$work_dir_yararulesproject/$db_file" "$clam_dbs/$db_file" ; then
                   if [ $? -eq 0 ] ; then
                     db_ext="${db_file#*.}"
-
                     xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
                     if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
                       if $clamscan_bin --quiet -d "$work_dir_yararulesproject/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null
@@ -2924,7 +2912,6 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                 if ! cmp -s "$work_dir_add/$db_file" "$clam_dbs/$db_file" ; then
                   if [ $? -eq 0 ] ; then
                     db_ext="${db_file#*.}"
-
                     xshok_pretty_echo_and_log "Testing updated additional database file: $db_file"
                     if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
                       if $clamscan_bin --quiet -d "$work_dir_add/$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null

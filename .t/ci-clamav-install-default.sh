@@ -11,7 +11,7 @@ pwd
 
 echo "Installing default Clamav"
 
-apt-get install -y libclamav6 clamav-base clamav-freshclam clamav clamav-daemon -qq
+apt-get install -y clamav-base clamav-freshclam clamav clamav-daemon -qq
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
