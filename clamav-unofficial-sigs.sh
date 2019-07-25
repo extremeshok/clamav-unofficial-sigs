@@ -288,11 +288,11 @@ function xshok_file_download() { #outputfile #url
 	if [ "${1}" ] && [ "${2}" ] ; then
 		if [ -n "$wget_bin" ] ; then
 			# shellcheck disable=SC2086
-			$wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"
+			$wget_bin --header 'Accept-Encoding: gzip' $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"
 			result=$?
 		else
 			# shellcheck disable=SC2086
-			$curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --output "${1}" "${2}"
+			$curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --output "${1}" "${2}"
 			result=$?
 		fi
 		return $result
@@ -836,12 +836,12 @@ function make_signature_database_from_ascii_file() {
 
 			echo -n "Would you like to move '$db_file' into '$clam_dbs' and reload databases?"
 			if xshok_prompt_confirm ; then
-				if ! cmp -s "$path_file" "${clam_dbs}/${db}_file" ; then
+				if ! cmp -s "$path_file" "${clam_dbs}/${db_file}" ; then
 					if $rsync_bin -pcqt "$path_file" "$clam_dbs" ; then
-						perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+						perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 						perms chmod -f 0644 "$clam_dbs"/"$db_file"
 						if [ "$selinux_fixes" == "yes" ] ; then
-							restorecon "${clam_dbs}/${db}_file"
+							restorecon "${clam_dbs}/${db_file}"
 						fi
 						$clamd_restart_opt
 
@@ -1170,10 +1170,10 @@ function check_clamav() {
 function check_new_version() {
 	if [ -n "$wget_bin" ] ; then
 		# shellcheck disable=SC2086
-		latest_version="$($wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
+		latest_version="$($wget_bin --header 'Accept-Encoding: gzip' $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
 	else
 		# shellcheck disable=SC2086
-		latest_version="$($curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
+		latest_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin "script""_version=" | cut -d '"' -f 2)"
 	fi
 	if [ "$latest_version" ] ; then
 		if [ "$latest_version" != "$script_version" ] ; then
@@ -1186,10 +1186,10 @@ function check_new_version() {
 function check_new_config_version() {
 	if [ -n "$wget_bin" ] ; then
 		# shellcheck disable=SC2086
-		latest_config_version="$($wget_bin $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O - 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
+		latest_config_version="$($wget_bin --header 'Accept-Encoding: gzip' $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O - 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
 	else
 		# shellcheck disable=SC2086
-		latest_config_version="$($curl_bin $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
+		latest_config_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf 2> /dev/null | $grep_bin "config_version=" | cut -d '"' -f 2)"
 	fi
 	if [ "$latest_config_version" ] ; then
 		if [ "$latest_config_version" != "$config_version" ] ; then
@@ -1887,9 +1887,9 @@ if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
 			mv -f "$db_file-tmp" "$db_file"
 			if $clamscan_bin --quiet -d "$db_file" "$work_dir_work_configs/scan-test.txt" 2>/dev/null ; then
 				if $rsync_bin -pcqt "$db_file" "$clam_dbs" ; then
-					perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+					perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 					if [ "$selinux_fixes" == "yes" ] ; then
-						restorecon "${clam_dbs}/${db}_file"
+						restorecon "${clam_dbs}/${db_file}"
 					fi
 					do_clamd_reload=1
 				fi
@@ -2154,7 +2154,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 						if [ "$ret" -eq 0 ] || [ "$ret" -eq 23 ] ; then # The correct way, 23 is some files were not transfered, can be ignored and we can assume a success
 							sanesecurity_rsync_success="1"
 							for db_file in "${sanesecurity_dbs[@]}" ; do
-								if ! cmp -s "${work_dir_sanesecurity}/${db_file}" "${clam_dbs}/${db}_file" ; then
+								if ! cmp -s "${work_dir_sanesecurity}/${db_file}" "${clam_dbs}/${db_file}" ; then
 									xshok_pretty_echo_and_log "Testing updated Sanesecurity database file: $db_file"
 
 									if [ "$enable_gpg" == "yes" ] ; then
@@ -2184,10 +2184,10 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 													fi
 												fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${work_dir_sanesecurity}/${db_file}" "$clam_dbs" 2>/dev/null ; then
-												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${work_dir_sanesecurity}/${db_file}" "$clam_dbs" 2>/dev/null ; then
+												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
-													restorecon "${clam_dbs}/${db}_file"
+													restorecon "${clam_dbs}/${db_file}"
 												fi
 
 												xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
@@ -2211,10 +2211,10 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 												xshok_pretty_echo_and_log "Clamscan reports Sanesecurity $db_file database integrity tested BAD"
 												# DO NOT KILL THIS DB
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
-													restorecon "${clam_dbs}/${db}_file"
+													restorecon "${clam_dbs}/${db_file}"
 												fi
 												xshok_pretty_echo_and_log "Successfully updated Sanesecurity production database file: $db_file"
 												sanesecurity_update=1
@@ -2262,9 +2262,9 @@ else
 					rm -f "${work_dir_sanesecurity}/${db_file}"
 					do_clamd_reload=1
 				fi
-				if [ -r "${clam_dbs}/${db}_file" ] ; then
-					xshok_pretty_echo_and_log "Removing ${clam_dbs}/${db}_file"
-					rm -f "${clam_dbs}/${db}_file"
+				if [ -r "${clam_dbs}/${db_file}" ] ; then
+					xshok_pretty_echo_and_log "Removing ${clam_dbs}/${db_file}"
+					rm -f "${clam_dbs}/${db_file}"
 					do_clamd_reload=1
 				fi
 			done
@@ -2306,7 +2306,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 						ret="$?"
 						if [ "$ret" -eq 0 ] ; then
 							loop="1"
-							if ! cmp -s "$work_dir_securiteinfo/$db_file" "${clam_dbs}/${db}_file" ; then
+							if ! cmp -s "$work_dir_securiteinfo/$db_file" "${clam_dbs}/${db_file}" ; then
 								db_ext="${db_file#*.}"
 
 								xshok_pretty_echo_and_log "Testing updated SecuriteInfo database file: $db_file"
@@ -2322,10 +2322,10 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 											fi
 										fi
 										false
-										fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_securiteinfo/$db_file" "$clam_dbs" 2>/dev/null ; then
-										perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+										fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_securiteinfo/$db_file" "$clam_dbs" 2>/dev/null ; then
+										perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 										if [ "$selinux_fixes" == "yes" ] ; then
-											restorecon "${clam_dbs}/${db}_file"
+											restorecon "${clam_dbs}/${db_file}"
 										fi
 										xshok_pretty_echo_and_log "Successfully updated SecuriteInfo production database file: $db_file"
 										securiteinfo_updates=1
@@ -2352,10 +2352,10 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
 											fi
 										fi
 										false
-										fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-										perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+										fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+										perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 										if [ "$selinux_fixes" == "yes" ] ; then
-											restorecon "${clam_dbs}/${db}_file"
+											restorecon "${clam_dbs}/${db_file}"
 										fi
 										xshok_pretty_echo_and_log "Successfully updated SecuriteInfo production database file: $db_file"
 										securiteinfo_updates=1
@@ -2396,9 +2396,9 @@ else
 					rm -f "$work_dir_securiteinfo/$db_file"
 					do_clamd_reload=1
 				fi
-				if [ -r "${clam_dbs}/${db}_file" ] ; then
-					xshok_pretty_echo_and_log "Removing ${clam_dbs}/${db}_file"
-					rm -f "${clam_dbs}/${db}_file"
+				if [ -r "${clam_dbs}/${db_file}" ] ; then
+					xshok_pretty_echo_and_log "Removing ${clam_dbs}/${db_file}"
+					rm -f "${clam_dbs}/${db_file}"
 					do_clamd_reload=1
 				fi
 			done
@@ -2441,7 +2441,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 					ret="$?"
 					if [ "$ret" -eq 0 ] ; then
 						loop="1"
-						if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "${clam_dbs}/${db}_file" ; then
+						if ! cmp -s "$work_dir_linuxmalwaredetect/$db_file" "${clam_dbs}/${db_file}" ; then
 							db_ext="${db_file#*.}"
 
 							xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: $db_file"
@@ -2457,8 +2457,8 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-									fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs" 2>/dev/null ; then
-									perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+									fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_linuxmalwaredetect/$db_file" "$clam_dbs" 2>/dev/null ; then
+									perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 									if [ "$selinux_fixes" == "yes" ] ; then
 										restorecon "$clam_dbs/local.ign"
 									fi
@@ -2486,10 +2486,10 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 										fi
 									fi
 									false
-									fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-									perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+									fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+									perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 									if [ "$selinux_fixes" == "yes" ] ; then
-										restorecon "${clam_dbs}/${db}_file"
+										restorecon "${clam_dbs}/${db_file}"
 									fi
 									xshok_pretty_echo_and_log "Successfully updated linuxmalwaredetect production database file: $db_file"
 									linuxmalwaredetect_updates=1
@@ -2530,9 +2530,9 @@ else
 					rm -f "$work_dir_linuxmalwaredetect/$db_file"
 					do_clamd_reload=1
 				fi
-				if [ -r "${clam_dbs}/${db}_file" ] ; then
-					xshok_pretty_echo_and_log "Removing ${clam_dbs}/${db}_file"
-					rm -f "${clam_dbs}/${db}_file"
+				if [ -r "${clam_dbs}/${db_file}" ] ; then
+					xshok_pretty_echo_and_log "Removing ${clam_dbs}/${db_file}"
+					rm -f "${clam_dbs}/${db_file}"
 					do_clamd_reload=1
 				fi
 			done
@@ -2747,7 +2747,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							yararulesproject_db_update="0"
 							if xshok_file_download "$work_dir_yararulesproject/$db_file" "$yararulesproject_url/$yr_dir/$db_file" ; then
 								loop="1"
-								if ! cmp -s "$work_dir_yararulesproject/$db_file" "${clam_dbs}/${db}_file" ; then
+								if ! cmp -s "$work_dir_yararulesproject/$db_file" "${clam_dbs}/${db_file}" ; then
 										db_ext="${db_file#*.}"
 										xshok_pretty_echo_and_log "Testing updated yararulesproject database file: $db_file"
 										if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
@@ -2762,10 +2762,10 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 													fi
 												fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_yararulesproject/$db_file" "$clam_dbs" 2>/dev/null ; then
-												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_yararulesproject/$db_file" "$clam_dbs" 2>/dev/null ; then
+												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
-													restorecon "${clam_dbs}/${db}_file"
+													restorecon "${clam_dbs}/${db_file}"
 												fi
 												xshok_pretty_echo_and_log "Successfully updated yararulesproject production database file: $db_file"
 												yararulesproject_updates=1
@@ -2791,10 +2791,10 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 													fi
 												fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
-													restorecon "${clam_dbs}/${db}_file"
+													restorecon "${clam_dbs}/${db_file}"
 												fi
 												xshok_pretty_echo_and_log "Successfully updated yararulesproject production database file: $db_file"
 												yararulesproject_updates=1
@@ -2838,8 +2838,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							rm -f "$work_dir_yararulesproject/$db_file"
 							do_clamd_reload="1"
 						fi
-						if [ -r "${clam_dbs}/${db}_file" ] ; then
-							rm -f "${clam_dbs}/${db}_file"
+						if [ -r "${clam_dbs}/${db_file}" ] ; then
+							rm -f "${clam_dbs}/${db_file}"
 							do_clamd_reload=1
 						fi
 					done
@@ -2905,7 +2905,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							# Maybe better to process each file inside work_dir_add in its own for loop.
 							if [ "$ret" -eq 0 ] ; then
 								loop="1"
-								if ! cmp -s "$work_dir_add/$db_file" "${clam_dbs}/${db}_file" ; then
+								if ! cmp -s "$work_dir_add/$db_file" "${clam_dbs}/${db_file}" ; then
                   db_ext="${db_file#*.}"
 										xshok_pretty_echo_and_log "Testing updated additional database file: $db_file"
 										if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
@@ -2920,10 +2920,10 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 													fi
                         fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_add/$db_file" "$clam_dbs" 2>/dev/null ; then
-												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$work_dir_add/$db_file" "$clam_dbs" 2>/dev/null ; then
+												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
-													restorecon "${clam_dbs}/${db}_file"
+													restorecon "${clam_dbs}/${db_file}"
 												fi
 												xshok_pretty_echo_and_log "Successfully updated additional production database file: $db_file"
 												additional_updates=1
@@ -2955,10 +2955,10 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 													fi
 												fi
 												false
-												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db}_file" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
-												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db}_file"
+												fi && (test "$keep_db_backup" = "yes" && cp -f "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "$test_dir/$db_file" "$clam_dbs" 2>/dev/null ; then
+												perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
 												if [ "$selinux_fixes" == "yes" ] ; then
-													restorecon "${clam_dbs}/${db}_file"
+													restorecon "${clam_dbs}/${db_file}"
 												fi
 												xshok_pretty_echo_and_log "Successfully updated additional production database file: $db_file"
 												additional_updates=1
@@ -2997,8 +2997,8 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 							rm -f "$work_dir_add/$db_file"
 							do_clamd_reload=1
 						fi
-						if [ -r "${clam_dbs}/${db}_file" ] ; then
-							rm -f "${clam_dbs}/${db}_file"
+						if [ -r "${clam_dbs}/${db_file}" ] ; then
+							rm -f "${clam_dbs}/${db_file}"
 							do_clamd_reload=1
 						fi
 					done
