@@ -573,7 +573,9 @@ function install_cron() {
 	if [ -z "$cron_script_full_path" ] ; then
 		cron_script_full_path="$this_script_full_path"
 	fi
-
+  if [ "$cron_sudo" == "yes" ] ; then
+    $cron_sudo="sudo -u"
+  fi
 	if [ ! -e "${cron_dir}/${cron_filename}" ] ; then
 		mkdir -p "$cron_dir"
 		touch "${cron_dir}/${cron_filename}" 2>/dev/null
@@ -611,7 +613,7 @@ function install_cron() {
 # 60 - 600 seconds.  To Adjust the cron values, edit your configs and run
 # bash clamav-unofficial-sigs.sh --install-cron to generate a new file.
 
-$cron_minute * * * * ${cron_user} [ -x ${cron_script_full_path} ] && ${cron_bash} ${cron_script_full_path} > /dev/null
+$cron_minute * * * * ${cron_sudo} ${cron_user} [ -x ${cron_script_full_path} ] && ${cron_bash} ${cron_script_full_path} > /dev/null
 
 # https://eXtremeSHOK.com ######################################################
 
