@@ -286,7 +286,7 @@ function xshok_file_download() { #outputfile #url
   if [ "${1}" ] && [ "${2}" ] ; then
     if [ -n "$wget_bin" ] ; then
       # shellcheck disable=SC2086
-			$wget_bin $wget_compressionion $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping --output-document="${1}" "${2}"
+			$wget_bin $wget_compression $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping --output-document="${1}" "${2}"
       result=$?
     else
       # shellcheck disable=SC2086
