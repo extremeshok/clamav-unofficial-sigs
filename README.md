@@ -170,9 +170,13 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ### UNDER DEV : Version 6.0 (Started July 2019
  - eXtremeSHOK.com Maintenance & Refactoring
- - Add timestamp support
+ - Add timestamp support (do not re-download not modified files)
+ - Posix compliance which replaced with command -v
+ - More escape characters, shellcheck compliance
+ - Option added : force_curl , to force the usage of curl instead of wget
+ - wget and curl downloads use compression for the transfer (detected when supported)
  - Added SECURITEINFO  securiteinfoold.hdb
- - wget and curl downloads use compression
+ - Fix: Clamscan database integrity test
  - Fix: version comparison of minimum Yara @bytesplit
  - Use custom config directory @Amish
  - unzip option -j was removed @wotomg

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2119
 # shellcheck disable=SC2120
-# shellcheck disable=SC2154
 # shellcheck disable=SC2128
+# shellcheck disable=SC2154
 ################################################################################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
@@ -63,7 +63,7 @@ function xshok_prompt_confirm() { # optional_message
     case "${response}" in
       [yY]) return 0 ;;
       [nN]) return 1 ;;
-      *) printf " \033[31m %s \n\033[0m" "invalid input"
+      *) printf " \\033[31m %s \\n\\033[0m" "invalid input"
     esac
   done
 }
@@ -103,7 +103,7 @@ function xshok_is_root() {
   if [ "$(uname -s)" == "SunOS" ] ; then
     id_bin="/usr/xpg4/bin/id"
   else
-    id_bin="$(which id 2> /dev/null)"
+    id_bin="$(command -v id 2> /dev/null)"
   fi
   if [ "$($id_bin -u)" == 0 ] ; then
     return 0
@@ -162,7 +162,7 @@ function xshok_user_group_exists() { # username groupname
   if [ "$(uname -s)" == "SunOS" ] ; then
     id_bin="/usr/xpg4/bin/id"
   else
-    id_bin="$(which id 2> /dev/null)"
+    id_bin="$(command -v id 2> /dev/null)"
   fi
 
   if [ "${2}" ] ; then
@@ -171,7 +171,7 @@ function xshok_user_group_exists() { # username groupname
       ruby -e 'require "etc"; puts Etc::getgrnam("_clamav").gid' > /dev/null 2>&1
       ret="$?"
     else
-      getent_bin="$(which getent 2> /dev/null)"
+      getent_bin="$(command -v getent 2> /dev/null)"
       $getent_bin group "${2}" >/dev/null 2>&1
       ret="$?"
     fi
@@ -228,7 +228,7 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
         myvar="${myvar}${2}"
       done
       if [ -n "${1}" ] ; then
-        echo -e "${myvar}\n${1}\n${myvar}"
+        echo -e "${myvar}\\n${1}\\n${myvar}"
       else
         echo -e "${myvar}"
       fi
@@ -286,11 +286,11 @@ function xshok_file_download() { #outputfile #url
   if [ "${1}" ] && [ "${2}" ] ; then
     if [ -n "$wget_bin" ] ; then
       # shellcheck disable=SC2086
-      $wget_bin $wget_compressionion $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"
+			$wget_bin $wget_compressionion $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping --output-document="${1}" "${2}"
       result=$?
     else
       # shellcheck disable=SC2086
-      $curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --output "${1}" "${2}"
+      $curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
       result=$?
     fi
     return $result
@@ -429,25 +429,25 @@ function install_man() {
     echo "ERROR: man install aborted, as file not writable: ${man_dir}/${man_filename}"
   else
 
-    BOLD="\fB"
+    BOLD="\\fB"
     #REV=""
-    NORM="\fR"
+    NORM="\\fR"
     manresult="$(help_and_usage "man")"
 
     # Our template..
     cat << EOF > "${man_dir}/${man_filename}"
 
-.\" Manual page for eXtremeSHOK.com ClamAV Unofficial Signature Updater
+.\\" Manual page for eXtremeSHOK.com ClamAV Unofficial Signature Updater
 .TH clamav-unofficial-sigs 8 "${script_version_date}" "Version: ${script_version}" "SCRIPT COMMANDS"
 .SH NAME
-clamav-unofficial-sigs \- Download, test, and install third-party ClamAV signature databases.
+clamav-unofficial-sigs \\- Download, test, and install third-party ClamAV signature databases.
 .SH SYNOPSIS
 .B clamav-unofficial-sigs
 .RI [ options ]
 .SH DESCRIPTION
-\fBclamav-unofficial-sigs\fP provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. It will also generate and install cron, logrotate, and man files.
+\\fBclamav-unofficial-sigs\\fP provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. It will also generate and install cron, logrotate, and man files.
 .SH UPDATES
-Script updates can be found at: \fBhttps://github.com/extremeshok/clamav-unofficial-sigs\fP
+Script updates can be found at: \\fBhttps://github.com/extremeshok/clamav-unofficial-sigs\\fP
 .SH OPTIONS
 This script follows the standard GNU command line syntax.
 .LP
@@ -462,7 +462,7 @@ You are free to use, modify and distribute, however you may not remove this noti
 .SH LICENSE
 BSD (Berkeley Software Distribution)
 .SH BUGS
-Report bugs to \fBhttps://github.com/extremeshok/clamav-unofficial-sigs\fP
+Report bugs to \\fBhttps://github.com/extremeshok/clamav-unofficial-sigs\\fP
 .SH AUTHOR
 Adrian Jon Kriel :: admin@extremeshok.com
 Originially based on Script provide by Bill Landry
@@ -566,7 +566,7 @@ function install_cron() {
     cron_user="${clam_user}";
   fi
   if [ -z "$cron_bash" ] ; then
-    cron_bash="$(which bash 2> /dev/null)"
+    cron_bash="$(command -v bash 2> /dev/null)"
   fi
   if [ -z "$cron_script_full_path" ] ; then
     cron_script_full_path="$this_script_full_path"
@@ -630,7 +630,7 @@ function decode_third_party_signature_by_signature_name() {
   echo "in the signature name nor add quote marks to any input string):"
   read -r input
   input="$(echo "${input}" | tr -d "'" | tr -d '"')"
-  if echo "${input}" | $grep_bin "\." > /dev/null ; then
+  if echo "${input}" | $grep_bin "\\." > /dev/null ; then
     cd "$clam_dbs" || exit
     sig="$($grep_bin "${input}:" ./*.ndb)"
     if [ -n "$sig" ] ; then
@@ -814,11 +814,11 @@ function make_signature_database_from_ascii_file() {
       while read -r line ; do
         line_prefix="$(echo "$line" | awk -F ":" '{print $1}')"
         if [ "$line_prefix" == "-" ] ; then
-          echo "$line" | cut -d ":" -f 2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+          echo "$line" | cut -d ":" -f 2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
         elif [ "$line_prefix" == "=" ] ; then
-          echo "$line" | cut -d ":" -f 2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+          echo "$line" | cut -d ":" -f 2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | command sed "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
         else
-          echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\.$line_num:4:\*:/" >> "$path_file"
+          echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
         fi
         echo "Hexadecimal encoding ${source_file} line: ${line_num} of ${total}"
         line_num="$((line_num + 1))"
@@ -930,8 +930,7 @@ function clamscan_integrity_test_specific_database_file() { # databasefile
     db_file="$(find "$work_dir" -name "$input")"
     if [ -r "$db_file" ] ; then
       echo "Clamscan integrity testing: ${db_file}"
-
-      if ! $clamscan_bin --quiet -d "$db_file" "${work_dir_work_configs}/scan-test.txt" ; then
+      if $clamscan_bin --quiet -d "$db_file" "${work_dir_work_configs}/scan-test.txt" ; then
         echo "Clamscan reports that '${input}' database integrity tested GOOD"
         exit 0
       else
@@ -1119,7 +1118,7 @@ function check_clamav() {
           xshok_pretty_echo_and_log "ClamD is running" "="
         fi
       else
-        socat="$(which socat 2>/dev/null)"
+        socat="$(command -v socat 2>/dev/null)"
         if [ -n "$socat" ] && [ -x "$socat" ] ; then
           socket_cat1="1"
           if [ "$( (echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null)" == "PONG" ] ; then
@@ -1206,9 +1205,9 @@ function help_and_usage() {
 
   if [ "${1}" ] ; then
     # option_format_start
-    ofs="\fB"
+    ofs="\\fB"
     # option_format_end
-    ofe="\fR"
+    ofe="\\fR"
     # option_format_blankline
     ofb=".TP"
     # option_format_tab_line
@@ -1217,21 +1216,21 @@ function help_and_usage() {
     # option_format_start
     ofs="${BOLD}"
     # option_format_end
-    ofe="${NORM}\t"
+    ofe="${NORM}\\t"
     # option_format_blankline
-    ofb="\n"
+    ofb="\\n"
     # option_format_tab_line
-    oft="\n\t"
+    oft="\\n\\t"
   fi
 
   helpcontents="$(cat << EOF
 ${ofs} Usage: $(basename "$0") ${ofe} [OPTION] [PATH|FILE]
 ${ofb}
-${ofs} -c, --config ${ofe} Use a specific configuration file or directory ${oft} eg: \'-c /your/dir\' or \' -c /your/file.name\'  ${oft} Note: If a directory is specified the directory must contain atleast:  ${oft} master.conf, os.conf or user.conf ${oft} Default Directory: ${config_dir}
+${ofs} -c, --config ${ofe} Use a specific configuration file or directory ${oft} eg: '-c /your/dir' or ' -c /your/file.name'  ${oft} Note: If a directory is specified the directory must contain atleast:  ${oft} master.conf, os.conf or user.conf ${oft} Default Directory: ${config_dir}
 ${ofb}
 ${ofs} -F, --force ${ofe} Force all databases to be downloaded, could cause ip to be blocked
 ${ofb}
-${ofs} -h, --help ${ofe} Display this script\'s help and usage information
+${ofs} -h, --help ${ofe} Display this script's help and usage information
 ${ofb}
 ${ofs} -V, --version ${ofe} Output script version and date information
 ${ofb}
@@ -1239,23 +1238,23 @@ ${ofs} -v, --verbose ${ofe} Be verbose, enabled when not run under cron
 ${ofb}
 ${ofs} -s, --silence ${ofe} Only output error messages, enabled when run under cron
 ${ofb}
-${ofs} -d, --decode-sig ${ofe} Decode a third-party signature either by signature name ${oft} \(eg: Sanesecurity.Junk.15248\) or hexadecimal string. ${oft} This flag will \'NOT\' decode image signatures
+${ofs} -d, --decode-sig ${ofe} Decode a third-party signature either by signature name ${oft} (eg: Sanesecurity.Junk.15248) or hexadecimal string. ${oft} This flag will 'NOT' decode image signatures
 ${ofb}
-${ofs} -e, --encode-string ${ofe} Hexadecimal encode an entire input string that can ${oft} be used in any \'*.ndb\' signature database file
+${ofs} -e, --encode-string ${ofe} Hexadecimal encode an entire input string that can ${oft} be used in any '*.ndb' signature database file
 ${ofb}
-${ofs} -f, --encode-formatted ${ofe} Hexadecimal encode a formatted input string containing ${oft} signature spacing fields \'{}, (), *\', without encoding ${oft} the spacing fields, so that the encoded signature ${oft} can be used in any \'*.ndb\' signature database file
+${ofs} -f, --encode-formatted ${ofe} Hexadecimal encode a formatted input string containing ${oft} signature spacing fields '{}, (), *', without encoding ${oft} the spacing fields, so that the encoded signature ${oft} can be used in any '*.ndb' signature database file
 ${ofb}
-${ofs} -g, --gpg-verify ${ofe} GPG verify a specific Sanesecurity database file ${oft} eg: \'-g filename.ext\' (do not include file path)
+${ofs} -g, --gpg-verify ${ofe} GPG verify a specific Sanesecurity database file ${oft} eg: '-g filename.ext' (do not include file path)
 ${ofb}
 ${ofs} -i, --information ${ofe} Output system and configuration information for ${oft} viewing or possible debugging purposes
 ${ofb}
 ${ofs} -m, --make-database ${ofe} Make a signature database from an ascii file containing ${oft} data strings, with one data string per line.  Additional ${oft} information is provided when using this flag
 ${ofb}
-${ofs} -t, --test-database ${ofe} Clamscan integrity test a specific database file ${oft} eg: \'-t filename.ext\' (do not include file path)
+${ofs} -t, --test-database ${ofe} Clamscan integrity test a specific database file ${oft} eg: '-t filename.ext' (do not include file path)
 ${ofb}
-${ofs} -o, --output-triggered ${ofe} If HAM directory scanning is enabled in the script\'s ${oft} configuration file, then output names of any third-party ${oft} signatures that triggered during the HAM directory scan
+${ofs} -o, --output-triggered ${ofe} If HAM directory scanning is enabled in the script's ${oft} configuration file, then output names of any third-party ${oft} signatures that triggered during the HAM directory scan
 ${ofb}
-${ofs} -w, --whitelist ${ofe} Adds a signature whitelist entry in the newer ClamAV IGN2 ${oft} format to \'my-whitelist.ign2\' in order to temporarily resolve ${oft} a false-positive issue with a specific third-party signature. ${oft} Script added whitelist entries will automatically be removed ${oft} if the original signature is either modified or removed from ${oft} the third-party signature database
+${ofs} -w, --whitelist ${ofe} Adds a signature whitelist entry in the newer ClamAV IGN2 ${oft} format to 'my-whitelist.ign2' in order to temporarily resolve ${oft} a false-positive issue with a specific third-party signature. ${oft} Script added whitelist entries will automatically be removed ${oft} if the original signature is either modified or removed from ${oft} the third-party signature database
 ${ofb}
 ${ofs} --check-clamav ${ofe} If ClamD status check is enabled and the socket path is correctly ${oft} specifiedthen test to see if clamd is running or not
 ${ofb}
@@ -1326,8 +1325,8 @@ enable_log="no"
 custom_config="no"
 we_have_a_config="0"
 
-# Solaris which function returns garbage when the program is not found
-# only define the new which function if running under Solaris
+# Solaris command -v function returns garbage when the program is not found
+# only define the new command -v function if running under Solaris
 if [ "$(uname -s)" == "SunOS" ] ; then
   function which() {
     # Use the switch -p to ignore ksh internal commands
@@ -1336,30 +1335,31 @@ if [ "$(uname -s)" == "SunOS" ] ; then
 fi
 
 # Default Binaries & Commands
-uname_bin="$(which uname 2> /dev/null)"
-clamscan_bin="$(which clamscan 2> /dev/null)"
-rsync_bin="$(which rsync 2> /dev/null)"
+uname_bin="$(command -v uname 2> /dev/null)"
+clamscan_bin="$(command -v clamscan 2> /dev/null)"
+rsync_bin="$(command -v rsync 2> /dev/null)"
 
 # Detect supprot for gnu grep
 if [ -x /usr/gnu/bin/grep ] ; then
   grep_bin="/usr/gnu/bin/grep"
 else
-  grep_bin="$(which grep 2> /dev/null)"
+  grep_bin="$(command -v grep 2> /dev/null)"
 fi
 
 # Detect support for wget
 if [ -x /usr/sfw/bin/wget ] ; then
   wget_bin="/usr/sfw/bin/wget"
 else
-  wget_bin="$(which wget 2> /dev/null)"
+  wget_bin="$(command -v wget 2> /dev/null)"
 fi
-if [ -z "$wget_bin" ] ; then
-  curl_bin="$(which curl 2> /dev/null)"
+if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
+  curl_bin="$(command -v curl 2> /dev/null)"
   if [ -z "$curl_bin" ] ; then
     xshok_pretty_echo_and_log "ERROR: both wget and curl commands are missing, One of them is required" "="
     exit 1
   fi
-else
+fi
+if [ ! -z "$wget_bin" ] ; then
   # wget compression support
   if $wget_bin --help | $grep_bin -q "compression=TYPE" ; then
     wget_compression="--compression=auto"
@@ -1369,16 +1369,14 @@ else
 fi
 
 # Detect support for dig or host
-dig_bin="$(which dig 2> /dev/null)"
+dig_bin="$(command -v dig 2> /dev/null)"
 if [ -z "$dig_bin" ] ; then
-  host_bin="$(which host 2> /dev/null)"
+  host_bin="$(command -v host 2> /dev/null)"
   if [ -z "$host_bin" ] ; then
     xshok_pretty_echo_and_log "ERROR: both dig and host commands are missing, One of them is required" "="
     exit 1
   fi
 fi
-
-
 
 
 # Detect if terminal
@@ -1667,10 +1665,10 @@ if [ "$enable_gpg" == "yes" ] ; then
     if [ -x /opt/csw/bin/gpg ] ; then
       gpg_bin="/opt/csw/bin/gpg"
     else
-      gpg_bin="$(which gpg 2> /dev/null)"
+      gpg_bin="$(command -v gpg 2> /dev/null)"
     fi
     if [ -z "$gpg_bin" ] ; then
-      gpg_bin="$(which gpg2 2> /dev/null)"
+      gpg_bin="$(command -v gpg2 2> /dev/null)"
     fi
   fi
   if [ -z "$gpg_bin" ] ; then
@@ -1702,6 +1700,17 @@ fi
 if [ ! -w "$clam_dbs" ] ; then
   xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not writable ${clam_dbs}" "="
   exit 1
+fi
+
+# Force curl over wget.
+if [ ! -z "$wget_bin" ] && [ "$force_curl" == "yes" ] ; then
+  if [ -z "$curl_bin" ] ; then
+		curl_bin="$(command -v curl 2> /dev/null)"
+	fi
+	if [ ! -z "$curl_bin" ] ; then
+		xshok_pretty_echo_and_log "Force Curl: enabled"
+	  wget_bin=""
+  fi
 fi
 
 # Reset the update timers to force a full update.
@@ -2025,7 +2034,7 @@ current_tmp="${work_dir_work_configs}/current-dbs.tmp"
 current_dbs_file="${work_dir_work_configs}/current-dbs.txt"
 
 if [ "$sanesecurity_enabled" == "yes" ] ; then
-  # Create the Sanesecurity rsync "include" file (defines which files to download).
+  # Create the Sanesecurity rsync "include" file (defines command -v files to download).
   sanesecurity_include_dbs="${work_dir_work_configs}/ss-include-dbs.txt"
   if [ -n "${sanesecurity_dbs[0]}" ] ; then
     rm -f -- "${sanesecurity_include_dbs}" "${work_dir_sanesecurity}/*.sha256"
@@ -2309,7 +2318,7 @@ fi
 ##############################################################################################################################################
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ "$securiteinfo_authorisation_signature" != "YOUR-SIGNATURE-NUMBER" ] ; then
-    if [ -n "$securiteinfo_dbs[0]" ] ; then
+    if [ -n "${securiteinfo_dbs[0]}" ] ; then
       if [ ${#securiteinfo_dbs} -lt 1 ] ; then
         xshok_pretty_echo_and_log "Failed securiteinfo_dbs config is invalid or not defined - SKIPPING"
       else
@@ -3042,16 +3051,16 @@ if [ -r "${clam_dbs}/local.ign" ] && [ -s "${work_dir_work_configs}/monitor-ign.
 
   xshok_pretty_echo_and_log "" "=" "80"
   while read -r entry ; do
-    sig_file="$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $1}')"
-    sig_hex="$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $NF}')"
-    sig_name_old="$(echo "$entry" | tr -d "\r" | awk -F ":" '{print $3}')"
+    sig_file="$(echo "$entry" | tr -d "\\r" | awk -F ":" '{print $1}')"
+    sig_hex="$(echo "$entry" | tr -d "\\r" | awk -F ":" '{print $NF}')"
+    sig_name_old="$(echo "$entry" | tr -d "\\r" | awk -F ":" '{print $3}')"
     sig_ign_old="$($grep_bin ":$sig_name_old" "${work_dir_work_configs}/local.ign")"
-    sig_old="$(echo "$entry" | tr -d "\r" | cut -d ":" -f 3-)"
-    sig_new="$($grep_bin -hwF ":$sig_hex" "$sig_file" | tr -d "\r" 2>/dev/null)"
-    sig_mon_new="$($grep_bin -HwF -n ":$sig_hex" "$sig_file" | tr -d "\r")"
+    sig_old="$(echo "$entry" | tr -d "\\r" | cut -d ":" -f 3-)"
+    sig_new="$($grep_bin -hwF ":$sig_hex" "$sig_file" | tr -d "\\r" 2>/dev/null)"
+    sig_mon_new="$($grep_bin -HwF -n ":$sig_hex" "$sig_file" | tr -d "\\r")"
     if [ -n "$sig_new" ] ; then
       if [ "$sig_old" != "$sig_new" ] || [ "$entry" != "$sig_mon_new" ] ; then
-        sig_name_new="$(echo "$sig_new" | tr -d "\r" | awk -F ":" '{print $1}')"
+        sig_name_new="$(echo "$sig_new" | tr -d "\\r" | awk -F ":" '{print $1}')"
         sig_ign_new="$(echo "$sig_mon_new" | cut -d ":" -f 1-3)"
         perl -i -ne "print unless /$sig_ign_old/" "${work_dir_work_configs}/monitor-ign.txt"
         echo "$sig_mon_new" >> "${work_dir_work_configs}/monitor-ign.txt"
@@ -3138,7 +3147,7 @@ fi
 # Check for non-matching whitelist.hex signatures and remove them from the whitelist file (signature modified or removed).
 if [ -n "$ham_dir" ] ; then
   if [ -r "${work_dir_work_configs}/whitelist.hex" ] ; then
-    $grep_bin -h -f "${work_dir_work_configs}/whitelist.hex" "$work_dir"/*/*.ndb | cut -d "*" -f 2 | tr -d "\r" | sort | uniq > "${work_dir_work_configs}/whitelist.tmp"
+    $grep_bin -h -f "${work_dir_work_configs}/whitelist.hex" "$work_dir"/*/*.ndb | cut -d "*" -f 2 | tr -d "\\r" | sort | uniq > "${work_dir_work_configs}/whitelist.tmp"
     $grep_bin -h -f "${work_dir_work_configs}/whitelist.hex" "$work_dir"/*/*.db | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' | sort | uniq >> "${work_dir_work_configs}/whitelist.tmp"
     mv -f "${work_dir_work_configs}/whitelist.tmp" "${work_dir_work_configs}/whitelist.hex"
     rm -f "${work_dir_work_configs}/whitelist.txt"
