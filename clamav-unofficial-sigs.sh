@@ -285,7 +285,7 @@ function xshok_draw_time_remaining() { #time_remaining #update_hours #name
 function xshok_file_download() { #outputfile #url #notimestamp
   if [ "${1}" ] && [ "${2}" ] ; then
     if [ -n "$wget_bin" ] ; then
-			if [ -n "${3}" ] ; then
+			if [ ! "${3}" ] ; then
 				# the following is required because wget, cannot do --timestamping and --output-document together
 				this_dir="$PWD"
 				output_file="$1"
