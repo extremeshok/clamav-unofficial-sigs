@@ -175,6 +175,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - More escape characters, shellcheck compliance
  - Option added : force_curl , to force the usage of curl instead of wget
  - wget and curl downloads use compression for the transfer (detected when supported)
+ - Workaround for wget, which cannot do --timestamping and --output-document together
  - Fix: remove hardcoded malwarepatrol_product_code
  - Fix: os.macosx.conf service: command not found
  - set malwarepatrol_free = no , when malwarepatrol_product_code != 8

@@ -285,14 +285,37 @@ function xshok_draw_time_remaining() { #time_remaining #update_hours #name
 function xshok_file_download() { #outputfile #url
   if [ "${1}" ] && [ "${2}" ] ; then
     if [ -n "$wget_bin" ] ; then
+			# the following is required because wget, cannot do --timestamping and --output-document together
+			this_dir="$PWD"
+			output_file="$1"
+			url="$2"
+			output_dir="${output_file%/*}"
+			output_file="${output_file##*/}"
+			url_file="${url##*/}"
+			wget_output_link=""
+
+			cd "${output_dir}" || exit
+			if [ "$output_file" != "$url_file" ] ; then
+				if [ ! -f "$url_file" ] ; then
+					ln -s  "$output_file" "$url_file"
+					wget_output_link="$url_file"
+				fi
+			fi
       # shellcheck disable=SC2086
-			$wget_bin $wget_compression $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping --output-document="${1}" "${2}"
-      result=$?
+			$wget_bin $wget_compression $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping "${2}"
+			#$wget_bin $wget_compression $wget_proxy_https $wget_proxy_http $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping --output-document="${1}" "${2}"
+			if [ ! -n "$wget_output_link" ] ; then
+				if [ -L "$wget_output_link" ] ; then
+					rm -f "$wget_output_link"
+				fi
+			fi
+			result=$?
     else
       # shellcheck disable=SC2086
       $curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
       result=$?
     fi
+		cd "$this_dir" || exit
     return $result
   fi
 }
