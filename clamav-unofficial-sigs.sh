@@ -1024,7 +1024,7 @@ function add_signature_whitelist_entry() {
     cd "$clam_dbs" || exit
     input="$(echo "${input}" | tr -d "'" | tr -d '"')"
     sig_full="$($grep_bin -H "$input" ./*.*db)"
-    sig_name="$(echo "$sig_full" | cut -d ":" -f 2)"
+    sig_name="$(echo "$sig_full" | cut -d ":" -f 2 | cut -d "=" -f 1)"
     if [ -n "$sig_name" ] ; then
       if ! $grep_bin "$sig_name" my-whitelist.ign2 > /dev/null 2>&1 ; then
         cp -f -p my-whitelist.ign2 "$work_dir_work_configs" 2>/dev/null
