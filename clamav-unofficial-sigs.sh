@@ -238,7 +238,7 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
   # Handle logging
   if [ "$enable_log" == "yes" ] ; then
     if [ ! -z "$log_pipe_cmd" ] ; then
-      echo "${1}" | "$log_pipe_cmd"
+      echo "${1}" | $log_pipe_cmd
     else
       if [ ! -e "${log_file_path}/${log_file_name}" ] ; then
         # xshok_mkdir_ownership "$log_file_path"
@@ -1309,7 +1309,7 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.0.0"
+script_version="6.0.1"
 script_version_date="2019-07-30"
 minimum_required_config_version="75"
 minimum_yara_clamav_version="0.99"
@@ -2314,7 +2314,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
         fi
       else
         xshok_pretty_echo_and_log "Sanesecurity Database File Updates" "="
-        xshok_draw_time_remaining "$((update_interval - time_interval))" "$sanesecurity_update_hours" "sanesecurity"
+        xshok_draw_time_remaining "$((update_interval - time_interval))" "$sanesecurity_update_hours" "Sanesecurity"
       fi
     fi
   fi
