@@ -1309,15 +1309,10 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="5.6.2"
-script_version_date="2017-03-19"
-minimum_required_config_version="72"
+script_version="6.0.0"
+script_version_date="2019-07-30"
+minimum_required_config_version="75"
 minimum_yara_clamav_version="0.99"
-
-#script_version="6.0.0"
-#script_version_date="2019-08-01"
-#minimum_required_config_version="80"
-#minimum_yara_clamav_version="0.99"
 
 #allow for other negatives besides no.
 #disabled_values_array=("0 no No NO false False FALSE off Off OFF disable Disable DISABLE disabled Disabled DISABLED")

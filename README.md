@@ -168,19 +168,19 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 
 ## Change Log
 
-### UNDER DEV : Version 6.0 (Started July 2019
+### Version 6.0 (Updated 30 July 2019)
  - eXtremeSHOK.com Maintenance & Refactoring
- - Add timestamp support (do not re-download not modified files)
- - Posix compliance which replaced with command -v
- - More escape characters, shellcheck compliance
+ - Add timestamp support (do not re-download not modified files, saves bandwidth)
+ - wget and curl uses compression for the transfer (detected when supported, saves bandwidth)
+ - Posix compliance 'which' replaced with 'command -v'
+ - More escaped characters, shellcheck compliance
  - Option added : force_curl , to force the usage of curl instead of wget
- - wget and curl downloads use compression for the transfer (detected when supported)
  - Workaround for wget, which cannot do --timestamping and --output-document together
+ - Added SECURITEINFO  securiteinfoold.hdb
+ - set malwarepatrol_free = no , when malwarepatrol_product_code != 8
  - Fix: remove hardcoded malwarepatrol_product_code
  - Fix: os.macosx.conf service: command not found
  - Fix: whitelist a MalwarePatrol signature
- - set malwarepatrol_free = no , when malwarepatrol_product_code != 8
- - Added SECURITEINFO  securiteinfoold.hdb
  - More reliable version checking
  - Fix: Clamscan database integrity test
  - Fix: version comparison of minimum Yara @bytesplit
@@ -191,7 +191,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Specify correct path for systemd units @SlothOfAnarchy
  - Avoid hardcoded path to BASH @rseichter
 
-### Version 5.6.2 (updated 2017-03-19)
+### Version 5.6.2
  - eXtremeSHOK.com Maintenance
  - Bug Fix GPG always being disabled, thanks @orlitzky
 
