@@ -1895,6 +1895,10 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
 fi
 
 # Set the variables for MalwarePatrol
+if [ "$malwarepatrol_product_code" != "8" ] ; then
+	# assumption, free product code is always 8 (non-free product code is never 8)
+	malwarepatrol_free="no"
+fi
 if [ "$malwarepatrol_free" == "yes" ] ; then
   malwarepatrol_product_code="8"
   malwarepatrol_list="clamav_basic"

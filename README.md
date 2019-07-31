@@ -175,6 +175,8 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - More escape characters, shellcheck compliance
  - Option added : force_curl , to force the usage of curl instead of wget
  - wget and curl downloads use compression for the transfer (detected when supported)
+ - Fix: remove hardcoded malwarepatrol_product_code
+ - set malwarepatrol_free = no , when malwarepatrol_product_code != 8
  - Added SECURITEINFO  securiteinfoold.hdb
  - Fix: Clamscan database integrity test
  - Fix: version comparison of minimum Yara @bytesplit
