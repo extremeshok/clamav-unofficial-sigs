@@ -178,6 +178,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Workaround for wget, which cannot do --timestamping and --output-document together
  - Fix: remove hardcoded malwarepatrol_product_code
  - Fix: os.macosx.conf service: command not found
+ - Fix: whitelist a MalwarePatrol signature
  - set malwarepatrol_free = no , when malwarepatrol_product_code != 8
  - Added SECURITEINFO  securiteinfoold.hdb
  - More reliable version checking
