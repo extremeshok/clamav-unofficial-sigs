@@ -180,6 +180,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Fix: os.macosx.conf service: command not found
  - set malwarepatrol_free = no , when malwarepatrol_product_code != 8
  - Added SECURITEINFO  securiteinfoold.hdb
+ - More reliable version checking
  - Fix: Clamscan database integrity test
  - Fix: version comparison of minimum Yara @bytesplit
  - Use custom config directory @Amish
