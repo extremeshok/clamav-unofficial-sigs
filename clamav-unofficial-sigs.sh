@@ -1291,7 +1291,7 @@ minimum_yara_clamav_version="0.99"
 #minimum_required_config_version="80"
 #minimum_yara_clamav_version="0.99"
 
-# TODO , allow for other negatives besides no.
+#allow for other negatives besides no.
 #disabled_values_array=("0 no No NO false False FALSE off Off OFF disable Disable DISABLE disabled Disabled DISABLED")
 # if [[ " ${disabled_values_array[@]} " =~ " ${value} " ]]; then
 #     # whatever you want to do when arr contains value
