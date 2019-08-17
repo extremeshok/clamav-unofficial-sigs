@@ -347,16 +347,16 @@ function xshok_auto_update() { # version
   result=$?
 
   if [ "$result" -ne 0 ] ; then
-    echo "Failed: Error while trying to get new version!"
-    echo "File requested: ${UPDATE_BASE}/${SELF}"
+    xshok_pretty_echo_and_log "Failed: Error while trying to get new version!"
+    xshok_pretty_echo_and_log "File requested: ${UPDATE_BASE}/${SELF}"
     exit 1
   fi
-  echo "Done."
+  xshok_pretty_echo_and_log "Done."
 
   # Copy over modes from old version
   OCTAL_MODE="$(stat -c "%a" "$SELF")"
   if ! chmod "$OCTAL_MODE" "${0}.tmp" ; then
-    echo "Failed: Error while trying to set mode on ${0}.tmp."
+    xshok_pretty_echo_and_log "Failed: Error while trying to set mode on ${0}.tmp."
     exit 1
   fi
 
@@ -365,10 +365,10 @@ function xshok_auto_update() { # version
 #!/usr/bin/env bash
 # Overwrite old file with new
 if mv "${0}.tmp" "${0}" ; then
-  echo "Done. Update complete."
+  xshok_pretty_echo_and_log "Done. Update complete."
   rm \$0
 else
-  echo "Failed! The update was not completed."
+  xshok_pretty_echo_and_log "Failed! The update was not completed."
 fi
 EOF
 
@@ -471,12 +471,12 @@ function xshok_database() { # rating database_array
 function install_man() {
 
   if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
-    echo "This script (clamav-unofficial-sigs) was installed on the system via ${pkg_mgr}"
+    xshok_pretty_echo_and_log "This script (clamav-unofficial-sigs) was installed on the system via ${pkg_mgr}"
     exit 1
   fi
 
-  echo ""
-  echo "Generating man file for install...."
+  xshok_pretty_echo_and_log ""
+  xshok_pretty_echo_and_log "Generating man file for install...."
 
   # Use defined varibles or attempt to use default varibles
 
@@ -485,7 +485,7 @@ function install_man() {
     touch "${man_dir}/${man_filename}" 2>/dev/null
   fi
   if [ ! -w "${man_dir}/${man_filename}" ] ; then
-    echo "ERROR: man install aborted, as file not writable: ${man_dir}/${man_filename}"
+    xshok_pretty_echo_and_log "ERROR: man install aborted, as file not writable: ${man_dir}/${man_filename}"
   else
 
     BOLD="\\fB"
@@ -530,7 +530,7 @@ Originially based on Script provide by Bill Landry
 EOF
 
   fi
-  echo "Completed: man installed, as file: ${man_dir}/${man_filename}"
+  xshok_pretty_echo_and_log "Completed: man installed, as file: ${man_dir}/${man_filename}"
 }
 
 
@@ -538,12 +538,12 @@ EOF
 function install_logrotate() {
 
   if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
-    echo "This script (clamav-unofficial-sigs) was installed on the system via ${pkg_mgr}"
+    xshok_pretty_echo_and_log "This script (clamav-unofficial-sigs) was installed on the system via ${pkg_mgr}"
     exit 1
   fi
 
-  echo ""
-  echo "Generating logrotate file for install...."
+  xshok_pretty_echo_and_log ""
+  xshok_pretty_echo_and_log "Generating logrotate file for install...."
 
   # Use defined varibles or attempt to use default varibles
 
@@ -603,19 +603,19 @@ $logrotate_log_file_full_path {
 EOF
 
   fi
-  echo "Completed: logrotate installed, as file: ${logrotate_dir}/${logrotate_filename}"
+  xshok_pretty_echo_and_log "Completed: logrotate installed, as file: ${logrotate_dir}/${logrotate_filename}"
 }
 
 # Generate a cron config and install it
 function install_cron() {
 
   if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
-    echo "This script (clamav-unofficial-sigs) was installed on the system via {$pkg_mgr}"
+    xshok_pretty_echo_and_log "This script (clamav-unofficial-sigs) was installed on the system via {$pkg_mgr}"
     exit 1
   fi
 
-  echo ""
-  echo "Generating cron file for install...."
+  xshok_pretty_echo_and_log ""
+  xshok_pretty_echo_and_log "Generating cron file for install...."
 
   # Use defined varibles or attempt to use default varibles
   if [ -z "$cron_minute" ] ; then
@@ -677,15 +677,15 @@ $cron_minute * * * * ${cron_sudo} ${cron_user} [ -x ${cron_script_full_path} ] &
 EOF
 
   fi
-  echo "Completed: cron installed, as file: ${cron_dir}/${cron_filename}"
+  xshok_pretty_echo_and_log "Completed: cron installed, as file: ${cron_dir}/${cron_filename}"
 }
 
 
 # Decode a third-party signature either by signature name
 function decode_third_party_signature_by_signature_name() {
-  echo ""
-  echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
-  echo "a hexadecimal encoded data string and press enter:"
+  xshok_pretty_echo_and_log ""
+  xshok_pretty_echo_and_log "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
+  xshok_pretty_echo_and_log "a hexadecimal encoded data string and press enter:"
   read -r input
 	# Remove quotes and .UNOFFICIAL from the whitelist input string
   input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`')"
@@ -695,51 +695,51 @@ function decode_third_party_signature_by_signature_name() {
     sig="$($grep_bin "${input}:" ./*.ndb)"
     if [ -n "$sig" ] ; then
       db_file="${sig%:*}"
-      echo "${input} found in: ${db_file}"
-      echo "${input} signature decodes to:"
-      echo "$sig" | cut -d ":" -f 5 | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
+      xshok_pretty_echo_and_log "${input} found in: ${db_file}"
+      xshok_pretty_echo_and_log "${input} signature decodes to:"
+      xshok_pretty_echo_and_log "$sig" | cut -d ":" -f 5 | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
     else
-      echo "Signature ${input} could not be found."
-      echo "This script will only decode ClamAV 'UNOFFICIAL' third-Party,"
-      echo "non-image based, signatures as found in the *.ndb databases."
+      xshok_pretty_echo_and_log "Signature ${input} could not be found."
+      xshok_pretty_echo_and_log "This script will only decode ClamAV 'UNOFFICIAL' third-Party,"
+      xshok_pretty_echo_and_log "non-image based, signatures as found in the *.ndb databases."
     fi
   else
-    echo "Here is the decoded hexadecimal input string:"
+    xshok_pretty_echo_and_log "Here is the decoded hexadecimal input string:"
     echo "${input}" | perl -pe 's/([a-fA-F0-9]{2})|(\{[^}]*\}|\([^)]*\))/defined $2 ? $2 : chr(hex $1)/eg'
   fi
 }
 
 # Hexadecimal encode an entire input string
 function hexadecimal_encode_entire_input_string() {
-  echo ""
-  echo "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
-  echo "any quotes around the string unless you want them included in the hexadecimal encoded output:"
+  xshok_pretty_echo_and_log ""
+  xshok_pretty_echo_and_log "Input the data string that you want to hexadecimal encode and then press enter.  Do not include"
+  xshok_pretty_echo_and_log "any quotes around the string unless you want them included in the hexadecimal encoded output:"
   read -r input
-  echo "Here is the hexadecimal encoded input string:"
+  xshok_pretty_echo_and_log "Here is the hexadecimal encoded input string:"
   echo "${input}" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg'
 }
 
 # Hexadecimal encode a formatted input string
 function hexadecimal_encode_formatted_input_string() {
-  echo ""
-  echo "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
-  echo "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
-  echo "around the string unless you want them included in the hexadecimal encoded output:"
+  xshok_pretty_echo_and_log ""
+  xshok_pretty_echo_and_log "Input a formated data string containing spacing fields '{}, (), *' that you want to hexadecimal"
+  xshok_pretty_echo_and_log "encode, without encoding the spacing fields, and then press enter.  Do not include any quotes"
+  xshok_pretty_echo_and_log "around the string unless you want them included in the hexadecimal encoded output:"
   read -r input
-  echo "Here is the hexadecimal encoded input string:"
+  xshok_pretty_echo_and_log "Here is the hexadecimal encoded input string:"
   echo "${input}" | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg'
 }
 
 # GPG verify a specific Sanesecurity database file
 function gpg_verify_specific_sanesecurity_database_file() { # databasefile
-  echo ""
+  xshok_pretty_echo_and_log ""
   if [ "$enable_gpg" == "no" ] ; then
     xshok_pretty_echo_and_log "Notice: GnuPG / signature verification disabled" "-"
   else
     if [ "${1}" ] ; then
       db_file="$(echo "${1}" | awk -F "/" '{print $NF}')"
       if [ -r "${work_dir_sanesecurity}/${db_file}" ] ; then
-        echo "GPG signature testing database file: ${work_dir_sanesecurity}/${db_file}"
+        xshok_pretty_echo_and_log "GPG signature testing database file: ${work_dir_sanesecurity}/${db_file}"
         if [ -r "${work_dir_sanesecurity}/${db_file}.sig" ] ; then
           if ! "$gpg_bin" -q --trust-model always --no-default-keyring --homedir "${work_dir_gpg}" --keyring "${work_dir_gpg}/ss-keyring.gpg" --verify "${work_dir_sanesecurity}/${db_file}.sig" "${work_dir_sanesecurity}/${db_file}" ; then
             if "$gpg_bin" -q --always-trust --no-default-keyring --homedir "${work_dir_gpg}" --keyring "${work_dir_gpg}/ss-keyring.gpg" --verify "${work_dir_sanesecurity}/${db_file}.sig" "${work_dir_sanesecurity}/${db_file}" ; then
@@ -751,11 +751,11 @@ function gpg_verify_specific_sanesecurity_database_file() { # databasefile
             exit 0
           fi
         else
-          echo "Signature ${db_file}.sig cannot be found."
+          xshok_pretty_echo_and_log "Signature ${db_file}.sig cannot be found."
         fi
       else
-        echo "File ${db_file} cannot be found or is not a Sanesecurity database file."
-        echo "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
+        xshok_pretty_echo_and_log "File ${db_file} cannot be found or is not a Sanesecurity database file."
+        xshok_pretty_echo_and_log "Only the following Sanesecurity and OITC databases can be GPG signature tested:"
         ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "${work_dir_sanesecurity}"
       fi
     else
@@ -768,51 +768,51 @@ function gpg_verify_specific_sanesecurity_database_file() { # databasefile
 
 # Output system and configuration information
 function output_system_configuration_information() {
-  echo ""
-  echo "*** SCRIPT VERSION ***"
-  echo "${this_script_name} ${script_version} (${script_version_date})"
-  echo "*** SYSTEM INFORMATION ***"
+  xshok_pretty_echo_and_log ""
+  xshok_pretty_echo_and_log "*** SCRIPT VERSION ***"
+  xshok_pretty_echo_and_log "${this_script_name} ${script_version} (${script_version_date})"
+  xshok_pretty_echo_and_log "*** SYSTEM INFORMATION ***"
   $uname_bin -a
-  echo "*** CLAMSCAN LOCATION & VERSION ***"
-  echo "${clamscan_bin}"
+  xshok_pretty_echo_and_log "*** CLAMSCAN LOCATION & VERSION ***"
+  xshok_pretty_echo_and_log "${clamscan_bin}"
   $clamscan_bin --version | head -1
-  echo "*** RSYNC LOCATION & VERSION ***"
-  echo "${rsync_bin}"
+  xshok_pretty_echo_and_log "*** RSYNC LOCATION & VERSION ***"
+  xshok_pretty_echo_and_log "${rsync_bin}"
   $rsync_bin --version | head -1
   if [ -n "$wget_bin" ] ; then
-    echo "*** WGET LOCATION & VERSION ***"
-    echo "${wget_bin}"
+    xshok_pretty_echo_and_log "*** WGET LOCATION & VERSION ***"
+    xshok_pretty_echo_and_log "${wget_bin}"
     $wget_bin --version | head -1
   else
-    echo "*** CURL LOCATION & VERSION ***"
-    echo "${curl_bin}"
+    xshok_pretty_echo_and_log "*** CURL LOCATION & VERSION ***"
+    xshok_pretty_echo_and_log "${curl_bin}"
     $curl_bin --version | head -1
   fi
   if [ "$enable_gpg" == "yes" ] ; then
-    echo "*** GPG LOCATION & VERSION ***"
-    echo "${gpg_bin}"
+    xshok_pretty_echo_and_log "*** GPG LOCATION & VERSION ***"
+    xshok_pretty_echo_and_log "${gpg_bin}"
     $gpg_bin --version | head -1
   fi
-  echo "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
-  echo "${work_dir}"
-  echo "*** CLAMAV DIRECTORY INFORMATION ***"
-  echo "${clam_dbs}"
-  echo "*** SCRIPT CONFIGURATION SETTINGS ***"
+  xshok_pretty_echo_and_log "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
+  xshok_pretty_echo_and_log "${work_dir}"
+  xshok_pretty_echo_and_log "*** CLAMAV DIRECTORY INFORMATION ***"
+  xshok_pretty_echo_and_log "${clam_dbs}"
+  xshok_pretty_echo_and_log "*** SCRIPT CONFIGURATION SETTINGS ***"
   if [ "$custom_config" != "no" ] ; then
     if [ -d "$custom_config" ] ; then
       # Assign the custom config dir and remove trailing / (removes / and //)
-      echo "Custom Configuration Directory: ${custom_config}"
+      xshok_pretty_echo_and_log "Custom Configuration Directory: ${custom_config}"
     else
-      echo "Custom Configuration File: ${custom_config}"
+      xshok_pretty_echo_and_log "Custom Configuration File: ${custom_config}"
     fi
   else
-    echo "Configuration Directory: ${config_dir}"
+    xshok_pretty_echo_and_log "Configuration Directory: ${config_dir}"
   fi
 }
 
 # Make a signature database from an ascii file
 function make_signature_database_from_ascii_file() {
-  echo ""
+  xshok_pretty_echo_and_log ""
   echo "
   The '-m' script flag provides a way to create a ClamAV hexadecimal signature database (*.ndb) file
   from a list of data strings stored in a clear-text ascii file, with one data string entry per line.
@@ -860,8 +860,8 @@ function make_signature_database_from_ascii_file() {
     if [ -r "$source" ] ; then
       source_file="$(basename "$source")"
 
-      echo "What signature prefix would you like to use?  For example: 'Phish.Domains'"
-      echo "will create signatures that looks like: 'Phish.Domains.1:4:*:HexSigHere'"
+      xshok_pretty_echo_and_log "What signature prefix would you like to use?  For example: 'Phish.Domains'"
+      xshok_pretty_echo_and_log "will create signatures that looks like: 'Phish.Domains.1:4:*:HexSigHere'"
 
       echo -n "Enter signature prefix: "
       read -r prefix
@@ -880,19 +880,19 @@ function make_signature_database_from_ascii_file() {
         else
           echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
         fi
-        echo "Hexadecimal encoding ${source_file} line: ${line_num} of ${total}"
+        xshok_pretty_echo_and_log "Hexadecimal encoding ${source_file} line: ${line_num} of ${total}"
         line_num="$((line_num + 1))"
       done < "$source"
     else
-      echo "Source file not found, exiting..."
+      xshok_pretty_echo_and_log "Source file not found, exiting..."
       exit
     fi
 
 
-    echo "Signature database file created at: ${path_file}"
+    xshok_pretty_echo_and_log "Signature database file created at: ${path_file}"
     if $clamscan_bin --quiet -d "$path_file" "${work_dir_work_configs}/scan-test.txt" 2>/dev/null ; then
 
-      echo "Clamscan reports database integrity tested good."
+      xshok_pretty_echo_and_log "Clamscan reports database integrity tested good."
 
       echo -n "Would you like to move '${db_file}' into '${clam_dbs}' and reload databases?"
       if xshok_prompt_confirm ; then
@@ -905,60 +905,60 @@ function make_signature_database_from_ascii_file() {
             fi
             $clamd_restart_opt
 
-            echo "Signature database '${db_file}' was successfully implemented and ClamD databases reloaded."
+            xshok_pretty_echo_and_log "Signature database '${db_file}' was successfully implemented and ClamD databases reloaded."
           else
 
-            echo "Failed to add/update '${db_file}', ClamD database not reloaded."
+            xshok_pretty_echo_and_log "Failed to add/update '${db_file}', ClamD database not reloaded."
           fi
         else
 
-          echo "Database '${db_file}' has not changed - skipping"
+          xshok_pretty_echo_and_log "Database '${db_file}' has not changed - skipping"
         fi
       else
 
-        echo "No action taken."
+        xshok_pretty_echo_and_log "No action taken."
       fi
     else
 
-      echo "Clamscan reports that '${db_file}' signature database integrity tested bad."
+      xshok_pretty_echo_and_log "Clamscan reports that '${db_file}' signature database integrity tested bad."
     fi
   fi
 }
 
 # Remove the clamav-unofficial-sigs script
 function remove_script() {
-  echo ""
+  xshok_pretty_echo_and_log ""
   if [ -n "$pkg_mgr" ] || [ -n "$pkg_rm" ] ; then
-    echo "This script (clamav-unofficial-sigs) was installed on the system via '${pkg_mgr}'"
-    echo "use '${pkg_rm}' to remove the script and all of its associated files and databases from the system."
+    xshok_pretty_echo_and_log "This script (clamav-unofficial-sigs) was installed on the system via '${pkg_mgr}'"
+    xshok_pretty_echo_and_log "use '${pkg_rm}' to remove the script and all of its associated files and databases from the system."
 
   else
     cron_file_full_path="${cron_dir}/${cron_filename}"
     logrotate_file_full_path="${logrotate_dir}/${logrotate_filename}"
     man_file_full_path="${man_dir}/${man_filename}"
 
-    echo "This will remove the workdir (${work_dir}), logrotate file (${logrotate_file_full_path}), cron file (${cron_file_full_path}), man file (${man_file_full_path})"
-    echo "Are you sure you want to remove the clamav-unofficial-sigs script and all of its associated files, third-party databases, and work directory from the system?"
+    xshok_pretty_echo_and_log "This will remove the workdir (${work_dir}), logrotate file (${logrotate_file_full_path}), cron file (${cron_file_full_path}), man file (${man_file_full_path})"
+    xshok_pretty_echo_and_log "Are you sure you want to remove the clamav-unofficial-sigs script and all of its associated files, third-party databases, and work directory from the system?"
     if xshok_prompt_confirm ; then
-      echo "This can not be undone are you sure ?"
+      xshok_pretty_echo_and_log "This can not be undone are you sure ?"
       if xshok_prompt_confirm ; then
         if [ -r "${work_dir_work_configs}/purge.txt" ] ; then
 
           while read -r file ; do
             xshok_is_file "$file" && rm -f -- "$file"
-            echo "     Removed file: ${file}"
+            xshok_pretty_echo_and_log "     Removed file: ${file}"
           done < "${work_dir_work_configs}/purge.txt"
           if [ -r "$cron_file_full_path" ] ; then
             xshok_is_file "$cron_file_full_path" && rm -f "$cron_file_full_path"
-            echo "     Removed file: ${cron_file_full_path}"
+            xshok_pretty_echo_and_log "     Removed file: ${cron_file_full_path}"
           fi
           if [ -r "$logrotate_file_full_path" ] ; then
             xshok_is_file "$logrotate_file_full_path" && rm -f "$logrotate_file_full_path"
-            echo "     Removed file: ${logrotate_file_full_path}"
+            xshok_pretty_echo_and_log "     Removed file: ${logrotate_file_full_path}"
           fi
           if [ -r "$man_file_full_path" ] ; then
             xshok_is_file "$man_file_full_path" && rm -f "$man_file_full_path"
-            echo "     Removed file: ${man_file_full_path}"
+            xshok_pretty_echo_and_log "     Removed file: ${man_file_full_path}"
           fi
 
           # Rather keep the configs
@@ -966,60 +966,60 @@ function remove_script() {
           #rm -f -- "${0}" && echo "     Removed file: $0"
           xshok_is_subdir "$work_dir" && rm -rf -- "${work_dir:?}" && echo "     Removed script working directories: ${work_dir}"
 
-          echo "  The clamav-unofficial-sigs script and all of its associated files, third-party"
-          echo "  databases, and work directories have been successfully removed from the system."
+          xshok_pretty_echo_and_log "  The clamav-unofficial-sigs script and all of its associated files, third-party"
+          xshok_pretty_echo_and_log "  databases, and work directories have been successfully removed from the system."
 
         else
-          echo "  Cannot locate 'purge.txt' file in ${work_dir_work_configs}."
-          echo "  Files and signature database will need to be removed manually."
+          xshok_pretty_echo_and_log "  Cannot locate 'purge.txt' file in ${work_dir_work_configs}."
+          xshok_pretty_echo_and_log "  Files and signature database will need to be removed manually."
         fi
       else
-        echo "Aborted"
+        xshok_pretty_echo_and_log "Aborted"
       fi
     else
-      echo "Aborted"
+      xshok_pretty_echo_and_log "Aborted"
     fi
   fi
 }
 
 # Clamscan integrity test a specific database file
 function clamscan_integrity_test_specific_database_file() { # databasefile
-  echo ""
+  xshok_pretty_echo_and_log ""
   if [ "${1}" ] ; then
     input="$(echo "${1}" | awk -F "/" '{print $NF}')"
     db_file="$(find "$work_dir" -name "$input")"
     if [ -r "$db_file" ] ; then
-      echo "Clamscan integrity testing: ${db_file}"
+      xshok_pretty_echo_and_log "Clamscan integrity testing: ${db_file}"
       if $clamscan_bin --quiet -d "$db_file" "${work_dir_work_configs}/scan-test.txt" ; then
-        echo "Clamscan reports that '${input}' database integrity tested GOOD"
+        xshok_pretty_echo_and_log "Clamscan reports that '${input}' database integrity tested GOOD"
         exit 0
       else
-        echo "Clamscan reports that '${input}' database integrity tested BAD"
+        xshok_pretty_echo_and_log "Clamscan reports that '${input}' database integrity tested BAD"
         exit 1
       fi
     else
-      echo "File '${input}' cannot be found."
-      echo "Here is a list of third-party databases that can be clamscan integrity tested:"
+      xshok_pretty_echo_and_log "File '${input}' cannot be found."
+      xshok_pretty_echo_and_log "Here is a list of third-party databases that can be clamscan integrity tested:"
 
-      echo "=== Sanesecurity ==="
+      xshok_pretty_echo_and_log "=== Sanesecurity ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_sanesecurity"
 
-      echo "=== SecuriteInfo ==="
+      xshok_pretty_echo_and_log "=== SecuriteInfo ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_securiteinfo"
 
-      echo "=== MalwarePatrol ==="
+      xshok_pretty_echo_and_log "=== MalwarePatrol ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_malwarepatrol"
 
-      echo "=== Linux Malware Detect ==="
+      xshok_pretty_echo_and_log "=== Linux Malware Detect ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_linuxmalwaredetect"
 
-      echo "=== Linux Malware Detect ==="
+      xshok_pretty_echo_and_log "=== Linux Malware Detect ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_yararulesproject"
 
-      echo "=== User Defined Databases ==="
+      xshok_pretty_echo_and_log "=== User Defined Databases ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_add"
 
-      echo "Check the file name and try again..."
+      xshok_pretty_echo_and_log "Check the file name and try again..."
     fi
   else
     xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
@@ -1029,26 +1029,26 @@ function clamscan_integrity_test_specific_database_file() { # databasefile
 
 # Output names of any third-party signatures that triggered during the HAM directory scan
 function output_signatures_triggered_during_ham_directory_scan() {
-  echo ""
+  xshok_pretty_echo_and_log ""
   if [ -n "$ham_dir" ] ; then
     if [ -r "${work_dir_work_configs}/whitelist.hex" ] ; then
-      echo "The following third-party signatures triggered hits during the HAM Directory scan:"
+      xshok_pretty_echo_and_log "The following third-party signatures triggered hits during the HAM Directory scan:"
 
       $grep_bin -h -f "${work_dir_work_configs}/whitelist.hex" "$work_dir"/*/*.ndb | cut -d ":" -f 1
       $grep_bin -h -f "${work_dir_work_configs}/whitelist.hex" "$work_dir"/*/*.db | cut -d "=" -f 1
     else
-      echo "No third-party signatures have triggered hits during the HAM Directory scan."
+      xshok_pretty_echo_and_log "No third-party signatures have triggered hits during the HAM Directory scan."
     fi
   else
-    echo "Ham directory scanning is not currently enabled in the script's configuration file."
+    xshok_pretty_echo_and_log "Ham directory scanning is not currently enabled in the script's configuration file."
   fi
 }
 
 # Adds a signature whitelist entry in the newer ClamAV IGN2 format
 function add_signature_whitelist_entry() {
-  echo ""
-  echo "Input a third-party signature name that you wish to whitelist due to false-positives"
-  echo "and press enter"
+  xshok_pretty_echo_and_log ""
+  xshok_pretty_echo_and_log "Input a third-party signature name that you wish to whitelist due to false-positives"
+  xshok_pretty_echo_and_log "and press enter"
 
   read -r input
   if [ -n "$input" ] ; then
@@ -1079,31 +1079,31 @@ function add_signature_whitelist_entry() {
             fi
             clamscan_reload_dbs
 
-            echo "Signature '${input}' has been added to my-whitelist.ign2 and"
-            echo "all databases have been reloaded.  The script will track any changes"
-            echo "to the offending signature and will automatically remove it if the"
-            echo "signature is modified or removed from the third-party database."
+            xshok_pretty_echo_and_log "Signature '${input}' has been added to my-whitelist.ign2 and"
+            xshok_pretty_echo_and_log "all databases have been reloaded.  The script will track any changes"
+            xshok_pretty_echo_and_log "to the offending signature and will automatically remove it if the"
+            xshok_pretty_echo_and_log "signature is modified or removed from the third-party database."
           else
 
-            echo "Failed to successfully update my-whitelist.ign2 file - SKIPPING."
+            xshok_pretty_echo_and_log "Failed to successfully update my-whitelist.ign2 file - SKIPPING."
           fi
         else
 
-          echo "Clamscan reports my-whitelist.ign2 database integrity is bad - SKIPPING."
+          xshok_pretty_echo_and_log "Clamscan reports my-whitelist.ign2 database integrity is bad - SKIPPING."
         fi
       else
 
-        echo "Signature '${input}' already exists in my-whitelist.ign2 - no action taken."
+        xshok_pretty_echo_and_log "Signature '${input}' already exists in my-whitelist.ign2 - no action taken."
       fi
     else
 
-      echo "Signature '${input}' could not be found."
+      xshok_pretty_echo_and_log "Signature '${input}' could not be found."
 
-      echo "This script will only create a whitelise entry in my-whitelist.ign2 for ClamAV"
-      echo "'UNOFFICIAL' third-Party signatures as found in the *.ndb *.hdb *.db databases."
+      xshok_pretty_echo_and_log "This script will only create a whitelise entry in my-whitelist.ign2 for ClamAV"
+      xshok_pretty_echo_and_log "'UNOFFICIAL' third-Party signatures as found in the *.ndb *.hdb *.db databases."
     fi
   else
-    echo "No input detected - no action taken."
+    xshok_pretty_echo_and_log "No input detected - no action taken."
   fi
 }
 
