@@ -214,8 +214,10 @@ function xshok_user_group_exists() { # username groupname
 # type: e = error, w= warning, a = alert
 function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 	#detect if running under cron and silence
-	if [ ! -t 1 ] ; then
-		comment_silence="yes"
+	if [ "$comment_silence" != "yes" ] ; then
+		if [ ! -t 1 ] ; then
+			comment_silence="yes"
+		fi
 	fi
 	# always show errors and alerts
 	if [ -n "$4" ] ; then
