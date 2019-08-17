@@ -211,7 +211,11 @@ function xshok_user_group_exists() { # username groupname
 # ========
 # pretty_echo_and_log "" "/\" "7"
 # /\/\/\/\/\/\
-# type: e = error, w= warning, a = alert
+# type: e = error, w= warning, a = alert,
+# will auto detect using the first word "error,warning,alert"
+# type e will make a == border
+# type w will make a -- border
+# type a will make a ++ border
 function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 	#detect if running under cron and silence
 	if [ "$comment_silence" != "yes" ] ; then
@@ -220,13 +224,30 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 		fi
 	fi
 	# always show errors and alerts
-	if [ -n "$4" ] ; then
-		if [ "$4" == "e" ] || [ "$4" == "a" ] ; then
-			comment_silence="no"
+	if [ -z "$4" ] ; then
+		shopt -s nocasematch
+		if [[ $1 =~ "error:" ]] || [[ $1 =~ "error " ]]; then
+			4="e"
+		elif [[ $1 =~ "warning:" ]] || [[ $1 =~ "warning " ]]; then
+			4="w"
+		elif [[ $1 =~ "alert:" ]] || [[ $1 =~ "alert " ]]; then
+			4="a"
 		fi
+	fi
+	if [ "$4" == "e" ] || [ "$4" == "a" ] ; then
+			comment_silence="no"
 	fi
 	# Handle comments is not silenced or type
   if [ "$comment_silence" != "yes" ] ; then
+		if [ -z "$2" ] ; then
+			if [ "$4" == "e" ] ; then
+				2="="
+			elif [ "$4" == "w" ] ; then
+				2="-"
+			elif [ "$4" == "a" ] ; then
+				2="+"
+			fi
+		fi
     if [ "${#@}" -eq 1 ] ; then
       echo "${1}"
     else
