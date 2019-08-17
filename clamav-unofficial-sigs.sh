@@ -441,15 +441,15 @@ function xshok_database() { # rating database_array
 									new_dbs+=( "$db_name" )
 								fi
 							elif [ "$current_rating" == "LOWMEDIUMONLY" ] ; then
-								if [ "$db_name_rating" == "LOWMEDIUMONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "MEDIUM" ]; then
+								if [ "$db_name_rating" == "LOWMEDIUMONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "MEDIUM" ] ; then
 									new_dbs+=( "$db_name" )
 								fi
 							elif [ "$current_rating" == "MEDIUMHIGHONLY" ] ; then
-								if [ "$db_name_rating" == "MEDIUMHIGHONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "HIGH" ]; then
+								if [ "$db_name_rating" == "MEDIUMHIGHONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "HIGH" ] ; then
 									new_dbs+=( "$db_name" )
 								fi
 							elif [ "$current_rating" == "HIGHONLY" ] ; then
-								if [ "$db_name_rating" == "HIGHONLY" ] || || [ "$db_name_rating" == "HIGH" ]; then
+								if [ "$db_name_rating" == "HIGHONLY" ] || [ "$db_name_rating" == "HIGH" ] ; then
 									new_dbs+=( "$db_name" )
 								fi
 							fi
