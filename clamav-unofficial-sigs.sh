@@ -695,7 +695,7 @@ function install_cron() {
 # script itself is set to randomize the actual execution time between
 # 60 - 600 seconds.  To Adjust the cron values, edit your configs and run
 # bash clamav-unofficial-sigs.sh --install-cron to generate a new file.
-
+MAILTO=root
 $cron_minute * * * * ${cron_sudo} ${cron_user} [ -x ${cron_script_full_path} ] && ${cron_bash} ${cron_script_full_path} > /dev/null
 
 # https://eXtremeSHOK.com ######################################################
