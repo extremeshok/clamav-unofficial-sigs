@@ -654,10 +654,11 @@ EOF
 function decode_third_party_signature_by_signature_name() {
   echo ""
   echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
-  echo "a hexadecimal encoded data string and press enter (do not include '.UNOFFICIAL'"
-  echo "in the signature name nor add quote marks to any input string):"
+  echo "a hexadecimal encoded data string and press enter:"
   read -r input
-  input="$(echo "${input}" | tr -d "'" | tr -d '"')"
+	# Remove qotes and .UNOFFICIAL from the whitelist input string
+  input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`')"
+	input=${input/\.UNOFFICIAL/}
   if echo "${input}" | $grep_bin "\\." > /dev/null ; then
     cd "$clam_dbs" || exit
     sig="$($grep_bin "${input}:" ./*.ndb)"
