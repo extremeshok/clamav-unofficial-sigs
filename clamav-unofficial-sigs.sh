@@ -1502,7 +1502,20 @@ if [ "$custom_config" != "no" ] ; then
   if [ -d "$custom_config" ] ; then
     # Assign the custom config dir and remove trailing / (removes / and //)
     shopt -s extglob; config_dir="${custom_config%%+(/)}"
-    config_files=( "${config_dir}/master.conf" "${config_dir}/os.conf" "${config_dir}/user.conf" )
+		declare -A config_files
+		if [ -r "${config_dir}/master.conf" ] ; then
+			config_files+=( "${config_dir}/master.conf" )
+		fi
+		#find the first suitable os.conf or os.*.conf file
+		config_file="$(ls ${config_dir} | $grep_bin "os.*.conf" | head -n1)"
+		if [ -r "${config_dir}/${config_file}" ] && [ "$config_file" != "" ]; then
+			config_files+=( "${config_dir}/${config_file}" )
+		else
+			xshok_pretty_echo_and_log "WARNING: ${config_dir}/os.conf not found" "*"
+		fi
+		if [ -r "${config_dir}/user.conf" ] ; then
+			config_files+=( "${config_dir}/user.conf" )
+		fi
   else
     config_files=( "$custom_config" )
   fi
@@ -1513,8 +1526,6 @@ for config_file in "${config_files[@]}" ; do
     we_have_a_config="1"
     # Config stripping
     xshok_pretty_echo_and_log "Loading config: ${config_file}" "="
-
-
 
     if [ "$(uname -s)" == "SunOS" ] ; then
       # Solaris FIXES only, i had issues with running with a single command..
