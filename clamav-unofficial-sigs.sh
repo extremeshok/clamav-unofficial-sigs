@@ -656,7 +656,7 @@ function decode_third_party_signature_by_signature_name() {
   echo "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
   echo "a hexadecimal encoded data string and press enter:"
   read -r input
-	# Remove qotes and .UNOFFICIAL from the whitelist input string
+	# Remove quotes and .UNOFFICIAL from the whitelist input string
   input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`')"
 	input=${input/\.UNOFFICIAL/}
   if echo "${input}" | $grep_bin "\\." > /dev/null ; then
@@ -1022,7 +1022,7 @@ function add_signature_whitelist_entry() {
   read -r input
   if [ -n "$input" ] ; then
     cd "$clam_dbs" || exit
-		# Remove qotes and .UNOFFICIAL from the string
+		# Remove quotes and .UNOFFICIAL from the string
 		input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`"')"
 		input=${input/\.UNOFFICIAL/}
 
