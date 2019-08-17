@@ -563,7 +563,7 @@ function install_logrotate() {
     touch "${logrotate_dir}/${logrotate_filename}" 2>/dev/null
   fi
   if [ ! -w "${logrotate_dir}/${logrotate_filename}" ] ; then
-    echo "ERROR: logrotate install aborted, as file not writable: ${logrotate_dir}/${logrotate_filename}"
+    xshok_pretty_echo_and_log "ERROR: logrotate install aborted, as file not writable: ${logrotate_dir}/${logrotate_filename}" "="
   else
     # Our template..
     cat << EOF > "${logrotate_dir}/${logrotate_filename}"
@@ -638,7 +638,7 @@ function install_cron() {
     touch "${cron_dir}/${cron_filename}" 2>/dev/null
   fi
   if [ ! -w "${cron_dir}/${cron_filename}" ] ; then
-    echo "ERROR: cron install aborted, as file not writable: ${cron_dir}/${cron_filename}"
+    xshok_pretty_echo_and_log "ERROR: cron install aborted, as file not writable: ${cron_dir}/${cron_filename}" "="
   else
     # Our template..
     cat << EOF > "${cron_dir}/${cron_filename}"
@@ -1502,7 +1502,7 @@ if [ "$custom_config" != "no" ] ; then
   if [ -d "$custom_config" ] ; then
     # Assign the custom config dir and remove trailing / (removes / and //)
     shopt -s extglob; config_dir="${custom_config%%+(/)}"
-		declare -A config_files
+		config_files=()
 		if [ -r "${config_dir}/master.conf" ] ; then
 			config_files+=( "${config_dir}/master.conf" )
 		fi
