@@ -77,7 +77,7 @@ function xshok_create_pid_file() { # pid.file
       exit 1
     fi
   else
-    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+    xshok_pretty_echo_and_log "ERROR: Missing value for option"
     exit 1
   fi
 }
@@ -149,7 +149,7 @@ function xshok_mkdir_ownership() { # path
     fi
     perms chown -f "${clam_user}:${clam_group}" "${1}" > /dev/null 2>&1
   else
-    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+    xshok_pretty_echo_and_log "ERROR: Missing value for option"
     exit 1
   fi
 }
@@ -192,7 +192,7 @@ function xshok_user_group_exists() { # username groupname
       return 1 ; # User does NOT exist
     fi
   else
-    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+    xshok_pretty_echo_and_log "ERROR: Missing value for option"
     exit 1
   fi
 }
@@ -211,11 +211,12 @@ function xshok_user_group_exists() { # username groupname
 # ========
 # pretty_echo_and_log "" "/\" "7"
 # /\/\/\/\/\/\
-# type: e = error, w= warning, a = alert,
-# will auto detect using the first word "error,warning,alert"
+# type: e = error, w= warning, a = alert, n = notice
+# will auto detect using the first word "error,warning,alert,notice"
 # type e will make a == border
 # type w will make a -- border
-# type a will make a ++ border
+# type a will make a ** border
+# type n will make a ++ border
 function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 	#detect if running under cron and silence
 	if [ "$comment_silence" != "yes" ] ; then
@@ -232,6 +233,8 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 			4="w"
 		elif [[ $1 =~ "alert:" ]] || [[ $1 =~ "alert " ]]; then
 			4="a"
+		elif [[ $1 =~ "notice:" ]] || [[ $1 =~ "notice " ]]; then
+			4="n"
 		fi
 	fi
 	if [ "$4" == "e" ] || [ "$4" == "a" ] ; then
@@ -245,6 +248,8 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 			elif [ "$4" == "w" ] ; then
 				2="-"
 			elif [ "$4" == "a" ] ; then
+				2="*"
+			elif [ "$4" == "n" ] ; then
 				2="+"
 			fi
 		fi
@@ -292,11 +297,11 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 function xshok_check_s2() { # value1 value2
   if [ "${1}" ] ; then
     if [[ "${1}" =~ ^-.* ]] ; then
-      xshok_pretty_echo_and_log "ERROR: Missing value for option or value begins with -" "="
+      xshok_pretty_echo_and_log "ERROR: Missing value for option or value begins with -"
       exit 1
     fi
   else
-    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+    xshok_pretty_echo_and_log "ERROR: Missing value for option"
     exit 1
   fi
 }
@@ -584,7 +589,7 @@ function install_logrotate() {
     touch "${logrotate_dir}/${logrotate_filename}" 2>/dev/null
   fi
   if [ ! -w "${logrotate_dir}/${logrotate_filename}" ] ; then
-    xshok_pretty_echo_and_log "ERROR: logrotate install aborted, as file not writable: ${logrotate_dir}/${logrotate_filename}" "="
+    xshok_pretty_echo_and_log "ERROR: logrotate install aborted, as file not writable: ${logrotate_dir}/${logrotate_filename}"
   else
     # Our template..
     cat << EOF > "${logrotate_dir}/${logrotate_filename}"
@@ -659,7 +664,7 @@ function install_cron() {
     touch "${cron_dir}/${cron_filename}" 2>/dev/null
   fi
   if [ ! -w "${cron_dir}/${cron_filename}" ] ; then
-    xshok_pretty_echo_and_log "ERROR: cron install aborted, as file not writable: ${cron_dir}/${cron_filename}" "="
+    xshok_pretty_echo_and_log "ERROR: cron install aborted, as file not writable: ${cron_dir}/${cron_filename}"
   else
     # Our template..
     cat << EOF > "${cron_dir}/${cron_filename}"
@@ -755,7 +760,7 @@ function hexadecimal_encode_formatted_input_string() {
 function gpg_verify_specific_sanesecurity_database_file() { # databasefile
   xshok_pretty_echo_and_log ""
   if [ "$enable_gpg" == "no" ] ; then
-    xshok_pretty_echo_and_log "Notice: GnuPG / signature verification disabled" "-"
+    xshok_pretty_echo_and_log "GnuPG / signature verification disabled" "-"
   else
     if [ "${1}" ] ; then
       db_file="$(echo "${1}" | awk -F "/" '{print $NF}')"
@@ -780,7 +785,7 @@ function gpg_verify_specific_sanesecurity_database_file() { # databasefile
         ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "${work_dir_sanesecurity}"
       fi
     else
-      xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+      xshok_pretty_echo_and_log "ERROR: Missing value for option"
       exit 1
     fi
     exit 1
@@ -1043,7 +1048,7 @@ function clamscan_integrity_test_specific_database_file() { # databasefile
       xshok_pretty_echo_and_log "Check the file name and try again..."
     fi
   else
-    xshok_pretty_echo_and_log "ERROR: Missing value for option" "="
+    xshok_pretty_echo_and_log "ERROR: Missing value for option"
     exit 1
   fi
 }
@@ -1146,16 +1151,16 @@ function clamscan_reload_dbs() {
       fi
 
       if [[ "$($clamd_reload_opt 2>&1)" = *"ERROR"* ]] ; then
-        xshok_pretty_echo_and_log "ERROR: Failed to reload, trying again" "-"
+        xshok_pretty_echo_and_log "ERROR: Failed to reload, trying again"
         if [ -r "$clamd_pid" ] ; then
           mypid="$(cat "$clamd_pid")"
 
           if kill -USR2 "$mypid" ; then
             xshok_pretty_echo_and_log "ClamAV databases Reloaded" "="
           else
-            xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart" "-"
+            xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart"
             if [ -z "$clamd_restart_opt" ] ; then
-              xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'" "*"
+              xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'"
             else
               if $clamd_restart_opt > /dev/null ; then
                 xshok_pretty_echo_and_log "ClamAV Restarted" "="
@@ -1165,9 +1170,9 @@ function clamscan_reload_dbs() {
             fi
           fi
         else
-          xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart" "-"
+          xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart"
           if [ -z "$clamd_restart_opt" ] ; then
-            xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'" "*"
+            xshok_pretty_echo_and_log "WARNING: Check the script's configuration file, 'reload_dbs' enabled but no 'clamd_restart_opt'"
           else
             if $clamd_restart_opt > /dev/null ; then
               xshok_pretty_echo_and_log "ClamAV Restarted" "="
@@ -1211,11 +1216,11 @@ function check_clamav() {
         fi
       fi
       if [ -z "$io_socket1" ] && [ -z "$socket_cat1" ] ; then
-        xshok_pretty_echo_and_log "WARNING: socat or perl module 'IO::Socket::UNIX' not found, cannot test if ClamD is running" "*"
+        xshok_pretty_echo_and_log "WARNING: socat or perl module 'IO::Socket::UNIX' not found, cannot test if ClamD is running"
       else
         if [ -z "$io_socket2" ] && [ -z "$socket_cat2" ] ; then
 
-          xshok_pretty_echo_and_log "ALERT: CLAMD IS NOT RUNNING!" "="
+          xshok_pretty_echo_and_log "ALERT: CLAMD IS NOT RUNNING!"
           if [ -n "$clamd_restart_opt" ] ; then
             xshok_pretty_echo_and_log "Attempting to start ClamD..." "-"
             if [ -n "$io_socket1" ] ; then
@@ -1223,7 +1228,7 @@ function check_clamav() {
               if [ "$(perl -MIO::Socket::UNIX -we '$s = IO::Socket::UNIX->new(shift); $s->print("PING"); print $s->getline; $s->close' "$clamd_socket" 2>/dev/null)" = "PONG" ] ; then
                 xshok_pretty_echo_and_log "ClamD was successfully started" "="
               else
-                xshok_pretty_echo_and_log "ERROR: CLAMD FAILED TO START" "="
+                xshok_pretty_echo_and_log "ERROR: CLAMD FAILED TO START"
                 exit 1
               fi
             else
@@ -1232,7 +1237,7 @@ function check_clamav() {
                 if [ "$( (echo "PING"; sleep 1;) | socat - "$clamd_socket" 2>/dev/null)" == "PONG" ] ; then
                   xshok_pretty_echo_and_log "ClamD was successfully started" "="
                 else
-                  xshok_pretty_echo_and_log "ERROR: CLAMD FAILED TO START" "="
+                  xshok_pretty_echo_and_log "ERROR: CLAMD FAILED TO START"
                   exit 1
                 fi
               fi
@@ -1241,10 +1246,10 @@ function check_clamav() {
         fi
       fi
     else
-      xshok_pretty_echo_and_log "WARNING: ${clamd_socket} is not a usable socket" "*"
+      xshok_pretty_echo_and_log "WARNING: ${clamd_socket} is not a usable socket"
     fi
   else
-    xshok_pretty_echo_and_log "WARNING: clamd_socket is not defined in the configuration file" "*"
+    xshok_pretty_echo_and_log "WARNING: clamd_socket is not defined in the configuration file"
   fi
 }
 
@@ -1259,7 +1264,7 @@ function check_new_version() {
   fi
   if [ "$latest_version" ] ; then
     if [ "$latest_version" != "$script_version" ] ; then
-      xshok_pretty_echo_and_log "New version : v${latest_version} @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
+      xshok_pretty_echo_and_log "ALERT: New version : v${latest_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
     fi
   fi
 }
@@ -1275,7 +1280,7 @@ function check_new_config_version() {
   fi
   if [ "$latest_config_version" ] ; then
     if [ "$latest_config_version" != "$config_version" ] ; then
-      xshok_pretty_echo_and_log "New configversion : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs" "-"
+      xshok_pretty_echo_and_log "ALERT: New configversion : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
     fi
   fi
 }
@@ -1387,7 +1392,7 @@ elif [ -f "/usr/local/etc/clamav-unofficial-sigs/master.conf" ] ; then
 elif [ -f "/opt/zimbra/conf/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/opt/zimbra/conf/clamav-unofficial-sigs/"
 else
-  xshok_pretty_echo_and_log "ERROR: config_dir (/etc/clamav-unofficial-sigs/master.conf) could not be found" "="
+  xshok_pretty_echo_and_log "ERROR: config_dir (/etc/clamav-unofficial-sigs/master.conf) could not be found"
   exit 1
 fi
 # Default config files
@@ -1433,7 +1438,7 @@ fi
 if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
   curl_bin="$(command -v curl 2> /dev/null)"
   if [ -z "$curl_bin" ] ; then
-    xshok_pretty_echo_and_log "ERROR: both wget and curl commands are missing, One of them is required" "="
+    xshok_pretty_echo_and_log "ERROR: both wget and curl commands are missing, One of them is required"
     exit 1
   fi
 fi
@@ -1451,7 +1456,7 @@ dig_bin="$(command -v dig 2> /dev/null)"
 if [ -z "$dig_bin" ] ; then
   host_bin="$(command -v host 2> /dev/null)"
   if [ -z "$host_bin" ] ; then
-    xshok_pretty_echo_and_log "ERROR: both dig and host commands are missing, One of them is required" "="
+    xshok_pretty_echo_and_log "ERROR: both dig and host commands are missing, One of them is required"
     exit 1
   fi
 fi
@@ -1532,7 +1537,7 @@ if [ "$custom_config" != "no" ] ; then
 		if [ -r "${config_dir}/${config_file}" ] && [ "$config_file" != "" ]; then
 			config_files+=( "${config_dir}/${config_file}" )
 		else
-			xshok_pretty_echo_and_log "WARNING: ${config_dir}/os.conf not found" "*"
+			xshok_pretty_echo_and_log "WARNING: ${config_dir}/os.conf not found"
 		fi
 		if [ -r "${config_dir}/user.conf" ] ; then
 			config_files+=( "${config_dir}/user.conf" )
@@ -1584,7 +1589,7 @@ for config_file in "${config_files[@]}" ; do
     # Check "" are an even number
     config_check="${clean_config//[^\"]}"
     if [ "$(( ${#config_check} % 2 ))" -eq 1 ] ; then
-      xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every \" requires a closing \"" "="
+      xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every \" requires a closing \""
       exit 1
     fi
 
@@ -1592,7 +1597,7 @@ for config_file in "${config_files[@]}" ; do
     config_check_vars="$(echo "$clean_config" | $grep_bin -c '=\s*\"' )"
 
     if [ $(( ${#config_check} / 2 )) -ne "$config_check_vars" ] ; then
-      xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\"" "="
+      xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\""
       exit 1
     fi
 
@@ -1616,27 +1621,27 @@ fi
 
 # Make sure we have a readable config file
 if [ "$we_have_a_config" == "0" ] ; then
-  xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded" "="
+  xshok_pretty_echo_and_log "ERROR: Config file/s could NOT be read/loaded"
   xshok_pretty_echo_and_log "Note: Possible fix would be to checkl the config dir ${config_dir} exists and contains config files"
   exit 1
 fi
 
 # Prevent some issues with an incomplete or only a user.conf being loaded
 if [ "$config_version" == "0" ] ; then
-  xshok_pretty_echo_and_log "ERROR: Config file/s are missing important contents" "="
+  xshok_pretty_echo_and_log "ERROR: Config file/s are missing important contents"
   xshok_pretty_echo_and_log "Note: Possible fix would be to point the script to the dir with the configs"
   exit 1
 fi
 
 # Config version validation
 if [ "$config_version" -lt "$minimum_required_config_version" ] ; then
-  xshok_pretty_echo_and_log "ERROR: Your config version ${config_version} is not compatible with the min required version ${minimum_required_config_version}" "="
+  xshok_pretty_echo_and_log "ERROR: Your config version ${config_version} is not compatible with the min required version ${minimum_required_config_version}"
   exit 1
 fi
 
 # Check to see if the script's "USER CONFIGURATION FILE" has been completed.
 if [ "$user_configuration_complete" != "yes" ] ; then
-  xshok_pretty_echo_and_log "WARNING: SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED" "*"
+  xshok_pretty_echo_and_log "WARNING: SCRIPT CONFIGURATION HAS NOT BEEN COMPLETED"
   xshok_pretty_echo_and_log "Please review the script configuration files"
   xshok_pretty_echo_and_log "and uncomment the following line in user.conf"
   xshok_pretty_echo_and_log "#user_configuration_complete=\"yes\""
@@ -1726,25 +1731,25 @@ shopt -s extglob; clam_dbs="${clam_dbs%%+(/)}"
 # Check default Binaries & Commands are defined
 if [ "$reload_dbs" == "yes" ] ; then
   if [ -z "$clamd_reload_opt" ] ; then
-    xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt" "="
+    xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt"
     exit 1
   fi
 fi
 if [ -z "$uname_bin" ] ; then
-  xshok_pretty_echo_and_log "ERROR: uname (uname_bin) not found" "="
+  xshok_pretty_echo_and_log "ERROR: uname (uname_bin) not found"
   exit 1
 fi
 if [ -z "$clamscan_bin" ] ; then
-  xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found" "="
+  xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found"
   exit 1
 fi
 if [ -z "$rsync_bin" ] ; then
-  xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found" "="
+  xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found"
   exit 1
 fi
 if [ -z "$wget_bin" ] ; then
   if [ -z "$curl_bin" ] ; then
-    xshok_pretty_echo_and_log "ERROR: wget and curl binaries not found, script requires either wget or curl" "="
+    xshok_pretty_echo_and_log "ERROR: wget and curl binaries not found, script requires either wget or curl"
     exit 1
   fi
 fi
@@ -1768,26 +1773,26 @@ if [ "$enable_gpg" == "yes" ] ; then
   fi
 fi
 if [ "$enable_gpg" != "yes" ] ; then
-  xshok_pretty_echo_and_log "Notice: GnuPG / signature verification disabled" "-"
+  xshok_pretty_echo_and_log "GnuPG / signature verification disabled"
 fi
 # Check default directories are defined
 if [ -z "$work_dir" ] ; then
-  xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not defined" "="
+  xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not defined"
   exit 1
 fi
 if [ -z "$clam_dbs" ] ; then
-  xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not defined" "="
+  xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not defined"
   exit 1
 fi
 # Check default directories are writable
 if [ -e "$work_dir" ] ; then
   if [ ! -w "$work_dir" ] ; then
-    xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not writable ${work_dir}" "="
+    xshok_pretty_echo_and_log "ERROR: working directory (work_dir) not writable ${work_dir}"
     exit 1
   fi
 fi
 if [ ! -w "$clam_dbs" ] ; then
-  xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not writable ${clam_dbs}" "="
+  xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not writable ${clam_dbs}"
   exit 1
 fi
 
@@ -1821,7 +1826,7 @@ if [ "$enable_locking" == "yes" ] ; then
   if [ -f "$pid_file_fullpath" ] ; then
     pid_file_pid="$(cat "$pid_file_fullpath")"
     if ps -p "$pid_file_pid" > /dev/null 2>&1 ; then
-      xshok_pretty_echo_and_log "ERROR: Only one instance can run at the same time." "="
+      xshok_pretty_echo_and_log "ERROR: Only one instance can run at the same time."
       exit 1
     else
       xshok_create_pid_file "$pid_file_fullpath"
@@ -1835,7 +1840,7 @@ fi
 
 # Verify the clam_user and clam_group actually exists on the system
 if ! xshok_user_group_exists "${clam_user}" "${clam_group}" ; then
-  xshok_pretty_echo_and_log "ERROR: Either the user: ${clam_user} and/or group: ${clam_group} does not exist on the system." "="
+  xshok_pretty_echo_and_log "ERROR: Either the user: ${clam_user} and/or group: ${clam_group} does not exist on the system."
   exit 1
 fi
 
@@ -1926,7 +1931,7 @@ if [ "$enable_yararules" == "yes" ] ; then
   if [ "$current_clamav_version" -lt "$minimum_yara_clamav_version" ] ; then # Older
     yararulesproject_enabled="no"
     enable_yararules="no"
-    xshok_pretty_echo_and_log "Notice: Yararules Disabled due to clamav being older than the minimum required version"
+    xshok_pretty_echo_and_log "Yararules Disabled due to clamav being older than the minimum required version"
   fi
 else
   yararulesproject_enabled="no"
@@ -2064,13 +2069,13 @@ if [ "$enable_gpg" == "yes" ] ; then
     xshok_file_download "${work_dir_gpg}/publickey.gpg" "$sanesecurity_gpg_url"
     ret="$?"
     if [ "$ret" -ne 0 ] ; then
-      xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key" "*"
+      xshok_pretty_echo_and_log "ALERT: Could not download Sanesecurity public GPG key"
       exit 1
     else
       xshok_pretty_echo_and_log "Sanesecurity public GPG key successfully downloaded"
       rm -f -- "${work_dir_gpg}/ss-keyring.gp*"
       if ! $gpg_bin -q --no-options --no-default-keyring --homedir "${work_dir_gpg}" --keyring "${work_dir_gpg}/ss-keyring.gpg" --import "${work_dir_gpg}/publickey.gpg" 2>/dev/null ; then
-        xshok_pretty_echo_and_log "ALERT: could not import Sanesecurity public GPG key to custom keyring" "*"
+        xshok_pretty_echo_and_log "ALERT: could not import Sanesecurity public GPG key to custom keyring"
         exit 1
       else
         chmod -f 0644 "${work_dir_gpg}/*.*"
@@ -2082,7 +2087,7 @@ if [ "$enable_gpg" == "yes" ] ; then
   if [ ! -s "${work_dir_gpg}/ss-keyring.gpg" ] ; then
     rm -f -- "${work_dir_gpg}/ss-keyring.gp*"
     if ! $gpg_bin -q --no-options --no-default-keyring --homedir "${work_dir_gpg}" --keyring "${work_dir_gpg}/ss-keyring.gpg" --import "${work_dir_gpg}/publickey.gpg" 2>/dev/null ; then
-      xshok_pretty_echo_and_log "ALERT: Custom keyring MISSING or CORRUPT!  Could not import Sanesecurity public GPG key to custom keyring" "*"
+      xshok_pretty_echo_and_log "ALERT: Custom keyring MISSING or CORRUPT!  Could not import Sanesecurity public GPG key to custom keyring"
       exit 1
     else
       chmod -f 0644 "${work_dir_gpg}/*.*"
@@ -2241,7 +2246,7 @@ if [ -n "${securiteinfo_dbs[0]}" ] || [ -n "$malwarepatrol_db" ] ; then
     current_time="$(perl -le print+time 2> /dev/null)"
   fi
   if [ "$current_time" -le 0 ] ; then
-    xshok_pretty_echo_and_log "WARNING: No support for 'date +%s' or 'perl' was not found , SecuriteInfo and MalwarePatrol updates bypassed" "="
+    xshok_pretty_echo_and_log "WARNING: No support for 'date +%s' or 'perl' was not found , SecuriteInfo and MalwarePatrol updates bypassed"
     securiteinfo_dbs=()
     malwarepatrol_db=()
   fi
@@ -3245,7 +3250,7 @@ if [ -n "$ham_dir" ] ; then
     mv -f "${work_dir_work_configs}/whitelist.tmp" "${work_dir_work_configs}/whitelist.hex"
     rm -f "${work_dir_work_configs}/whitelist.txt"
     rm -f "${test_dir}/*.*"
-    xshok_pretty_echo_and_log "WARNING: Signature(s) triggered on HAM directory scan - signature(s) removed" "*"
+    xshok_pretty_echo_and_log "WARNING: Signature(s) triggered on HAM directory scan - signature(s) removed"
   else
     xshok_pretty_echo_and_log "No signatures triggered on HAM directory scan" "="
   fi
