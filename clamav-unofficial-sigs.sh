@@ -211,10 +211,20 @@ function xshok_user_group_exists() { # username groupname
 # ========
 # pretty_echo_and_log "" "/\" "7"
 # /\/\/\/\/\/\
-  # type: e = error, w= warning ""
+# type: e = error, w= warning, a = alert
 function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
-  # Handle comments
-  if [ "$comment_silence" == "no" ] ; then
+	#detect if running under cron and silence
+	if [ ! -t 1 ] ; then
+		comment_silence="yes"
+	fi
+	# always show errors and alerts
+	if [ -n "$4" ] ; then
+		if [ "$4" == "e" ] || [ "$4" == "a" ] ; then
+			comment_silence="no"
+		fi
+	fi
+	# Handle comments is not silenced or type
+  if [ "$comment_silence" != "yes" ] ; then
     if [ "${#@}" -eq 1 ] ; then
       echo "${1}"
     else
@@ -234,7 +244,6 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
       fi
     fi
   fi
-
   # Handle logging
   if [ "$enable_log" == "yes" ] ; then
     if [ ! -z "$log_pipe_cmd" ] ; then
