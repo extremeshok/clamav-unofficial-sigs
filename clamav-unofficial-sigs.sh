@@ -1411,14 +1411,11 @@ else
   exit 1
 fi
 # Default config files
-config_files=()
-if [ -r "${config_dir}/master.conf" ] ; then
-	config_files+=( "${config_dir}/master.conf" )
-fi
+config_files=("${config_dir}/master.conf")
 #find the a suitable os.conf or os.*.conf file
 config_file="$(find "$config_dir" -type f -iname "os.conf" -o -iname "os.*.conf" | tail -n1)"
-if [ -r "${config_dir}/${config_file}" ] && [ "$config_file" != "" ]; then
-	config_files+=( "${config_dir}/${config_file}" )
+if [ -r "${config_file}" ]; then
+	config_files+=( "${config_file}" )
 fi
 if [ -r "${config_dir}/user.conf" ] ; then
 	config_files+=( "${config_dir}/user.conf" )
@@ -1563,8 +1560,8 @@ if [ "$custom_config" != "no" ] ; then
 		fi
 		#find the a suitable os.conf or os.*.conf file
 		config_file="$(find "$config_dir" -type f -iname "os.conf" -o -iname "os.*.conf" | tail -n1)"
-		if [ -r "${config_dir}/${config_file}" ] && [ "$config_file" != "" ]; then
-			config_files+=( "${config_dir}/${config_file}" )
+		if [ -r "${config_file}" ] ; then
+			config_files+=( "${config_file}" )
 		else
 			xshok_pretty_echo_and_log "WARNING: ${config_dir}/os.conf not found"
 		fi
