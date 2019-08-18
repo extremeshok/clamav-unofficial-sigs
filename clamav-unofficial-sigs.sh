@@ -2277,19 +2277,22 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
         echo "$current_time" > "${work_dir_work_configs}/last-ss-update.txt"
         xshok_pretty_echo_and_log "Sanesecurity Database & GPG Signature File Updates" "="
         xshok_pretty_echo_and_log "Checking for Sanesecurity updates..."
-
+				# shellcheck disable=SC2086
         sanesecurity_mirror_ips="$(dig $dig_proxy +ignore +short "$sanesecurity_url")"
         # Add fallback to host if dig returns no records
         if [ ${#sanesecurity_mirror_ips} -lt 1 ] ; then
+					# shellcheck disable=SC2086
           sanesecurity_mirror_ips="$(host $host_proxy -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')"
         fi
 
         if [ ${#sanesecurity_mirror_ips} -ge 1 ] ; then
           for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
             sanesecurity_mirror_name=""
+						# shellcheck disable=SC2086
             sanesecurity_mirror_name="$(dig $dig_proxy +short -x "$sanesecurity_mirror_ip" | command sed 's/\.$//')"
             # Add fallback to host if dig returns no records
             if [ -z "$sanesecurity_mirror_name" ] ; then
+							# shellcheck disable=SC2086
               sanesecurity_mirror_name="$(host $host_proxy "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')"
             fi
             sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
