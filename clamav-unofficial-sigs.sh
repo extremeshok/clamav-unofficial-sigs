@@ -1075,7 +1075,6 @@ function output_signatures_triggered_during_ham_directory_scan() {
 # Adds a signature whitelist entry in the newer ClamAV IGN2 format
 function add_signature_whitelist_entry() { #signature
   xshok_pretty_echo_and_log "Signature Whitelist" "="
-
 	if [ -n "$1" ] ; then
 		input="$1"
 	else
@@ -1083,15 +1082,26 @@ function add_signature_whitelist_entry() { #signature
 		read -r input
 	fi
   if [ -n "$input" ] ; then
+		xshok_pretty_echo_and_log "Processing: ${input}"
     cd "$clam_dbs" || exit
 		# Remove quotes and .UNOFFICIAL from the string
 		input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`"')"
 		input=${input/\.UNOFFICIAL/}
 
-    sig_full="$($grep_bin -H "$input" ./*.*db)"
-    sig_name="$(echo "$sig_full" | cut -d ":" -f 2 | cut -d "=" -f 1)"
+    sig_full="$($grep_bin -H -m 1 "$input" ./*.*db)"
+		sig_extension=${sig_full%%\:*}
+		sig_extension=${sig_extension##*\.}
+		shopt -s nocasematch
+		if [ "$sig_extension" == "hdb" ] || [ "$sig_extension" == "hsb" ] || [ "$sig_extension" == "hdu " ] || [ "$sig_extension" == "hsu" ] || [ "$sig_extension" == "mdb" ] || [ "$sig_extension" == "msb" ] || [ "$sig_extension" == "mdu" ] || [ "$sig_extension" == "msu" ] ; then
+			# Hash-based Signature Database
+			position="4"
+		else
+			position="2"
+		fi
+    sig_name="$(echo "$sig_full" | cut -d ":" -f $position | cut -d "=" -f 1)"
+
     if [ -n "$sig_name" ] ; then
-      if ! $grep_bin "$sig_name" my-whitelist.ign2 > /dev/null 2>&1 ; then
+      if ! $grep_bin -m 1 "$sig_name" my-whitelist.ign2 > /dev/null 2>&1 ; then
         cp -f -p my-whitelist.ign2 "$work_dir_work_configs" 2>/dev/null
         echo "$sig_name" >> "${work_dir_work_configs}/my-whitelist.ign2"
         echo "$sig_full" >> "${work_dir_work_configs}/tracker.txt"
