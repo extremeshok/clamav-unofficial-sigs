@@ -1118,6 +1118,7 @@ function add_signature_whitelist_entry() { #signature
             if [ "$selinux_fixes" == "yes" ] ; then
               restorecon "${clam_dbs}/local.ign"
             fi
+						do_clamd_reload="4"
             clamscan_reload_dbs
 
             xshok_pretty_echo_and_log "Signature '${input}' has been added to my-whitelist.ign2 and"
