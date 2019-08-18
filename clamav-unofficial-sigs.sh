@@ -1073,12 +1073,15 @@ function output_signatures_triggered_during_ham_directory_scan() {
 }
 
 # Adds a signature whitelist entry in the newer ClamAV IGN2 format
-function add_signature_whitelist_entry() {
-  xshok_pretty_echo_and_log ""
-  xshok_pretty_echo_and_log "Input a third-party signature name that you wish to whitelist due to false-positives"
-  xshok_pretty_echo_and_log "and press enter"
+function add_signature_whitelist_entry() { #signature
+  xshok_pretty_echo_and_log "Signature Whitelist" "="
 
-  read -r input
+	if [ -n "$1" ] ; then
+		input="$1"
+	else
+		xshok_pretty_echo_and_log "Input a third-party signature name that you wish to whitelist and press enter"
+		read -r input
+	fi
   if [ -n "$input" ] ; then
     cd "$clam_dbs" || exit
 		# Remove quotes and .UNOFFICIAL from the string
@@ -1553,7 +1556,7 @@ for config_file in "${config_files[@]}" ; do
   if [ -r "$config_file" ] ; then # Exists and readable
     we_have_a_config="1"
     # Config stripping
-    xshok_pretty_echo_and_log "Loading config: ${config_file}" "="
+    xshok_pretty_echo_and_log "Loading config: ${config_file}"
 
     if [ "$(uname -s)" == "SunOS" ] ; then
       # Solaris FIXES only, i had issues with running with a single command..
@@ -1912,7 +1915,7 @@ while true; do
     -m|--make-database) make_signature_database_from_ascii_file; exit ;;
     -t|--test-database) xshok_check_s2 "${2}"; clamscan_integrity_test_specific_database_file "${2}"; exit ;;
     -o|--output-triggered) output_signatures_triggered_during_ham_directory_scan; exit ;;
-    -w|--whitelist) add_signature_whitelist_entry; exit ;;
+    -w|--whitelist) add_signature_whitelist_entry "${2}"; exit ;;
     --check-clamav) check_clamav; exit ;;
     --install-all) install_cron; install_logrotate; install_man; exit ;;
     --install-cron) install_cron; exit ;;
