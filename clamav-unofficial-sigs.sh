@@ -1357,7 +1357,7 @@ ${ofs} -t, --test-database ${ofe} Clamscan integrity test a specific database fi
 ${ofb}
 ${ofs} -o, --output-triggered ${ofe} If HAM directory scanning is enabled in the script's ${oft} configuration file, then output names of any third-party ${oft} signatures that triggered during the HAM directory scan
 ${ofb}
-${ofs} -w, --whitelist ${ofe} Adds a signature whitelist entry in the newer ClamAV IGN2 ${oft} format to 'my-whitelist.ign2' in order to temporarily resolve ${oft} a false-positive issue with a specific third-party signature. ${oft} Script added whitelist entries will automatically be removed ${oft} if the original signature is either modified or removed from ${oft} the third-party signature database
+${ofs} -w, --whitelist <signature-name> ${ofe} Adds a signature whitelist entry in the newer ClamAV IGN2 ${oft} format to 'my-whitelist.ign2' in order to temporarily resolve ${oft} a false-positive issue with a specific third-party signature. ${oft} Script added whitelist entries will automatically be removed ${oft} if the original signature is either modified or removed from ${oft} the third-party signature database
 ${ofb}
 ${ofs} --check-clamav ${ofe} If ClamD status check is enabled and the socket path is correctly ${oft} specifiedthen test to see if clamd is running or not
 ${ofb}
@@ -1411,7 +1411,19 @@ else
   exit 1
 fi
 # Default config files
-config_files=( "${config_dir}/master.conf" "${config_dir}/os.conf" "${config_dir}/user.conf" )
+config_files=()
+if [ -r "${config_dir}/master.conf" ] ; then
+	config_files+=( "${config_dir}/master.conf" )
+fi
+#find the a suitable os.conf or os.*.conf file
+config_file="$(find "$config_dir" -type f -iname "os.conf" -o -iname "os.*.conf" | tail -n1)"
+if [ -r "${config_dir}/${config_file}" ] && [ "$config_file" != "" ]; then
+	config_files+=( "${config_dir}/${config_file}" )
+fi
+if [ -r "${config_dir}/user.conf" ] ; then
+	config_files+=( "${config_dir}/user.conf" )
+fi
+
 
 # Initialise
 config_version="0"
@@ -1546,6 +1558,8 @@ if [ "$custom_config" != "no" ] ; then
 		config_files=()
 		if [ -r "${config_dir}/master.conf" ] ; then
 			config_files+=( "${config_dir}/master.conf" )
+		else
+			xshok_pretty_echo_and_log "WARNING: ${config_dir}/master.conf not found"
 		fi
 		#find the a suitable os.conf or os.*.conf file
 		config_file="$(find "$config_dir" -type f -iname "os.conf" -o -iname "os.*.conf" | tail -n1)"
@@ -1556,6 +1570,8 @@ if [ "$custom_config" != "no" ] ; then
 		fi
 		if [ -r "${config_dir}/user.conf" ] ; then
 			config_files+=( "${config_dir}/user.conf" )
+		else
+			xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf not found"
 		fi
   else
     config_files=( "$custom_config" )
