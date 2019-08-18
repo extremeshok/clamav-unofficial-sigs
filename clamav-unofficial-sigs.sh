@@ -231,13 +231,13 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 	# always show errors and alerts
 	if [ -z "$mytype" ] ; then
 		shopt -s nocasematch
-		if [[ $mystring =~ "error:" ]] || [[ $mystring =~ "error " ]] ; then
+		if [[ "$mystring" =~ "error:" ]] || [[ "$mystring" =~ "error " ]] ; then
 			mytype="e"
-		elif [[ $mystring =~ "warning:" ]] || [[ $mystring =~ "warning " ]] ; then
+		elif [[ "$mystring" =~ "warning:" ]] || [[ "$mystring" =~ "warning " ]] ; then
 			mytype="w"
-		elif [[ $mystring =~ "alert:" ]] || [[ $mystring =~ "alert " ]] ; then
+		elif [[ "$mystring" =~ "alert:" ]] || [[ "$mystring" =~ "alert " ]] ; then
 			mytype="a"
-		elif [[ $mystring =~ "notice:" ]] || [[ $mystring =~ "notice " ]] ; then
+		elif [[ "$mystring" =~ "notice:" ]] || [[ "$mystring" =~ "notice " ]] ; then
 			mytype="n"
 		fi
 	fi
@@ -257,17 +257,17 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 				myrepeating="+"
 			fi
 		fi
-    if [ "${#@}" -eq 1 ] ; then
-      echo "${1}"
+    if [ -z "$myrepeating" ] ; then
+      echo "${mystring}"
     else
       myvar=""
       if [ -z "$mycount" ] ; then
-        mycount="${#1}"
+        mycount="${#mystring}"
       fi
       for (( n = 0; n < mycount; n++ )) ; do
         myvar="${myvar}${myrepeating}"
       done
-      if [ -n "${1}" ] ; then
+      if [ -n "${mystring}" ] ; then
         echo -e "${myvar}\\n${1}\\n${myvar}"
       else
         echo -e "${myvar}"
