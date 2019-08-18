@@ -219,51 +219,53 @@ function xshok_user_group_exists() { # username groupname
 # type n will make a ++ border
 function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 	#detect if running under cron and silence
+	mystring="$1"
+	myrepeating="$2"
+	mycount="$3"
+	mytype="$4"
 	if [ "$comment_silence" != "yes" ] ; then
 		if [ ! -t 1 ] ; then
 			comment_silence="yes"
 		fi
 	fi
 	# always show errors and alerts
-	if [ -z "$4" ] ; then
+	if [ -z "$mytype" ] ; then
 		shopt -s nocasematch
-		if [[ $1 =~ "error:" ]] || [[ $1 =~ "error " ]]; then
-			4="e"
-		elif [[ $1 =~ "warning:" ]] || [[ $1 =~ "warning " ]]; then
-			4="w"
-		elif [[ $1 =~ "alert:" ]] || [[ $1 =~ "alert " ]]; then
-			4="a"
-		elif [[ $1 =~ "notice:" ]] || [[ $1 =~ "notice " ]]; then
-			4="n"
+		if [[ $mystring =~ "error:" ]] || [[ $mystring =~ "error " ]] ; then
+			mytype="e"
+		elif [[ $mystring =~ "warning:" ]] || [[ $mystring =~ "warning " ]] ; then
+			mytype="w"
+		elif [[ $mystring =~ "alert:" ]] || [[ $mystring =~ "alert " ]] ; then
+			mytype="a"
+		elif [[ $mystring =~ "notice:" ]] || [[ $mystring =~ "notice " ]] ; then
+			mytype="n"
 		fi
 	fi
-	if [ "$4" == "e" ] || [ "$4" == "a" ] ; then
+	if [ "$mytype" == "e" ] || [ "$mytype" == "a" ] ; then
 			comment_silence="no"
 	fi
 	# Handle comments is not silenced or type
   if [ "$comment_silence" != "yes" ] ; then
-		if [ -z "$2" ] ; then
-			if [ "$4" == "e" ] ; then
-				2="="
-			elif [ "$4" == "w" ] ; then
-				2="-"
-			elif [ "$4" == "a" ] ; then
-				2="*"
-			elif [ "$4" == "n" ] ; then
-				2="+"
+		if [ -z "$myrepeating" ] ; then
+			if [ "$mytype" == "e" ] ; then
+				myrepeating="="
+			elif [ "$mytype" == "w" ] ; then
+				myrepeating="-"
+			elif [ "$mytype" == "a" ] ; then
+				myrepeating="*"
+			elif [ "$mytype" == "n" ] ; then
+				myrepeating="+"
 			fi
 		fi
     if [ "${#@}" -eq 1 ] ; then
       echo "${1}"
     else
       myvar=""
-      if [ -n "$3" ] ; then
-        mycount="$3"
-      else
+      if [ -z "$mycount" ] ; then
         mycount="${#1}"
       fi
       for (( n = 0; n < mycount; n++ )) ; do
-        myvar="${myvar}${2}"
+        myvar="${myvar}${myrepeating}"
       done
       if [ -n "${1}" ] ; then
         echo -e "${myvar}\\n${1}\\n${myvar}"
@@ -1257,10 +1259,10 @@ function check_clamav() {
 function check_new_version() {
   if [ -n "$wget_bin" ] ; then
     # shellcheck disable=SC2086
-    latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+    latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
 	else
     # shellcheck disable=SC2086
-    latest_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+    latest_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
   fi
   if [ "$latest_version" ] ; then
     if [ "$latest_version" != "$script_version" ] ; then
@@ -1273,10 +1275,10 @@ function check_new_version() {
 function check_new_config_version() {
   if [ -n "$wget_bin" ] ; then
     # shellcheck disable=SC2086
-    latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+    latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
   else
     # shellcheck disable=SC2086
-    latest_config_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+    latest_config_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
   fi
   if [ "$latest_config_version" ] ; then
     if [ "$latest_config_version" != "$config_version" ] ; then
@@ -1369,9 +1371,9 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.0.1"
-script_version_date="2019-07-30"
-minimum_required_config_version="75"
+script_version="6.0.2"
+script_version_date="2019-08-18"
+minimum_required_config_version="76"
 minimum_yara_clamav_version="0.99"
 
 #allow for other negatives besides no.
@@ -2117,6 +2119,10 @@ fi
 # Create "scan-test.txt" file for clamscan database integrity testing.
 if [ ! -s "${work_dir_work_configs}/scan-test.txt" ] ; then
   echo "This is the clamscan test file..." > "${work_dir_work_configs}/scan-test.txt"
+fi
+
+if [ -z "$git_branch" ] ; then
+	git_branch="master"
 fi
 
 # If rsync proxy is defined in the config file, then export it for use.
