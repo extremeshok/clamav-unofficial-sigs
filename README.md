@@ -169,18 +169,19 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
 ## Change Log
 ### Version 6.1.0 (Updated XX August 2019)
  - eXtremeSHOK.com Maintenance
- - Sanitize whitelist input string (Remove quotes and .UNOFFICIAL)
- - --fail added to curl commands
- - Silence output when run under cron
+ - Thanks Reio Remma & Oliver Nissen
+ - fail added to all curl commands
  - Fix: Missing logic for LOWMEDIUMONLY | MEDIUMHIGHONLY | HIGHONLY databases
- - Support for os.<osname>.conf and os.config_file
+ - Support for either os.osname.conf or os.conf files (no more needing to rename the os.osname.conf to os.conf)
  - Where possible replaced echo with xshok_pretty_echo_and_log
  - Refactor xshok_pretty_echo_and_log and make all notices styles consistent
- - add MAILTO=root to the cron file
+ - Silence output when run under cron
+ - add MAILTO=root to the generated cron file
  - Add full proxy support for wget, curl, rsync, dig, host
  - Better support for proxy config variables
  - New config variable: git_branch (defaults to master for the update checks)
- - allow -w <signature> for quicker whitelisting
+ - allow -w signature for quicker whitelisting
+ - Sanitize whitelist input string (Remove quotes and .UNOFFICIAL)
  - Added Full support for Hash-based Signature Databases
  - User.conf is pre-configured with default options to allow for quicker setup
  - Default sanesecurity and linuxmalwaredetect to enabled
