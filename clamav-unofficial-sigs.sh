@@ -231,13 +231,13 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 	# always show errors and alerts
 	if [ -z "$mytype" ] ; then
 		shopt -s nocasematch
-		if [[ "$mystring" =~ "error:" ]] || [[ "$mystring" =~ "error " ]] ; then
+		if [[ "$mystring" =~ "ERROR:" ]] || [[ "$mystring" =~ "ERROR " ]] ; then
 			mytype="e"
-		elif [[ "$mystring" =~ "warning:" ]] || [[ "$mystring" =~ "warning " ]] ; then
+		elif [[ "$mystring" =~ "WARNING:" ]] || [[ "$mystring" =~ "WARNING " ]] ; then
 			mytype="w"
-		elif [[ "$mystring" =~ "alert:" ]] || [[ "$mystring" =~ "alert " ]] ; then
+		elif [[ "$mystring" =~ "ALERT:" ]] || [[ "$mystring" =~ "ALERT " ]] ; then
 			mytype="a"
-		elif [[ "$mystring" =~ "notice:" ]] || [[ "$mystring" =~ "notice " ]] ; then
+		elif [[ "$mystring" =~ "NOTICES:" ]] || [[ "$mystring" =~ "NOTICES " ]] ; then
 			mytype="n"
 		fi
 	fi
@@ -286,7 +286,7 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
         perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
       fi
       if [ ! -w "${log_file_path}/${log_file_name}" ] ; then
-        echo "Warning: Logging Disabled, as file not writable: ${log_file_path}/${log_file_name}"
+        echo "WARNING: Logging Disabled, as file not writable: ${log_file_path}/${log_file_name}"
         enable_log="no"
       else
         echo "$(date "+%b %d %T")" "${1}" >> "${log_file_path}/${log_file_name}"
