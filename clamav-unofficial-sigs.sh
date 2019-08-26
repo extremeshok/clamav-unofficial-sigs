@@ -3323,5 +3323,12 @@ check_new_config_version
 
 xshok_cleanup
 
+# Set the permission of the log file, to fix any permission errors, this is done to fix cron errors after running the script as root.
+if [ "$enable_log" == "yes" ] ; then
+	if [ -w "${log_file_path}/${log_file_name}" ] ; then
+		perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
+	fi
+fi
+
 # And lastly we exit, Note: the exit is always on the 2nd last line
 exit $?
