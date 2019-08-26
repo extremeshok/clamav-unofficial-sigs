@@ -167,7 +167,7 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
         its associated files and databases from the system      
 
 ## Change Log
-### Version 6.1.0 (Updated XX August 2019)
+### Version 6.1.0 (Updated 27 August 2019)
  - eXtremeSHOK.com Maintenance
  - Thanks Reio Remma & Oliver Nissen
  - fail added to all curl commands
@@ -186,6 +186,8 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - User.conf is pre-configured with default options to allow for quicker setup
  - Default sanesecurity and linuxmalwaredetect to enabled
  - Increase default retries from 3 to 5
+ - Ensure log file permissions are correct
+ - Better update comparison check, only notify if newer
  - Incremented the config to version 76
 
 ### Version 6.0.1 (Updated 30 July 2019)

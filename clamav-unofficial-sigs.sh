@@ -1298,7 +1298,7 @@ function check_new_config_version() {
   if [ "$latest_config_version" ] ; then
 # shellcheck disable=SC2183,SC2086
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
-      xshok_pretty_echo_and_log "ALERT: New configversion : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
+      xshok_pretty_echo_and_log "ALERT: New config version : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
     fi
   fi
 }
@@ -1388,7 +1388,7 @@ EOF
 
 # Script Info
 script_version="6.1.0"
-script_version_date="2019-08-XX"
+script_version_date="2019-08-27"
 minimum_required_config_version="76"
 minimum_yara_clamav_version="0.99"
 
