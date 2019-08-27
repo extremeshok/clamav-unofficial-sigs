@@ -1,14 +1,17 @@
 #### Basic guide to Installing on Mac OS 10.12+ and OS X
+Press Command+Space and type Terminal and press enter/return key.
+Run all the following in the Terminal app:
+
+## Notes:
+https://www.clamav.net/documents/installation-on-macos-mac-os-x
 
 ## Install Requirements
 # Step 1 Install Homebrew
-Press Command+Space and type Terminal and press enter/return key.
-Run in Terminal app:
 ```
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
-# Step 2
+# Step 2 Install clamav
 ```
 brew install clamav
 ```
@@ -17,7 +20,7 @@ brew install clamav
 ```
 sudo su
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh --output /usr/local/bin/clamav-unofficial-sigs.sh
-chmod 777  /usr/local/bin/clamav-unofficial-sigs.sh
+chmod 755  /usr/local/bin/clamav-unofficial-sigs.sh
 mkdir -p /etc/clamav-unofficial-sigs
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf --output /etc/clamav-unofficial-sigs/master.conf
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os.macosx.conf --output /etc/clamav-unofficial-sigs/os.conf
