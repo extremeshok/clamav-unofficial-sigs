@@ -20,7 +20,7 @@ brew install clamav
 ```
 sudo su
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh --output /usr/local/bin/clamav-unofficial-sigs.sh
-chmod 777  /usr/local/bin/clamav-unofficial-sigs.sh
+chmod 755  /usr/local/bin/clamav-unofficial-sigs.sh
 mkdir -p /etc/clamav-unofficial-sigs
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf --output /etc/clamav-unofficial-sigs/master.conf
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os.macosx.conf --output /etc/clamav-unofficial-sigs/os.conf

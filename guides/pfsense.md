@@ -24,7 +24,7 @@ pkg install rsync
 echo "fdesc	/dev/fd		fdescfs		rw	0	0" >> /etc/fstab
 ln -s /usr/local/bin/bash /bin/bash
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh --output /usr/sbin/clamav-unofficial-sigs.sh
-chmod 777 /usr/sbin/clamav-unofficial-sigs.sh
+chmod 755 /usr/sbin/clamav-unofficial-sigs.sh
 mkdir -p /etc/clamav-unofficial-sigs
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf --output /etc/clamav-unofficial-sigs/master.conf
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os.pfsense.conf --output /etc/clamav-unofficial-sigs/os.conf
@@ -59,6 +59,6 @@ SHELL=/bin/sh
 PATH=/usr/local/bin:$PATH
 /bin/bash /usr/sbin/clamav-unofficial-sigs.sh
 EOF
-chmod 777 /etc/rc.clamav-unofficial-sigs.sh
+chmod 755 /etc/rc.clamav-unofficial-sigs.sh
 echo -e "*/5 * * * * root /etc/rc.clamav-unofficial-sigs.sh\n\n" >> /etc/crontab
 ```
