@@ -21,14 +21,14 @@ Run the following commands in shell (console/terminal)
 mkdir -p /usr/local/sbin/
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
 mkdir -p /etc/clamav-unofficial-sigs/
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/conf/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/conf/user.conf -c -O /etc/clamav-unofficial-sigs/user.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf -c -O /etc/clamav-unofficial-sigs/user.conf
 ```
 Select your operating system config from https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/
 **replace os.ubuntu.conf with your required config, centos7 = os.centos7.conf**
 ```
 os_conf="os.ubuntu.conf"
-wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/conf/os/${os_conf}" -c -O /etc/clamav-unofficial-sigs/os.conf
+wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}" -c -O /etc/clamav-unofficial-sigs/os.conf
 ```
 
 ### Optional: configure your user config /etc/clamav-unofficial-sigs/user.conf
