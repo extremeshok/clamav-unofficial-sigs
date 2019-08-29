@@ -190,11 +190,11 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Better update comparison check, only notify if newer
  - Incremented the config to version 76
 
-### Version 6.0.1 (Updated 30 July 2019)
+### Version 6.0.1
  - eXtremeSHOK.com Maintenance
  - Fix logging @dominicraf
 
-### Version 6.0 (30 July 2019)
+### Version 6.0
  - eXtremeSHOK.com Maintenance & Refactoring
  - Add timestamp support (do not re-download not modified files, saves bandwidth)
  - wget and curl uses compression for the transfer (detected when supported, saves bandwidth)
