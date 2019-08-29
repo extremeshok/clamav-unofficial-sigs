@@ -43,7 +43,7 @@ before_install:
 install:
   - sudo mkdir -p /etc/clamav-unofficial-sigs
   - sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf
-  - sudo cp -f config/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
+  - sudo cp -f config/os/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
   - sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs
 
 script:
