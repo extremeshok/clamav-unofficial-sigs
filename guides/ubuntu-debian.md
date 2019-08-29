@@ -1,19 +1,15 @@
-# GENERAL INFORMATION
-This is property of eXtremeSHOK.com
-You are free to use, modify and distribute, however you may not remove this notice.
-Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
-License: BSD (Berkeley Software Distribution)
+# Basic guide to Installing on Ubuntu / Debian
 
-Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
+# CLAMAV INSTALL INSTRUCTIONS
+# Install clamav
+```
+apt-get update && apt-get install -y clamav-base clamav-freshclam clamav clamav-daemon
+```
 
-# Operating System Specific Install Guides
-* CentOS : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md
-* Ubuntu : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
-* Debian : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
-* Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
-* pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
-
-# GENERIC INSTALLATION INSTRUCTIONS
+## Make sure you do not have the package installed via apt
+```
+apt-get purge -y clamav-unofficial-sigs
+```
 
 ## Install
 Run the following commands in shell (console/terminal)
@@ -25,9 +21,9 @@ wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/conf/user.conf -c -O /etc/clamav-unofficial-sigs/user.conf
 ```
 Select your operating system config from https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/
-**replace os.ubuntu.conf with your required config, centos7 = os.centos7.conf**
+**replace os.centos7.conf with your required config, centos6 = os.centos6.conf, centos7-atomic = os.centos7-atomic.conf, centos6-cpanel = os.centos6-cpanel.conf**
 ```
-os_conf="os.ubuntu.conf"
+os_conf="os.centos7.conf"
 wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/conf/os/${os_conf}" -c -O /etc/clamav-unofficial-sigs/os.conf
 ```
 
@@ -58,5 +54,3 @@ wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.timer -c -O /etc/systemd/system/clamav-unofficial-sigs.timer
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamd.scan.service -c -O /etc/systemd/system/clamd.scan.service
 ```
-
-### Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs

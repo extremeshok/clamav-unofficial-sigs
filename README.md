@@ -24,20 +24,16 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS), pfSense, Zimbra and derivative systems  
 
 ### Quick Install Guide
-* Download the files to /tmp/
-* Copy clamav-unofficial-sigs.sh to /usr/local/sbin/
-* Set 755 permissions on  /usr/local/sbin/clamav-unofficial-sigs.sh
-* Make the directory /etc/clamav-unofficial-sigs/
-* Copy the contents of config/ into /etc/clamav-unofficial-sigs/
-* Make the directory /var/log/clamav-unofficial-sigs/
-* Rename the your os.your-distro.conf to os.conf, where your-distro is your distribution
-* Set your user config options in the configs /etc/clamav-unofficial-sigs/user.conf
-* Run the script with --install-cron to install the cron file
-* Run the script with --install-logrotate to install the logrotate file
-* Run the script with --install-man to install the man file
+https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/INSTALL.md
 
-### First Usage
-* Run the script once as your superuser to set all the permissions and create the relevant directories
+### Operating System Specific Install Guides
+* CentOS : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md
+* Ubuntu : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
+* Debian : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
+* Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
+* pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
+
+### Always Run the script once as your superuser to set all the permissions and create the relevant directories
 
 ### Systemd
 * Copy the contents of systemd/ into to /etc/systemd/system/

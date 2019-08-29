@@ -1,27 +1,28 @@
 # WORK IN PROGRESS
 
-#### Basic guide to Installing on CentOS 7
+# Basic guide to Installing on CentOS
 
-## Install Requirements
-# Step 1 Install epel
+# CLAMAV INSTALL INSTRUCTIONS
+
+## Install Install epel
 ```
 yum -y update
 yum -y install epel-release
 yum -y update
 ```
 
-# Step 2 Install clamav
+## Install clamav
 ```
 yum -y install clamav-server clamav-data clamav-update clamav-filesystem clamav clamav-scanner-systemd clamav-devel clamav-lib clamav-server-systemd
 ```
 
-# Step 3 Configure SELinux to allow clamav
+## Configure SELinux to allow clamav
 ```
 setsebool -P antivirus_can_scan_system 1
 setsebool -P clamd_use_jit 1
 ```
 
-# Step 4 Configure clamav
+## Configure clamav
 ```
 sed -i '/^Example$/d' /etc/clamd.d/scan.conf
 sed -i -e 's|#LocalSocket /var/run/clamd.scan/clamd.sock|LocalSocket /var/run/clamd.scan/clamd.sock/g' /etc/clamd.d/scan.conf
@@ -57,7 +58,7 @@ systemctl daemon-reload
 
 ```
 
-# Step 5 Configure Freshclam
+## Configure Freshclam
 ```
 sed -i '/^Example$/d' /etc/freshclam.conf
 sed -i '/REMOVE ME/d' /etc/sysconfig/freshclam
@@ -88,40 +89,64 @@ systemctl start clam-freshclam.service
 
 ```
 
-# Step 6 Configure clamav
+## Configure clamav
 ```
 systemctl enable clamd@scan
 systemctl start clamd@scan
 systemctl status clamd@scan
 ```
 
-# Step 7 Install Dependencies
+## Install Dependencies
 ```
 yum -y install bind-utils rsync
 ```
-# Step 8
+# INSTALLATION INSTRUCTIONS
+
+## Make sure you do not have the package installed via yum
 ```
-curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh --output /usr/local/bin/clamav-unofficial-sigs.sh
-chmod 755 /usr/local/bin/clamav-unofficial-sigs.sh
-mkdir -p /etc/clamav-unofficial-sigs
-curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf --output /etc/clamav-unofficial-sigs/master.conf
-curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os.centos7.conf --output /etc/clamav-unofficial-sigs/os.centos7.conf
-curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf --output /etc/clamav-unofficial-sigs/user.conf
+yum purge -y clamav-unofficial-sigs
 ```
 
-# Step 9
-set your user options
+## Install
+Run the following commands in shell (console/terminal)
 ```
-vim /etc/clamav-unofficial-sigs/user.conf
+mkdir -p /usr/local/sbin/
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+mkdir -p /etc/clamav-unofficial-sigs/
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/conf/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/conf/user.conf -c -O /etc/clamav-unofficial-sigs/user.conf
+```
+Select your operating system config from https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/
+**replace os.centos7.conf with your required config, centos6 = os.centos6.conf, centos7-atomic = os.centos7-atomic.conf, centos6-cpanel = os.centos6-cpanel.conf**
+```
+os_conf="os.centos7.conf"
+wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/conf/os/${os_conf}" -c -O /etc/clamav-unofficial-sigs/os.conf
 ```
 
-# Step 10
-run once to make sure there are no errors
+### Optional: configure your user config /etc/clamav-unofficial-sigs/user.conf
+
+## RUN THE SCRIPT ONCE AS ROOT
+ensure there are no errors, fix any missing dependencies
+script must run once as your superuser to set all the permissions and create the relevant directories
 ```
-bash clamav-unofficial-sigs.sh
+/usr/local/sbin/clamav-unofficial-sigs.sh --force
 ```
 
-# Step 11
+### Install logrotate and Man files
 ```
-bash clamav-unofficial-sigs.sh --install-all
+/usr/local/sbin/clamav-unofficial-sigs.sh --install-logrotate
+/usr/local/sbin/clamav-unofficial-sigs.sh --install-man
+```
+
+### Install Systemd configs or use cron
+#### cron
+```
+/usr/local/sbin/clamav-unofficial-sigs.sh --install-cron
+```
+### OR
+#### systemd
+```
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.service -c -O /etc/systemd/system/clamav-unofficial-sigs.service
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.timer -c -O /etc/systemd/system/clamav-unofficial-sigs.timer
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamd.scan.service -c -O /etc/systemd/system/clamd.scan.service
 ```

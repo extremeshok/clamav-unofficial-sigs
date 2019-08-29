@@ -1,4 +1,4 @@
-#### Basic guide to Installing on Mac OS 10.12+ and OS X
+# Basic guide to Installing on Mac OS 10.12+ and OS X
 Press Command+Space and type Terminal and press enter/return key.
 Run all the following in the Terminal app:
 
@@ -23,7 +23,7 @@ curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 chmod 755  /usr/local/bin/clamav-unofficial-sigs.sh
 mkdir -p /etc/clamav-unofficial-sigs
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf --output /etc/clamav-unofficial-sigs/master.conf
-curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os.macosx.conf --output /etc/clamav-unofficial-sigs/os.conf
+curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/os.macosx.conf --output /etc/clamav-unofficial-sigs/os.conf
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf --output /etc/clamav-unofficial-sigs/user.conf
 exit
 ```

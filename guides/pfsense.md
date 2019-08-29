@@ -1,4 +1,4 @@
-#### Basic guide to Installing on pfSense 2.3+
+# Basic guide to Installing on pfSense 2.3+
 
 ## Install Requirements
 # Step 1
@@ -27,7 +27,7 @@ curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 chmod 755 /usr/sbin/clamav-unofficial-sigs.sh
 mkdir -p /etc/clamav-unofficial-sigs
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf --output /etc/clamav-unofficial-sigs/master.conf
-curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os.pfsense.conf --output /etc/clamav-unofficial-sigs/os.conf
+curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/os.pfsense.conf --output /etc/clamav-unofficial-sigs/os.conf
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf --output /etc/clamav-unofficial-sigs/user.conf
 ````
 
