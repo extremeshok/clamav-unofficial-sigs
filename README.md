@@ -9,12 +9,12 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Description
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. The script will also generate and install cron, logrotate, and man files.
 
-#### Try our custom spamassasin plugin: https://github.com/extremeshok/spamassassin-extremeshok_fromreplyto
+#### Checkout some of our other solutions: https://github.com/extremeshok?tab=repositories
 
 ### Support / Suggestions / Comments
 Please post them on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
 
-### Submit Patches / Pull requests to the "Dev" Branch
+### Submit Patches / Pull requests to the "dev" Branch
 
 ### Required Ports / Firewall Exceptions
 * rsync: TCP port 873
@@ -24,23 +24,16 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS), pfSense, Zimbra and derivative systems  
 
 ### Quick Install Guide
-* Download the files to /tmp/
-* Copy clamav-unofficial-sigs.sh to /usr/local/sbin/
-* Set 755 permissions on  /usr/local/sbin/clamav-unofficial-sigs.sh
-* Make the directory /etc/clamav-unofficial-sigs/
-* Copy the contents of config/ into /etc/clamav-unofficial-sigs/
-* Make the directory /var/log/clamav-unofficial-sigs/
-* Rename the your os.your-distro.conf to os.conf, where your-distro is your distribution
-* Set your user config options in the configs /etc/clamav-unofficial-sigs/user.conf
-* Run the script with --install-cron to install the cron file
-* Run the script with --install-logrotate to install the logrotate file
-* Run the script with --install-man to install the man file
+https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/INSTALL.md
 
-### First Usage
-* Run the script once as your superuser to set all the permissions and create the relevant directories
+### Operating System Specific Install Guides
+* CentOS : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md
+* Ubuntu : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
+* Debian : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
+* Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
+* pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
 
-### Systemd
-* Copy the contents of systemd/ into to /etc/systemd/system/
+### Always Run the script once as your superuser to set all the permissions and create the relevant directories
 
 ### Advanced Config Overrides
 * Default configs are loaded in the following order if they exist:
@@ -94,77 +87,97 @@ Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/proje
 
 ## USAGE
 
-Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
+Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
 
--c, --config    Use a specific configuration file or directory
-        eg: '-c /your/dir' or ' -c /your/file.name'
-        Note: If a directory is specified the directory must contain atleast:
-        master.conf, os.conf or user.conf
-        Default Directory: /etc/clamav-unofficial-sigs
+-c, --config 	 Use a specific configuration file or directory
+  eg: '-c /your/dir' or ' -c /your/file.name'  
+  Note: If a directory is specified the directory must contain atleast:  
+  master.conf, os.conf or user.conf
+  Default Directory: /etc/clamav-unofficial-sigs
 
--F, --force     Force all databases to be downloaded, could cause ip to be blocked
 
--h, --help      Display this script's help and usage information
+-F, --force 	 Force all databases to be downloaded, could cause ip to be blocked
 
--V, --version   Output script version and date information
 
--v, --verbose   Be verbose, enabled when not run under cron
+-h, --help 	 Display this script's help and usage information
 
--s, --silence   Only output error messages, enabled when run under cron
 
--d, --decode-sig        Decode a third-party signature either by signature name
-        (eg: Sanesecurity.Junk.15248) or hexadecimal string.
-        This flag will 'NOT' decode image signatures
+-V, --version 	 Output script version and date information
 
--e, --encode-string     Hexadecimal encode an entire input string that can
-        be used in any '*.ndb' signature database file
 
--f, --encode-formatted  Hexadecimal encode a formatted input string containing
-        signature spacing fields '{}, (), *', without encoding
-        the spacing fields, so that the encoded signature
-        can be used in any '*.ndb' signature database file
+-v, --verbose 	 Be verbose, enabled when not run under cron
 
--g, --gpg-verify        GPG verify a specific Sanesecurity database file
-        eg: '-g filename.ext' (do not include file path)
 
--i, --information       Output system and configuration information for
-        viewing or possible debugging purposes
+-s, --silence 	 Only output error messages, enabled when run under cron
 
--m, --make-database     Make a signature database from an ascii file containing
-        data strings, with one data string per line.  Additional
-        information is provided when using this flag
 
--t, --test-database     Clamscan integrity test a specific database file
-        eg: '-t filename.ext' (do not include file path)
+-d, --decode-sig 	 Decode a third-party signature either by signature name
+  (eg: Sanesecurity.Junk.15248) or hexadecimal string.
+  This flag will 'NOT' decode image signatures
 
--o, --output-triggered  If HAM directory scanning is enabled in the script's
-        configuration file, then output names of any third-party
-        signatures that triggered during the HAM directory scan
 
--w, --whitelist Adds a signature whitelist entry in the newer ClamAV IGN2
-        format to 'my-whitelist.ign2' in order to temporarily resolve
-        a false-positive issue with a specific third-party signature.
-        Script added whitelist entries will automatically be removed
-        if the original signature is either modified or removed from
-        the third-party signature database
+-e, --encode-string 	 Hexadecimal encode an entire input string that can
+  be used in any '*.ndb' signature database file
 
---check-clamav  If ClamD status check is enabled and the socket path is correctly
-        specifiedthen test to see if clamd is running or not
 
---install-all   Install and generate the cron, logroate and man files, autodetects the values
-         based on your config files
+-f, --encode-formatted 	 Hexadecimal encode a formatted input string containing
+  signature spacing fields '{}, (), *', without encoding
+  the spacing fields, so that the encoded signature
+  can be used in any '*.ndb' signature database file
 
---install-cron  Install and generate the cron file, autodetects the values
-        based on your config files
 
---install-logrotate     Install and generate the logrotate file, autodetects the
-        values based on your config files
+-g, --gpg-verify 	 GPG verify a specific Sanesecurity database file
+  eg: '-g filename.ext' (do not include file path)
 
---install-man   Install and generate the man file, autodetects the
-         values based on your config files
 
---remove-script     Remove the clamav-unofficial-sigs script and all of
-        its associated files and databases from the system      
+-i, --information 	 Output system and configuration information for
+  viewing or possible debugging purposes
+
+
+-m, --make-database 	 Make a signature database from an ascii file containing
+  data strings, with one data string per line.  Additional
+  information is provided when using this flag
+
+
+-t, --test-database 	 Clamscan integrity test a specific database file
+  eg: '-t filename.ext' (do not include file path)
+
+
+-o, --output-triggered 	 If HAM directory scanning is enabled in the script's
+  configuration file, then output names of any third-party
+  signatures that triggered during the HAM directory scan
+
+
+-w, --whitelist <signature-name> 	 Adds a signature whitelist entry in the newer ClamAV IGN2
+  format to 'my-whitelist.ign2' in order to temporarily resolve
+  a false-positive issue with a specific third-party signature.
+  Script added whitelist entries will automatically be removed
+  if the original signature is either modified or removed from
+  the third-party signature database
+
+
+--check-clamav 	 If ClamD status check is enabled and the socket path is correctly
+  specifiedthen test to see if clamd is running or not
+
+
+--install-all 	 Install and generate the cron, logroate and man files, autodetects the values
+  based on your config files
+
+
+--install-cron 	 Install and generate the cron file, autodetects the values
+  based on your config files
+
+
+--install-logrotate 	 Install and generate the logrotate file, autodetects the
+  values based on your config files
+
+
+--install-man 	 Install and generate the man file, autodetects the
+  values based on your config files
+
+
+--remove-script 	 Remove the clamav-unofficial-sigs script and all of
+  its associated files and databases from the system
 
 ## Change Log
 ### Version 6.1.0 (Updated 27 August 2019)
@@ -190,11 +203,11 @@ Usage: clamav-unofficial-sigs.sh [OPTION] [PATH|FILE]
  - Better update comparison check, only notify if newer
  - Incremented the config to version 76
 
-### Version 6.0.1 (Updated 30 July 2019)
+### Version 6.0.1
  - eXtremeSHOK.com Maintenance
  - Fix logging @dominicraf
 
-### Version 6.0 (30 July 2019)
+### Version 6.0
  - eXtremeSHOK.com Maintenance & Refactoring
  - Add timestamp support (do not re-download not modified files, saves bandwidth)
  - wget and curl uses compression for the transfer (detected when supported, saves bandwidth)

@@ -1,110 +1,14 @@
-# WORK IN PROGRESS
-
-# Basic guide to Installing on CentOS
+# Basic guide to Installing on Ubuntu / Debian
 
 # CLAMAV INSTALL INSTRUCTIONS
-
-## Install Install epel
+# Install clamav
 ```
-yum -y update
-yum -y install epel-release
-yum -y update
+apt-get update && apt-get install -y clamav-base clamav-freshclam clamav clamav-daemon
 ```
 
-## Install clamav
+## Make sure you do not have the package installed via apt
 ```
-yum -y install clamav-server clamav-data clamav-update clamav-filesystem clamav clamav-scanner-systemd clamav-devel clamav-lib clamav-server-systemd
-```
-
-## Configure SELinux to allow clamav
-```
-setsebool -P antivirus_can_scan_system 1
-setsebool -P clamd_use_jit 1
-```
-
-## Configure clamav
-```
-sed -i '/^Example$/d' /etc/clamd.d/scan.conf
-sed -i -e 's|#LocalSocket /var/run/clamd.scan/clamd.sock|LocalSocket /var/run/clamd.scan/clamd.sock/g' /etc/clamd.d/scan.conf
-
-
-cat << EOF > /etc/tmpfiles.d/clamav.conf
-/var/run/clamd.scan 0755 clam clam
-EOF
-
-mv /usr/lib/systemd/system/clamd\@scan.service /usr/lib/systemd/system/clamd\@scan.old
-cat << EOF > /usr/lib/systemd/system/clamd\@scan.service
-# Run the clamd scanner
-[Unit]
-Description = clamd scanner (%i) daemon
-After = syslog.target nss-lookup.target network.target
-
-[Service]
-Type = simple
-ExecStart = /usr/sbin/clamd --foreground=yes
-Restart = on-failure
-IOSchedulingPriority = 7
-CPUSchedulingPolicy = 5
-Nice = 19
-PrivateTmp = true
-MemoryLimit=500M
-CPUQuota=50%
-
-[Install]
-WantedBy = multi-user.target
-EOF
-
-systemctl daemon-reload
-
-```
-
-## Configure Freshclam
-```
-sed -i '/^Example$/d' /etc/freshclam.conf
-sed -i '/REMOVE ME/d' /etc/sysconfig/freshclam
-
-cat << EOF > /usr/lib/systemd/system/clam-freshclam.service
-# Run the freshclam as daemon
-[Unit]
-Description = freshclam scanner
-After = network.target
-
-[Service]
-Type = forking
-ExecStart = /usr/bin/freshclam -d
-Restart = on-failure
-IOSchedulingPriority = 7
-CPUSchedulingPolicy = 5
-Nice = 19
-PrivateTmp = true
-
-[Install]
-WantedBy = multi-user.target
-EOF
-systemctl daemon-reload
-
-freshclam
-systemctl enable clam-freshclam.service
-systemctl start clam-freshclam.service
-
-```
-
-## Configure clamav
-```
-systemctl enable clamd@scan
-systemctl start clamd@scan
-systemctl status clamd@scan
-```
-
-## Install Dependencies
-```
-yum -y install bind-utils rsync
-```
-# INSTALLATION INSTRUCTIONS
-
-## Make sure you do not have the package installed via yum
-```
-yum purge -y clamav-unofficial-sigs
+apt-get purge -y clamav-unofficial-sigs
 ```
 
 ## Install
