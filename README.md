@@ -9,7 +9,7 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Description
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. The script will also generate and install cron, logrotate, and man files.
 
-#### Checkout some of our other solutions: https://github.com/extremeshok?tab=repositories
+## Checkout some of our other solutions: https://github.com/extremeshok?tab=repositories
 
 ### Support / Suggestions / Comments
 Please post them on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
@@ -28,8 +28,8 @@ https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/INSTALL.md
 
 ### Operating System Specific Install Guides
 * CentOS : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md
-* Ubuntu : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
-* Debian : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
+* Ubuntu : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md
+* Debian : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md
 * Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
 * pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
 

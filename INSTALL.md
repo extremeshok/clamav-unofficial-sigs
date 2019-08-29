@@ -8,8 +8,8 @@ Script updates can be found at: https://github.com/extremeshok/clamav-unofficial
 
 # Operating System Specific Install Guides
 * CentOS : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md
-* Ubuntu : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
-* Debian : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ununtu-debian.md
+* Ubuntu : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md
+* Debian : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md
 * Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
 * pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
 
