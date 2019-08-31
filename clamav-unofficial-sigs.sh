@@ -3326,9 +3326,15 @@ check_new_config_version
 xshok_cleanup
 
 # Set the permission of the log file, to fix any permission errors, this is done to fix cron errors after running the script as root.
-if [ "$enable_log" == "yes" ] ; then
-	if [ -w "${log_file_path}/${log_file_name}" ] ; then
-		perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
+if xshok_is_root ; then
+	if [ "$enable_log" == "yes" ] ; then
+		# check if the file is owned by root (the current user)
+		if [ -O "${log_file_path}/${log_file_name}" ] ; then
+			# checks the file is writable and a file (not a symlink/link)
+			if [ -w "${log_file_path}/${log_file_name}" ] && [ -F "${log_file_path}/${log_file_name}" ] ; then
+				perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
+			fi
+		fi
 	fi
 fi
 
