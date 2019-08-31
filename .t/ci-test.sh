@@ -14,8 +14,8 @@ if [ -e "/var/lib/clamav/sanesecurity.ftm" ] ; then
 	rm -f /var/lib/clamav/sanesecurity.ftm
 fi
 
-echo "running script as root"
-sudo bash /usr/sbin/clamav-unofficial-sigs
+echo "running script as root and verbose"
+sudo bash /usr/sbin/clamav-unofficial-sigs --verbose
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
@@ -23,8 +23,8 @@ else
   exit 1
 fi
 
-echo "running script as clamav"
-sudo -u clamav  [ -x /usr/sbin/clamav-unofficial-sigs ] && bash /usr/sbin/clamav-unofficial-sigs --force
+echo "running script as clamav and silence"
+sudo -u clamav  [ -x /usr/sbin/clamav-unofficial-sigs ] && bash /usr/sbin/clamav-unofficial-sigs --force --silence
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
