@@ -3332,7 +3332,7 @@ if xshok_is_root ; then
 		# check if the file is owned by root (the current user)
 		if [ -O "${log_file_path}/${log_file_name}" ] ; then
 			# checks the file is writable and a file (not a symlink/link)
-			if [ -w "${log_file_path}/${log_file_name}" ] && [ -F "${log_file_path}/${log_file_name}" ] ; then
+			if [ -w "${log_file_path}/${log_file_name}" ] && [ -f "${log_file_path}/${log_file_name}" ] ; then
 				perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
 			fi
 		fi
