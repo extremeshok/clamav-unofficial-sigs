@@ -223,7 +223,7 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 	myrepeating="$2"
 	mycount="$3"
 	mytype="$4"
-	if [ "$comment_silence" != "yes" ] ; then
+	if [ "$comment_silence" != "yes" ] && [ "$force_verbose" != "yes" ]; then
 		if [ ! -t 1 ] ; then
 			comment_silence="yes"
 		fi
@@ -1429,6 +1429,7 @@ fi
 config_version="0"
 do_clamd_reload="0"
 comment_silence="no"
+force_verbose="no"
 logging_enabled="no"
 force_updates="no"
 enable_log="no"
@@ -1894,7 +1895,7 @@ fi
 
 # Silence wget output and only report errors - useful if script is run via cron.
 if [ "$downloader_silence" == "yes" ] ; then
-  wget_output_level="--no-verbose" #--quiet
+  wget_output_level="--quiet"
   curl_output_level="--silent --show-error"
 else
   wget_output_level="--no-verbose"
