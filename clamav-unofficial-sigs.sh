@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 # shellcheck disable=SC2119
 # shellcheck disable=SC2120
