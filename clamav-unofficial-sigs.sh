@@ -325,7 +325,7 @@ function xshok_file_download() { #outputfile #url #notimestamp
   if [ "${1}" ] && [ "${2}" ] ; then
 		if [ -n "$curl_bin" ] ; then
 			# shellcheck disable=SC2086
-			$curl_bin --fail --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
+			$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
 			result=$?
 		else
 			if [ ! "${3}" ] ; then
@@ -1276,7 +1276,7 @@ function check_clamav() {
 function check_new_version() {
   if [ -n "$curl_bin" ] ; then
 		# shellcheck disable=SC2086
-		latest_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+		latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
 	else
 		# shellcheck disable=SC2086
 		latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
@@ -1293,7 +1293,7 @@ function check_new_version() {
 function check_new_config_version() {
   if [ -n "$curl_bin" ] ; then
 		# shellcheck disable=SC2086
-		latest_config_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+		latest_config_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
   else
 		# shellcheck disable=SC2086
 		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
@@ -1490,7 +1490,7 @@ fi
 if [ ! -z "$wget_bin" ] ; then
   # wget compression support
   if $wget_bin --help | $grep_bin -q "compression=TYPE" ; then
-    wget_compression="--compression=auto"
+    wget_compression="--compressedion=auto"
   else
     wget_compression=""
   fi

@@ -190,6 +190,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Fix: suppress all non-error output under cron/non interactive terminal
  - Fix: check log file is not a link before setting permissions, only set if owned by root.
  - Fix: failed to create symbolic link
+ - Fix: curl --compress ->> cirl --compressed
  - Minor enhancement to travis-ci checks
  - Incremented the config to version 77
 
