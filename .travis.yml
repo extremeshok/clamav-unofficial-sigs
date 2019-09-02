@@ -28,7 +28,7 @@ dist: bionic
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y ca-certificates wget rsync p7zip-full shellcheck -qq
+  - sudo apt-get install -y ca-certificates curl wget rsync p7zip-full shellcheck -qq
   #- sudo pip install bashate
   # - "sudo mkdir -p tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs"
