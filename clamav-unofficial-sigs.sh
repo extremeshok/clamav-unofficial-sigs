@@ -237,7 +237,7 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 			mytype="w"
 		elif [[ "$mystring" =~ "ALERT:" ]] || [[ "$mystring" =~ "ALERT " ]] ; then
 			mytype="a"
-		elif [[ "$mystring" =~ "NOTICES:" ]] || [[ "$mystring" =~ "NOTICES " ]] ; then
+		elif [[ "$mystring" =~ "NOTICE:" ]] || [[ "$mystring" =~ "NOTICE " ]] ; then
 			mytype="n"
 		fi
 	fi
@@ -323,7 +323,11 @@ function xshok_draw_time_remaining() { #time_remaining #update_hours #name
 # Download function
 function xshok_file_download() { #outputfile #url #notimestamp
   if [ "${1}" ] && [ "${2}" ] ; then
-    if [ -n "$wget_bin" ] ; then
+		if [ -n "$curl_bin" ] ; then
+			# shellcheck disable=SC2086
+			$curl_bin --fail --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
+			result=$?
+		else
 			if [ ! "${3}" ] ; then
 				# the following is required because wget, cannot do --timestamping and --output-document together
 				this_dir="$PWD"
@@ -337,6 +341,9 @@ function xshok_file_download() { #outputfile #url #notimestamp
 				cd "${output_dir}" || exit
 				if [ "$output_file" != "$url_file" ] ; then
 					if [ ! -f "$url_file" ] ; then
+						if [ ! -f "$output_file" ] ; then
+							touch "$output_file"
+						fi
 						ln -s  "$output_file" "$url_file"
 						wget_output_link="$url_file"
 					fi
@@ -354,10 +361,6 @@ function xshok_file_download() { #outputfile #url #notimestamp
 				$wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"
 				result=$?
 			fi
-    else
-      # shellcheck disable=SC2086
-      $curl_bin --fail --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
-      result=$?
     fi
 		cd "$this_dir" || exit
     return $result
@@ -807,14 +810,14 @@ function output_system_configuration_information() {
   xshok_pretty_echo_and_log "*** RSYNC LOCATION & VERSION ***"
   xshok_pretty_echo_and_log "${rsync_bin}"
   $rsync_bin --version | head -1
-  if [ -n "$wget_bin" ] ; then
-    xshok_pretty_echo_and_log "*** WGET LOCATION & VERSION ***"
-    xshok_pretty_echo_and_log "${wget_bin}"
-    $wget_bin --version | head -1
+  if [ -n "$curl_bin" ] ; then
+		xshok_pretty_echo_and_log "*** CURL LOCATION & VERSION ***"
+		xshok_pretty_echo_and_log "${curl_bin}"
+		$curl_bin --version | head -1
   else
-    xshok_pretty_echo_and_log "*** CURL LOCATION & VERSION ***"
-    xshok_pretty_echo_and_log "${curl_bin}"
-    $curl_bin --version | head -1
+		xshok_pretty_echo_and_log "*** WGET LOCATION & VERSION ***"
+		xshok_pretty_echo_and_log "${wget_bin}"
+		$wget_bin --version | head -1
   fi
   if [ "$enable_gpg" == "yes" ] ; then
     xshok_pretty_echo_and_log "*** GPG LOCATION & VERSION ***"
@@ -1271,12 +1274,12 @@ function check_clamav() {
 
 # Check for a new version
 function check_new_version() {
-  if [ -n "$wget_bin" ] ; then
-    # shellcheck disable=SC2086
-    latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+  if [ -n "$curl_bin" ] ; then
+		# shellcheck disable=SC2086
+		latest_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
 	else
-    # shellcheck disable=SC2086
-    latest_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+		# shellcheck disable=SC2086
+		latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
   fi
   if [ "$latest_version" ] ; then
 # shellcheck disable=SC2183,SC2086
@@ -1288,12 +1291,12 @@ function check_new_version() {
 
 # Check for a new version
 function check_new_config_version() {
-  if [ -n "$wget_bin" ] ; then
-    # shellcheck disable=SC2086
-    latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+  if [ -n "$curl_bin" ] ; then
+		# shellcheck disable=SC2086
+		latest_config_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
   else
-    # shellcheck disable=SC2086
-    latest_config_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+		# shellcheck disable=SC2086
+		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
   fi
   if [ "$latest_config_version" ] ; then
 # shellcheck disable=SC2183,SC2086
@@ -1457,12 +1460,25 @@ else
   grep_bin="$(command -v grep 2> /dev/null)"
 fi
 
-# Detect support for wget
-if [ -x /usr/sfw/bin/wget ] ; then
-  wget_bin="/usr/sfw/bin/wget"
-else
-  wget_bin="$(command -v wget 2> /dev/null)"
+# Detect support for curl
+if [ -z "$curl_bin" ]; then
+	curl_bin="$(command -v curl 2> /dev/null)"
 fi
+# Detect support for wget
+if [ -z "$curl_bin" ]; then
+	if [ -x /usr/sfw/bin/wget ] ; then
+	  wget_bin="/usr/sfw/bin/wget"
+	else
+	  wget_bin="$(command -v wget 2> /dev/null)"
+	fi
+fi
+
+# Force wget over curl.
+if [ ! -z "$curl_bin" ] && [ "$force_wget" == "yes" ] ; then
+		xshok_pretty_echo_and_log "NOTICE: Force wget enabled"
+	  curl_bin=""
+fi
+
 if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
   curl_bin="$(command -v curl 2> /dev/null)"
   if [ -z "$curl_bin" ] ; then
@@ -1470,6 +1486,7 @@ if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
     exit 1
   fi
 fi
+
 if [ ! -z "$wget_bin" ] ; then
   # wget compression support
   if $wget_bin --help | $grep_bin -q "compression=TYPE" ; then
@@ -1779,8 +1796,8 @@ if [ -z "$rsync_bin" ] ; then
   xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found"
   exit 1
 fi
-if [ -z "$wget_bin" ] ; then
-  if [ -z "$curl_bin" ] ; then
+if [ -z "$curl_bin" ] ; then
+  if [ -z "$wget_bin" ] ; then
     xshok_pretty_echo_and_log "ERROR: wget and curl binaries not found, script requires either wget or curl"
     exit 1
   fi
@@ -1826,17 +1843,6 @@ fi
 if [ ! -w "$clam_dbs" ] ; then
   xshok_pretty_echo_and_log "ERROR: clam database directory (clam_dbs) not writable ${clam_dbs}"
   exit 1
-fi
-
-# Force curl over wget.
-if [ ! -z "$wget_bin" ] && [ "$force_curl" == "yes" ] ; then
-  if [ -z "$curl_bin" ] ; then
-		curl_bin="$(command -v curl 2> /dev/null)"
-	fi
-	if [ ! -z "$curl_bin" ] ; then
-		xshok_pretty_echo_and_log "Force Curl: enabled"
-	  wget_bin=""
-  fi
 fi
 
 # Reset the update timers to force a full update.
