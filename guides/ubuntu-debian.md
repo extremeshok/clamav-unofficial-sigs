@@ -21,9 +21,9 @@ wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf -c -O /etc/clamav-unofficial-sigs/user.conf
 ```
 Select your operating system config from https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/
-**replace os.centos7.conf with your required config, centos6 = os.centos6.conf, centos7-atomic = os.centos7-atomic.conf, centos6-cpanel = os.centos6-cpanel.conf**
+**replace os.debian9.conf with your required config, ubuntu = ubuntu.conf, debian9 = os.debian9.conf, debian8 = os.debian8.conf, debian8-systemd = os.debian8.systemd.conf, debian7 = os.debian7.conf**
 ```
-os_conf="os.centos7.conf"
+os_conf="os.debian9.conf"
 wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}" -c -O /etc/clamav-unofficial-sigs/os.conf
 ```
 
