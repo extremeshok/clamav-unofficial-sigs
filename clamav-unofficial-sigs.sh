@@ -1465,18 +1465,11 @@ fi
 if [ -z "$curl_bin" ]; then
 	curl_bin="$(command -v curl 2> /dev/null)"
 fi
-# Force wget over curl.
-if [ ! -z "$curl_bin" ] && [ "$force_wget" == "yes" ] ; then
-		xshok_pretty_echo_and_log "NOTICE: Force wget enabled"
-	  curl_bin=""
-fi
 # Detect support for wget
-if [ -z "$curl_bin" ]; then
-	if [ -x /usr/sfw/bin/wget ] ; then
-	  wget_bin="/usr/sfw/bin/wget"
-	else
-	  wget_bin="$(command -v wget 2> /dev/null)"
-	fi
+if [ -x /usr/sfw/bin/wget ] ; then
+  wget_bin="/usr/sfw/bin/wget"
+else
+  wget_bin="$(command -v wget 2> /dev/null)"
 fi
 if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
   curl_bin="$(command -v curl 2> /dev/null)"
@@ -1821,7 +1814,7 @@ if [ "$enable_gpg" == "yes" ] ; then
   fi
 fi
 if [ "$enable_gpg" != "yes" ] ; then
-  xshok_pretty_echo_and_log "GnuPG / signature verification disabled"
+  xshok_pretty_echo_and_log "NOTICE: GnuPG / signature verification disabled"
 fi
 # Check default directories are defined
 if [ -z "$work_dir" ] ; then
@@ -1846,13 +1839,19 @@ fi
 
 # Reset the update timers to force a full update.
 if [ "$force_updates" == "yes" ] ; then
-  xshok_pretty_echo_and_log "Force Updates: enabled"
+  xshok_pretty_echo_and_log "NOTICE: Forced updates enabled"
   sanesecurity_update_hours="0"
   securiteinfo_update_hours="0"
   linuxmalwaredetect_update_hours="0"
   malwarepatrol_update_hours="0"
   yararulesproject_update_hours="0"
   additional_update_hours="0"
+fi
+
+# Force wget over curl.
+if [ ! -z "$wget" ] && [ "$force_wget" == "yes" ] ; then
+		xshok_pretty_echo_and_log "NOTICE: Force wget enabled"
+	  curl_bin=""
 fi
 
 # Enable pid file to prevent issues with multiple instances
