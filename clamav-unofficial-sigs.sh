@@ -1435,6 +1435,7 @@ comment_silence="no"
 force_verbose="no"
 logging_enabled="no"
 force_updates="no"
+force_wget="no"
 enable_log="no"
 custom_config="no"
 we_have_a_config="0"
@@ -1464,6 +1465,11 @@ fi
 if [ -z "$curl_bin" ]; then
 	curl_bin="$(command -v curl 2> /dev/null)"
 fi
+# Force wget over curl.
+if [ ! -z "$curl_bin" ] && [ "$force_wget" == "yes" ] ; then
+		xshok_pretty_echo_and_log "NOTICE: Force wget enabled"
+	  curl_bin=""
+fi
 # Detect support for wget
 if [ -z "$curl_bin" ]; then
 	if [ -x /usr/sfw/bin/wget ] ; then
@@ -1472,13 +1478,6 @@ if [ -z "$curl_bin" ]; then
 	  wget_bin="$(command -v wget 2> /dev/null)"
 	fi
 fi
-
-# Force wget over curl.
-if [ ! -z "$curl_bin" ] && [ "$force_wget" == "yes" ] ; then
-		xshok_pretty_echo_and_log "NOTICE: Force wget enabled"
-	  curl_bin=""
-fi
-
 if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
   curl_bin="$(command -v curl 2> /dev/null)"
   if [ -z "$curl_bin" ] ; then
