@@ -1411,6 +1411,19 @@ minimum_yara_clamav_version="0.99"
 #     # whatever you want to do when arr doesn't contain value
 # fi
 
+# Initialise
+config_version="0"
+do_clamd_reload="0"
+comment_silence="no"
+force_verbose="no"
+logging_enabled="no"
+force_updates="no"
+force_wget="no"
+enable_log="no"
+custom_config="no"
+we_have_a_config="0"
+
+
 # Attempt to scan for a valid config dir
 if [ -f "/etc/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/etc/clamav-unofficial-sigs"
@@ -1432,19 +1445,6 @@ fi
 if [ -r "${config_dir}/user.conf" ] ; then
 	config_files+=( "${config_dir}/user.conf" )
 fi
-
-
-# Initialise
-config_version="0"
-do_clamd_reload="0"
-comment_silence="no"
-force_verbose="no"
-logging_enabled="no"
-force_updates="no"
-force_wget="no"
-enable_log="no"
-custom_config="no"
-we_have_a_config="0"
 
 # Solaris command -v function returns garbage when the program is not found
 # only define the new command -v function if running under Solaris
@@ -1472,10 +1472,12 @@ if [ -z "$curl_bin" ]; then
 	curl_bin="$(command -v curl 2> /dev/null)"
 fi
 # Detect support for wget
-if [ -x /usr/sfw/bin/wget ] ; then
-  wget_bin="/usr/sfw/bin/wget"
-else
-  wget_bin="$(command -v wget 2> /dev/null)"
+if [ -z "$wget_bin" ]; then
+	if [ -x /usr/sfw/bin/wget ] ; then
+	  wget_bin="/usr/sfw/bin/wget"
+	else
+	  wget_bin="$(command -v wget 2> /dev/null)"
+	fi
 fi
 if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
   curl_bin="$(command -v curl 2> /dev/null)"
@@ -1493,7 +1495,6 @@ if [ ! -z "$wget_bin" ] ; then
     wget_compression=""
   fi
 fi
-
 # Detect support for dig or host
 dig_bin="$(command -v dig 2> /dev/null)"
 if [ -z "$dig_bin" ] ; then
@@ -1503,8 +1504,6 @@ if [ -z "$dig_bin" ] ; then
     exit 1
   fi
 fi
-
-
 # Detect if terminal
 if [ -t 1 ] ; then
   # Set fonts
@@ -1774,6 +1773,12 @@ fi
 # dont assign , but remove trailing /
 shopt -s extglob; clam_dbs="${clam_dbs%%+(/)}"
 
+# Force wget over curl.
+if [ ! -z "$wget_bin" ] && [ "$force_wget" == "yes" ] ; then
+		xshok_pretty_echo_and_log "NOTICE: Forcing wget"
+	  curl_bin=""
+fi
+
 # SANITY checks
 # Check default Binaries & Commands are defined
 if [ "$reload_dbs" == "yes" ] ; then
@@ -1845,19 +1850,13 @@ fi
 
 # Reset the update timers to force a full update.
 if [ "$force_updates" == "yes" ] ; then
-  xshok_pretty_echo_and_log "NOTICE: Forced updates enabled"
+  xshok_pretty_echo_and_log "NOTICE: forcing updates"
   sanesecurity_update_hours="0"
   securiteinfo_update_hours="0"
   linuxmalwaredetect_update_hours="0"
   malwarepatrol_update_hours="0"
   yararulesproject_update_hours="0"
   additional_update_hours="0"
-fi
-
-# Force wget over curl.
-if [ ! -z "$wget" ] && [ "$force_wget" == "yes" ] ; then
-		xshok_pretty_echo_and_log "NOTICE: Force wget enabled"
-	  curl_bin=""
 fi
 
 # Enable pid file to prevent issues with multiple instances
