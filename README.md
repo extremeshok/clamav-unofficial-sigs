@@ -168,6 +168,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   based on your config files
 
 
+
 --install-logrotate 	 Install and generate the logrotate file, autodetects the
   values based on your config files
 
