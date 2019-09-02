@@ -186,7 +186,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - master.conf set default dbs rating to medium
  - user.conf better suggested values
  - Default to using curl, less logic required (lower cpu)
- - force_curl replaces force_wget
+ - force_curl replaced with force_wget
  - Fix: suppress all non-error output under cron/non interactive terminal
  - Fix: check log file is not a link before setting permissions, only set if owned by root.
  - Fix: failed to create symbolic link
