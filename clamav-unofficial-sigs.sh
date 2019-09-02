@@ -1387,8 +1387,8 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.1.0"
-script_version_date="2019-08-27"
+script_version="6.1.1"
+script_version_date="2019-09-02"
 minimum_required_config_version="76"
 minimum_yara_clamav_version="0.99"
 

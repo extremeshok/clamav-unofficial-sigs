@@ -180,6 +180,16 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   its associated files and databases from the system
 
 ## Change Log
+### Version 6.1.1 (Updated 02 September 2019)
+ - eXtremeSHOK.com Maintenance
+ - Update os.archlinux.conf, thanks @amishmm
+ - master.conf set default dbs rating to medium
+ - user.conf better suggested values
+ - Fix: suppress all non-error output under cron/non interactive terminal
+ - Fix: check log file is not a link before setting permissions, only set if owned by root.
+ - Minor enhancement to travis-ci checks
+ - Incremented the config to version 77
+
 ### Version 6.1.0 (Updated 27 August 2019)
  - eXtremeSHOK.com Maintenance
  - Thanks Reio Remma & Oliver Nissen
