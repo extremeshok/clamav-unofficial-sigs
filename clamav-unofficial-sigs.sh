@@ -324,9 +324,15 @@ function xshok_draw_time_remaining() { #time_remaining #update_hours #name
 function xshok_file_download() { #outputfile #url #notimestamp
   if [ "${1}" ] && [ "${2}" ] ; then
 		if [ -n "$curl_bin" ] ; then
-			# shellcheck disable=SC2086
-			$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
-			result=$?
+			if [ -f "${1}" ] ; then
+				# shellcheck disable=SC2086
+				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
+				result=$?
+			else
+				# shellcheck disable=SC2086
+				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --output "${1}" "${2}"
+				result=$?
+			fi
 		else
 			if [ ! "${3}" ] ; then
 				# the following is required because wget, cannot do --timestamping and --output-document together
