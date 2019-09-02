@@ -1490,7 +1490,7 @@ fi
 if [ ! -z "$wget_bin" ] ; then
   # wget compression support
   if $wget_bin --help | $grep_bin -q "compression=TYPE" ; then
-    wget_compression="--compressedion=auto"
+    wget_compression="--compression=auto"
   else
     wget_compression=""
   fi
