@@ -223,7 +223,7 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 	myrepeating="$2"
 	mycount="$3"
 	mytype="$4"
-	if [ "$comment_silence" != "yes" ] ; then
+	if [ "$comment_silence" != "yes" ] && [ "$force_verbose" != "yes" ]; then
 		if [ ! -t 1 ] ; then
 			comment_silence="yes"
 		fi
@@ -237,7 +237,7 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
 			mytype="w"
 		elif [[ "$mystring" =~ "ALERT:" ]] || [[ "$mystring" =~ "ALERT " ]] ; then
 			mytype="a"
-		elif [[ "$mystring" =~ "NOTICES:" ]] || [[ "$mystring" =~ "NOTICES " ]] ; then
+		elif [[ "$mystring" =~ "NOTICE:" ]] || [[ "$mystring" =~ "NOTICE " ]] ; then
 			mytype="n"
 		fi
 	fi
@@ -323,7 +323,17 @@ function xshok_draw_time_remaining() { #time_remaining #update_hours #name
 # Download function
 function xshok_file_download() { #outputfile #url #notimestamp
   if [ "${1}" ] && [ "${2}" ] ; then
-    if [ -n "$wget_bin" ] ; then
+		if [ -n "$curl_bin" ] ; then
+			if [ -f "${1}" ] ; then
+				# shellcheck disable=SC2086
+				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
+				result=$?
+			else
+				# shellcheck disable=SC2086
+				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --output "${1}" "${2}"
+				result=$?
+			fi
+		else
 			if [ ! "${3}" ] ; then
 				# the following is required because wget, cannot do --timestamping and --output-document together
 				this_dir="$PWD"
@@ -337,6 +347,9 @@ function xshok_file_download() { #outputfile #url #notimestamp
 				cd "${output_dir}" || exit
 				if [ "$output_file" != "$url_file" ] ; then
 					if [ ! -f "$url_file" ] ; then
+						if [ ! -f "$output_file" ] ; then
+							touch "$output_file"
+						fi
 						ln -s  "$output_file" "$url_file"
 						wget_output_link="$url_file"
 					fi
@@ -354,10 +367,6 @@ function xshok_file_download() { #outputfile #url #notimestamp
 				$wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"
 				result=$?
 			fi
-    else
-      # shellcheck disable=SC2086
-      $curl_bin --fail --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
-      result=$?
     fi
 		cd "$this_dir" || exit
     return $result
@@ -807,14 +816,14 @@ function output_system_configuration_information() {
   xshok_pretty_echo_and_log "*** RSYNC LOCATION & VERSION ***"
   xshok_pretty_echo_and_log "${rsync_bin}"
   $rsync_bin --version | head -1
-  if [ -n "$wget_bin" ] ; then
-    xshok_pretty_echo_and_log "*** WGET LOCATION & VERSION ***"
-    xshok_pretty_echo_and_log "${wget_bin}"
-    $wget_bin --version | head -1
+  if [ -n "$curl_bin" ] ; then
+		xshok_pretty_echo_and_log "*** CURL LOCATION & VERSION ***"
+		xshok_pretty_echo_and_log "${curl_bin}"
+		$curl_bin --version | head -1
   else
-    xshok_pretty_echo_and_log "*** CURL LOCATION & VERSION ***"
-    xshok_pretty_echo_and_log "${curl_bin}"
-    $curl_bin --version | head -1
+		xshok_pretty_echo_and_log "*** WGET LOCATION & VERSION ***"
+		xshok_pretty_echo_and_log "${wget_bin}"
+		$wget_bin --version | head -1
   fi
   if [ "$enable_gpg" == "yes" ] ; then
     xshok_pretty_echo_and_log "*** GPG LOCATION & VERSION ***"
@@ -1271,12 +1280,12 @@ function check_clamav() {
 
 # Check for a new version
 function check_new_version() {
-  if [ -n "$wget_bin" ] ; then
-    # shellcheck disable=SC2086
-    latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+  if [ -n "$curl_bin" ] ; then
+		# shellcheck disable=SC2086
+		latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
 	else
-    # shellcheck disable=SC2086
-    latest_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+		# shellcheck disable=SC2086
+		latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
   fi
   if [ "$latest_version" ] ; then
 # shellcheck disable=SC2183,SC2086
@@ -1288,12 +1297,12 @@ function check_new_version() {
 
 # Check for a new version
 function check_new_config_version() {
-  if [ -n "$wget_bin" ] ; then
-    # shellcheck disable=SC2086
-    latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+  if [ -n "$curl_bin" ] ; then
+		# shellcheck disable=SC2086
+		latest_config_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
   else
-    # shellcheck disable=SC2086
-    latest_config_version="$($curl_bin --compress $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+		# shellcheck disable=SC2086
+		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
   fi
   if [ "$latest_config_version" ] ; then
 # shellcheck disable=SC2183,SC2086
@@ -1387,8 +1396,8 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.1.0"
-script_version_date="2019-08-27"
+script_version="6.1.1"
+script_version_date="2019-09-02"
 minimum_required_config_version="76"
 minimum_yara_clamav_version="0.99"
 
@@ -1401,6 +1410,19 @@ minimum_yara_clamav_version="0.99"
 # if [[ ! " ${disabled_values_array[@]} " =~ " ${value} " ]]; then
 #     # whatever you want to do when arr doesn't contain value
 # fi
+
+# Initialise
+config_version="0"
+do_clamd_reload="0"
+comment_silence="no"
+force_verbose="no"
+logging_enabled="no"
+force_updates="no"
+force_wget="no"
+enable_log="no"
+custom_config="no"
+we_have_a_config="0"
+
 
 # Attempt to scan for a valid config dir
 if [ -f "/etc/clamav-unofficial-sigs/master.conf" ] ; then
@@ -1424,17 +1446,6 @@ if [ -r "${config_dir}/user.conf" ] ; then
 	config_files+=( "${config_dir}/user.conf" )
 fi
 
-
-# Initialise
-config_version="0"
-do_clamd_reload="0"
-comment_silence="no"
-logging_enabled="no"
-force_updates="no"
-enable_log="no"
-custom_config="no"
-we_have_a_config="0"
-
 # Solaris command -v function returns garbage when the program is not found
 # only define the new command -v function if running under Solaris
 if [ "$(uname -s)" == "SunOS" ] ; then
@@ -1456,11 +1467,17 @@ else
   grep_bin="$(command -v grep 2> /dev/null)"
 fi
 
+# Detect support for curl
+if [ -z "$curl_bin" ]; then
+	curl_bin="$(command -v curl 2> /dev/null)"
+fi
 # Detect support for wget
-if [ -x /usr/sfw/bin/wget ] ; then
-  wget_bin="/usr/sfw/bin/wget"
-else
-  wget_bin="$(command -v wget 2> /dev/null)"
+if [ -z "$wget_bin" ]; then
+	if [ -x /usr/sfw/bin/wget ] ; then
+	  wget_bin="/usr/sfw/bin/wget"
+	else
+	  wget_bin="$(command -v wget 2> /dev/null)"
+	fi
 fi
 if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
   curl_bin="$(command -v curl 2> /dev/null)"
@@ -1469,6 +1486,7 @@ if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
     exit 1
   fi
 fi
+
 if [ ! -z "$wget_bin" ] ; then
   # wget compression support
   if $wget_bin --help | $grep_bin -q "compression=TYPE" ; then
@@ -1477,7 +1495,6 @@ if [ ! -z "$wget_bin" ] ; then
     wget_compression=""
   fi
 fi
-
 # Detect support for dig or host
 dig_bin="$(command -v dig 2> /dev/null)"
 if [ -z "$dig_bin" ] ; then
@@ -1487,8 +1504,6 @@ if [ -z "$dig_bin" ] ; then
     exit 1
   fi
 fi
-
-
 # Detect if terminal
 if [ -t 1 ] ; then
   # Set fonts
@@ -1758,6 +1773,12 @@ fi
 # dont assign , but remove trailing /
 shopt -s extglob; clam_dbs="${clam_dbs%%+(/)}"
 
+# Force wget over curl.
+if [ ! -z "$wget_bin" ] && [ "$force_wget" == "yes" ] ; then
+		xshok_pretty_echo_and_log "NOTICE: Forcing wget"
+	  curl_bin=""
+fi
+
 # SANITY checks
 # Check default Binaries & Commands are defined
 if [ "$reload_dbs" == "yes" ] ; then
@@ -1778,8 +1799,8 @@ if [ -z "$rsync_bin" ] ; then
   xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found"
   exit 1
 fi
-if [ -z "$wget_bin" ] ; then
-  if [ -z "$curl_bin" ] ; then
+if [ -z "$curl_bin" ] ; then
+  if [ -z "$wget_bin" ] ; then
     xshok_pretty_echo_and_log "ERROR: wget and curl binaries not found, script requires either wget or curl"
     exit 1
   fi
@@ -1804,7 +1825,7 @@ if [ "$enable_gpg" == "yes" ] ; then
   fi
 fi
 if [ "$enable_gpg" != "yes" ] ; then
-  xshok_pretty_echo_and_log "GnuPG / signature verification disabled"
+  xshok_pretty_echo_and_log "NOTICE: GnuPG / signature verification disabled"
 fi
 # Check default directories are defined
 if [ -z "$work_dir" ] ; then
@@ -1827,20 +1848,9 @@ if [ ! -w "$clam_dbs" ] ; then
   exit 1
 fi
 
-# Force curl over wget.
-if [ ! -z "$wget_bin" ] && [ "$force_curl" == "yes" ] ; then
-  if [ -z "$curl_bin" ] ; then
-		curl_bin="$(command -v curl 2> /dev/null)"
-	fi
-	if [ ! -z "$curl_bin" ] ; then
-		xshok_pretty_echo_and_log "Force Curl: enabled"
-	  wget_bin=""
-  fi
-fi
-
 # Reset the update timers to force a full update.
 if [ "$force_updates" == "yes" ] ; then
-  xshok_pretty_echo_and_log "Force Updates: enabled"
+  xshok_pretty_echo_and_log "NOTICE: forcing updates"
   sanesecurity_update_hours="0"
   securiteinfo_update_hours="0"
   linuxmalwaredetect_update_hours="0"
@@ -1894,7 +1904,7 @@ fi
 
 # Silence wget output and only report errors - useful if script is run via cron.
 if [ "$downloader_silence" == "yes" ] ; then
-  wget_output_level="--no-verbose" #--quiet
+  wget_output_level="--quiet"
   curl_output_level="--silent --show-error"
 else
   wget_output_level="--no-verbose"
@@ -3326,9 +3336,15 @@ check_new_config_version
 xshok_cleanup
 
 # Set the permission of the log file, to fix any permission errors, this is done to fix cron errors after running the script as root.
-if [ "$enable_log" == "yes" ] ; then
-	if [ -w "${log_file_path}/${log_file_name}" ] ; then
-		perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
+if xshok_is_root ; then
+	if [ "$enable_log" == "yes" ] ; then
+		# check if the file is owned by root (the current user)
+		if [ -O "${log_file_path}/${log_file_name}" ] ; then
+			# checks the file is writable and a file (not a symlink/link)
+			if [ -w "${log_file_path}/${log_file_name}" ] && [ -f "${log_file_path}/${log_file_name}" ] ; then
+				perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
+			fi
+		fi
 	fi
 fi
 
