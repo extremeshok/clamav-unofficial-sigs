@@ -180,6 +180,19 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   its associated files and databases from the system
 
 ## Change Log
+### Version 6.2.0 (Updated XX September 2019)
+ - eXtremeSHOK.com Maintenance
+ - Automatic upgrades ( --upgrade )
+ - Added --upgrade command line option
+ - Option to disable automatic upgrades ( allow_upgrades )
+ - Option to disable update checks (allow_update_checks)
+ - Increase download time to 1800 seconds from 600 seconds
+ - os.conf takes preference over os.***.conf
+ - Warn if there are multiple os.***.conf files
+ - More sanity checks to help users and prevent errors
+ - Incremented the config to version 80
+ - Set minimum config required to 80
+
 ### Version 6.1.1 (Updated 02 September 2019)
  - eXtremeSHOK.com Maintenance
  - Update os.archlinux.conf, thanks @amishmm
