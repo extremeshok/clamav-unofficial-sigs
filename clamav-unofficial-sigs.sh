@@ -1357,14 +1357,14 @@ function check_new_version() {
     fi
   fi
   if [ "$latest_config_version" ] ; then
-# shellcheck disable=SC2183,SC2086
+		# shellcheck disable=SC2183,SC2086
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
       xshok_pretty_echo_and_log "ALERT: New config version : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
 			found_upgrade="yes"
     fi
   fi
 
-if [ "$found_upgrade" == "yes" ] && [ "$allow_script_ugrades" == "yes" ] ; then
+if [ "$found_upgrade" == "yes" ] && [ "$allow_ugrade" == "yes" ] ; then
 	xshok_pretty_echo_and_log "Quickly upgrade, run the following command as root: ${this_script_name} --upgrade"
 fi
 
