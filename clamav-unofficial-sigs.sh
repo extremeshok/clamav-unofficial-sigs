@@ -1364,8 +1364,9 @@ function check_new_version() {
     fi
   fi
 
-if [ "$found_upgrade" == "yes" ] && [ "$allow_ugrade" == "yes" ] ; then
-	xshok_pretty_echo_and_log "Quickly upgrade, run the following command as root: ${this_script_name} --upgrade"
+if [ "$found_upgrade" == "yes" ] && [ "$allow_upgrades" == "yes" ] ; then
+	xshok_pretty_echo_and_log "Quickly upgrade, run the following command as root:"
+	xshok_pretty_echo_and_log "${this_script_name} --upgrade"
 fi
 
 }
