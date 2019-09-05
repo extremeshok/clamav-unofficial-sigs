@@ -1436,14 +1436,34 @@ else
   exit 1
 fi
 # Default config files
-config_files=("${config_dir}/master.conf")
-#find the a suitable os.conf or os.*.conf file
-config_file="$(find "$config_dir" -type f -iname "os.conf" -o -iname "os.*.conf" | tail -n1)"
-if [ -r "${config_file}" ]; then
-	config_files+=( "${config_file}" )
+if [ -r "${config_dir}/master.conf" ] ; then
+	config_files+=( "${config_dir}/master.conf" )
+else
+	xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not readable"
+	exit 1
+fi
+if [ -r "${config_dir}/os.conf" ] ; then
+	config_files+=( "${config_dir}/os.conf" )
+else
+	#find the a suitable os.*.conf file
+	os_config_number=$(find "$config_dir" -type f -iname "os.*.conf" | wc -l)
+	if [ "$os_config_number" == "0" ] ; then
+		xshok_pretty_echo_and_log "WARNING: no os.conf or os.*.conf found"
+	elif [ "$os_config_number" == "1" ] ; then
+		config_file="$(find "$config_dir" -type f -iname "os.*.conf" | head -n1)"
+		if [ -r "${config_file}" ]; then
+			config_files+=( "${config_file}" )
+		else
+			xshok_pretty_echo_and_log "WARNING: ${config_file} is not readable"
+		fi
+	else
+		xshok_pretty_echo_and_log "WARNING: Too many os.*.conf configs found"
+	fi
 fi
 if [ -r "${config_dir}/user.conf" ] ; then
 	config_files+=( "${config_dir}/user.conf" )
+else
+	xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf is not readable"
 fi
 
 # Solaris command -v function returns garbage when the program is not found
