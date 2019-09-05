@@ -701,11 +701,7 @@ function xshok_upgrade() { # version
 		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
 	fi
 
-	#dev force configs
-	config_version="1.0.0"
-	script_version="1.0.0"
-
-	# config_dir/master.conf
+  # config_dir/master.conf
 	if [ "$latest_config_version" ] ; then
 	# shellcheck disable=SC2183,SC2086
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
@@ -1368,7 +1364,7 @@ function check_new_version() {
     fi
   fi
 
-if [ found_upgrade="yes" ] && [ "$allow_script_ugrades" == "yes" ] ; then
+if [ "$found_upgrade" == "yes" ] && [ "$allow_script_ugrades" == "yes" ] ; then
 	xshok_pretty_echo_and_log "Quickly upgrade, run the following command as root: ${this_script_name} --upgrade"
 fi
 
