@@ -160,7 +160,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   specifiedthen test to see if clamd is running or not
 
 
---upgrade 	 Upgrades this script and master.conf to the latest version
+--upgrade 	 Upgrades this script and master.conf to the latest available version
 
 
 --install-all 	 Install and generate the cron, logroate and man files, autodetects the values

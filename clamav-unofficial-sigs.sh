@@ -1431,7 +1431,7 @@ ${ofs} -w, --whitelist <signature-name> ${ofe} Adds a signature whitelist entry 
 ${ofb}
 ${ofs} --check-clamav ${ofe} If ClamD status check is enabled and the socket path is correctly ${oft} specifiedthen test to see if clamd is running or not
 ${ofb}
-${ofs} --upgrade ${ofe} Upgrades this script and master.conf to the latest version
+${ofs} --upgrade ${ofe} Upgrades this script and master.conf to the latest available version
 ${ofb}
 ${ofs} --install-all ${ofe} Install and generate the cron, logroate and man files, autodetects the values ${oft} based on your config files
 ${ofb}
