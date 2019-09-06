@@ -673,8 +673,8 @@ EOF
   xshok_pretty_echo_and_log "Completed: cron installed, as file: ${cron_dir}/${cron_filename}"
 }
 
-# Auto upgrade
-function xshok_upgrade() { # version
+# Auto upgrade the master.conf and the
+function xshok_upgrade() {
 
 	allow_upgrades="yes"
 
@@ -700,9 +700,6 @@ function xshok_upgrade() { # version
 		# shellcheck disable=SC2086
 		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
 	fi
-
-	latest_version="9.9.0"
-	latest_config_version="999"
 
   # config_dir/master.conf
 	if [ "$latest_config_version" ] ; then
@@ -773,15 +770,22 @@ if ! mv -f "${work_dir}/clamav-unofficial-sigs.sh.tmp" "${this_script_full_path}
 fi
 if ! chmod "$OCTAL_MODE" "${this_script_full_path}" ; then
 	 echo "ERROR: unable to set permissions on ${this_script_full_path}"
+	 rm -f \$0
 	 exit 1
 fi
 	echo "Completed"
+	echo "----------------------"
+	echo "Optional, run as root: "
+	echo "clamav-unofficial-sigs.sh --install-all"
+
+	#remove the tmp script before exit
 	rm -f \$0
 EOF
 		  # Replaced with $0, so code will update and then call itself with the same parameters it had
 			#exec "${0}" "$@"
 			bash_bin="$(command -v bash 2> /dev/null)"
 		  exec "$bash_bin" "${work_dir}/xshok_update_script.sh"
+			echo "Running once as root"
 		else
 			 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
 			 exit 1

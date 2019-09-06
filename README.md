@@ -23,15 +23,21 @@ Please post them on the issue tracker : https://github.com/extremeshok/clamav-un
 ### Supported Operating Systems
 Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS), pfSense, Zimbra and derivative systems  
 
-### Quick Install Guide
+### Quick Install and Upgrade Guide
 https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/INSTALL.md
 
-### Operating System Specific Install Guides
+### Operating System Specific Install and Upgrade Guides
 * CentOS : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md
 * Ubuntu : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md
 * Debian : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md
 * Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
 * pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
+
+### Upgrade instructions (version 6.2 +)
+```
+clamav-unofficial-sigs.sh --upgrade
+clamav-unofficial-sigs.sh
+```
 
 ### Always Run the script once as your superuser to set all the permissions and create the relevant directories
 
