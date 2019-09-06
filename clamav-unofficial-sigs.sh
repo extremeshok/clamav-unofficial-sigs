@@ -778,9 +778,12 @@ if ! chmod "$OCTAL_MODE" "${this_script_full_path}" ; then
 	 exit 1
 fi
 	echo "Completed"
+	# echo "----------------------"
+	# echo "Optional, run as root: "
+	# echo "clamav-unofficial-sigs.sh --install-all"
 	echo "----------------------"
-	echo "Optional, run as root: "
-	echo "clamav-unofficial-sigs.sh --install-all"
+	echo "Run once as root: "
+	echo "clamav-unofficial-sigs.sh --force"
 
 	#remove the tmp script before exit
 	rm -f \$0
@@ -1485,7 +1488,7 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.3.1"
+script_version="6.3.0"
 script_version_date="2019-09-02"
 minimum_required_config_version="80"
 minimum_yara_clamav_version="0.99"
