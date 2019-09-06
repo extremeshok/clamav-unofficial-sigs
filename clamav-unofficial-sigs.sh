@@ -701,6 +701,9 @@ function xshok_upgrade() { # version
 		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
 	fi
 
+	latest_version="9.9.0"
+	latest_config_version="999"
+
   # config_dir/master.conf
 	if [ "$latest_config_version" ] ; then
 		# shellcheck disable=SC2183,SC2086
