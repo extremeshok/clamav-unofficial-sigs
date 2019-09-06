@@ -689,6 +689,8 @@ function xshok_upgrade() {
 
 	xshok_pretty_echo_and_log "Checking for updates ..."
 
+	found_upgrade="no"
+
 	if [ -n "$curl_bin" ] ; then
 		# shellcheck disable=SC2086
 		latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
@@ -705,6 +707,7 @@ function xshok_upgrade() {
 	if [ "$latest_config_version" ] ; then
 		# shellcheck disable=SC2183,SC2086
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
+			found_upgrade="yes"
 			xshok_pretty_echo_and_log "ALERT: Upgrading config from v${config_version} to v${latest_config_version}"
 			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
 				echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
@@ -740,6 +743,7 @@ function xshok_upgrade() {
 	if [ "$latest_version" ] ; then
 		# shellcheck disable=SC2183,SC2086
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
+			found_upgrade="yes"
 	    xshok_pretty_echo_and_log "ALERT:  Upgrading script from v${script_version} to v${latest_version}"
 			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
 				echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
@@ -791,6 +795,10 @@ EOF
 			 exit 1
 		fi
 	fi
+fi
+
+if [ "$found_upgrade" == "no" ] ; then
+	xshok_pretty_echo_and_log "No updates available"
 fi
 }
 
@@ -1477,7 +1485,7 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.3.0"
+script_version="6.3.1"
 script_version_date="2019-09-02"
 minimum_required_config_version="80"
 minimum_yara_clamav_version="0.99"
