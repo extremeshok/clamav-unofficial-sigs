@@ -679,7 +679,7 @@ function xshok_upgrade() { # version
 	allow_upgrades="yes"
 
 	if [ "$allow_upgrades" == "no" ] ; then
-		xshok_pretty_echo_and_log "ERROR: --upgrade has been disabled, allow_script_ugrades=no"
+		xshok_pretty_echo_and_log "ERROR: --upgrade has been disabled, allow_upgrades=no"
 		exit 1
 	fi
 	if ! xshok_is_root ; then
@@ -707,72 +707,83 @@ function xshok_upgrade() { # version
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
 			xshok_pretty_echo_and_log "ALERT: Upgrading config from v${config_version} to v${latest_config_version}"
 			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
-				echo "Downloading and replacing ${config_dir}/master.conf"
-				xshok_file_download "${config_dir}/master.conf" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
+				echo "Downloading ${config_dir}/master.conf"
+				xshok_file_download "${work_dir}/master.conf.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" "notimestamp"
 				ret="$?"
 				if [ "$ret" -ne 0 ] ; then
 					xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
 					exit 1
 				else
+					if ! $grep_bin -m 1 "config_version" "${work_dir}/master.conf.tmp" > /dev/null 2>&1 ; then
+						echo "ERROR: Downloaded master.conf is incomplete, please re-run"
+						exit 1
+					fi
+					mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf"
 					xshok_pretty_echo_and_log "Completed"
 				fi
 			else
-				 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file"
+				 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
 				 exit 1
 		  fi
 		fi
 	fi
 
-xshok_pretty_echo_and_log "ALERT: UNDER ACTIVE DEVELOPEMENT"
-exit 0
-
-
 	if [ "$latest_version" ] ; then
 		# shellcheck disable=SC2183,SC2086
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
-	    xshok_pretty_echo_and_log "ALERT: New version : v${latest_version}"
-			xshok_pretty_echo_and_log "UPGRADE____________SCRIPT"
-
-
-		  xshok_file_download "${0}.tmp" "${UPDATE_BASE}/${SELF}" "notimestamp"
-		  result=$?
-
-		  if [ "$result" -ne 0 ] ; then
-		    xshok_pretty_echo_and_log "Failed: Error while trying to get new version!"
-		    xshok_pretty_echo_and_log "File requested: ${UPDATE_BASE}/${SELF}"
-		    exit 1
-		  fi
-		  xshok_pretty_echo_and_log "Done."
+	    xshok_pretty_echo_and_log "ALERT:  Upgrading script from v${version} to v${latest_version}"
+			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
+				echo "Downloading ${config_dir}/clamav-unofficial-sigs.sh"
+				xshok_file_download "${work_dir}/clamav-unofficial-sigs.sh.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" "notimestamp"
+			  ret=$?
+				if [ "$ret" -ne 0 ] ; then
+					xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
+					exit 1
+				else
+					# Detect to make sure the entire script is avilable, fail if the script is missing contents
+					if [ "$(tail -n 1 "${work_dir}/clamav-unofficial-sigs.sh.tmp" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
+						echo "ERROR: Downloaded clamav-unofficial-sigs.sh is incomplete, please re-run"
+						exit 1
+					fi
+					xshok_pretty_echo_and_log "Completed"
+				fi
+		  	xshok_pretty_echo_and_log "Done."
 
 		  # Copy over modes from old version
 		  OCTAL_MODE="$(stat -c "%a" "$SELF")"
 		  if ! chmod "$OCTAL_MODE" "${0}.tmp" ; then
-		    xshok_pretty_echo_and_log "Failed: Error while trying to set mode on ${0}.tmp."
+		    xshok_pretty_echo_and_log "ERROR: unable to set mode on ${0}.tmp."
 		    exit 1
 		  fi
-
-		  # Generate the update script
-		  cat > xshok_update_script.sh << EOF
-#!/usr/bin/env bash
-# Overwrite old file with new
-if mv -f "${0}.tmp" "${0}" ; then
-  echo "Done. Update complete."
-  rm \$0
-else
-  echo "Failed! The update was not completed."
-	rm -f "${0}.tmp"
-	rm -f \$0
-fi
-EOF
-		  echo -n "Inserting update process..."
-
-		  # Replaced with $0, so code will update and then call itself with the same parameters it had
-		  #exec /bin/bash xshok_update_script.sh
-		  exec "${0}" "$@"
-
 		fi
 	fi
+fi
 }
+
+
+
+# 		  # Generate the update script
+# 		  cat > xshok_update_script.sh << EOF
+# #!/usr/bin/env bash
+# # Overwrite old file with new
+# if mv -f "${0}.tmp" "${0}" ; then
+#   echo "Done. Update complete."
+#   rm \$0
+# else
+#   echo "Failed! The update was not completed."
+# 	rm -f "${0}.tmp"
+# 	rm -f \$0
+# fi
+# EOF
+# 		  echo -n "Inserting update process..."
+#
+# 		  # Replaced with $0, so code will update and then call itself with the same parameters it had
+# 		  #exec /bin/bash xshok_update_script.sh
+# 		  exec "${0}" "$@"
+#
+# 		fi
+# 	fi
+# }
 
 
 # Decode a third-party signature either by signature name
@@ -1462,6 +1473,25 @@ script_version_date="2019-09-02"
 minimum_required_config_version="80"
 minimum_yara_clamav_version="0.99"
 
+# Discover script: name, full_path and path
+this_script_full_path="${BASH_SOURCE[0]}"
+# follow the symlinks
+while [ -h "$this_script_full_path" ]; do
+  this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>&1 && pwd )"
+  this_script_full_path="$(readlink "$this_script_full_path")"
+	# if relative symlink, then resolve the path
+  if [[ $this_script_full_path != /* ]] ; then
+    this_script_full_path="$this_script_path/$this_script_full_path"
+  fi
+done
+this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>&1 && pwd )"
+this_script_name="$(basename "$this_script_full_path")"
+
+if [ -z "$this_script_full_path" ] || [ -z "$this_script_path" ] || [ -z "$this_script_name" ] ; then
+	echo "ERROR: could not determin script name and fullpath"
+	exit 1
+fi
+
 #allow for other negatives besides no.
 #disabled_values_array=("0 no No NO false False FALSE off Off OFF disable Disable DISABLE disabled Disabled DISABLED")
 # if [[ " ${disabled_values_array[@]} " =~ " ${value} " ]]; then
@@ -2000,11 +2030,6 @@ else
   wget_insecure=""
   curl_insecure=""
 fi
-
-# This scripts name and path
-this_script_name="$(basename "$0")"
-this_script_path="$( cd "$(dirname "${0}")" || exit ; pwd -P )"
-this_script_full_path="${this_script_path}/${this_script_name}"
 
 # Set the script to 755 permissions
 if xshok_is_root ; then
