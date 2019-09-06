@@ -703,7 +703,7 @@ function xshok_upgrade() { # version
 
   # config_dir/master.conf
 	if [ "$latest_config_version" ] ; then
-	# shellcheck disable=SC2183,SC2086
+		# shellcheck disable=SC2183,SC2086
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
 			xshok_pretty_echo_and_log "ALERT: Upgrading config from v${config_version} to v${latest_config_version}"
 			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
@@ -713,14 +713,22 @@ function xshok_upgrade() { # version
 				if [ "$ret" -ne 0 ] ; then
 					xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
 					exit 1
-				else
-					if ! $grep_bin -m 1 "config_version" "${work_dir}/master.conf.tmp" > /dev/null 2>&1 ; then
-						echo "ERROR: Downloaded master.conf is incomplete, please re-run"
-						exit 1
-					fi
-					mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf"
-					xshok_pretty_echo_and_log "Completed"
 				fi
+				if ! $grep_bin -m 1 "config_version" "${work_dir}/master.conf.tmp" > /dev/null 2>&1 ; then
+					echo "ERROR: Downloaded master.conf is incomplete, please re-run"
+					exit 1
+				fi
+				# Copy over permissions from old version
+			  OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf")"
+				if ! mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf" ; then
+					xshok_pretty_echo_and_log "ERROR: failed moving ${work_dir}/master.conf.tmp to ${config_dir}/master.conf"
+				 	exit 1
+				fi
+				if ! chmod "$OCTAL_MODE" "${config_dir}/master.conf" ; then
+					 xshok_pretty_echo_and_log "ERROR: unable to set permissions on ${config_dir}/master.conf"
+					 exit 1
+				fi
+				xshok_pretty_echo_and_log "Completed"
 			else
 				 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
 				 exit 1
@@ -733,57 +741,54 @@ function xshok_upgrade() { # version
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
 	    xshok_pretty_echo_and_log "ALERT:  Upgrading script from v${version} to v${latest_version}"
 			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
-				echo "Downloading ${config_dir}/clamav-unofficial-sigs.sh"
+				echo "Downloading ${this_script_full_path}"
 				xshok_file_download "${work_dir}/clamav-unofficial-sigs.sh.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" "notimestamp"
 			  ret=$?
 				if [ "$ret" -ne 0 ] ; then
 					xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
 					exit 1
-				else
-					# Detect to make sure the entire script is avilable, fail if the script is missing contents
-					if [ "$(tail -n 1 "${work_dir}/clamav-unofficial-sigs.sh.tmp" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
-						echo "ERROR: Downloaded clamav-unofficial-sigs.sh is incomplete, please re-run"
-						exit 1
-					fi
-					xshok_pretty_echo_and_log "Completed"
 				fi
-		  	xshok_pretty_echo_and_log "Done."
+				# Detect to make sure the entire script is avilable, fail if the script is missing contents
+				if [ "$(tail -n 1 "${work_dir}/clamav-unofficial-sigs.sh.tmp" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
+					echo "ERROR: Downloaded clamav-unofficial-sigs.sh is incomplete, please re-run"
+					exit 1
+				fi
+				# Copy over permissions from old version
+			  OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}")"
 
-		  # Copy over modes from old version
-		  OCTAL_MODE="$(stat -c "%a" "$SELF")"
-		  if ! chmod "$OCTAL_MODE" "${0}.tmp" ; then
-		    xshok_pretty_echo_and_log "ERROR: unable to set mode on ${0}.tmp."
-		    exit 1
-		  fi
+			  # Generate the update script
+			  cat > "${work_dir}/xshok_update_script.sh" << EOF
+#!/usr/bin/env bash
+echo "Running update process"
+# Overwrite old file with new
+if ! mv -f "${work_dir}/clamav-unofficial-sigs.sh.tmp" "${this_script_full_path}" ; then
+  echo  "ERROR: failed moving ${work_dir}/clamav-unofficial-sigs.sh.tmp to ${this_script_full_path}"
+  rm -f \$0
+	exit 1
+fi
+if ! chmod "$OCTAL_MODE" "${this_script_full_path}" ; then
+	 echo "ERROR: unable to set permissions on ${this_script_full_path}"
+	 exit 1
+fi
+	echo "Completed"
+	rm -f \$0
+
+fi
+EOF
+		  echo -n "Inserting update process..."
+
+		  # Replaced with $0, so code will update and then call itself with the same parameters it had
+			#exec "${0}" "$@"
+			bash_bin="$(command -v bash 2> /dev/null)"
+		  exec "$bash_bin" "${work_dir}/xshok_update_script.sh"
+
+		else
+			 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
+			 exit 1
 		fi
 	fi
 fi
 }
-
-
-
-# 		  # Generate the update script
-# 		  cat > xshok_update_script.sh << EOF
-# #!/usr/bin/env bash
-# # Overwrite old file with new
-# if mv -f "${0}.tmp" "${0}" ; then
-#   echo "Done. Update complete."
-#   rm \$0
-# else
-#   echo "Failed! The update was not completed."
-# 	rm -f "${0}.tmp"
-# 	rm -f \$0
-# fi
-# EOF
-# 		  echo -n "Inserting update process..."
-#
-# 		  # Replaced with $0, so code will update and then call itself with the same parameters it had
-# 		  #exec /bin/bash xshok_update_script.sh
-# 		  exec "${0}" "$@"
-#
-# 		fi
-# 	fi
-# }
 
 
 # Decode a third-party signature either by signature name
