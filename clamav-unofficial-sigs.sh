@@ -894,8 +894,10 @@ function gpg_verify_specific_sanesecurity_database_file() { # databasefile
 # Output system and configuration information
 function output_system_configuration_information() {
   xshok_pretty_echo_and_log ""
-  xshok_pretty_echo_and_log "*** SCRIPT VERSION ***"
+  xshok_pretty_echo_and_log "*** SCRIPT INFORMATION ***"
   xshok_pretty_echo_and_log "${this_script_name} ${script_version} (${script_version_date})"
+	xshok_pretty_echo_and_log "Master.conf Version: ${config_version}"
+	xshok_pretty_echo_and_log "Minimum required config: ${minimum_required_config_version}"
   xshok_pretty_echo_and_log "*** SYSTEM INFORMATION ***"
   $uname_bin -a
   xshok_pretty_echo_and_log "*** CLAMSCAN LOCATION & VERSION ***"
@@ -918,11 +920,9 @@ function output_system_configuration_information() {
     xshok_pretty_echo_and_log "${gpg_bin}"
     $gpg_bin --version | head -1
   fi
-  xshok_pretty_echo_and_log "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
-  xshok_pretty_echo_and_log "${work_dir}"
-  xshok_pretty_echo_and_log "*** CLAMAV DIRECTORY INFORMATION ***"
-  xshok_pretty_echo_and_log "${clam_dbs}"
-  xshok_pretty_echo_and_log "*** SCRIPT CONFIGURATION SETTINGS ***"
+  xshok_pretty_echo_and_log "*** DIRECTORY INFORMATION ***"
+  xshok_pretty_echo_and_log "Working Directory: ${work_dir}"
+  xshok_pretty_echo_and_log "Clam Database Directory: ${clam_dbs}"
   if [ "$custom_config" != "no" ] ; then
     if [ -d "$custom_config" ] ; then
       # Assign the custom config dir and remove trailing / (removes / and //)
@@ -933,6 +933,7 @@ function output_system_configuration_information() {
   else
     xshok_pretty_echo_and_log "Configuration Directory: ${config_dir}"
   fi
+	xshok_pretty_echo_and_log ""
 }
 
 # Make a signature database from an ascii file

@@ -199,6 +199,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - os.conf takes preference over os.***.conf
  - Warn if there are multiple os.***.conf files
  - More sanity checks to help users and prevent errors
+ - Better output of --info 
  - Incremented the config to version 80
  - Set minimum config required to 80
 
