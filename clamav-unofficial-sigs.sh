@@ -710,7 +710,7 @@ function xshok_upgrade() { # version
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
 			xshok_pretty_echo_and_log "ALERT: Upgrading config from v${config_version} to v${latest_config_version}"
 			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
-				echo "Downloading ${config_dir}/master.conf"
+				echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
 				xshok_file_download "${work_dir}/master.conf.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" "notimestamp"
 				ret="$?"
 				if [ "$ret" -ne 0 ] ; then
@@ -723,6 +723,7 @@ function xshok_upgrade() { # version
 				fi
 				# Copy over permissions from old version
 			  OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf")"
+				xshok_pretty_echo_and_log "Running update process"
 				if ! mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf" ; then
 					xshok_pretty_echo_and_log "ERROR: failed moving ${work_dir}/master.conf.tmp to ${config_dir}/master.conf"
 				 	exit 1
@@ -742,9 +743,9 @@ function xshok_upgrade() { # version
 	if [ "$latest_version" ] ; then
 		# shellcheck disable=SC2183,SC2086
 		if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
-	    xshok_pretty_echo_and_log "ALERT:  Upgrading script from v${version} to v${latest_version}"
+	    xshok_pretty_echo_and_log "ALERT:  Upgrading script from v${script_version} to v${latest_version}"
 			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
-				echo "Downloading ${this_script_full_path}"
+				echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
 				xshok_file_download "${work_dir}/clamav-unofficial-sigs.sh.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" "notimestamp"
 			  ret=$?
 				if [ "$ret" -ne 0 ] ; then
@@ -759,6 +760,7 @@ function xshok_upgrade() { # version
 				# Copy over permissions from old version
 			  OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}")"
 
+				xshok_pretty_echo_and_log "Inserting update process..."
 			  # Generate the update script
 			  cat > "${work_dir}/xshok_update_script.sh" << EOF
 #!/usr/bin/env bash
@@ -775,16 +777,11 @@ if ! chmod "$OCTAL_MODE" "${this_script_full_path}" ; then
 fi
 	echo "Completed"
 	rm -f \$0
-
-fi
 EOF
-		  echo -n "Inserting update process..."
-
 		  # Replaced with $0, so code will update and then call itself with the same parameters it had
 			#exec "${0}" "$@"
 			bash_bin="$(command -v bash 2> /dev/null)"
 		  exec "$bash_bin" "${work_dir}/xshok_update_script.sh"
-
 		else
 			 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
 			 exit 1
@@ -1476,7 +1473,7 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.2.0"
+script_version="6.3.0"
 script_version_date="2019-09-02"
 minimum_required_config_version="80"
 minimum_yara_clamav_version="0.99"
