@@ -1543,6 +1543,8 @@ elif [ -f "/usr/local/etc/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/usr/local/etc/clamav-unofficial-sigs/"
 elif [ -f "/opt/zimbra/config/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/opt/zimbra/config/clamav-unofficial-sigs/"
+elif [ -f "/opt/zimbra/conf/clamav-unofficial-sigs/master.conf" ] ; then
+  config_dir="/opt/zimbra/conf/clamav-unofficial-sigs/"
 else
   xshok_pretty_echo_and_log "ERROR: config_dir (/etc/clamav-unofficial-sigs/master.conf) could not be found"
   exit 1
