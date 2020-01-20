@@ -362,13 +362,13 @@ function xshok_file_download() { #outputfile #url #notimestamp
 						rm -f "$wget_output_link"
 					fi
 				fi
+				cd "$this_dir" || exit
 			else
 				# shellcheck disable=SC2086
 				$wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"
 				result=$?
 			fi
     fi
-		cd "$this_dir" || exit
     return $result
   fi
 }
