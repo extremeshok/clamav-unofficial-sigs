@@ -326,11 +326,11 @@ function xshok_file_download() { #outputfile #url #notimestamp
 		if [ -n "$curl_bin" ] ; then
 			if [ -f "${1}" ] ; then
 				# shellcheck disable=SC2086
-				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"
+				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"  2>/dev/null
 				result=$?
 			else
 				# shellcheck disable=SC2086
-				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --output "${1}" "${2}"
+				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --output "${1}" "${2}"  2>/dev/null
 				result=$?
 			fi
 		else
@@ -355,7 +355,7 @@ function xshok_file_download() { #outputfile #url #notimestamp
 					fi
 				fi
 	      # shellcheck disable=SC2086
-				$wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping "${2}"
+				$wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping "${2}"  2>/dev/null
 				result=$?
 				if [ ! -n "$wget_output_link" ] ; then
 					if [ -L "$wget_output_link" ] ; then
@@ -365,7 +365,7 @@ function xshok_file_download() { #outputfile #url #notimestamp
 				cd "$this_dir" || exit
 			else
 				# shellcheck disable=SC2086
-				$wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"
+				$wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}"  2>/dev/null
 				result=$?
 			fi
     fi
