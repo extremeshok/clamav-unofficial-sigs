@@ -2889,9 +2889,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
             if cmp -s "${work_dir_malwarepatrol}/${malwarepatrol_db}" "${clam_dbs}/${malwarepatrol_db}" ; then
-              malwarepatrol_reloaded=1
+              malwarepatrol_reloaded=0
             else
-              malwarepatrol_reloaded=2
+              malwarepatrol_reloaded=1
             fi
           else # Wget failed
             malwarepatrol_reloaded=-1
@@ -2952,6 +2952,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: ${malwarepatrol_db} - SKIPPING"
             fi
             ;; # The strange case when $? != 0 in the original
+# BEGIN ... is this code still needed
           2)
             $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_malwarepatrol}/${malwarepatrol_db}" > "${test_dir}/${malwarepatrol_db}"
             $clamscan_bin --infected --no-summary -d "${test_dir}/${malwarepatrol_db}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
@@ -2989,6 +2990,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               xshok_pretty_echo_and_log "Failed to successfully update MalwarePatrol production database file: ${malwarepatrol_db} - SKIPPING"
             fi
             ;;
+# END ... is this code still needed
           0) # The database did not update
             xshok_pretty_echo_and_log "MalwarePatrol signature database (${malwarepatrol_db}) did not change - skipping"
             ;;
