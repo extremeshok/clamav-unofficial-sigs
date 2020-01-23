@@ -2730,7 +2730,7 @@ else
 fi
 
 ##############################################################################################################################################
-# Check for updated linuxmalwaredetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
+# Check for updated LinuxMalwareDetect database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
 ##############################################################################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "${linuxmalwaredetect_dbs[0]}" ] ; then
@@ -2750,14 +2750,14 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
       if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
         echo "$current_time" > "${work_dir_work_configs}/last-linuxmalwaredetect-update.txt"
 
-        xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
-        xshok_pretty_echo_and_log "Checking for linuxmalwaredetect updates..."
+        xshok_pretty_echo_and_log "LinuxMalwareDetect Database File Updates" "="
+        xshok_pretty_echo_and_log "Checking for LinuxMalwareDetect updates..."
         linuxmalwaredetect_updates="0"
         for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
           if [ "$loop" == "1" ] ; then
             xshok_pretty_echo_and_log "---"
           fi
-          xshok_pretty_echo_and_log "Checking for updated linuxmalwaredetect database file: ${db_file}"
+          xshok_pretty_echo_and_log "Checking for updated LinuxMalwareDetect database file: ${db_file}"
           linuxmalwaredetect_db_update="0"
           xshok_file_download "${work_dir_linuxmalwaredetect}/${db_file}" "$linuxmalwaredetect_url/${db_file}"
           ret="$?"
@@ -2766,13 +2766,13 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
             if ! cmp -s "${work_dir_linuxmalwaredetect}/${db_file}" "${clam_dbs}/${db_file}" ; then
               db_ext="${db_file#*.}"
 
-              xshok_pretty_echo_and_log "Testing updated linuxmalwaredetect database file: ${db_file}"
+              xshok_pretty_echo_and_log "Testing updated LinuxMalwareDetect database file: ${db_file}"
               if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
                 if $clamscan_bin --quiet -d "${work_dir_linuxmalwaredetect}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>/dev/null ; then
-                  xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect ${db_file} database integrity tested good"
+                  xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested good"
                   true
                 else
-                  xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect ${db_file} database integrity tested BAD"
+                  xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested BAD"
                   if [ "$remove_bad_database" == "yes" ] ; then
                     if rm -f "${work_dir_linuxmalwaredetect}/${db_file}" ; then
                       xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_linuxmalwaredetect}/${db_file}"
@@ -2784,12 +2784,12 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
                   if [ "$selinux_fixes" == "yes" ] ; then
                     restorecon "${clam_dbs}/local.ign"
                   fi
-                  xshok_pretty_echo_and_log "Successfully updated linuxmalwaredetect production database file: ${db_file}"
+                  xshok_pretty_echo_and_log "Successfully updated LinuxMalwareDetect production database file: ${db_file}"
                   linuxmalwaredetect_updates=1
                   linuxmalwaredetect_db_update=1
                   do_clamd_reload=1
                 else
-                  xshok_pretty_echo_and_log "Failed to successfully update linuxmalwaredetect production database file: ${db_file} - SKIPPING"
+                  xshok_pretty_echo_and_log "Failed to successfully update LinuxMalwareDetect production database file: ${db_file} - SKIPPING"
                 fi
               else
                 $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_linuxmalwaredetect}/${db_file}" > "${test_dir}/${db_file}"
@@ -2798,10 +2798,10 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
                 $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
                 mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
                 if $clamscan_bin --quiet -d "${test_dir}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>/dev/null ; then
-                  xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect ${db_file} database integrity tested good"
+                  xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested good"
                   true
                 else
-                  xshok_pretty_echo_and_log "Clamscan reports linuxmalwaredetect ${db_file} database integrity tested BAD"
+                  xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested BAD"
                   if [ "$remove_bad_database" == "yes" ] ; then
                     if rm -f "${work_dir_linuxmalwaredetect}/${db_file}" ; then
                       xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_linuxmalwaredetect}/${db_file}"
@@ -2813,28 +2813,28 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
                   if [ "$selinux_fixes" == "yes" ] ; then
                     restorecon "${clam_dbs}/${db_file}"
                   fi
-                  xshok_pretty_echo_and_log "Successfully updated linuxmalwaredetect production database file: ${db_file}"
+                  xshok_pretty_echo_and_log "Successfully updated LinuxMalwareDetect production database file: ${db_file}"
                   linuxmalwaredetect_updates=1
                   linuxmalwaredetect_db_update=1
                   do_clamd_reload=1
                 else
-                  xshok_pretty_echo_and_log "Failed to successfully update linuxmalwaredetect production database file: ${db_file} - SKIPPING"
+                  xshok_pretty_echo_and_log "Failed to successfully update LinuxMalwareDetect production database file: ${db_file} - SKIPPING"
                 fi
               fi
             fi
           else
-            xshok_pretty_echo_and_log "WARNING: Failed connection to ${linuxmalwaredetect_url} - SKIPPED linuxmalwaredetect ${db_file} update"
+            xshok_pretty_echo_and_log "WARNING: Failed connection to ${linuxmalwaredetect_url} - SKIPPED LinuxMalwareDetect ${db_file} update"
           fi
           if [ "$linuxmalwaredetect_db_update" != "1" ] ; then
 
-            xshok_pretty_echo_and_log "No updated linuxmalwaredetect ${db_file} database file found"
+            xshok_pretty_echo_and_log "No updated LinuxMalwareDetect ${db_file} database file found"
           fi
         done
         if [ "$linuxmalwaredetect_updates" != "1" ] ; then
-          xshok_pretty_echo_and_log "No linuxmalwaredetect database file updates found" "-"
+          xshok_pretty_echo_and_log "No LinuxMalwareDetect database file updates found" "-"
         fi
       else
-        xshok_pretty_echo_and_log "linuxmalwaredetect Database File Updates" "="
+        xshok_pretty_echo_and_log "LinuxMalwareDetect Database File Updates" "="
         xshok_draw_time_remaining "$((update_interval - time_interval))" "$linuxmalwaredetect_update_hours" "linuxmalwaredetect"
       fi
     fi
@@ -2842,7 +2842,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 else
   if [ -n "${linuxmalwaredetect_dbs[0]}" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
-      xshok_pretty_echo_and_log "Removing disabled linuxmalwaredetect Database files"
+      xshok_pretty_echo_and_log "Removing disabled LinuxMalwareDetect Database files"
       for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
         if echo "$db_file" | $grep_bin -q "|" ; then
           db_file="${db_file%|*}"

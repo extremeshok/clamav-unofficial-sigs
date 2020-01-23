@@ -234,7 +234,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Sanitize whitelist input string (Remove quotes and .UNOFFICIAL)
  - Added Full support for Hash-based Signature Databases
  - User.conf is pre-configured with default options to allow for quicker setup
- - Default sanesecurity and linuxmalwaredetect to enabled
+ - Default sanesecurity and LinuxMalwareDetect to enabled
  - Increase default retries from 3 to 5
  - Ensure log file permissions are correct
  - Better update comparison check, only notify if newer
