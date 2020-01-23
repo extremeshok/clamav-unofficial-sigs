@@ -1496,9 +1496,9 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.3.0"
-script_version_date="2019-09-02"
-minimum_required_config_version="80"
+script_version="6.4.0"
+script_version_date="2020-01-23"
+minimum_required_config_version="83"
 minimum_yara_clamav_version="0.99"
 
 # Discover script: name, full_path and path
