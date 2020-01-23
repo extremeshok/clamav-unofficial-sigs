@@ -85,7 +85,7 @@ function xshok_create_pid_file() { # pid.file
 # Intercept ctrl+c and calls the cleanup function
 function xshok_control_c() {
   echo
-  xshok_pretty_echo_and_log "--------------| Exiting ... Please wait |--------------" "-"
+  xshok_pretty_echo_and_log "---------------| Exiting ... Please wait |---------------" "-"
   xshok_cleanup
   exit $?
 }
@@ -276,22 +276,29 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
   fi
   # Handle logging
   if [ "$enable_log" == "yes" ] ; then
-    if [ ! -z "$log_pipe_cmd" ] ; then
-      echo "${1}" | $log_pipe_cmd
-    else
-      if [ ! -e "${log_file_path}/${log_file_name}" ] ; then
-        # xshok_mkdir_ownership "$log_file_path"
-        mkdir -p "$log_file_path"
-        touch "${log_file_path}/${log_file_name}" 2>/dev/null
-        perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
-      fi
-      if [ ! -w "${log_file_path}/${log_file_name}" ] ; then
-        echo "WARNING: Logging Disabled, as file not writable: ${log_file_path}/${log_file_name}"
-        enable_log="no"
-      else
-        echo "$(date "+%b %d %T")" "${1}" >> "${log_file_path}/${log_file_name}"
-      fi
-    fi
+
+		#filter ===, ---
+		mystring=${1//===}
+		mystring=${mystring//---}
+
+		if [ ! -z "$mystring" ] ; then
+	    if [ ! -z "$log_pipe_cmd" ] ; then
+	      echo "${mystring}" | $log_pipe_cmd
+	    else
+	      if [ ! -e "${log_file_path}/${log_file_name}" ] ; then
+	        # xshok_mkdir_ownership "$log_file_path"
+	        mkdir -p "$log_file_path"
+	        touch "${log_file_path}/${log_file_name}" 2>/dev/null
+	        perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
+	      fi
+	      if [ ! -w "${log_file_path}/${log_file_name}" ] ; then
+	        echo "WARNING: Logging Disabled, as file not writable: ${log_file_path}/${log_file_name}"
+	        enable_log="no"
+	      else
+	        echo "$(date "+%b %d %T")" "${mystring}" >> "${log_file_path}/${log_file_name}"
+	      fi
+	    fi
+		fi
   fi
 }
 
@@ -778,10 +785,10 @@ if ! chmod "$OCTAL_MODE" "${this_script_full_path}" ; then
 	 exit 1
 fi
 	echo "Completed"
-	# echo "----------------------"
+	# echo "---------------------"
 	# echo "Optional, run as root: "
 	# echo "clamav-unofficial-sigs.sh --install-all"
-	echo "----------------------"
+	echo "---------------------"
 	echo "Run once as root: "
 	echo "clamav-unofficial-sigs.sh --force"
 
@@ -1031,10 +1038,10 @@ function make_signature_database_from_ascii_file() {
             fi
             $clamd_restart_opt
 
-            xshok_pretty_echo_and_log "Signature database '${db_file}' was successfully implemented and ClamD databases reloaded."
+            xshok_pretty_echo_and_log "Signature database '${db_file}' was successfully implemented and ClamD databases reloading."
           else
 
-            xshok_pretty_echo_and_log "Failed to add/update '${db_file}', ClamD database not reloaded."
+            xshok_pretty_echo_and_log "Failed to add/update '${db_file}', ClamD database not reloading."
           fi
         else
 
@@ -1270,7 +1277,7 @@ function clamscan_reload_dbs() {
           mypid="$(cat "$clamd_pid")"
 
           if kill -USR2 "$mypid" ; then
-            xshok_pretty_echo_and_log "ClamAV databases Reloaded" "="
+            xshok_pretty_echo_and_log "ClamAV databases reloading" "="
           else
             xshok_pretty_echo_and_log "ERROR: Failed to reload, forcing clamd to restart"
             if [ -z "$clamd_restart_opt" ] ; then
@@ -1296,7 +1303,7 @@ function clamscan_reload_dbs() {
           fi
         fi
       else
-        xshok_pretty_echo_and_log "ClamAV databases Reloaded" "="
+        xshok_pretty_echo_and_log "ClamAV databases reloading" "="
       fi
     else
       xshok_pretty_echo_and_log "No updates detected, ClamAV databases were not reloaded" "="
