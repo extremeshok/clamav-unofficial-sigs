@@ -1541,8 +1541,6 @@ if [ -f "/etc/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/etc/clamav-unofficial-sigs"
 elif [ -f "/usr/local/etc/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/usr/local/etc/clamav-unofficial-sigs/"
-elif [ -f "/opt/zimbra/config/clamav-unofficial-sigs/master.conf" ] ; then
-  config_dir="/opt/zimbra/config/clamav-unofficial-sigs/"
 elif [ -f "/opt/zimbra/conf/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/opt/zimbra/conf/clamav-unofficial-sigs/"
 else
