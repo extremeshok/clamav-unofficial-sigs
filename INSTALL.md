@@ -13,6 +13,19 @@ Script updates can be found at: https://github.com/extremeshok/clamav-unofficial
 * Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
 * pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
 
+# GENERIC UPGRADE INSTRUCTIONS (version 6.2 +)
+```
+clamav-unofficial-sigs.sh --upgrade
+clamav-unofficial-sigs.sh --force
+```
+
+# GENERIC UPGRADE INSTRUCTIONS (version 6.1 and below)
+```
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+clamav-unofficial-sigs.sh --force
+```
+
 # GENERIC INSTALLATION INSTRUCTIONS
 
 ## Install

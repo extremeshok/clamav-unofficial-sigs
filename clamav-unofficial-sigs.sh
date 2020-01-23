@@ -373,50 +373,6 @@ function xshok_file_download() { #outputfile #url #notimestamp
   fi
 }
 
-# Auto update
-function xshok_auto_update() { # version
-  xshok_pretty_echo_and_log "Performing automatic update..."
-
-  # Download new version
-  echo -n "Downloading latest version..."
-
-  xshok_file_download "${0}.tmp" "${UPDATE_BASE}/${SELF}" "notimestamp"
-  result=$?
-
-  if [ "$result" -ne 0 ] ; then
-    xshok_pretty_echo_and_log "Failed: Error while trying to get new version!"
-    xshok_pretty_echo_and_log "File requested: ${UPDATE_BASE}/${SELF}"
-    exit 1
-  fi
-  xshok_pretty_echo_and_log "Done."
-
-  # Copy over modes from old version
-  OCTAL_MODE="$(stat -c "%a" "$SELF")"
-  if ! chmod "$OCTAL_MODE" "${0}.tmp" ; then
-    xshok_pretty_echo_and_log "Failed: Error while trying to set mode on ${0}.tmp."
-    exit 1
-  fi
-
-  # Generate the update script
-  cat > xshok_update_script.sh << EOF
-#!/usr/bin/env bash
-# Overwrite old file with new
-if mv "${0}.tmp" "${0}" ; then
-  xshok_pretty_echo_and_log "Done. Update complete."
-  rm \$0
-else
-  xshok_pretty_echo_and_log "Failed! The update was not completed."
-fi
-EOF
-
-
-  echo -n "Inserting update process..."
-
-  # Replaced with $0, so code will update and then call itself with the same parameters it had
-  #exec /bin/bash xshok_update_script.sh
-  exec "${0}" "$@"
-}
-
 # Handle list of database files
 function clamav_files() {
   echo "${clam_dbs}/${db}" >> "${current_tmp}"
@@ -717,6 +673,138 @@ EOF
   xshok_pretty_echo_and_log "Completed: cron installed, as file: ${cron_dir}/${cron_filename}"
 }
 
+# Auto upgrade the master.conf and the
+function xshok_upgrade() {
+
+	allow_upgrades="yes"
+
+	if [ "$allow_upgrades" == "no" ] ; then
+		xshok_pretty_echo_and_log "ERROR: --upgrade has been disabled, allow_upgrades=no"
+		exit 1
+	fi
+	if ! xshok_is_root ; then
+		xshok_pretty_echo_and_log "ERROR: Only root can run the upgrade"
+		exit 1
+	fi
+
+	xshok_pretty_echo_and_log "Checking for updates ..."
+
+	found_upgrade="no"
+
+	if [ -n "$curl_bin" ] ; then
+		# shellcheck disable=SC2086
+		latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+		# shellcheck disable=SC2086
+		latest_config_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+	else
+		# shellcheck disable=SC2086
+		latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+		# shellcheck disable=SC2086
+		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+	fi
+
+  # config_dir/master.conf
+	if [ "$latest_config_version" ] ; then
+		# shellcheck disable=SC2183,SC2086
+		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
+			found_upgrade="yes"
+			xshok_pretty_echo_and_log "ALERT: Upgrading config from v${config_version} to v${latest_config_version}"
+			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
+				echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
+				xshok_file_download "${work_dir}/master.conf.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" "notimestamp"
+				ret="$?"
+				if [ "$ret" -ne 0 ] ; then
+					xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
+					exit 1
+				fi
+				if ! $grep_bin -m 1 "config_version" "${work_dir}/master.conf.tmp" > /dev/null 2>&1 ; then
+					echo "ERROR: Downloaded master.conf is incomplete, please re-run"
+					exit 1
+				fi
+				# Copy over permissions from old version
+			  OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf")"
+				xshok_pretty_echo_and_log "Running update process"
+				if ! mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf" ; then
+					xshok_pretty_echo_and_log "ERROR: failed moving ${work_dir}/master.conf.tmp to ${config_dir}/master.conf"
+				 	exit 1
+				fi
+				if ! chmod "$OCTAL_MODE" "${config_dir}/master.conf" ; then
+					 xshok_pretty_echo_and_log "ERROR: unable to set permissions on ${config_dir}/master.conf"
+					 exit 1
+				fi
+				xshok_pretty_echo_and_log "Completed"
+			else
+				 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
+				 exit 1
+		  fi
+		fi
+	fi
+
+	if [ "$latest_version" ] ; then
+		# shellcheck disable=SC2183,SC2086
+		if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
+			found_upgrade="yes"
+	    xshok_pretty_echo_and_log "ALERT:  Upgrading script from v${script_version} to v${latest_version}"
+			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
+				echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
+				xshok_file_download "${work_dir}/clamav-unofficial-sigs.sh.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" "notimestamp"
+			  ret=$?
+				if [ "$ret" -ne 0 ] ; then
+					xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
+					exit 1
+				fi
+				# Detect to make sure the entire script is avilable, fail if the script is missing contents
+				if [ "$(tail -n 1 "${work_dir}/clamav-unofficial-sigs.sh.tmp" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
+					echo "ERROR: Downloaded clamav-unofficial-sigs.sh is incomplete, please re-run"
+					exit 1
+				fi
+				# Copy over permissions from old version
+			  OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}")"
+
+				xshok_pretty_echo_and_log "Inserting update process..."
+			  # Generate the update script
+			  cat > "${work_dir}/xshok_update_script.sh" << EOF
+#!/usr/bin/env bash
+echo "Running update process"
+# Overwrite old file with new
+if ! mv -f "${work_dir}/clamav-unofficial-sigs.sh.tmp" "${this_script_full_path}" ; then
+  echo  "ERROR: failed moving ${work_dir}/clamav-unofficial-sigs.sh.tmp to ${this_script_full_path}"
+  rm -f \$0
+	exit 1
+fi
+if ! chmod "$OCTAL_MODE" "${this_script_full_path}" ; then
+	 echo "ERROR: unable to set permissions on ${this_script_full_path}"
+	 rm -f \$0
+	 exit 1
+fi
+	echo "Completed"
+	# echo "----------------------"
+	# echo "Optional, run as root: "
+	# echo "clamav-unofficial-sigs.sh --install-all"
+	echo "----------------------"
+	echo "Run once as root: "
+	echo "clamav-unofficial-sigs.sh --force"
+
+	#remove the tmp script before exit
+	rm -f \$0
+EOF
+		  # Replaced with $0, so code will update and then call itself with the same parameters it had
+			#exec "${0}" "$@"
+			bash_bin="$(command -v bash 2> /dev/null)"
+		  exec "$bash_bin" "${work_dir}/xshok_update_script.sh"
+			echo "Running once as root"
+		else
+			 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
+			 exit 1
+		fi
+	fi
+fi
+
+if [ "$found_upgrade" == "no" ] ; then
+	xshok_pretty_echo_and_log "No updates available"
+fi
+}
+
 
 # Decode a third-party signature either by signature name
 function decode_third_party_signature_by_signature_name() {
@@ -806,8 +894,10 @@ function gpg_verify_specific_sanesecurity_database_file() { # databasefile
 # Output system and configuration information
 function output_system_configuration_information() {
   xshok_pretty_echo_and_log ""
-  xshok_pretty_echo_and_log "*** SCRIPT VERSION ***"
+  xshok_pretty_echo_and_log "*** SCRIPT INFORMATION ***"
   xshok_pretty_echo_and_log "${this_script_name} ${script_version} (${script_version_date})"
+	xshok_pretty_echo_and_log "Master.conf Version: ${config_version}"
+	xshok_pretty_echo_and_log "Minimum required config: ${minimum_required_config_version}"
   xshok_pretty_echo_and_log "*** SYSTEM INFORMATION ***"
   $uname_bin -a
   xshok_pretty_echo_and_log "*** CLAMSCAN LOCATION & VERSION ***"
@@ -830,11 +920,9 @@ function output_system_configuration_information() {
     xshok_pretty_echo_and_log "${gpg_bin}"
     $gpg_bin --version | head -1
   fi
-  xshok_pretty_echo_and_log "*** SCRIPT WORKING DIRECTORY INFORMATION ***"
-  xshok_pretty_echo_and_log "${work_dir}"
-  xshok_pretty_echo_and_log "*** CLAMAV DIRECTORY INFORMATION ***"
-  xshok_pretty_echo_and_log "${clam_dbs}"
-  xshok_pretty_echo_and_log "*** SCRIPT CONFIGURATION SETTINGS ***"
+  xshok_pretty_echo_and_log "*** DIRECTORY INFORMATION ***"
+  xshok_pretty_echo_and_log "Working Directory: ${work_dir}"
+  xshok_pretty_echo_and_log "Clam Database Directory: ${clam_dbs}"
   if [ "$custom_config" != "no" ] ; then
     if [ -d "$custom_config" ] ; then
       # Assign the custom config dir and remove trailing / (removes / and //)
@@ -845,6 +933,7 @@ function output_system_configuration_information() {
   else
     xshok_pretty_echo_and_log "Configuration Directory: ${config_dir}"
   fi
+	xshok_pretty_echo_and_log ""
 }
 
 # Make a signature database from an ascii file
@@ -1280,36 +1369,38 @@ function check_clamav() {
 
 # Check for a new version
 function check_new_version() {
+	found_upgrade="no"
   if [ -n "$curl_bin" ] ; then
 		# shellcheck disable=SC2086
 		latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+		# shellcheck disable=SC2086
+		latest_config_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
 	else
 		# shellcheck disable=SC2086
 		latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
-  fi
-  if [ "$latest_version" ] ; then
-# shellcheck disable=SC2183,SC2086
-		if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
-      xshok_pretty_echo_and_log "ALERT: New version : v${latest_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
-    fi
-  fi
-}
-
-# Check for a new version
-function check_new_config_version() {
-  if [ -n "$curl_bin" ] ; then
-		# shellcheck disable=SC2086
-		latest_config_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
-  else
 		# shellcheck disable=SC2086
 		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2> /dev/null | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
-  fi
-  if [ "$latest_config_version" ] ; then
-# shellcheck disable=SC2183,SC2086
-		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
-      xshok_pretty_echo_and_log "ALERT: New config version : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
+	fi
+  if [ "$latest_version" ] ; then
+		# shellcheck disable=SC2183,SC2086
+		if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
+      xshok_pretty_echo_and_log "ALERT: New version : v${latest_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
+			found_upgrade="yes"
     fi
   fi
+  if [ "$latest_config_version" ] ; then
+		# shellcheck disable=SC2183,SC2086
+		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
+      xshok_pretty_echo_and_log "ALERT: New config version : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
+			found_upgrade="yes"
+    fi
+  fi
+
+if [ "$found_upgrade" == "yes" ] && [ "$allow_upgrades" == "yes" ] ; then
+	xshok_pretty_echo_and_log "Quickly upgrade, run the following command as root:"
+	xshok_pretty_echo_and_log "${this_script_name} --upgrade"
+fi
+
 }
 
 # Display help and usage
@@ -1373,6 +1464,8 @@ ${ofs} -w, --whitelist <signature-name> ${ofe} Adds a signature whitelist entry 
 ${ofb}
 ${ofs} --check-clamav ${ofe} If ClamD status check is enabled and the socket path is correctly ${oft} specifiedthen test to see if clamd is running or not
 ${ofb}
+${ofs} --upgrade ${ofe} Upgrades this script and master.conf to the latest available version
+${ofb}
 ${ofs} --install-all ${ofe} Install and generate the cron, logroate and man files, autodetects the values ${oft} based on your config files
 ${ofb}
 ${ofs} --install-cron ${ofe} Install and generate the cron file, autodetects the values ${oft} based on your config files
@@ -1396,10 +1489,29 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.1.1"
+script_version="6.3.0"
 script_version_date="2019-09-02"
-minimum_required_config_version="76"
+minimum_required_config_version="80"
 minimum_yara_clamav_version="0.99"
+
+# Discover script: name, full_path and path
+this_script_full_path="${BASH_SOURCE[0]}"
+# follow the symlinks
+while [ -h "$this_script_full_path" ]; do
+  this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>&1 && pwd )"
+  this_script_full_path="$(readlink "$this_script_full_path")"
+	# if relative symlink, then resolve the path
+  if [[ $this_script_full_path != /* ]] ; then
+    this_script_full_path="$this_script_path/$this_script_full_path"
+  fi
+done
+this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>&1 && pwd )"
+this_script_name="$(basename "$this_script_full_path")"
+
+if [ -z "$this_script_full_path" ] || [ -z "$this_script_path" ] || [ -z "$this_script_name" ] ; then
+	echo "ERROR: could not determin script name and fullpath"
+	exit 1
+fi
 
 #allow for other negatives besides no.
 #disabled_values_array=("0 no No NO false False FALSE off Off OFF disable Disable DISABLE disabled Disabled DISABLED")
@@ -1436,14 +1548,34 @@ else
   exit 1
 fi
 # Default config files
-config_files=("${config_dir}/master.conf")
-#find the a suitable os.conf or os.*.conf file
-config_file="$(find "$config_dir" -type f -iname "os.conf" -o -iname "os.*.conf" | tail -n1)"
-if [ -r "${config_file}" ]; then
-	config_files+=( "${config_file}" )
+if [ -r "${config_dir}/master.conf" ] ; then
+	config_files+=( "${config_dir}/master.conf" )
+else
+	xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not readable"
+	exit 1
+fi
+if [ -r "${config_dir}/os.conf" ] ; then
+	config_files+=( "${config_dir}/os.conf" )
+else
+	#find the a suitable os.*.conf file
+	os_config_number=$(find "$config_dir" -type f -iname "os.*.conf" | wc -l)
+	if [ "$os_config_number" == "0" ] ; then
+		xshok_pretty_echo_and_log "WARNING: no os.conf or os.*.conf found"
+	elif [ "$os_config_number" == "1" ] ; then
+		config_file="$(find "$config_dir" -type f -iname "os.*.conf" | head -n1)"
+		if [ -r "${config_file}" ]; then
+			config_files+=( "${config_file}" )
+		else
+			xshok_pretty_echo_and_log "WARNING: ${config_file} is not readable"
+		fi
+	else
+		xshok_pretty_echo_and_log "WARNING: Too many os.*.conf configs found"
+	fi
 fi
 if [ -r "${config_dir}/user.conf" ] ; then
 	config_files+=( "${config_dir}/user.conf" )
+else
+	xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf is not readable"
 fi
 
 # Solaris command -v function returns garbage when the program is not found
@@ -1920,11 +2052,6 @@ else
   curl_insecure=""
 fi
 
-# This scripts name and path
-this_script_name="$(basename "$0")"
-this_script_path="$( cd "$(dirname "${0}")" || exit ; pwd -P )"
-this_script_full_path="${this_script_path}/${this_script_name}"
-
 # Set the script to 755 permissions
 if xshok_is_root ; then
   if [ "$setmode" == "yes" ] ; then
@@ -1953,6 +2080,7 @@ while true; do
     -o|--output-triggered) output_signatures_triggered_during_ham_directory_scan; exit ;;
     -w|--whitelist) add_signature_whitelist_entry "${2}"; exit ;;
     --check-clamav) check_clamav; exit ;;
+    --upgrade) xshok_upgrade; exit ;;
     --install-all) install_cron; install_logrotate; install_man; exit ;;
     --install-cron) install_cron; exit ;;
     --install-logrotate) install_logrotate; exit ;;
@@ -3329,9 +3457,9 @@ clamscan_reload_dbs
 
 xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
 
-check_new_version
-
-check_new_config_version
+if [ "$allow_update_checks" != "no" ] ; then
+	check_new_version
+fi
 
 xshok_cleanup
 

@@ -1,6 +1,18 @@
-# WORK IN PROGRESS
+# Basic guide to Installing and Updating on CentOS
+Run the following as root
 
-# Basic guide to Installing on CentOS
+# UPGRADE INSTRUCTIONS (version 6.2 +)
+```
+/usr/local/sbin/clamav-unofficial-sigs.sh --upgrade
+/usr/local/sbin/clamav-unofficial-sigs.sh --force
+```
+
+# UPGRADE INSTRUCTIONS (version 6.1 and below)
+```
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+/usr/local/sbin/clamav-unofficial-sigs.sh --force
+```
 
 # CLAMAV INSTALL INSTRUCTIONS
 

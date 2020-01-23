@@ -1,4 +1,18 @@
-# Basic guide to Installing on Ubuntu / Debian
+# Basic guide to Installing and Updating on Ubuntu / Debian
+Run the following as root
+
+# UPGRADE INSTRUCTIONS (version 6.2 +)
+```
+clamav-unofficial-sigs.sh --upgrade
+clamav-unofficial-sigs.sh --force
+```
+
+# UPGRADE INSTRUCTIONS (version 6.1 and below)
+```
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+clamav-unofficial-sigs.sh --force
+```
 
 # CLAMAV INSTALL INSTRUCTIONS
 # Install clamav

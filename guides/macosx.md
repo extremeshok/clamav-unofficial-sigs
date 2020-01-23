@@ -1,6 +1,20 @@
-# Basic guide to Installing on Mac OS 10.12+ and OS X
+# Basic guide to Installing and Updating on Mac OS 10.12+ and OS X
 Press Command+Space and type Terminal and press enter/return key.
 Run all the following in the Terminal app:
+
+# UPGRADE INSTRUCTIONS (version 6.2 +)
+```
+clamav-unofficial-sigs.sh --upgrade
+clamav-unofficial-sigs.sh --force
+```
+
+# UPGRADE INSTRUCTIONS (version 6.1 and below)
+```
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/bin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+clamav-unofficial-sigs.sh --force
+```
+
 
 ## Notes:
 https://www.clamav.net/documents/installation-on-macos-mac-os-x
@@ -37,7 +51,7 @@ sudo pico /etc/clamav-unofficial-sigs/user.conf
 # Step 5
 Console (shell)
 ```
-clamav-unofficial-sigs.sh
+clamav-unofficial-sigs.sh --force
 ```
 
 # Step 6

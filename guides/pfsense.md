@@ -1,4 +1,17 @@
-# Basic guide to Installing on pfSense 2.3+
+# Basic guide to Installing and Updating on pfSense 2.3+
+
+# UPGRADE INSTRUCTIONS (version 6.2 +)
+```
+clamav-unofficial-sigs.sh --upgrade
+clamav-unofficial-sigs.sh --force
+```
+
+# UPGRADE INSTRUCTIONS (version 6.1 and below)
+```
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+clamav-unofficial-sigs.sh --force
+```
 
 ## Install Requirements
 # Step 1
