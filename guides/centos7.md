@@ -1,4 +1,4 @@
-# Basic guide to Installing and Updating on CentOS
+# Basic guide to Installing and Updating on CentOS 7
 Run the following as root
 
 # UPGRADE INSTRUCTIONS (version 7.0 +)
@@ -129,9 +129,9 @@ wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf -O /etc/clamav-unofficial-sigs/user.conf
 ```
 Select your operating system config from https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/
-**replace os.centos7.conf with your required config, centos6 = os.centos6.conf, centos7-atomic = os.centos7-atomic.conf, centos6-cpanel = os.centos6-cpanel.conf**
+**replace os.centos.conf with your required config, centos6 = os.centos6.conf, centos7-atomic = os.centos7-atomic.conf, centos6-cpanel = os.centos6-cpanel.conf**
 ```
-os_conf="os.centos7.conf"
+os_conf="os.centos.conf"
 wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}" -O /etc/clamav-unofficial-sigs/os.conf
 ```
 
