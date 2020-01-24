@@ -9,8 +9,8 @@ clamav-unofficial-sigs.sh --force
 
 # UPGRADE INSTRUCTIONS (version 6.1 and below)
 ```
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh-O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf-O /etc/clamav-unofficial-sigs/master.conf
 clamav-unofficial-sigs.sh --force
 ```
 
@@ -29,16 +29,16 @@ apt-get purge -y clamav-unofficial-sigs
 Run the following commands in shell (console/terminal)
 ```
 mkdir -p /usr/local/sbin/
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh-O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
 mkdir -p /etc/clamav-unofficial-sigs/
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf -c -O /etc/clamav-unofficial-sigs/user.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf-O /etc/clamav-unofficial-sigs/master.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf-O /etc/clamav-unofficial-sigs/user.conf
 ```
 Select your operating system config from https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/
 **replace os.debian9.conf with your required config, ubuntu = os.ubuntu.conf, debian9 = os.debian9.conf, debian8 = os.debian8.conf, debian8-systemd = os.debian8.systemd.conf, debian7 = os.debian7.conf**
 ```
 os_conf="os.debian9.conf"
-wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}" -c -O /etc/clamav-unofficial-sigs/os.conf
+wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}"-O /etc/clamav-unofficial-sigs/os.conf
 ```
 
 ### Optional: configure your user config /etc/clamav-unofficial-sigs/user.conf
@@ -64,7 +64,7 @@ script must run once as your superuser to set all the permissions and create the
 ### OR
 #### systemd
 ```
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.service -c -O /etc/systemd/system/clamav-unofficial-sigs.service
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.timer -c -O /etc/systemd/system/clamav-unofficial-sigs.timer
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamd.scan.service -c -O /etc/systemd/system/clamd.scan.service
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.service-O /etc/systemd/system/clamav-unofficial-sigs.service
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.timer-O /etc/systemd/system/clamav-unofficial-sigs.timer
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamd.scan.service-O /etc/systemd/system/clamd.scan.service
 ```
