@@ -213,6 +213,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Yara rules requires clamav 0.100 or above
  - Updated guides
  - Fix for systemd timers
+ - Added debug options to config
 
 ### Version 6.1.1 (Updated 02 September 2019)
  - eXtremeSHOK.com Maintenance
