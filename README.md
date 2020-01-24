@@ -189,10 +189,11 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   its associated files and databases from the system
 
 ## Change Log
-### Version 7.0.0 (Updated XX January 2020)
+### Version 7.0.0 (Updated 24 January 2020)
  - eXtremeSHOK.com Maintenance
  - Added urlhaus database
  - Added extra yararulesproject databases
+- Added new linuxmalwaredetect yara file
  - Automatic upgrades ( --upgrade )
  - Added --upgrade command line option
  - Option to disable automatic upgrades ( allow_upgrades )
@@ -202,18 +203,23 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Warn if there are multiple os.***.conf files
  - More sanity checks to help users and prevent errors
  - Better output of --info
- - Incremented the config to version 90
- - Set minimum config required to 90
  - Fix all known bugs
+ - Implement all suggestions
  - Fixed yararulesproject database names
+ - Correctly silence curl and wget
  - New linuxmalwaredetect logic
  - New malwarepatrol logic
  - Suppress --- and === from the logs
- - Added more documentation / guides
- - Yara rules requires clamav 0.100 or above
- - Updated guides
- - Fix for systemd timers
- - Added debug options to config
+ - Update the documentation / guides
+ - Increase minimum clamav version for yara rules to 0.100 or above
+ - Fix systemd.timer and systemd.service files
+ - More travis-ci tests
+ - Added os.alpine.conf
+ - Added debug options/mode to config
+ - Set minimum config required to 90
+ - Lots of refactoring and optimizing
+ - Only check for and notify about script updates every 12hours
+ - Incremented the config to version 90
 
 ### Version 6.1.1 (Updated 02 September 2019)
  - eXtremeSHOK.com Maintenance
