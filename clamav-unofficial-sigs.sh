@@ -329,6 +329,9 @@ function xshok_draw_time_remaining() { #time_remaining #update_hours #name
 
 # Download function
 function xshok_file_download() { #outputfile #url #notimestamp
+	if [ "$downloader_debug" == "yes" ] ; then
+		xshok_pretty_echo_and_log "url: ${2} >> outputfile: ${1} | ${3}"
+	fi
   if [ "${1}" ] && [ "${2}" ] ; then
 		if [ -n "$curl_bin" ] ; then
 			if [ -f "${1}" ] ; then
@@ -2049,7 +2052,7 @@ if $rsync_bin --help | $grep_bin -q "contimeout" > /dev/null ; then
 fi
 
 # Silence wget output and only report errors - useful if script is run via cron.
-if [ "$downloader_silence" == "yes" ] ; then
+if [ "$downloader_silence" == "yes" ] && [ "$downloader_debug" == "no" ]  ; then
   wget_output_level="--quiet"
   curl_output_level="--silent --show-error"
 else
