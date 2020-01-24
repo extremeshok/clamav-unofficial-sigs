@@ -116,7 +116,7 @@ yum -y install bind-utils rsync
 
 ## Make sure you do not have the package installed via yum
 ```
-yum purge -y clamav-unofficial-sigs
+yum erase -y clamav-unofficial-sigs
 ```
 
 ## Install
