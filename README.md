@@ -7,7 +7,7 @@ ClamAV Unofficial Signatures Updater
 ## Description
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, etc. The script will also generate and install cron, logrotate, and man files.
 
-## Checkout some of our other solutions: https://github.com/extremeshok?tab=repositories
+### Checkout some of our other solutions: https://github.com/extremeshok?tab=repositories
 
 ### Support / Suggestions / Comments
 Please post them on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
