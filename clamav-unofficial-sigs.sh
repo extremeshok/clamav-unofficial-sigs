@@ -1496,9 +1496,9 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="6.4.0"
+script_version="7.0.0"
 script_version_date="2020-01-23"
-minimum_required_config_version="83"
+minimum_required_config_version="90"
 minimum_yara_clamav_version="0.99"
 
 # Discover script: name, full_path and path
@@ -1605,7 +1605,10 @@ if [ -x /usr/gnu/bin/grep ] ; then
 else
   grep_bin="$(command -v grep 2> /dev/null)"
 fi
-
+# Detect support for tar
+if [ -z "$tar_bin" ]; then
+	tar_bin="$(command -v tar 2> /dev/null)"
+fi
 # Detect support for curl
 if [ -z "$curl_bin" ]; then
 	curl_bin="$(command -v curl 2> /dev/null)"
@@ -2753,84 +2756,112 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
         xshok_pretty_echo_and_log "LinuxMalwareDetect Database File Updates" "="
         xshok_pretty_echo_and_log "Checking for LinuxMalwareDetect updates..."
         linuxmalwaredetect_updates="0"
-        for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
-          if [ "$loop" == "1" ] ; then
-            xshok_pretty_echo_and_log "---"
+
+
+        linuxmalwaredetect_sigpack_url="https://cdn.rfxn.com/downloads/maldet-sigpack.tgz"
+        linuxmalwaredetect_version_url="https://cdn.rfxn.com/downloads/maldet.sigs.ver"
+
+        # Check for a new version
+        found_upgrade="no"
+        if [ -n "$curl_bin" ] ; then
+          # shellcheck disable=SC2086
+          latest_linuxmalwaredetect_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "$linuxmalwaredetect_version_url" 2> /dev/null | head -n1 | xargs)"
+        else
+          # shellcheck disable=SC2086
+          latest_linuxmalwaredetect_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "$linuxmalwaredetect_version_url" -O - 2> /dev/null | $grep_bin "^script_version=" | head -n1 | xargs)"
+        fi
+
+        if [ "$latest_linuxmalwaredetect_version" ] ; then
+          # shellcheck disable=SC2183,SC2086
+          if [ -f "${work_dir_linuxmalwaredetect}/current_linuxmalwaredetect_version" ] ; then
+            current_linuxmalwaredetect_version="$(head -n1 "${work_dir_linuxmalwaredetect}/current_linuxmalwaredetect_version" | xargs)"
+          else
+            current_linuxmalwaredetect_version="-1"
           fi
-          xshok_pretty_echo_and_log "Checking for updated LinuxMalwareDetect database file: ${db_file}"
-          linuxmalwaredetect_db_update="0"
-          xshok_file_download "${work_dir_linuxmalwaredetect}/${db_file}" "$linuxmalwaredetect_url/${db_file}"
+          if [ "$latest_linuxmalwaredetect_version" != "$current_linuxmalwaredetect_version" ] ; then
+            xshok_pretty_echo_and_log "LinuxMalwareDetect Database File Updates" "="
+            found_upgrade="yes"
+          fi
+        fi
+
+        if [ "$found_upgrade" == "yes" ] ; then
+          xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
-            loop="1"
-            if ! cmp -s "${work_dir_linuxmalwaredetect}/${db_file}" "${clam_dbs}/${db_file}" ; then
-              db_ext="${db_file#*.}"
+            $tar_bin --strip-components=1 --wildcards --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+            for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
+              if [ "$loop" == "1" ] ; then
+                xshok_pretty_echo_and_log "---"
+              fi
+              loop="1"
+              if ! cmp -s "${work_dir_linuxmalwaredetect}/${db_file}" "${clam_dbs}/${db_file}" ; then
+                db_ext="${db_file#*.}"
 
-              xshok_pretty_echo_and_log "Testing updated LinuxMalwareDetect database file: ${db_file}"
-              if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
-                if $clamscan_bin --quiet -d "${work_dir_linuxmalwaredetect}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>/dev/null ; then
-                  xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested good"
-                  true
-                else
-                  xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested BAD"
-                  if [ "$remove_bad_database" == "yes" ] ; then
-                    if rm -f "${work_dir_linuxmalwaredetect}/${db_file}" ; then
-                      xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_linuxmalwaredetect}/${db_file}"
+                xshok_pretty_echo_and_log "Testing updated LinuxMalwareDetect database file: ${db_file}"
+                if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
+                  if $clamscan_bin --quiet -d "${work_dir_linuxmalwaredetect}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>/dev/null ; then
+                    xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested good"
+                    true
+                  else
+                    xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested BAD"
+                    if [ "$remove_bad_database" == "yes" ] ; then
+                      if rm -f "${work_dir_linuxmalwaredetect}/${db_file}" ; then
+                        xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_linuxmalwaredetect}/${db_file}"
+                      fi
                     fi
-                  fi
-                  false
-                  fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${work_dir_linuxmalwaredetect}/${db_file}" "$clam_dbs" 2>/dev/null ; then
-                  perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
-                  if [ "$selinux_fixes" == "yes" ] ; then
-                    restorecon "${clam_dbs}/local.ign"
-                  fi
-                  xshok_pretty_echo_and_log "Successfully updated LinuxMalwareDetect production database file: ${db_file}"
-                  linuxmalwaredetect_updates=1
-                  linuxmalwaredetect_db_update=1
-                  do_clamd_reload=1
-                else
-                  xshok_pretty_echo_and_log "Failed to successfully update LinuxMalwareDetect production database file: ${db_file} - SKIPPING"
-                fi
-              else
-                $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_linuxmalwaredetect}/${db_file}" > "${test_dir}/${db_file}"
-                $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
-                $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
-                $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
-                mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
-                if $clamscan_bin --quiet -d "${test_dir}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>/dev/null ; then
-                  xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested good"
-                  true
-                else
-                  xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested BAD"
-                  if [ "$remove_bad_database" == "yes" ] ; then
-                    if rm -f "${work_dir_linuxmalwaredetect}/${db_file}" ; then
-                      xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_linuxmalwaredetect}/${db_file}"
+                    false
+                    fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${work_dir_linuxmalwaredetect}/${db_file}" "$clam_dbs" 2>/dev/null ; then
+                    perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
+                    if [ "$selinux_fixes" == "yes" ] ; then
+                      restorecon "${clam_dbs}/local.ign"
                     fi
+                    xshok_pretty_echo_and_log "Successfully updated LinuxMalwareDetect production database file: ${db_file}"
+                    linuxmalwaredetect_updates=1
+                    linuxmalwaredetect_db_update=1
+                    do_clamd_reload=1
+                  else
+                    xshok_pretty_echo_and_log "Failed to successfully update LinuxMalwareDetect production database file: ${db_file} - SKIPPING"
                   fi
-                  false
-                  fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${test_dir}/${db_file}" "$clam_dbs" 2>/dev/null ; then
-                  perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
-                  if [ "$selinux_fixes" == "yes" ] ; then
-                    restorecon "${clam_dbs}/${db_file}"
-                  fi
-                  xshok_pretty_echo_and_log "Successfully updated LinuxMalwareDetect production database file: ${db_file}"
-                  linuxmalwaredetect_updates=1
-                  linuxmalwaredetect_db_update=1
-                  do_clamd_reload=1
                 else
-                  xshok_pretty_echo_and_log "Failed to successfully update LinuxMalwareDetect production database file: ${db_file} - SKIPPING"
+                  $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_linuxmalwaredetect}/${db_file}" > "${test_dir}/${db_file}"
+                  $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                  $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
+                  $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
+                  mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
+                  if $clamscan_bin --quiet -d "${test_dir}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>/dev/null ; then
+                    xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested good"
+                    true
+                  else
+                    xshok_pretty_echo_and_log "Clamscan reports LinuxMalwareDetect ${db_file} database integrity tested BAD"
+                    if [ "$remove_bad_database" == "yes" ] ; then
+                      if rm -f "${work_dir_linuxmalwaredetect}/${db_file}" ; then
+                        xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_linuxmalwaredetect}/${db_file}"
+                      fi
+                    fi
+                    false
+                    fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${test_dir}/${db_file}" "$clam_dbs" 2>/dev/null ; then
+                    perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
+                    if [ "$selinux_fixes" == "yes" ] ; then
+                      restorecon "${clam_dbs}/${db_file}"
+                    fi
+                    xshok_pretty_echo_and_log "Successfully updated LinuxMalwareDetect production database file: ${db_file}"
+                    linuxmalwaredetect_updates=1
+                    linuxmalwaredetect_db_update=1
+                    do_clamd_reload=1
+                  else
+                    xshok_pretty_echo_and_log "Failed to successfully update LinuxMalwareDetect production database file: ${db_file} - SKIPPING"
+                  fi
                 fi
               fi
-            fi
-          else
-            xshok_pretty_echo_and_log "WARNING: Failed connection to ${linuxmalwaredetect_url} - SKIPPED LinuxMalwareDetect ${db_file} update"
-          fi
-          if [ "$linuxmalwaredetect_db_update" != "1" ] ; then
 
-            xshok_pretty_echo_and_log "No updated LinuxMalwareDetect ${db_file} database file found"
+            done
+            #save the current version
+            echo "$latest_linuxmalwaredetect_version" > "${work_dir_linuxmalwaredetect}/current_linuxmalwaredetect_version"
+
+          else
+            xshok_pretty_echo_and_log "WARNING: Failed connection to ${linuxmalwaredetect_sigpack_url} - SKIPPED LinuxMalwareDetect update"
           fi
-        done
-        if [ "$linuxmalwaredetect_updates" != "1" ] ; then
+        else
           xshok_pretty_echo_and_log "No LinuxMalwareDetect database file updates found" "-"
         fi
       else
@@ -2843,6 +2874,14 @@ else
   if [ -n "${linuxmalwaredetect_dbs[0]}" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
       xshok_pretty_echo_and_log "Removing disabled LinuxMalwareDetect Database files"
+
+      if [ -f "${work_dir_linuxmalwaredetect}/current_linuxmalwaredetect_version" ] ; then
+        rm -f "${work_dir_linuxmalwaredetect}/current_linuxmalwaredetect_version"
+      fi
+      if [ -f "${work_dir_linuxmalwaredetect}/sigpack.tgz" ] ; then
+        rm -f "${work_dir_linuxmalwaredetect}/sigpack.tgz"
+      fi
+
       for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
         if echo "$db_file" | $grep_bin -q "|" ; then
           db_file="${db_file%|*}"
@@ -2861,6 +2900,7 @@ else
     fi
   fi
 fi
+
 
 #########################################################################################################################################
 # Download MalwarePatrol database file every set number of hours as defined in the "USER CONFIGURATION" section of this script.          #
