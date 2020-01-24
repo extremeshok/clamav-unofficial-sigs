@@ -3624,7 +3624,20 @@ clamscan_reload_dbs
 xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues" "-"
 
 if [ "$allow_update_checks" != "no" ] ; then
-	check_new_version
+
+	if [ -r "${work_dir_work_configs}/last-version-check.txt" ] ; then
+	  last_version_check="$(cat "${work_dir_work_configs}/last-version-check.txt")"
+	else
+	  last_version_check="0"
+	fi
+	db_file=""
+	update_check_interval="$((update_check_hours * 3600))"
+	time_interval="$((current_time - last_version_check))"
+	if [ "$time_interval" -ge $((update_check_interval - 600)) ] ; then
+	  echo "$current_time" > "${work_dir_work_configs}/last-version-check.txt"
+		check_new_version
+	fi
+
 fi
 
 xshok_cleanup
