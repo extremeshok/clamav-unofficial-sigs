@@ -41,7 +41,7 @@ Select your operating system config from https://github.com/extremeshok/clamav-u
 **replace os.ubuntu.conf with your required config, centos7 = os.centos7.conf**
 ```
 os_conf="os.ubuntu.conf"
-wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}"-O /etc/clamav-unofficial-sigs/os.conf
+wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}" -O /etc/clamav-unofficial-sigs/os.conf
 ```
 
 ### Optional: configure your user config /etc/clamav-unofficial-sigs/user.conf

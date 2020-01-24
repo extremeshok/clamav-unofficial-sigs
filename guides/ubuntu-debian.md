@@ -35,10 +35,10 @@ wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf -O /etc/clamav-unofficial-sigs/user.conf
 ```
 Select your operating system config from https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/
-**replace os.debian9.conf with your required config, ubuntu = os.ubuntu.conf, debian9 = os.debian9.conf, debian8 = os.debian8.conf, debian8-systemd = os.debian8.systemd.conf, debian7 = os.debian7.conf**
+**replace os.debian9.conf with your required config, ubuntu = os.ubuntu.conf, debian10 = os.debian.conf, debian9 = os.debian.conf, debian8 = os.debian8.conf, debian8-systemd = os.debian8.systemd.conf, debian7 = os.debian7.conf**
 ```
-os_conf="os.debian9.conf"
-wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}"-O /etc/clamav-unofficial-sigs/os.conf
+os_conf="os.debian.conf"
+wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}" -O /etc/clamav-unofficial-sigs/os.conf
 ```
 
 ### Optional: configure your user config /etc/clamav-unofficial-sigs/user.conf
