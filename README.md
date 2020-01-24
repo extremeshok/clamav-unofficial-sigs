@@ -67,7 +67,7 @@ Since usage yara rules requires clamav 0.100 or above, they will be automaticall
 Usage of free URLhaus Database: https://urlhaus.abuse.ch
 - Enabled by default
 
-### Yara-Rules Project Support (as of June 2015)
+### Yara-Rules Project Support (as of June 2015, updated January 2020)
 Usage of free Yara-Rules Project: http://yararules.com
 - Enabled by default
 
@@ -91,7 +91,7 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
    Your 128 character authorisation signature would be : your_unique_and_very_long_random_string_of_characters
  - 6. Enter the authorisation signature into the config securiteinfo_authorisation_signature: replacing YOUR-SIGNATURE-NUMBER with your authorisation signature from the link
 
-### Linux Malware Detect support (as of May 2015)
+### Linux Malware Detect support (as of May 2015, updated January 2020)
 Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/projects/linux-malware-detect/
  - Enabled by default, no configuration required
 
