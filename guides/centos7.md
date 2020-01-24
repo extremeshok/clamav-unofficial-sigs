@@ -1,7 +1,7 @@
-# Basic guide to Installing and Updating on CentOS
+# Basic guide to Installing and Updating on CentOS 7
 Run the following as root
 
-# UPGRADE INSTRUCTIONS (version 6.2 +)
+# UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
 /usr/local/sbin/clamav-unofficial-sigs.sh --upgrade
 /usr/local/sbin/clamav-unofficial-sigs.sh --force
@@ -9,8 +9,8 @@ Run the following as root
 
 # UPGRADE INSTRUCTIONS (version 6.1 and below)
 ```
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O /etc/clamav-unofficial-sigs/master.conf
 /usr/local/sbin/clamav-unofficial-sigs.sh --force
 ```
 
@@ -116,23 +116,23 @@ yum -y install bind-utils rsync
 
 ## Make sure you do not have the package installed via yum
 ```
-yum purge -y clamav-unofficial-sigs
+yum erase -y clamav-unofficial-sigs
 ```
 
 ## Install
 Run the following commands in shell (console/terminal)
 ```
 mkdir -p /usr/local/sbin/
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O /usr/local/sbin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
 mkdir -p /etc/clamav-unofficial-sigs/
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf -c -O /etc/clamav-unofficial-sigs/user.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O /etc/clamav-unofficial-sigs/master.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf -O /etc/clamav-unofficial-sigs/user.conf
 ```
 Select your operating system config from https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/
-**replace os.centos7.conf with your required config, centos6 = os.centos6.conf, centos7-atomic = os.centos7-atomic.conf, centos6-cpanel = os.centos6-cpanel.conf**
+**replace os.centos.conf with your required config, centos6 = os.centos6.conf, centos7-atomic = os.centos7-atomic.conf, centos6-cpanel = os.centos6-cpanel.conf**
 ```
-os_conf="os.centos7.conf"
-wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}" -c -O /etc/clamav-unofficial-sigs/os.conf
+os_conf="os.centos.conf"
+wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}" -O /etc/clamav-unofficial-sigs/os.conf
 ```
 
 ### Optional: configure your user config /etc/clamav-unofficial-sigs/user.conf
@@ -158,7 +158,12 @@ script must run once as your superuser to set all the permissions and create the
 ### OR
 #### systemd
 ```
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.service -c -O /etc/systemd/system/clamav-unofficial-sigs.service
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.timer -c -O /etc/systemd/system/clamav-unofficial-sigs.timer
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamd.scan.service -c -O /etc/systemd/system/clamd.scan.service
+mkdir -p /etc/systemd/system/
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.service -O /etc/systemd/system/clamav-unofficial-sigs.service
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.timer -O /etc/systemd/system/clamav-unofficial-sigs.timer
+
+systemctl enable clamav-unofficial-sigs.service
+systemctl enable clamav-unofficial-sigs.timer
+systemctl start clamav-unofficial-sigs.timer
+
 ```

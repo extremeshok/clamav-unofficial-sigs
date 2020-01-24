@@ -7,7 +7,7 @@ Github fork of the sourceforge hosted and non maintained utility.
 ## Maintained and provided by https://eXtremeSHOK.com
 
 ## Description
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. The script will also generate and install cron, logrotate, and man files.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, etc. The script will also generate and install cron, logrotate, and man files.
 
 ## Checkout some of our other solutions: https://github.com/extremeshok?tab=repositories
 
@@ -33,7 +33,7 @@ https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/INSTALL.md
 * Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
 * pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
 
-### Upgrade instructions (version 6.2 +)
+### UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
 clamav-unofficial-sigs.sh --upgrade
 clamav-unofficial-sigs.sh
@@ -61,7 +61,7 @@ clamav-unofficial-sigs.sh
 ```setsebool -P antivirus_can_scan_system true```
 
 ### Yara Rule Support automatically enabled (as of April 2016)
-Since usage yara rules requires clamav 0.99 or above, they will be automatically deactivated if your clamav is older than the required version
+Since usage yara rules requires clamav 0.100 or above, they will be automatically deactivated if your clamav is older than the required version
 
 ### Yara-Rules Project Support (as of June 2015)
 Usage of free Yara-Rules Project: http://yararules.com
@@ -189,8 +189,11 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   its associated files and databases from the system
 
 ## Change Log
-### Version 6.2.0 (Updated XX September 2019)
+### Version 7.0.0 (Updated 24 January 2020)
  - eXtremeSHOK.com Maintenance
+ - Added urlhaus database
+ - Added extra yararulesproject databases
+- Added new linuxmalwaredetect yara file
  - Automatic upgrades ( --upgrade )
  - Added --upgrade command line option
  - Option to disable automatic upgrades ( allow_upgrades )
@@ -199,9 +202,24 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - os.conf takes preference over os.***.conf
  - Warn if there are multiple os.***.conf files
  - More sanity checks to help users and prevent errors
- - Better output of --info 
- - Incremented the config to version 80
- - Set minimum config required to 80
+ - Better output of --info
+ - Fix all known bugs
+ - Implement all suggestions
+ - Fixed yararulesproject database names
+ - Correctly silence curl and wget
+ - New linuxmalwaredetect logic
+ - New malwarepatrol logic
+ - Suppress --- and === from the logs
+ - Update the documentation / guides
+ - Increase minimum clamav version for yara rules to 0.100 or above
+ - Fix systemd.timer and systemd.service files
+ - More travis-ci tests
+ - Added os.alpine.conf
+ - Added debug options/mode to config
+ - Set minimum config required to 90
+ - Lots of refactoring and optimizing
+ - Only check for and notify about script updates every 12hours
+ - Incremented the config to version 90
 
 ### Version 6.1.1 (Updated 02 September 2019)
  - eXtremeSHOK.com Maintenance
@@ -234,7 +252,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Sanitize whitelist input string (Remove quotes and .UNOFFICIAL)
  - Added Full support for Hash-based Signature Databases
  - User.conf is pre-configured with default options to allow for quicker setup
- - Default sanesecurity and linuxmalwaredetect to enabled
+ - Default sanesecurity and LinuxMalwareDetect to enabled
  - Increase default retries from 3 to 5
  - Ensure log file permissions are correct
  - Better update comparison check, only notify if newer

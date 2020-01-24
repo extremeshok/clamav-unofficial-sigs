@@ -2,7 +2,7 @@
 Press Command+Space and type Terminal and press enter/return key.
 Run all the following in the Terminal app:
 
-# UPGRADE INSTRUCTIONS (version 6.2 +)
+# UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
 clamav-unofficial-sigs.sh --upgrade
 clamav-unofficial-sigs.sh --force
@@ -10,8 +10,8 @@ clamav-unofficial-sigs.sh --force
 
 # UPGRADE INSTRUCTIONS (version 6.1 and below)
 ```
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -c -O /usr/local/bin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -c -O /etc/clamav-unofficial-sigs/master.conf
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O /usr/local/bin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
+wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O /etc/clamav-unofficial-sigs/master.conf
 clamav-unofficial-sigs.sh --force
 ```
 
