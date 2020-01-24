@@ -2785,6 +2785,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
+						# shellcheck disable=SC2035
             $tar_bin --strip-components=1 --wildcards --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
