@@ -683,8 +683,6 @@ EOF
 # Auto upgrade the master.conf and the
 function xshok_upgrade() {
 
-	allow_upgrades="yes"
-
 	if [ "$allow_upgrades" == "no" ] ; then
 		xshok_pretty_echo_and_log "ERROR: --upgrade has been disabled, allow_upgrades=no"
 		exit 1
@@ -697,7 +695,6 @@ function xshok_upgrade() {
 	xshok_pretty_echo_and_log "Checking for updates ..."
 
 	found_upgrade="no"
-
 	if [ -n "$curl_bin" ] ; then
 		# shellcheck disable=SC2086
 		latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2> /dev/null | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
