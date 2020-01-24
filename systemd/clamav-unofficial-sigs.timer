@@ -16,13 +16,15 @@
 # script itself is set to randomize the actual execution time between
 # 60 - 600 seconds.  Adjust the timer start time, user account to run the
 # script under, and path information shown below to meet your own needs.
-
 [Unit]
 Description=Clamav Unofficial Sigs Update timer
 Documentation=man:clamav-unofficial-sigs(8)
 
 [Timer]
-OnCalendar=*-*-* *:45:00
+OnCalendar=*-*-* *:37:00
+Unit=/clamav-unofficial-sigs.service
+RandomizedDelaySec=60m
+Persistent=true
 
 [Install]
-WantedBy=clamd@scan.service
+WantedBy=multi-user.target

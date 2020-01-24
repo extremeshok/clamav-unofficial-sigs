@@ -160,5 +160,8 @@ script must run once as your superuser to set all the permissions and create the
 ```
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.service -O /etc/systemd/system/clamav-unofficial-sigs.service
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.timer -O /etc/systemd/system/clamav-unofficial-sigs.timer
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamd.scan.service -O /etc/systemd/system/clamd.scan.service
+
+systemctl enable clamav-unofficial-sigs.timer
+systemctl start clamav-unofficial-sigs.timer
+
 ```

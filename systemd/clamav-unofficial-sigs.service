@@ -22,4 +22,8 @@ Description=Clamav Unofficial Sigs Update service
 Documentation=man:clamav-unofficial-sigs(8)
 
 [Service]
+Type=simple
 ExecStart=/usr/local/sbin/clamav-unofficial-sigs.sh
+
+[Install]
+WantedBy=multi-user.target
