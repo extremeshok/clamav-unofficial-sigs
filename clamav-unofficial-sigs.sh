@@ -1934,7 +1934,9 @@ if [ -z "$uname_bin" ] ; then
   exit 1
 fi
 if [ -z "$clamscan_bin" ] ; then
-  xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found"
+	if [ "${1}" != "--remove-script" ] ; then
+  	xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found"
+	fi
   exit 1
 fi
 if [ -z "$rsync_bin" ] ; then
