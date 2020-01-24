@@ -2755,11 +2755,6 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
 
         xshok_pretty_echo_and_log "LinuxMalwareDetect Database File Updates" "="
         xshok_pretty_echo_and_log "Checking for LinuxMalwareDetect updates..."
-        linuxmalwaredetect_updates="0"
-
-
-        linuxmalwaredetect_sigpack_url="https://cdn.rfxn.com/downloads/maldet-sigpack.tgz"
-        linuxmalwaredetect_version_url="https://cdn.rfxn.com/downloads/maldet.sigs.ver"
 
         # Check for a new version
         found_upgrade="no"
@@ -2816,8 +2811,6 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
                       restorecon "${clam_dbs}/local.ign"
                     fi
                     xshok_pretty_echo_and_log "Successfully updated LinuxMalwareDetect production database file: ${db_file}"
-                    linuxmalwaredetect_updates=1
-                    linuxmalwaredetect_db_update=1
                     do_clamd_reload=1
                   else
                     xshok_pretty_echo_and_log "Failed to successfully update LinuxMalwareDetect production database file: ${db_file} - SKIPPING"
@@ -2845,8 +2838,6 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
                       restorecon "${clam_dbs}/${db_file}"
                     fi
                     xshok_pretty_echo_and_log "Successfully updated LinuxMalwareDetect production database file: ${db_file}"
-                    linuxmalwaredetect_updates=1
-                    linuxmalwaredetect_db_update=1
                     do_clamd_reload=1
                   else
                     xshok_pretty_echo_and_log "Failed to successfully update LinuxMalwareDetect production database file: ${db_file} - SKIPPING"
@@ -3031,6 +3022,143 @@ else
           rm -f "${clam_dbs}/${malwarepatrol_db }"
           do_clamd_reload=1
         fi
+    fi
+  fi
+fi
+
+##############################################################################################################################################
+# Check for updated urlhaus database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
+##############################################################################################################################################
+if [ "$urlhaus_enabled" == "yes" ] ; then
+  if [ -n "${urlhaus_dbs[0]}" ] ; then
+    if [ ${#urlhaus_dbs} -lt 1 ] ; then
+      xshok_pretty_echo_and_log "Failed urlhaus_dbs config is invalid or not defined - SKIPPING"
+    else
+      rm -f "${work_dir_urlhaus}/*.gz"
+      if [ -r "${work_dir_work_configs}/last-urlhaus-update.txt" ] ; then
+        last_urlhaus_update="$(cat "${work_dir_work_configs}/last-urlhaus-update.txt")"
+      else
+        last_urlhaus_update="0"
+      fi
+      db_file=""
+      loop=""
+      update_interval="$((urlhaus_update_hours * 3600))"
+      time_interval="$((current_time - last_urlhaus_update))"
+      if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
+        echo "$current_time" > "${work_dir_work_configs}/last-urlhaus-update.txt"
+
+        xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
+        xshok_pretty_echo_and_log "Checking for urlhaus updates..."
+        urlhaus_updates="0"
+        for db_file in "${urlhaus_dbs[@]}" ; do
+          if echo "$db_file" | $grep_bin -q "/" ; then
+            yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
+            db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+          else yr_dir=""
+          fi
+          if [ "$loop" == "1" ] ; then
+            xshok_pretty_echo_and_log "---"
+          fi
+          xshok_pretty_echo_and_log "Checking for updated urlhaus database file: ${db_file}"
+          urlhaus_db_update="0"
+          if xshok_file_download "${work_dir_urlhaus}/${db_file}" "$urlhaus_url/${db_file}" ; then
+            loop="1"
+            if ! cmp -s "${work_dir_urlhaus}/${db_file}" "${clam_dbs}/${db_file}" ; then
+              db_ext="${db_file#*.}"
+              xshok_pretty_echo_and_log "Testing updated urlhaus database file: ${db_file}"
+              if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
+                if $clamscan_bin --quiet -d "${work_dir_urlhaus}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>/dev/null ; then
+                  xshok_pretty_echo_and_log "Clamscan reports urlhaus ${db_file} database integrity tested good"
+                  true
+                else
+                  xshok_pretty_echo_and_log "Clamscan reports urlhaus ${db_file} database integrity tested BAD"
+                  if [ "$remove_bad_database" == "yes" ] ; then
+                    if rm -f "${work_dir_urlhaus}/${db_file}" ; then
+                      xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_urlhaus}/${db_file}"
+                    fi
+                  fi
+                  false
+                  fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${work_dir_urlhaus}/${db_file}" "$clam_dbs" 2>/dev/null ; then
+                  perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
+                  if [ "$selinux_fixes" == "yes" ] ; then
+                    restorecon "${clam_dbs}/${db_file}"
+                  fi
+                  xshok_pretty_echo_and_log "Successfully updated urlhaus production database file: ${db_file}"
+                  urlhaus_updates=1
+                  urlhaus_db_update=1
+                  do_clamd_reload=1
+                else
+                  xshok_pretty_echo_and_log "Failed to successfully update urlhaus production database file: ${db_file} - SKIPPING"
+                fi
+              else
+                $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_urlhaus}/${db_file}" > "${test_dir}/${db_file}"
+                $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
+                $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
+                mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
+                if $clamscan_bin --quiet -d "${test_dir}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>/dev/null ; then
+                  xshok_pretty_echo_and_log "Clamscan reports urlhaus ${db_file} database integrity tested good"
+                  true
+                else
+                  xshok_pretty_echo_and_log "Clamscan reports urlhaus ${db_file} database integrity tested BAD"
+                  if [ "$remove_bad_database" == "yes" ] ; then
+                    if rm -f "${work_dir_urlhaus}/${db_file}" ; then
+                      xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_urlhaus}/${db_file}"
+                    fi
+                  fi
+                  false
+                  fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${test_dir}/${db_file}" "$clam_dbs" 2>/dev/null ; then
+                  perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
+                  if [ "$selinux_fixes" == "yes" ] ; then
+                    restorecon "${clam_dbs}/${db_file}"
+                  fi
+                  xshok_pretty_echo_and_log "Successfully updated urlhaus production database file: ${db_file}"
+                  urlhaus_updates=1
+                  urlhaus_db_update=1
+                  do_clamd_reload=1
+                else
+                  xshok_pretty_echo_and_log "Failed to successfully update urlhaus production database file: ${db_file} - SKIPPING"
+                fi
+              fi
+
+            fi
+          else
+            xshok_pretty_echo_and_log "WARNING: Failed connection to $urlhaus_url - SKIPPED urlhaus ${db_file} update"
+          fi
+          if [ "$urlhaus_db_update" != "1" ] ; then
+            xshok_pretty_echo_and_log "No updated urlhaus ${db_file} database file found"
+          fi
+        done
+        if [ "$urlhaus_updates" != "1" ] ; then
+          xshok_pretty_echo_and_log "No urlhaus database file updates found" "-"
+        fi
+      else
+
+        xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
+        xshok_draw_time_remaining "$((update_interval - time_interval))" "$urlhaus_update_hours" "urlhaus"
+      fi
+    fi
+  fi
+else
+  if [ -n "${urlhaus_dbs[0]}" ] ; then
+    if [ "$remove_disabled_databases" == "yes" ] ; then
+      xshok_pretty_echo_and_log "Removing disabled urlhaus Database files"
+      for db_file in "${urlhaus_dbs[@]}" ; do
+        if echo "$db_file" | $grep_bin -q "/" ; then
+          db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+        fi
+        if echo "$db_file" | $grep_bin -q "|" ; then
+          db_file="${db_file%|*}"
+        fi
+        if [ -r "${work_dir_urlhaus}/${db_file}" ] ; then
+          rm -f "${work_dir_urlhaus}/${db_file}"
+          do_clamd_reload="1"
+        fi
+        if [ -r "${clam_dbs}/${db_file}" ] ; then
+          rm -f "${clam_dbs}/${db_file}"
+          do_clamd_reload=1
+        fi
+      done
     fi
   fi
 fi
