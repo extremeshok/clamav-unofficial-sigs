@@ -1860,15 +1860,15 @@ if [ -z "$work_dir_malwarepatrol" ] ; then
 else
   shopt -s extglob; work_dir_malwarepatrol="${work_dir_malwarepatrol%%+(/)}"
 fi
-if [ -z "$work_dir_malwarepatrol" ] ; then
-  work_dir_malwarepatrol="$(echo "${work_dir}/${malwarepatrol_dir}" | sed 's:/*$::')"
-else
-  shopt -s extglob; work_dir_malwarepatrol="${work_dir_malwarepatrol%%+(/)}"
-fi
 if [ -z "$work_dir_urlhaust" ] ; then
   work_dir_urlhaus="$(echo "${work_dir}/${urlhaus_dir}" | sed 's:/*$::')"
 else
   shopt -s extglob; work_dir_urlhaus="${work_dir_urlhaus%%+(/)}"
+fi
+if [ -z "$work_dir_yararulesproject" ] ; then
+  work_dir_yararulesproject="$(echo "${work_dir}/${yararulesproject_dir}" | sed 's:/*$::')"
+else
+  shopt -s extglob; work_dir_yararulesproject="${work_dir_yararulesproject%%+(/)}"
 fi
 if [ -z "$work_dir_add" ] ; then
   work_dir_add="$(echo "${work_dir}/${add_dir}" | sed 's:/*$::')"
