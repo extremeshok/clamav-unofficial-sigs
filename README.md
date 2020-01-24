@@ -2,8 +2,6 @@
 
 ClamAV Unofficial Signatures Updater
 
-Github fork of the sourceforge hosted and non maintained utility.
-
 ## Maintained and provided by https://eXtremeSHOK.com
 
 ## Description
@@ -684,7 +682,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - sig-boundary patch by Alan Stern
  - create intermediate monitor-ign-old.txt to prevent reading and writing of local.ign by Alan Stern
 
-### Version 4.0.0
+### Version 4.0.0 (Released 9 May 2015)
  - eXtremeSHOK.com Maintenance
  - Enabled all low false positive sources by default
  - Added all Sanesecurity database files
@@ -701,5 +699,3 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
 
 ## Script updates can be found at:
 ### https://github.com/extremeshok/clamav-unofficial-sigs
-
-Original Script can be found at: http://sourceforge.net/projects/unofficial-sigs
