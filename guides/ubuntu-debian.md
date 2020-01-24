@@ -64,9 +64,11 @@ script must run once as your superuser to set all the permissions and create the
 ### OR
 #### systemd
 ```
+mkdir -p /etc/systemd/system/
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.service -O /etc/systemd/system/clamav-unofficial-sigs.service
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.timer -O /etc/systemd/system/clamav-unofficial-sigs.timer
 
+systemctl enable clamav-unofficial-sigs.service
 systemctl enable clamav-unofficial-sigs.timer
 systemctl start clamav-unofficial-sigs.timer
 
