@@ -1,6 +1,6 @@
 # Basic guide to Installing and Updating on pfSense 2.3+
 
-# UPGRADE INSTRUCTIONS (version 6.2 +)
+# UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
 clamav-unofficial-sigs.sh --upgrade
 clamav-unofficial-sigs.sh --force

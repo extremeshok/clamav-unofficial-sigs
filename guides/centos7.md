@@ -1,7 +1,7 @@
 # Basic guide to Installing and Updating on CentOS
 Run the following as root
 
-# UPGRADE INSTRUCTIONS (version 6.2 +)
+# UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
 /usr/local/sbin/clamav-unofficial-sigs.sh --upgrade
 /usr/local/sbin/clamav-unofficial-sigs.sh --force

@@ -13,7 +13,7 @@ Script updates can be found at: https://github.com/extremeshok/clamav-unofficial
 * Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
 * pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
 
-# GENERIC UPGRADE INSTRUCTIONS (version 6.2 +)
+# GENERIC UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
 clamav-unofficial-sigs.sh --upgrade
 clamav-unofficial-sigs.sh --force

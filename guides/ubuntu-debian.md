@@ -1,7 +1,7 @@
 # Basic guide to Installing and Updating on Ubuntu / Debian
 Run the following as root
 
-# UPGRADE INSTRUCTIONS (version 6.2 +)
+# UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
 clamav-unofficial-sigs.sh --upgrade
 clamav-unofficial-sigs.sh --force

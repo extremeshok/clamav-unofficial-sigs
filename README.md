@@ -33,7 +33,7 @@ https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/INSTALL.md
 * Mac OSX : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md
 * pFsense : https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md
 
-### Upgrade instructions (version 6.2 +)
+### UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
 clamav-unofficial-sigs.sh --upgrade
 clamav-unofficial-sigs.sh
@@ -189,7 +189,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   its associated files and databases from the system
 
 ## Change Log
-### Version 6.2.0 (Updated XX September 2019)
+### Version 7.0.0 (Updated XX January 2020)
  - eXtremeSHOK.com Maintenance
  - Automatic upgrades ( --upgrade )
  - Added --upgrade command line option
@@ -199,10 +199,17 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - os.conf takes preference over os.***.conf
  - Warn if there are multiple os.***.conf files
  - More sanity checks to help users and prevent errors
- - Better output of --info 
- - Incremented the config to version 80
- - Set minimum config required to 80
-
+ - Better output of --info
+ - Incremented the config to version 90
+ - Set minimum config required to 90
+ - Fix all known bugs
+ - Fixed yararulesproject database names
+ - Added extra yararulesproject databases
+ - New linuxmalwaredetect logic
+ - New malwarepatrol logic
+ - Suppress --- and === from the logs
+ - Added more documentation / guides
+ 
 ### Version 6.1.1 (Updated 02 September 2019)
  - eXtremeSHOK.com Maintenance
  - Update os.archlinux.conf, thanks @amishmm

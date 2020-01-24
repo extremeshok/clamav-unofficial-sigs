@@ -2,7 +2,7 @@
 Press Command+Space and type Terminal and press enter/return key.
 Run all the following in the Terminal app:
 
-# UPGRADE INSTRUCTIONS (version 6.2 +)
+# UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
 clamav-unofficial-sigs.sh --upgrade
 clamav-unofficial-sigs.sh --force
