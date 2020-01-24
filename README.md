@@ -191,6 +191,8 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
 ## Change Log
 ### Version 7.0.0 (Updated XX January 2020)
  - eXtremeSHOK.com Maintenance
+ - Added urlhaus database
+ - Added extra yararulesproject databases
  - Automatic upgrades ( --upgrade )
  - Added --upgrade command line option
  - Option to disable automatic upgrades ( allow_upgrades )
@@ -204,13 +206,13 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Set minimum config required to 90
  - Fix all known bugs
  - Fixed yararulesproject database names
- - Added extra yararulesproject databases
  - New linuxmalwaredetect logic
  - New malwarepatrol logic
  - Suppress --- and === from the logs
  - Added more documentation / guides
- - Added urlhaus database
  - Yara rules requires clamav 0.100 or above
+ - Updated guides
+ - Fix for systemd timers
 
 ### Version 6.1.1 (Updated 02 September 2019)
  - eXtremeSHOK.com Maintenance

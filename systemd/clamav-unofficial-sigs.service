@@ -13,6 +13,11 @@
 # by Sanesecurity, SecuriteInfo, MalwarePatrol, OITC, etc.
 #
 # File Location: /etc/systemd/system/clamav-unofficial-sigs.service
+#
+# Remember to enable: 
+# systemctl enable clamav-unofficial-sigs.service
+# systemctl enable clamav-unofficial-sigs.timer
+#
 ##################
 
 [Unit]
