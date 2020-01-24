@@ -63,6 +63,11 @@ clamav-unofficial-sigs.sh
 ### Yara Rule Support automatically enabled (as of April 2016)
 Since usage yara rules requires clamav 0.100 or above, they will be automatically deactivated if your clamav is older than the required version
 
+
+### URLhaus Support (as of January 2020)
+Usage of free URLhaus Database: https://urlhaus.abuse.ch
+- Enabled by default
+
 ### Yara-Rules Project Support (as of June 2015)
 Usage of free Yara-Rules Project: http://yararules.com
 - Enabled by default
