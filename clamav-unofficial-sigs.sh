@@ -2170,7 +2170,18 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
     read -r -a yararulesproject_dbs <<< "$temp_db"
   fi
 fi
-
+if [ "$urlhaus_enabled" == "yes" ] ; then
+  if [ -n "$urlhaus_dbs" ] ; then
+    if [ -n "$urlhaus_dbs_rating" ] ; then
+      temp_db="$(xshok_database "$urlhaus_dbs_rating" "${urlhaus_dbs[@]}")"
+    else
+      temp_db="$(xshok_database "$default_dbs_rating" "${urlhaus_dbs[@]}")"
+    fi
+    urlhaus_dbs=( )
+    #urlhaus_dbs=( $temp_db )
+    read -r -a urlhaus_dbs <<< "$temp_db"
+  fi
+fi
 # Set the variables for MalwarePatrol
 if [ "$malwarepatrol_product_code" != "8" ] ; then
 	# assumption, free product code is always 8 (non-free product code is never 8)
