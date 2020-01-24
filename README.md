@@ -41,8 +41,9 @@ clamav-unofficial-sigs.sh
 
 ### Advanced Config Overrides
 * Default configs are loaded in the following order if they exist:
-* master.conf -> os.conf -> user.conf or your-specified.config
-* user.conf will override os.conf and master.conf, os.conf will override master.conf
+* master.conf -> os.conf -> os.*.conf -> user.conf or your-specified.config
+* user.conf will always override os.conf and master.conf, os.conf will override master.conf
+* please do not alter the master.conf, rather create a user.conf 
 * A minimum of 1 config is required.
 * Specifying a config on the command line (-c | --config) will override the loading of the default configs
 
