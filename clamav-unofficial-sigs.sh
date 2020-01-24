@@ -2208,7 +2208,7 @@ if [ $malwarepatrol_list == "clamav_basic" ] ; then
 else
   malwarepatrol_db="malwarepatrol.ndb"
 fi
-malwarepatrol_url="${malwarepatrol_url}?product=${malwarepatrol_product_code}&list=${malwarepatrol_list}"
+malwarepatrol_url="${malwarepatrol_url}?receipt=${malwarepatrol_receipt_code}&product=${malwarepatrol_product_code}&list=${malwarepatrol_list}"
 
 # If "ham_dir" variable is set, then create initial whitelist files (skipped if first-time script run).
 test_dir="$work_dir/test"
