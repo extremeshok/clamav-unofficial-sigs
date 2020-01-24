@@ -3064,7 +3064,7 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
           fi
           xshok_pretty_echo_and_log "Checking for updated urlhaus database file: ${db_file}"
           urlhaus_db_update="0"
-          if xshok_file_download "${work_dir_urlhaus}/${db_file}" "$urlhaus_url/${db_file}" ; then
+          if xshok_file_download "${work_dir_urlhaus}/${db_file}" "${urlhaus_url}/${db_file}" ; then
             loop="1"
             if ! cmp -s "${work_dir_urlhaus}/${db_file}" "${clam_dbs}/${db_file}" ; then
               db_ext="${db_file#*.}"
