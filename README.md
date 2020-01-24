@@ -94,6 +94,9 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
 ### Linux Malware Detect support (as of May 2015, updated January 2020)
 Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/projects/linux-malware-detect/
  - Enabled by default, no configuration required
+ 
+### Need a database added ? Missing a database or a database not working ?
+Please post on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
 
 ## USAGE
 
