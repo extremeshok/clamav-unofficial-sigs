@@ -61,7 +61,7 @@ clamav-unofficial-sigs.sh
 ```setsebool -P antivirus_can_scan_system true```
 
 ### Yara Rule Support automatically enabled (as of April 2016)
-Since usage yara rules requires clamav 0.99 or above, they will be automatically deactivated if your clamav is older than the required version
+Since usage yara rules requires clamav 0.100 or above, they will be automatically deactivated if your clamav is older than the required version
 
 ### Yara-Rules Project Support (as of June 2015)
 Usage of free Yara-Rules Project: http://yararules.com
@@ -210,6 +210,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Suppress --- and === from the logs
  - Added more documentation / guides
  - Added urlhaus database
+ - Yara rules requires clamav 0.100 or above
 
 ### Version 6.1.1 (Updated 02 September 2019)
  - eXtremeSHOK.com Maintenance
