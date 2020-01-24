@@ -1,13 +1,3 @@
-[Unit]
-Description=Clamav Unofficial Sigs Update service
-
-[Service]
-Type=simple
-ExecStart=/usr/local/sbin/clamav-unofficial-sigs.sh
-
-[Install]
-WantedBy=multi-user.target
-
 ###################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
@@ -24,3 +14,13 @@ WantedBy=multi-user.target
 #
 # File Location: /etc/systemd/system/clamav-unofficial-sigs.service
 ##################
+
+[Unit]
+Description=Clamav Unofficial Sigs Update service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/clamav-unofficial-sigs.sh
+
+[Install]
+WantedBy=multi-user.target
