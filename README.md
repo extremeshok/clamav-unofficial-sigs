@@ -199,6 +199,10 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   its associated files and databases from the system
 
 ## Change Log
+### Version 7.0.1 (Updated 25 January 2020)
+ - Disable yara project rules duplicated in rxfn.yara (Thanks @dominicraf)
+ - Incremented the config to version 91
+ 
 ### Version 7.0.0 (Updated 24 January 2020)
  - eXtremeSHOK.com Maintenance
  - Added urlhaus database
