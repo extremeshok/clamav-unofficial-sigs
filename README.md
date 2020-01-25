@@ -38,7 +38,7 @@ clamav-unofficial-sigs.sh
 ```
 
 ### FOR PACKAGE MAINTAINERS / PACKAGERS
-Please use the os.recommended-packaging-defaults.conf as a base for your os.conf, this will disable automatic updates, update notifications and the uninstallation feature. https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/config/os/os.recommended-packaging-defaults.conf
+Please use the sample package os.*.conf as a base for your os.conf, this will disable automatic updates, update notifications and the uninstallation feature. https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/packaging
 
 ### Always Run the script once as your superuser to set all the permissions and create the relevant directories
 
