@@ -2979,7 +2979,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "Checking for updated MalwarePatrol database file: ${malwarepatrol_db}"
             malwarepatrol_db_update="0"
 
-            xshok_file_download "${work_dir_malwarepatrol}/${malwarepatrol_db}" "${malwarepatrol_url}&receipt=${malwarepatrol_receipt_code}"
+            xshok_file_download "${work_dir_malwarepatrol}/${malwarepatrol_db}" "${malwarepatrol_url}"
 
             ret="$?"
             if [ "$ret" -eq 0 ] ; then
