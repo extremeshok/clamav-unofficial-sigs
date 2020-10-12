@@ -2358,6 +2358,12 @@ if [ -n "$rsync_proxy" ] ; then
   export RSYNC_PROXY
 fi
 
+# If rsync connect program is defined in the config file, then export it for use. (to use netcat for socks tunnel)
+if [ -n "$rsync_connect_prog" ] ; then
+  RSYNC_CONNECT_PROG="$rsync_connect_prog"
+  export RSYNC_CONNECT_PROG
+fi
+
 # Create $current_dbsfiles containing lists of current and previously active 3rd-party databases
 # so that databases and/or backup files that are no longer being used can be removed.
 current_tmp="${work_dir_work_configs}/current-dbs.tmp"
