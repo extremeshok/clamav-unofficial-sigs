@@ -25,12 +25,18 @@ https://www.clamav.net/documents/installation-on-macos-mac-os-x
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
 
-# Step 2 Install clamav
+
+# Step 2 Install gtar
+```
+brew install gtar
+```
+
+# Step 3 Install clamav
 ```
 brew install clamav
 ```
 
-# Step 3
+# Step 4
 ```
 sudo su
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh --output /usr/local/bin/clamav-unofficial-sigs.sh
@@ -42,19 +48,19 @@ curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 exit
 ```
 
-# Step 4
+# Step 5
 set your user options
 ```
 sudo pico /etc/clamav-unofficial-sigs/user.conf
 ```
 
-# Step 5
+# Step 6
 Console (shell)
 ```
 clamav-unofficial-sigs.sh --force
 ```
 
-# Step 6
+# Step 7
 launchd helper Script (replaces cron)
 ```
 sudo su

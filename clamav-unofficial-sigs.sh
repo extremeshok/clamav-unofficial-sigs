@@ -1605,9 +1605,13 @@ if [ -x /usr/gnu/bin/grep ] ; then
 else
   grep_bin="$(command -v grep 2> /dev/null)"
 fi
-# Detect support for tar
+# Detect support for tar or custom tar_executable
 if [ -z "$tar_bin" ]; then
-	tar_bin="$(command -v tar 2> /dev/null)"
+	if [ -z "$tar_executable" ]; then
+		tar_bin="$(command -v tar 2> /dev/null)"
+	else
+		tar_bin="$(command -v "$tar_executable" 2> /dev/null)"
+	fi
 fi
 # Detect support for curl
 if [ -z "$curl_bin" ]; then

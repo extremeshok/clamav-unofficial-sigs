@@ -210,6 +210,9 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Fix: URLhaus log message
  - Fix wrong download URL for MalwarePatrol
  - Added malwarepatrol_db to specifiy the extact database name (default: malwarepatrol.db)
+ - Added tar_executable to specify a non-default tar executable
+ - Config os.macosx.conf renamed to os.macos.conf
+ - Added tar_executable=gtar to os.macos.conf and os.openbsd.conf
  - Fix: set ownership of last-version-check.txt
  - Incremented the config to version 92
  - BSD read config fix
