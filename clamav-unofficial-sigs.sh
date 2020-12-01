@@ -345,7 +345,7 @@ function xshok_file_download() { #outputfile #url #notimestamp
             fi
         else
             if [ ! "${3}" ] ; then
-                # the following is required because wget, cannot do --timestamping and --output-document together                
+                # the following is required because wget, cannot do --timestamping and --output-document together
                 this_dir="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
                 output_file="$1"
                 url="$2"
@@ -1497,9 +1497,9 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="7.0.1"
-script_version_date="2020-01-25"
-minimum_required_config_version="92"
+script_version="7.2"
+script_version_date="2020-12-02"
+minimum_required_config_version="93"
 minimum_yara_clamav_version="0.100"
 
 # Discover script: name, full_path and path
@@ -2018,6 +2018,7 @@ if [ "$force_updates" == "yes" ] ; then
   xshok_pretty_echo_and_log "NOTICE: forcing updates"
   sanesecurity_update_hours="0"
   securiteinfo_update_hours="0"
+  securiteinfo_premium_update_hours="0"
   linuxmalwaredetect_update_hours="0"
   malwarepatrol_update_hours="0"
   yararulesproject_update_hours="0"
@@ -2182,11 +2183,12 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
     fi
         sanesecurity_dbs=( )
         if [ -n "$temp_db" ] ; then
-        #sanesecurity_dbs=( $temp_db )
-        read -r -a sanesecurity_dbs <<< "$temp_db"
+            #sanesecurity_dbs=( $temp_db )
+            read -r -a sanesecurity_dbs <<< "$temp_db"
         fi
   fi
 fi
+############################################################################################
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_dbs" ] ; then
     if [ -n "$securiteinfo_dbs_rating" ] ; then
@@ -2196,11 +2198,23 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
     fi
         securiteinfo_dbs=( )
         if [ -n "$temp_db" ] ; then
-        #securiteinfo_dbs=( $temp_db )
-        read -r -a securiteinfo_dbs <<< "$temp_db"
+            #securiteinfo_dbs=( $temp_db )
+            read -r -a securiteinfo_dbs <<< "$temp_db"
+        fi
+  fi
+  if [ -n "$securiteinfo_premium_dbs" ] && [ "$securiteinfo_premium" == "yes" ] ; then
+    if [ -n "$securiteinfo_dbs_rating" ] ; then
+      temp_db="$(xshok_database "$securiteinfo_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
+    else
+      temp_db="$(xshok_database "$default_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
+    fi
+        if [ -n "$temp_db" ] ; then
+            #securiteinfo_dbs=( $temp_db )
+            read -r -a securiteinfo_dbs <<< "$temp_db"
         fi
   fi
 fi
+############################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
     if [ -n "$linuxmalwaredetect_dbs_rating" ] ; then
@@ -2210,11 +2224,12 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
     fi
         linuxmalwaredetect_dbs=( )
         if [ -n "$temp_db" ] ; then
-        #linuxmalwaredetect_dbs=( $temp_db )
-        read -r -a linuxmalwaredetect_dbs <<< "$temp_db"
+            #linuxmalwaredetect_dbs=( $temp_db )
+            read -r -a linuxmalwaredetect_dbs <<< "$temp_db"
         fi
   fi
 fi
+############################################################################################
 if [ "$yararulesproject_enabled" == "yes" ] ; then
   if [ -n "$yararulesproject_dbs" ] ; then
     if [ -n "$yararulesproject_dbs_rating" ] ; then
@@ -2224,11 +2239,12 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
     fi
     yararulesproject_dbs=( )
         if [ -n "$temp_db" ] ; then
-        #yararulesproject_dbs=( $temp_db )
-        read -r -a yararulesproject_dbs <<< "$temp_db"
+            #yararulesproject_dbs=( $temp_db )
+            read -r -a yararulesproject_dbs <<< "$temp_db"
         fi
   fi
 fi
+############################################################################################
 if [ "$urlhaus_enabled" == "yes" ] ; then
   if [ -n "$urlhaus_dbs" ] ; then
     if [ -n "$urlhaus_dbs_rating" ] ; then
@@ -2243,6 +2259,7 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
         fi
   fi
 fi
+############################################################################################
 # Set the variables for MalwarePatrol
 if [ "$malwarepatrol_product_code" != "8" ] ; then
     # assumption, free product code is always 8 (non-free product code is never 8)
@@ -2702,7 +2719,11 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
         fi
         db_file=""
         loop=""
-        update_interval="$((securiteinfo_update_hours * 3600))"
+        if [ "$securiteinfo_premium" == "yes" ] ; then
+            update_interval="$((securiteinfo_premium_update_hours * 3600))"
+        else
+            update_interval="$((securiteinfo_update_hours * 3600))"
+        fi
         time_interval="$((current_time - last_securiteinfo_update))"
         if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
           echo "$current_time" > "${work_dir_work_configs}/last-si-update.txt"
@@ -2791,7 +2812,11 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
           fi
         else
           xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
-          xshok_draw_time_remaining "$((update_interval - time_interval))" "$securiteinfo_update_hours" "SecuriteInfo"
+          if [ "$securiteinfo_premium" == "yes" ] ; then
+              xshok_draw_time_remaining "$((update_interval - time_interval))" "$securiteinfo_premium_update_hours" "SecuriteInfo"
+          else
+              xshok_draw_time_remaining "$((update_interval - time_interval))" "$securiteinfo_update_hours" "SecuriteInfo"
+          fi
         fi
       fi
     fi

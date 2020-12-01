@@ -76,6 +76,12 @@ Usage of free Yara-Rules Project: http://yararules.com
 
 Current limitations of clamav support : http://blog.clamav.net/search/label/yara
 
+### malware.experrt non-free database support (as of December 2020)
+Usage of malware.expert : https://www.malware.expert
+ - 1. Sign up for an account :  https://www.malware.expert
+ - 2. You will recieve an email containing your serial key/number
+ - 3. Enter the serial key into the config malwareexpert_serial_key: replacing YOUR-SERIAL-KEY with your serial key from the email
+
 ### MalwarePatrol Free/Delayed list support (as of May 2015)
 Usage of MalwarePatrol 2015 free clamav signatures : https://www.malwarepatrol.net
  - 1. Sign up for a free account : https://www.malwarepatrol.net/free-guard-upgrade-option/
@@ -199,25 +205,27 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   its associated files and databases from the system
 
 ## Change Log
+### Version 7.2 ( XX December 2020 : Under Development)
+ - Added Malware.expert databases (non-free)
+ - Reworked securiteinfo premium databases (non-free)
+ - Added malwarepatrol_db to specifiy the extact database name (default: malwarepatrol.db)
+ - Added detection of tar executable (use gtar on mac and bsd)
+ - Config os.macosx.conf renamed to os.macos.conf
+ - Fix: set ownership of last-version-check.txt
+ - Incremented the config to version 93
 
-### Version 7.1 ( XX December 2020 : Under Development)
+### Version 7.1 ( Not Released)
  - Enforce HTTPS validation by default
  - Updated sanesecurity publickey.gpg url to use SSL
  - Ignore yara files that include modules
  - Enabled yararulesproject rules by default
  - os.gentoo.conf: disable updates and upgrade checks
- - Replace $PWD with readlink -f "$0"
  - Fix: URLhaus log message
  - Fix wrong download URL for MalwarePatrol
- - Added malwarepatrol_db to specifiy the extact database name (default: malwarepatrol.db)
- - Added tar_executable to specify a non-default tar executable
- - Config os.macosx.conf renamed to os.macos.conf
- - Added tar_executable=gtar to os.macos.conf and os.openbsd.conf
- - Fix: set ownership of last-version-check.txt
  - Fix: fallback to host if dig is not used
  - Disable cron MAILTO
- - Incremented the config to version 92
  - BSD read config fix
+ - Incremented the config to version 92
  - Thank you @dandanio @Mrothyr @m0urs @msapiro @orlitzky @SlothOfAnarchy @jkellerer @RobbieTheK
 
 ### Version 7.0.1 (25 January 2020)
@@ -228,7 +236,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - eXtremeSHOK.com Maintenance
  - Added urlhaus database
  - Added extra yararulesproject databases
-- Added new linuxmalwaredetect yara file
+ - Added new linuxmalwaredetect yara file
  - Automatic upgrades ( --upgrade )
  - Added --upgrade command line option
  - Option to disable automatic upgrades ( allow_upgrades )

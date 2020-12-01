@@ -26,7 +26,7 @@ https://www.clamav.net/documents/installation-on-macos-mac-os-x
 ```
 
 
-# Step 2 Install gtar
+# Step 2 Install gtar (gnu tar)
 ```
 brew install gtar
 ```
