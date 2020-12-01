@@ -216,7 +216,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Fix: set ownership of last-version-check.txt
  - Incremented the config to version 92
  - BSD read config fix
- - Thank you @dandanio @Mrothyr @m0urs @msapiro @orlitzky @SlothOfAnarchy @jkellerer
+ - Thank you @dandanio @Mrothyr @m0urs @msapiro @orlitzky @SlothOfAnarchy @jkellerer @RobbieTheK
 
 ### Version 7.0.1 (25 January 2020)
  - Disable yara project rules duplicated in rxfn.yara (Thanks @dominicraf)
