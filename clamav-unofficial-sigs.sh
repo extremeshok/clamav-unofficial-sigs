@@ -3673,6 +3673,9 @@ if [ "$allow_update_checks" != "no" ] ; then
 	time_interval="$((current_time - last_version_check))"
 	if [ "$time_interval" -ge $((update_check_interval - 600)) ] ; then
 	  echo "$current_time" > "${work_dir_work_configs}/last-version-check.txt"
+		if xshok_is_root ; then
+			perms chown -f "${clam_user}:${clam_group}" "${work_dir_work_configs}/last-version-check.txt"
+		fi
 		check_new_version
 	fi
 

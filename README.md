@@ -200,8 +200,17 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
 
 ## Change Log
 
-### Version 7.2 ( XX December 2020 : Under Development)
+### Version 7.1 ( XX December 2020 : Under Development)
  - Enforce HTTPS validation by default
+ - Updated sanesecurity publickey.gpg url to use SSL
+ - Ignore yara files that include modules
+ - Enabled yararulesproject rules by default
+ - os.gentoo.conf: disable updates and upgrade checks
+ - Fix: URLhaus log message
+ - Fix wrong download URL for MalwarePatrol
+ - Fix: set ownership of last-version-check.txt
+ - Incremented the config to version 92
+ - Thank you @
 
 ### Version 7.0.1 (25 January 2020)
  - Disable yara project rules duplicated in rxfn.yara (Thanks @dominicraf)
