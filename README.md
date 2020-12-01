@@ -214,6 +214,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Config os.macosx.conf renamed to os.macos.conf
  - Added tar_executable=gtar to os.macos.conf and os.openbsd.conf
  - Fix: set ownership of last-version-check.txt
+ - Fix: fallback to host if dig is not used
  - Incremented the config to version 92
  - BSD read config fix
  - Thank you @dandanio @Mrothyr @m0urs @msapiro @orlitzky @SlothOfAnarchy @jkellerer @RobbieTheK
