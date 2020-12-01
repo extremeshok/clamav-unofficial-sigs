@@ -212,7 +212,8 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Added malwarepatrol_db to specifiy the extact database name (default: malwarepatrol.db)
  - Fix: set ownership of last-version-check.txt
  - Incremented the config to version 92
- - Thank you @
+ - BSD read config fix
+ - Thank you @Mrothyr
 
 ### Version 7.0.1 (25 January 2020)
  - Disable yara project rules duplicated in rxfn.yara (Thanks @dominicraf)

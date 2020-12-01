@@ -1767,7 +1767,8 @@ for config_file in "${config_files[@]}" ; do
       # Delete both trailing and leading whitespace
       # Delete all trailing whitespace
       # Delete all empty lines
-      clean_config="$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")"
+      clean_config="$(command sed -e '/^#./d' -e 's/[[:space:]]#.//' -e 's/#[[:space:]].//' -e $'s/^[ \t]//;s/[ \t]$//' -e '/^\s$/d' "$config_file")"
+
     fi
 
     #fix eval of |
