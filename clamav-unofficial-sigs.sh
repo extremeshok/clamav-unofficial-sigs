@@ -33,8 +33,8 @@
 
 # Detect to make sure the entire script is avilable, fail if the script is missing contents
 if [ "$(tail -n 1 "${0}" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
-	echo "FATAL ERROR: Script is incomplete, please redownload"
-	exit 1
+    echo "FATAL ERROR: Script is incomplete, please redownload"
+    exit 1
 fi
 
 # Trap the keyboard interrupt (Ctrl + C)
@@ -218,45 +218,45 @@ function xshok_user_group_exists() { # username groupname
 # type a will make a ** border
 # type n will make a ++ border
 function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
-	#detect if running under cron and silence
-	mystring="$1"
-	myrepeating="$2"
-	mycount="$3"
-	mytype="$4"
-	if [ "$comment_silence" != "yes" ] && [ "$force_verbose" != "yes" ]; then
-		if [ ! -t 1 ] ; then
-			comment_silence="yes"
-		fi
-	fi
-	# always show errors and alerts
-	if [ -z "$mytype" ] ; then
-		shopt -s nocasematch
-		if [[ "$mystring" =~ "ERROR:" ]] || [[ "$mystring" =~ "ERROR " ]] ; then
-			mytype="e"
-		elif [[ "$mystring" =~ "WARNING:" ]] || [[ "$mystring" =~ "WARNING " ]] ; then
-			mytype="w"
-		elif [[ "$mystring" =~ "ALERT:" ]] || [[ "$mystring" =~ "ALERT " ]] ; then
-			mytype="a"
-		elif [[ "$mystring" =~ "NOTICE:" ]] || [[ "$mystring" =~ "NOTICE " ]] ; then
-			mytype="n"
-		fi
-	fi
-	if [ "$mytype" == "e" ] || [ "$mytype" == "a" ] ; then
-			comment_silence="no"
-	fi
-	# Handle comments is not silenced or type
+    #detect if running under cron and silence
+    mystring="$1"
+    myrepeating="$2"
+    mycount="$3"
+    mytype="$4"
+    if [ "$comment_silence" != "yes" ] && [ "$force_verbose" != "yes" ]; then
+        if [ ! -t 1 ] ; then
+            comment_silence="yes"
+        fi
+    fi
+    # always show errors and alerts
+    if [ -z "$mytype" ] ; then
+        shopt -s nocasematch
+        if [[ "$mystring" =~ "ERROR:" ]] || [[ "$mystring" =~ "ERROR " ]] ; then
+            mytype="e"
+        elif [[ "$mystring" =~ "WARNING:" ]] || [[ "$mystring" =~ "WARNING " ]] ; then
+            mytype="w"
+        elif [[ "$mystring" =~ "ALERT:" ]] || [[ "$mystring" =~ "ALERT " ]] ; then
+            mytype="a"
+        elif [[ "$mystring" =~ "NOTICE:" ]] || [[ "$mystring" =~ "NOTICE " ]] ; then
+            mytype="n"
+        fi
+    fi
+    if [ "$mytype" == "e" ] || [ "$mytype" == "a" ] ; then
+            comment_silence="no"
+    fi
+    # Handle comments is not silenced or type
   if [ "$comment_silence" != "yes" ] ; then
-		if [ -z "$myrepeating" ] ; then
-			if [ "$mytype" == "e" ] ; then
-				myrepeating="="
-			elif [ "$mytype" == "w" ] ; then
-				myrepeating="-"
-			elif [ "$mytype" == "a" ] ; then
-				myrepeating="*"
-			elif [ "$mytype" == "n" ] ; then
-				myrepeating="+"
-			fi
-		fi
+        if [ -z "$myrepeating" ] ; then
+            if [ "$mytype" == "e" ] ; then
+                myrepeating="="
+            elif [ "$mytype" == "w" ] ; then
+                myrepeating="-"
+            elif [ "$mytype" == "a" ] ; then
+                myrepeating="*"
+            elif [ "$mytype" == "n" ] ; then
+                myrepeating="+"
+            fi
+        fi
     if [ -z "$myrepeating" ] ; then
       echo "${mystring}"
     else
@@ -277,28 +277,28 @@ function xshok_pretty_echo_and_log() { # "string" "repeating" "count" "type"
   # Handle logging
   if [ "$enable_log" == "yes" ] ; then
 
-		#filter ===, ---
-		mystring=${1//===}
-		mystring=${mystring//---}
+        #filter ===, ---
+        mystring=${1//===}
+        mystring=${mystring//---}
 
-		if [ ! -z "$mystring" ] ; then
-	    if [ ! -z "$log_pipe_cmd" ] ; then
-	      echo "${mystring}" | $log_pipe_cmd
-	    else
-	      if [ ! -e "${log_file_path}/${log_file_name}" ] ; then
-	        # xshok_mkdir_ownership "$log_file_path"
-	        mkdir -p "$log_file_path"
-	        touch "${log_file_path}/${log_file_name}" 2>/dev/null
-	        perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
-	      fi
-	      if [ ! -w "${log_file_path}/${log_file_name}" ] ; then
-	        echo "WARNING: Logging Disabled, as file not writable: ${log_file_path}/${log_file_name}"
-	        enable_log="no"
-	      else
-	        echo "$(date "+%b %d %T")" "${mystring}" >> "${log_file_path}/${log_file_name}"
-	      fi
-	    fi
-		fi
+        if [ -n "$mystring" ] ; then
+        if [ -n "$log_pipe_cmd" ] ; then
+          echo "${mystring}" | $log_pipe_cmd
+        else
+          if [ ! -e "${log_file_path}/${log_file_name}" ] ; then
+            # xshok_mkdir_ownership "$log_file_path"
+            mkdir -p "$log_file_path"
+            touch "${log_file_path}/${log_file_name}" 2>/dev/null
+            perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
+          fi
+          if [ ! -w "${log_file_path}/${log_file_name}" ] ; then
+            echo "WARNING: Logging Disabled, as file not writable: ${log_file_path}/${log_file_name}"
+            enable_log="no"
+          else
+            echo "$(date "+%b %d %T")" "${mystring}" >> "${log_file_path}/${log_file_name}"
+          fi
+        fi
+        fi
   fi
 }
 
@@ -329,55 +329,55 @@ function xshok_draw_time_remaining() { #time_remaining #update_hours #name
 
 # Download function
 function xshok_file_download() { #outputfile #url #notimestamp
-	if [ "$downloader_debug" == "yes" ] ; then
-		xshok_pretty_echo_and_log "url: ${2} >> outputfile: ${1} | ${3}"
-	fi
+    if [ "$downloader_debug" == "yes" ] ; then
+        xshok_pretty_echo_and_log "url: ${2} >> outputfile: ${1} | ${3}"
+    fi
   if [ "${1}" ] && [ "${2}" ] ; then
-		if [ -n "$curl_bin" ] ; then
-			if [ -f "${1}" ] ; then
-				# shellcheck disable=SC2086
-				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"  2>&11
-				result=$?
-			else
-				# shellcheck disable=SC2086
-				$curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --output "${1}" "${2}"  2>&11
-				result=$?
-			fi
-		else
-			if [ ! "${3}" ] ; then
-				# the following is required because wget, cannot do --timestamping and --output-document together
-				this_dir="$(readlink -f "$0")"
-				output_file="$1"
-				url="$2"
-				output_dir="${output_file%/*}"
-				output_file="${output_file##*/}"
-				url_file="${url##*/}"
-				wget_output_link=""
+        if [ -n "$curl_bin" ] ; then
+            if [ -f "${1}" ] ; then
+                # shellcheck disable=SC2086
+                $curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --time-cond "${1}" --output "${1}" "${2}"  2>&11
+                result=$?
+            else
+                # shellcheck disable=SC2086
+                $curl_bin --fail --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" --output "${1}" "${2}"  2>&11
+                result=$?
+            fi
+        else
+            if [ ! "${3}" ] ; then
+                # the following is required because wget, cannot do --timestamping and --output-document together
+                this_dir="$(readlink -f "$0")"
+                output_file="$1"
+                url="$2"
+                output_dir="${output_file%/*}"
+                output_file="${output_file##*/}"
+                url_file="${url##*/}"
+                wget_output_link=""
 
-				cd "${output_dir}" || exit
-				if [ "$output_file" != "$url_file" ] ; then
-					if [ ! -f "$url_file" ] ; then
-						if [ ! -f "$output_file" ] ; then
-							touch "$output_file"
-						fi
-						ln -s  "$output_file" "$url_file"
-						wget_output_link="$url_file"
-					fi
-				fi
-	      # shellcheck disable=SC2086
-				$wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping "${2}" 2>&12
-				result=$?
-				if [ ! -n "$wget_output_link" ] ; then
-					if [ -L "$wget_output_link" ] ; then
-						rm -f "$wget_output_link"
-					fi
-				fi
-				cd "$this_dir" || exit
-			else
-				# shellcheck disable=SC2086
-				$wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}" 2>&12
-				result=$?
-			fi
+                cd "${output_dir}" || exit
+                if [ "$output_file" != "$url_file" ] ; then
+                    if [ ! -f "$url_file" ] ; then
+                        if [ ! -f "$output_file" ] ; then
+                            touch "$output_file"
+                        fi
+                        ln -s  "$output_file" "$url_file"
+                        wget_output_link="$url_file"
+                    fi
+                fi
+          # shellcheck disable=SC2086
+                $wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping "${2}" 2>&12
+                result=$?
+                if [ -z "$wget_output_link" ] ; then
+                    if [ -L "$wget_output_link" ] ; then
+                        rm -f "$wget_output_link"
+                    fi
+                fi
+                cd "$this_dir" || exit
+            else
+                # shellcheck disable=SC2086
+                $wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}" 2>&12
+                result=$?
+            fi
     fi
     return $result
   fi
@@ -435,27 +435,27 @@ function xshok_database() { # rating database_array
                 if [ "$db_name_rating" == "HIGHONLY" ] || [ "$db_name_rating" == "HIGH" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] || [ "$db_name_rating" == "MEDIUMHIGHONLY" ] ; then
                   new_dbs+=( "$db_name" )
                 fi
-							elif [ "$current_rating" == "LOWONLY" ] ; then
-								if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ] ; then
-									new_dbs+=( "$db_name" )
-								fi
-							elif [ "$current_rating" == "MEDIUMONLY" ] ; then
-								if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] ; then
-									new_dbs+=( "$db_name" )
-								fi
-							elif [ "$current_rating" == "LOWMEDIUMONLY" ] ; then
-								if [ "$db_name_rating" == "LOWMEDIUMONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "MEDIUM" ] ; then
-									new_dbs+=( "$db_name" )
-								fi
-							elif [ "$current_rating" == "MEDIUMHIGHONLY" ] ; then
-								if [ "$db_name_rating" == "MEDIUMHIGHONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "HIGH" ] ; then
-									new_dbs+=( "$db_name" )
-								fi
-							elif [ "$current_rating" == "HIGHONLY" ] ; then
-								if [ "$db_name_rating" == "HIGHONLY" ] || [ "$db_name_rating" == "HIGH" ] ; then
-									new_dbs+=( "$db_name" )
-								fi
-							fi
+                            elif [ "$current_rating" == "LOWONLY" ] ; then
+                                if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ] ; then
+                                    new_dbs+=( "$db_name" )
+                                fi
+                            elif [ "$current_rating" == "MEDIUMONLY" ] ; then
+                                if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] ; then
+                                    new_dbs+=( "$db_name" )
+                                fi
+                            elif [ "$current_rating" == "LOWMEDIUMONLY" ] ; then
+                                if [ "$db_name_rating" == "LOWMEDIUMONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "MEDIUM" ] ; then
+                                    new_dbs+=( "$db_name" )
+                                fi
+                            elif [ "$current_rating" == "MEDIUMHIGHONLY" ] ; then
+                                if [ "$db_name_rating" == "MEDIUMHIGHONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "HIGH" ] ; then
+                                    new_dbs+=( "$db_name" )
+                                fi
+                            elif [ "$current_rating" == "HIGHONLY" ] ; then
+                                if [ "$db_name_rating" == "HIGHONLY" ] || [ "$db_name_rating" == "HIGH" ] ; then
+                                    new_dbs+=( "$db_name" )
+                                fi
+                            fi
             fi
           fi
         fi
@@ -687,129 +687,129 @@ EOF
 # Auto upgrade the master.conf and the
 function xshok_upgrade() {
 
-	if [ "$allow_upgrades" == "no" ] ; then
-		xshok_pretty_echo_and_log "ERROR: --upgrade has been disabled, allow_upgrades=no"
-		exit 1
-	fi
-	if ! xshok_is_root ; then
-		xshok_pretty_echo_and_log "ERROR: Only root can run the upgrade"
-		exit 1
-	fi
+    if [ "$allow_upgrades" == "no" ] ; then
+        xshok_pretty_echo_and_log "ERROR: --upgrade has been disabled, allow_upgrades=no"
+        exit 1
+    fi
+    if ! xshok_is_root ; then
+        xshok_pretty_echo_and_log "ERROR: Only root can run the upgrade"
+        exit 1
+    fi
 
-	xshok_pretty_echo_and_log "Checking for updates ..."
+    xshok_pretty_echo_and_log "Checking for updates ..."
 
-	found_upgrade="no"
-	if [ -n "$curl_bin" ] ; then
-		# shellcheck disable=SC2086
-		latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2>&11 | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
-		# shellcheck disable=SC2086
-		latest_config_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2>&11 | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
-	else
-		# shellcheck disable=SC2086
-		latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2>&12 | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
-		# shellcheck disable=SC2086
-		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2>&12 | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
-	fi
+    found_upgrade="no"
+    if [ -n "$curl_bin" ] ; then
+        # shellcheck disable=SC2086
+        latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2>&11 | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+        # shellcheck disable=SC2086
+        latest_config_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2>&11 | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+    else
+        # shellcheck disable=SC2086
+        latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2>&12 | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+        # shellcheck disable=SC2086
+        latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2>&12 | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+    fi
 
   # config_dir/master.conf
-	if [ "$latest_config_version" ] ; then
-		# shellcheck disable=SC2183,SC2086
-		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
-			found_upgrade="yes"
-			xshok_pretty_echo_and_log "ALERT: Upgrading config from v${config_version} to v${latest_config_version}"
-			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
-				echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
-				xshok_file_download "${work_dir}/master.conf.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" "notimestamp"
-				ret="$?"
-				if [ "$ret" -ne 0 ] ; then
-					xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
-					exit 1
-				fi
-				if ! $grep_bin -m 1 "config_version" "${work_dir}/master.conf.tmp" > /dev/null 2>&1 ; then
-					echo "ERROR: Downloaded master.conf is incomplete, please re-run"
-					exit 1
-				fi
-				# Copy over permissions from old version
-			  OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf")"
-				xshok_pretty_echo_and_log "Running update process"
-				if ! mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf" ; then
-					xshok_pretty_echo_and_log "ERROR: failed moving ${work_dir}/master.conf.tmp to ${config_dir}/master.conf"
-				 	exit 1
-				fi
-				if ! chmod "$OCTAL_MODE" "${config_dir}/master.conf" ; then
-					 xshok_pretty_echo_and_log "ERROR: unable to set permissions on ${config_dir}/master.conf"
-					 exit 1
-				fi
-				xshok_pretty_echo_and_log "Completed"
-			else
-				 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
-				 exit 1
-		  fi
-		fi
-	fi
+    if [ "$latest_config_version" ] ; then
+        # shellcheck disable=SC2183,SC2086
+        if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
+            found_upgrade="yes"
+            xshok_pretty_echo_and_log "ALERT: Upgrading config from v${config_version} to v${latest_config_version}"
+            if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
+                echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
+                xshok_file_download "${work_dir}/master.conf.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" "notimestamp"
+                ret="$?"
+                if [ "$ret" -ne 0 ] ; then
+                    xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf"
+                    exit 1
+                fi
+                if ! $grep_bin -m 1 "config_version" "${work_dir}/master.conf.tmp" > /dev/null 2>&1 ; then
+                    echo "ERROR: Downloaded master.conf is incomplete, please re-run"
+                    exit 1
+                fi
+                # Copy over permissions from old version
+              OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf")"
+                xshok_pretty_echo_and_log "Running update process"
+                if ! mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf" ; then
+                    xshok_pretty_echo_and_log "ERROR: failed moving ${work_dir}/master.conf.tmp to ${config_dir}/master.conf"
+                     exit 1
+                fi
+                if ! chmod "$OCTAL_MODE" "${config_dir}/master.conf" ; then
+                     xshok_pretty_echo_and_log "ERROR: unable to set permissions on ${config_dir}/master.conf"
+                     exit 1
+                fi
+                xshok_pretty_echo_and_log "Completed"
+            else
+                 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
+                 exit 1
+          fi
+        fi
+    fi
 
-	if [ "$latest_version" ] ; then
-		# shellcheck disable=SC2183,SC2086
-		if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
-			found_upgrade="yes"
-	    xshok_pretty_echo_and_log "ALERT:  Upgrading script from v${script_version} to v${latest_version}"
-			if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
-				echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
-				xshok_file_download "${work_dir}/clamav-unofficial-sigs.sh.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" "notimestamp"
-			  ret=$?
-				if [ "$ret" -ne 0 ] ; then
-					xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
-					exit 1
-				fi
-				# Detect to make sure the entire script is avilable, fail if the script is missing contents
-				if [ "$(tail -n 1 "${work_dir}/clamav-unofficial-sigs.sh.tmp" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
-					echo "ERROR: Downloaded clamav-unofficial-sigs.sh is incomplete, please re-run"
-					exit 1
-				fi
-				# Copy over permissions from old version
-			  OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}")"
+    if [ "$latest_version" ] ; then
+        # shellcheck disable=SC2183,SC2086
+        if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
+            found_upgrade="yes"
+        xshok_pretty_echo_and_log "ALERT:  Upgrading script from v${script_version} to v${latest_version}"
+            if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
+                echo "Downloading https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
+                xshok_file_download "${work_dir}/clamav-unofficial-sigs.sh.tmp" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" "notimestamp"
+              ret=$?
+                if [ "$ret" -ne 0 ] ; then
+                    xshok_pretty_echo_and_log "ERROR: Could not download https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh"
+                    exit 1
+                fi
+                # Detect to make sure the entire script is avilable, fail if the script is missing contents
+                if [ "$(tail -n 1 "${work_dir}/clamav-unofficial-sigs.sh.tmp" | head -n 1 | cut -c 1-7)" != "exit \$?" ] ; then
+                    echo "ERROR: Downloaded clamav-unofficial-sigs.sh is incomplete, please re-run"
+                    exit 1
+                fi
+                # Copy over permissions from old version
+              OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}")"
 
-				xshok_pretty_echo_and_log "Inserting update process..."
-			  # Generate the update script
-			  cat > "${work_dir}/xshok_update_script.sh" << EOF
+                xshok_pretty_echo_and_log "Inserting update process..."
+              # Generate the update script
+              cat > "${work_dir}/xshok_update_script.sh" << EOF
 #!/usr/bin/env bash
 echo "Running update process"
 # Overwrite old file with new
 if ! mv -f "${work_dir}/clamav-unofficial-sigs.sh.tmp" "${this_script_full_path}" ; then
   echo  "ERROR: failed moving ${work_dir}/clamav-unofficial-sigs.sh.tmp to ${this_script_full_path}"
   rm -f \$0
-	exit 1
+    exit 1
 fi
 if ! chmod "$OCTAL_MODE" "${this_script_full_path}" ; then
-	 echo "ERROR: unable to set permissions on ${this_script_full_path}"
-	 rm -f \$0
-	 exit 1
+     echo "ERROR: unable to set permissions on ${this_script_full_path}"
+     rm -f \$0
+     exit 1
 fi
-	echo "Completed"
-	# echo "---------------------"
-	# echo "Optional, run as root: "
-	# echo "clamav-unofficial-sigs.sh --install-all"
-	echo "---------------------"
-	echo "Run once as root: "
-	echo "clamav-unofficial-sigs.sh --force"
+    echo "Completed"
+    # echo "---------------------"
+    # echo "Optional, run as root: "
+    # echo "clamav-unofficial-sigs.sh --install-all"
+    echo "---------------------"
+    echo "Run once as root: "
+    echo "clamav-unofficial-sigs.sh --force"
 
-	#remove the tmp script before exit
-	rm -f \$0
+    #remove the tmp script before exit
+    rm -f \$0
 EOF
-		  # Replaced with $0, so code will update and then call itself with the same parameters it had
-			#exec "${0}" "$@"
-			bash_bin="$(command -v bash 2> /dev/null)"
-		  exec "$bash_bin" "${work_dir}/xshok_update_script.sh"
-			echo "Running once as root"
-		else
-			 xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
-			 exit 1
-		fi
-	fi
+          # Replaced with $0, so code will update and then call itself with the same parameters it had
+            #exec "${0}" "$@"
+            bash_bin="$(command -v bash 2> /dev/null)"
+          exec "$bash_bin" "${work_dir}/xshok_update_script.sh"
+            echo "Running once as root"
+        else
+             xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not a file or is not writable"
+             exit 1
+        fi
+    fi
 fi
 
 if [ "$found_upgrade" == "no" ] ; then
-	xshok_pretty_echo_and_log "No updates available"
+    xshok_pretty_echo_and_log "No updates available"
 fi
 }
 
@@ -820,9 +820,9 @@ function decode_third_party_signature_by_signature_name() {
   xshok_pretty_echo_and_log "Input a third-party signature name to decode (e.g: Sanesecurity.Junk.15248) or"
   xshok_pretty_echo_and_log "a hexadecimal encoded data string and press enter:"
   read -r input
-	# Remove quotes and .UNOFFICIAL from the whitelist input string
+    # Remove quotes and .UNOFFICIAL from the whitelist input string
   input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`')"
-	input=${input/\.UNOFFICIAL/}
+    input=${input/\.UNOFFICIAL/}
   if echo "${input}" | $grep_bin "\\." > /dev/null ; then
     cd "$clam_dbs" || exit
     sig="$($grep_bin "${input}:" ./*.ndb)"
@@ -904,8 +904,8 @@ function output_system_configuration_information() {
   xshok_pretty_echo_and_log ""
   xshok_pretty_echo_and_log "*** SCRIPT INFORMATION ***"
   xshok_pretty_echo_and_log "${this_script_name} ${script_version} (${script_version_date})"
-	xshok_pretty_echo_and_log "Master.conf Version: ${config_version}"
-	xshok_pretty_echo_and_log "Minimum required config: ${minimum_required_config_version}"
+    xshok_pretty_echo_and_log "Master.conf Version: ${config_version}"
+    xshok_pretty_echo_and_log "Minimum required config: ${minimum_required_config_version}"
   xshok_pretty_echo_and_log "*** SYSTEM INFORMATION ***"
   $uname_bin -a
   xshok_pretty_echo_and_log "*** CLAMSCAN LOCATION & VERSION ***"
@@ -915,13 +915,13 @@ function output_system_configuration_information() {
   xshok_pretty_echo_and_log "${rsync_bin}"
   $rsync_bin --version | head -1
   if [ -n "$curl_bin" ] ; then
-		xshok_pretty_echo_and_log "*** CURL LOCATION & VERSION ***"
-		xshok_pretty_echo_and_log "${curl_bin}"
-		$curl_bin --version | head -1
+        xshok_pretty_echo_and_log "*** CURL LOCATION & VERSION ***"
+        xshok_pretty_echo_and_log "${curl_bin}"
+        $curl_bin --version | head -1
   else
-		xshok_pretty_echo_and_log "*** WGET LOCATION & VERSION ***"
-		xshok_pretty_echo_and_log "${wget_bin}"
-		$wget_bin --version | head -1
+        xshok_pretty_echo_and_log "*** WGET LOCATION & VERSION ***"
+        xshok_pretty_echo_and_log "${wget_bin}"
+        $wget_bin --version | head -1
   fi
   if [ "$enable_gpg" == "yes" ] ; then
     xshok_pretty_echo_and_log "*** GPG LOCATION & VERSION ***"
@@ -941,7 +941,7 @@ function output_system_configuration_information() {
   else
     xshok_pretty_echo_and_log "Configuration Directory: ${config_dir}"
   fi
-	xshok_pretty_echo_and_log ""
+    xshok_pretty_echo_and_log ""
 }
 
 # Make a signature database from an ascii file
@@ -1181,29 +1181,29 @@ function output_signatures_triggered_during_ham_directory_scan() {
 # Adds a signature whitelist entry in the newer ClamAV IGN2 format
 function add_signature_whitelist_entry() { #signature
   xshok_pretty_echo_and_log "Signature Whitelist" "="
-	if [ -n "$1" ] ; then
-		input="$1"
-	else
-		xshok_pretty_echo_and_log "Input a third-party signature name that you wish to whitelist and press enter"
-		read -r input
-	fi
+    if [ -n "$1" ] ; then
+        input="$1"
+    else
+        xshok_pretty_echo_and_log "Input a third-party signature name that you wish to whitelist and press enter"
+        read -r input
+    fi
   if [ -n "$input" ] ; then
-		xshok_pretty_echo_and_log "Processing: ${input}"
+        xshok_pretty_echo_and_log "Processing: ${input}"
     cd "$clam_dbs" || exit
-		# Remove quotes and .UNOFFICIAL from the string
-		input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`"')"
-		input=${input/\.UNOFFICIAL/}
+        # Remove quotes and .UNOFFICIAL from the string
+        input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`"')"
+        input=${input/\.UNOFFICIAL/}
 
     sig_full="$($grep_bin -H -m 1 "$input" ./*.*db)"
-		sig_extension=${sig_full%%\:*}
-		sig_extension=${sig_extension##*\.}
-		shopt -s nocasematch
-		if [ "$sig_extension" == "hdb" ] || [ "$sig_extension" == "hsb" ] || [ "$sig_extension" == "hdu " ] || [ "$sig_extension" == "hsu" ] || [ "$sig_extension" == "mdb" ] || [ "$sig_extension" == "msb" ] || [ "$sig_extension" == "mdu" ] || [ "$sig_extension" == "msu" ] ; then
-			# Hash-based Signature Database
-			position="4"
-		else
-			position="2"
-		fi
+        sig_extension=${sig_full%%\:*}
+        sig_extension=${sig_extension##*\.}
+        shopt -s nocasematch
+        if [ "$sig_extension" == "hdb" ] || [ "$sig_extension" == "hsb" ] || [ "$sig_extension" == "hdu " ] || [ "$sig_extension" == "hsu" ] || [ "$sig_extension" == "mdb" ] || [ "$sig_extension" == "msb" ] || [ "$sig_extension" == "mdu" ] || [ "$sig_extension" == "msu" ] ; then
+            # Hash-based Signature Database
+            position="4"
+        else
+            position="2"
+        fi
     sig_name="$(echo "$sig_full" | cut -d ":" -f $position | cut -d "=" -f 1)"
 
     if [ -n "$sig_name" ] ; then
@@ -1224,7 +1224,7 @@ function add_signature_whitelist_entry() { #signature
             if [ "$selinux_fixes" == "yes" ] ; then
               restorecon "${clam_dbs}/local.ign"
             fi
-						do_clamd_reload="4"
+                        do_clamd_reload="4"
             clamscan_reload_dbs
 
             xshok_pretty_echo_and_log "Signature '${input}' has been added to my-whitelist.ign2 and"
@@ -1377,36 +1377,36 @@ function check_clamav() {
 
 # Check for a new version
 function check_new_version() {
-	found_upgrade="no"
+    found_upgrade="no"
   if [ -n "$curl_bin" ] ; then
-		# shellcheck disable=SC2086
-		latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2>&11 | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
-		# shellcheck disable=SC2086
-		latest_config_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2>&11 | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
-	else
-		# shellcheck disable=SC2086
-		latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2>&12 | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
-		# shellcheck disable=SC2086
-		latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2>&12 | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
-	fi
+        # shellcheck disable=SC2086
+        latest_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" 2>&11 | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+        # shellcheck disable=SC2086
+        latest_config_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" 2>&11 | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+    else
+        # shellcheck disable=SC2086
+        latest_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/clamav-unofficial-sigs.sh" -O - 2>&12 | $grep_bin "^script_version=" | head -n1 | cut -d '"' -f 2)"
+        # shellcheck disable=SC2086
+        latest_config_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/${git_branch}/config/master.conf" -O - 2>&12 | $grep_bin "^config_version=" | head -n1 | cut -d '"' -f 2)"
+    fi
   if [ "$latest_version" ] ; then
-		# shellcheck disable=SC2183,SC2086
-		if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
+        # shellcheck disable=SC2183,SC2086
+        if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
       xshok_pretty_echo_and_log "ALERT: New version : v${latest_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
-			found_upgrade="yes"
+            found_upgrade="yes"
     fi
   fi
   if [ "$latest_config_version" ] ; then
-		# shellcheck disable=SC2183,SC2086
-		if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
+        # shellcheck disable=SC2183,SC2086
+        if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
       xshok_pretty_echo_and_log "ALERT: New config version : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
-			found_upgrade="yes"
+            found_upgrade="yes"
     fi
   fi
 
 if [ "$found_upgrade" == "yes" ] && [ "$allow_upgrades" == "yes" ] ; then
-	xshok_pretty_echo_and_log "Quickly upgrade, run the following command as root:"
-	xshok_pretty_echo_and_log "${this_script_name} --upgrade"
+    xshok_pretty_echo_and_log "Quickly upgrade, run the following command as root:"
+    xshok_pretty_echo_and_log "${this_script_name} --upgrade"
 fi
 
 }
@@ -1508,7 +1508,7 @@ this_script_full_path="${BASH_SOURCE[0]}"
 while [ -h "$this_script_full_path" ]; do
   this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>&1 && readlink -f "$0" )"
   this_script_full_path="$(readlink "$this_script_full_path")"
-	# if relative symlink, then resolve the path
+    # if relative symlink, then resolve the path
   if [[ $this_script_full_path != /* ]] ; then
     this_script_full_path="$this_script_path/$this_script_full_path"
   fi
@@ -1517,8 +1517,8 @@ this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>
 this_script_name="$(basename "$this_script_full_path")"
 
 if [ -z "$this_script_full_path" ] || [ -z "$this_script_path" ] || [ -z "$this_script_name" ] ; then
-	echo "ERROR: could not determin script name and fullpath"
-	exit 1
+    echo "ERROR: could not determin script name and fullpath"
+    exit 1
 fi
 
 #allow for other negatives besides no.
@@ -1557,33 +1557,33 @@ else
 fi
 # Default config files
 if [ -r "${config_dir}/master.conf" ] ; then
-	config_files+=( "${config_dir}/master.conf" )
+    config_files+=( "${config_dir}/master.conf" )
 else
-	xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not readable"
-	exit 1
+    xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not readable"
+    exit 1
 fi
 if [ -r "${config_dir}/os.conf" ] ; then
-	config_files+=( "${config_dir}/os.conf" )
+    config_files+=( "${config_dir}/os.conf" )
 else
-	#find the a suitable os.*.conf file
-	os_config_number=$(find "$config_dir" -type f -iname "os.*.conf" | wc -l)
-	if [ "$os_config_number" == "0" ] ; then
-		xshok_pretty_echo_and_log "WARNING: no os.conf or os.*.conf found"
-	elif [ "$os_config_number" == "1" ] ; then
-		config_file="$(find "$config_dir" -type f -iname "os.*.conf" | head -n1)"
-		if [ -r "${config_file}" ]; then
-			config_files+=( "${config_file}" )
-		else
-			xshok_pretty_echo_and_log "WARNING: ${config_file} is not readable"
-		fi
-	else
-		xshok_pretty_echo_and_log "WARNING: Too many os.*.conf configs found"
-	fi
+    #find the a suitable os.*.conf file
+    os_config_number=$(find "$config_dir" -type f -iname "os.*.conf" | wc -l)
+    if [ "$os_config_number" == "0" ] ; then
+        xshok_pretty_echo_and_log "WARNING: no os.conf or os.*.conf found"
+    elif [ "$os_config_number" == "1" ] ; then
+        config_file="$(find "$config_dir" -type f -iname "os.*.conf" | head -n1)"
+        if [ -r "${config_file}" ]; then
+            config_files+=( "${config_file}" )
+        else
+            xshok_pretty_echo_and_log "WARNING: ${config_file} is not readable"
+        fi
+    else
+        xshok_pretty_echo_and_log "WARNING: Too many os.*.conf configs found"
+    fi
 fi
 if [ -r "${config_dir}/user.conf" ] ; then
-	config_files+=( "${config_dir}/user.conf" )
+    config_files+=( "${config_dir}/user.conf" )
 else
-	xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf is not readable"
+    xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf is not readable"
 fi
 
 # Solaris command -v function returns garbage when the program is not found
@@ -1609,26 +1609,26 @@ fi
 # Detect support for tar or gtar
 
 if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
-	tar_executable="gtar"
+    tar_executable="gtar"
 else
-	tar_executable="tar"
+    tar_executable="tar"
 fi
 if [ -z "$tar_bin" ]; then
-		tar_bin="$(command -v "$tar_executable" 2> /dev/null)"
-	else
-		xshok_pretty_echo_and_log "ERROR: gtar (gnu tar) is missing"
+        tar_bin="$(command -v "$tar_executable" 2> /dev/null)"
+    else
+        xshok_pretty_echo_and_log "ERROR: gtar (gnu tar) is missing"
 fi
 # Detect support for curl
 if [ -z "$curl_bin" ]; then
-	curl_bin="$(command -v curl 2> /dev/null)"
+    curl_bin="$(command -v curl 2> /dev/null)"
 fi
 # Detect support for wget
 if [ -z "$wget_bin" ]; then
-	if [ -x /usr/sfw/bin/wget ] ; then
-	  wget_bin="/usr/sfw/bin/wget"
-	else
-	  wget_bin="$(command -v wget 2> /dev/null)"
-	fi
+    if [ -x /usr/sfw/bin/wget ] ; then
+      wget_bin="/usr/sfw/bin/wget"
+    else
+      wget_bin="$(command -v wget 2> /dev/null)"
+    fi
 fi
 if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
   curl_bin="$(command -v curl 2> /dev/null)"
@@ -1638,7 +1638,7 @@ if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
   fi
 fi
 
-if [ ! -z "$wget_bin" ] ; then
+if [ -n "$wget_bin" ] ; then
   # wget compression support
   if $wget_bin --help | $grep_bin -q "compression=TYPE" ; then
     wget_compression="--compression=auto"
@@ -1648,7 +1648,7 @@ if [ ! -z "$wget_bin" ] ; then
 fi
 # Detect support for dig or host
 dig_bin="$(command -v dig 2> /dev/null)"
-if [ -z "$dig_bin" ] ; then
+if [ -n "$dig_bin" ] ; then
   host_bin="$(command -v host 2> /dev/null)"
   if [ -z "$host_bin" ] ; then
     xshok_pretty_echo_and_log "ERROR: both dig and host commands are missing, One of them is required"
@@ -1721,24 +1721,24 @@ if [ "$custom_config" != "no" ] ; then
   if [ -d "$custom_config" ] ; then
     # Assign the custom config dir and remove trailing / (removes / and //)
     shopt -s extglob; config_dir="${custom_config%%+(/)}"
-		config_files=()
-		if [ -r "${config_dir}/master.conf" ] ; then
-			config_files+=( "${config_dir}/master.conf" )
-		else
-			xshok_pretty_echo_and_log "WARNING: ${config_dir}/master.conf not found"
-		fi
-		#find the a suitable os.conf or os.*.conf file
-		config_file="$(find "$config_dir" -type f -iname "os.conf" -o -iname "os.*.conf" | tail -n1)"
-		if [ -r "${config_file}" ] ; then
-			config_files+=( "${config_file}" )
-		else
-			xshok_pretty_echo_and_log "WARNING: ${config_dir}/os.conf not found"
-		fi
-		if [ -r "${config_dir}/user.conf" ] ; then
-			config_files+=( "${config_dir}/user.conf" )
-		else
-			xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf not found"
-		fi
+        config_files=()
+        if [ -r "${config_dir}/master.conf" ] ; then
+            config_files+=( "${config_dir}/master.conf" )
+        else
+            xshok_pretty_echo_and_log "WARNING: ${config_dir}/master.conf not found"
+        fi
+        #find the a suitable os.conf or os.*.conf file
+        config_file="$(find "$config_dir" -type f -iname "os.conf" -o -iname "os.*.conf" | tail -n1)"
+        if [ -r "${config_file}" ] ; then
+            config_files+=( "${config_file}" )
+        else
+            xshok_pretty_echo_and_log "WARNING: ${config_dir}/os.conf not found"
+        fi
+        if [ -r "${config_dir}/user.conf" ] ; then
+            config_files+=( "${config_dir}/user.conf" )
+        else
+            xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf not found"
+        fi
   else
     config_files=( "$custom_config" )
   fi
@@ -1755,18 +1755,24 @@ for config_file in "${config_files[@]}" ; do
       clean_config="$(command sed -e '/^#.*/d' "$config_file")" # Comment line
       #clean_config="$(echo "$clean_config" | sed -e 's/#[[:space:]].*//')" # Comment line (duplicated)
       clean_config=${clean_config//\#*/} # Comment line (duplicated)
+      # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
       #clean_config="$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
       clean_config="$(echo "$clean_config" | xargs)"
+      # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | sed -e '/^\s*$/d')" # Blank lines
 
     elif [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
       # MacOS / OSX / BSD fixes, had issues with running with a single command and with SunOS work around..
+      # shellcheck disable=SC2001
       clean_config="$(command sed -e '/^#.*/d' "$config_file")" # Comment line
+      # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | sed -e 's/#[[:space:]].*//')" # Comment line (duplicated)
+      # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
       #clean_config="$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
       #clean_config="$(echo "$clean_config" | xargs)"
+      # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | sed -e '/^\s*$/d')" # Blank lines
 
     else
@@ -1931,9 +1937,9 @@ fi
 shopt -s extglob; clam_dbs="${clam_dbs%%+(/)}"
 
 # Force wget over curl.
-if [ ! -z "$wget_bin" ] && [ "$force_wget" == "yes" ] ; then
-		xshok_pretty_echo_and_log "NOTICE: Forcing wget"
-	  curl_bin=""
+if [ -n "$wget_bin" ] && [ "$force_wget" == "yes" ] ; then
+        xshok_pretty_echo_and_log "NOTICE: Forcing wget"
+      curl_bin=""
 fi
 
 # SANITY checks
@@ -1949,9 +1955,9 @@ if [ -z "$uname_bin" ] ; then
   exit 1
 fi
 if [ -z "$clamscan_bin" ] ; then
-	if [ "${1}" != "--remove-script" ] ; then
-  	xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found"
-	fi
+    if [ "${1}" != "--remove-script" ] ; then
+      xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found"
+    fi
   exit 1
 fi
 if [ -z "$rsync_bin" ] ; then
@@ -2055,35 +2061,35 @@ if $rsync_bin --help | $grep_bin -q "contimeout" > /dev/null ; then
 fi
 
 if [ "$debug" == "yes" ] ; then
-	 downloader_debug="yes"
-	 clamscan_debug="yes"
-	 curl_debug="yes"
-	 wget_debug="yes"
-	 rsync_debug="yes"
+     downloader_debug="yes"
+     clamscan_debug="yes"
+     curl_debug="yes"
+     wget_debug="yes"
+     rsync_debug="yes"
 fi
 # Show clamscan errors
 if [ "$clamscan_debug" == "yes" ] ; then
-	exec 10>&2
+    exec 10>&2
 else
-	exec 10>/dev/null
+    exec 10>/dev/null
 fi
 # Show curl errors
 if [ "$curl_debug" == "yes" ] ; then
-	exec 11>&2
+    exec 11>&2
 else
-	exec 11>/dev/null
+    exec 11>/dev/null
 fi
 # Show wget errors
 if [ "$wget_debug" == "yes" ] ; then
-	exec 12>&2
+    exec 12>&2
 else
-	exec 12>/dev/null
+    exec 12>/dev/null
 fi
 # Show rsync errors
 if [ "$rsync_debug" == "yes" ] ; then
-	exec 13>&2
+    exec 13>&2
 else
-	exec 13>/dev/null
+    exec 13>/dev/null
 fi
 
 # Silence wget output and only report errors - useful if script is run via cron.
@@ -2174,11 +2180,11 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${sanesecurity_dbs[@]}")"
     fi
-		sanesecurity_dbs=( )
-		if [ ! -z "$temp_db" ] ; then
-	    #sanesecurity_dbs=( $temp_db )
-	    read -r -a sanesecurity_dbs <<< "$temp_db"
-		fi
+        sanesecurity_dbs=( )
+        if [ -n "$temp_db" ] ; then
+        #sanesecurity_dbs=( $temp_db )
+        read -r -a sanesecurity_dbs <<< "$temp_db"
+        fi
   fi
 fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
@@ -2188,11 +2194,11 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${securiteinfo_dbs[@]}")"
     fi
-		securiteinfo_dbs=( )
-		if [ ! -z "$temp_db" ] ; then
-	    #securiteinfo_dbs=( $temp_db )
-	    read -r -a securiteinfo_dbs <<< "$temp_db"
-		fi
+        securiteinfo_dbs=( )
+        if [ -n "$temp_db" ] ; then
+        #securiteinfo_dbs=( $temp_db )
+        read -r -a securiteinfo_dbs <<< "$temp_db"
+        fi
   fi
 fi
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
@@ -2202,11 +2208,11 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
     fi
-		linuxmalwaredetect_dbs=( )
-		if [ ! -z "$temp_db" ] ; then
-	    #linuxmalwaredetect_dbs=( $temp_db )
-	    read -r -a linuxmalwaredetect_dbs <<< "$temp_db"
-		fi
+        linuxmalwaredetect_dbs=( )
+        if [ -n "$temp_db" ] ; then
+        #linuxmalwaredetect_dbs=( $temp_db )
+        read -r -a linuxmalwaredetect_dbs <<< "$temp_db"
+        fi
   fi
 fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
@@ -2217,10 +2223,10 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
       temp_db="$(xshok_database "$default_dbs_rating" "${yararulesproject_dbs[@]}")"
     fi
     yararulesproject_dbs=( )
-		if [ ! -z "$temp_db" ] ; then
-	    #yararulesproject_dbs=( $temp_db )
-	    read -r -a yararulesproject_dbs <<< "$temp_db"
-		fi
+        if [ -n "$temp_db" ] ; then
+        #yararulesproject_dbs=( $temp_db )
+        read -r -a yararulesproject_dbs <<< "$temp_db"
+        fi
   fi
 fi
 if [ "$urlhaus_enabled" == "yes" ] ; then
@@ -2231,16 +2237,16 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
       temp_db="$(xshok_database "$default_dbs_rating" "${urlhaus_dbs[@]}")"
     fi
     urlhaus_dbs=( )
-		if [ ! -z "$temp_db" ] ; then
-	    #urlhaus_dbs=( $temp_db )
-	    read -r -a urlhaus_dbs <<< "$temp_db"
-		fi
+        if [ -n "$temp_db" ] ; then
+        #urlhaus_dbs=( $temp_db )
+        read -r -a urlhaus_dbs <<< "$temp_db"
+        fi
   fi
 fi
 # Set the variables for MalwarePatrol
 if [ "$malwarepatrol_product_code" != "8" ] ; then
-	# assumption, free product code is always 8 (non-free product code is never 8)
-	malwarepatrol_free="no"
+    # assumption, free product code is always 8 (non-free product code is never 8)
+    malwarepatrol_free="no"
 fi
 if [ "$malwarepatrol_free" == "yes" ] ; then
   malwarepatrol_product_code="8"
@@ -2255,7 +2261,7 @@ else
   fi
 fi
 if [ -z "$malwarepatrol_db" ] ; then
-	malwarepatrol_db="malwarepatrol.db"
+    malwarepatrol_db="malwarepatrol.db"
 fi
 
 malwarepatrol_url="${malwarepatrol_url}?receipt=${malwarepatrol_receipt_code}&product=${malwarepatrol_product_code}&list=${malwarepatrol_list}"
@@ -2367,7 +2373,7 @@ if [ ! -s "${work_dir_work_configs}/scan-test.txt" ] ; then
 fi
 
 if [ -z "$git_branch" ] ; then
-	git_branch="master"
+    git_branch="master"
 fi
 
 # If rsync proxy is defined in the config file, then export it for use.
@@ -2528,29 +2534,29 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
         echo "$current_time" > "${work_dir_work_configs}/last-ss-update.txt"
         xshok_pretty_echo_and_log "Sanesecurity Database & GPG Signature File Updates" "="
         xshok_pretty_echo_and_log "Checking for Sanesecurity updates..."
-				if [ -z "$dig_bin" ] ; then
-					# shellcheck disable=SC2086
-        	sanesecurity_mirror_ips="$($dig_bin $dig_proxy +ignore +short "$sanesecurity_url")"
-				else
-					sanesecurity_mirror_ips=""
-				fi
-				# Add fallback to host if dig returns no records or dig is not used
+                if [ -n "$dig_bin" ] ; then
+                    # shellcheck disable=SC2086
+            sanesecurity_mirror_ips="$($dig_bin $dig_proxy +ignore +short "$sanesecurity_url")"
+                else
+                    sanesecurity_mirror_ips=""
+                fi
+                # Add fallback to host if dig returns no records or dig is not used
         if [ ${#sanesecurity_mirror_ips} -lt 1 ] ; then
-					# shellcheck disable=SC2086
+                    # shellcheck disable=SC2086
           sanesecurity_mirror_ips="$($host_bin $host_proxy -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')"
         fi
 
         if [ ${#sanesecurity_mirror_ips} -ge 1 ] ; then
           for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
-						if [ -z "$dig_bin" ] ; then
-							# shellcheck disable=SC2086
-	            sanesecurity_mirror_name="$($dig_bin $dig_proxy +short -x "$sanesecurity_mirror_ip" | command sed 's/\.$//')"
-						else
-							sanesecurity_mirror_name=""
-						fi
+                        if [ -n "$dig_bin" ] ; then
+                            # shellcheck disable=SC2086
+                sanesecurity_mirror_name="$($dig_bin $dig_proxy +short -x "$sanesecurity_mirror_ip" | command sed 's/\.$//')"
+                        else
+                            sanesecurity_mirror_name=""
+                        fi
             # Add fallback to host if dig returns no records or dig is not used
             if [ -z "$sanesecurity_mirror_name" ] ; then
-							# shellcheck disable=SC2086
+                            # shellcheck disable=SC2086
               sanesecurity_mirror_name="$($host_bin $host_proxy "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')"
             fi
             sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
@@ -2864,7 +2870,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
-						# shellcheck disable=SC2035
+                        # shellcheck disable=SC2035
             $tar_bin --strip-components=1 --wildcards --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
@@ -3688,21 +3694,21 @@ xshok_pretty_echo_and_log "Issue tracker : https://github.com/extremeshok/clamav
 
 if [ "$allow_update_checks" != "no" ] ; then
 
-	if [ -r "${work_dir_work_configs}/last-version-check.txt" ] ; then
-	  last_version_check="$(cat "${work_dir_work_configs}/last-version-check.txt")"
-	else
-	  last_version_check="0"
-	fi
-	db_file=""
-	update_check_interval="$((update_check_hours * 3600))"
-	time_interval="$((current_time - last_version_check))"
-	if [ "$time_interval" -ge $((update_check_interval - 600)) ] ; then
-	  echo "$current_time" > "${work_dir_work_configs}/last-version-check.txt"
-		if xshok_is_root ; then
-			perms chown -f "${clam_user}:${clam_group}" "${work_dir_work_configs}/last-version-check.txt"
-		fi
-		check_new_version
-	fi
+    if [ -r "${work_dir_work_configs}/last-version-check.txt" ] ; then
+      last_version_check="$(cat "${work_dir_work_configs}/last-version-check.txt")"
+    else
+      last_version_check="0"
+    fi
+    db_file=""
+    update_check_interval="$((update_check_hours * 3600))"
+    time_interval="$((current_time - last_version_check))"
+    if [ "$time_interval" -ge $((update_check_interval - 600)) ] ; then
+      echo "$current_time" > "${work_dir_work_configs}/last-version-check.txt"
+        if xshok_is_root ; then
+            perms chown -f "${clam_user}:${clam_group}" "${work_dir_work_configs}/last-version-check.txt"
+        fi
+        check_new_version
+    fi
 
 fi
 
@@ -3710,15 +3716,15 @@ xshok_cleanup
 
 # Set the permission of the log file, to fix any permission errors, this is done to fix cron errors after running the script as root.
 if xshok_is_root ; then
-	if [ "$enable_log" == "yes" ] ; then
-		# check if the file is owned by root (the current user)
-		if [ -O "${log_file_path}/${log_file_name}" ] ; then
-			# checks the file is writable and a file (not a symlink/link)
-			if [ -w "${log_file_path}/${log_file_name}" ] && [ -f "${log_file_path}/${log_file_name}" ] ; then
-				perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
-			fi
-		fi
-	fi
+    if [ "$enable_log" == "yes" ] ; then
+        # check if the file is owned by root (the current user)
+        if [ -O "${log_file_path}/${log_file_name}" ] ; then
+            # checks the file is writable and a file (not a symlink/link)
+            if [ -w "${log_file_path}/${log_file_name}" ] && [ -f "${log_file_path}/${log_file_name}" ] ; then
+                perms chown -f "${clam_user}:${clam_group}" "${log_file_path}/${log_file_name}"
+            fi
+        fi
+    fi
 fi
 
 # And lastly we exit, Note: the exit is always on the 2nd last line
