@@ -2234,12 +2234,10 @@ else
     malwarepatrol_product_code=8
   fi
 fi
-
-if [ $malwarepatrol_list == "clamav_basic" ] ; then
-  malwarepatrol_db="malwarepatrol.db"
-else
-  malwarepatrol_db="malwarepatrol.ndb"
+if [ -z $malwarepatrol_db ] ; then
+	malwarepatrol_db="malwarepatrol.db"
 fi
+
 malwarepatrol_url="${malwarepatrol_url}?receipt=${malwarepatrol_receipt_code}&product=${malwarepatrol_product_code}&list=${malwarepatrol_list}"
 
 # If "ham_dir" variable is set, then create initial whitelist files (skipped if first-time script run).
@@ -2972,11 +2970,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
           malwarepatrol_updates="0"
 
           # Cleanup any not required database files
-          if [ "$malwarepatrol_db" == "malwarepatrol.db" ] && [ -f "${clam_dbs}/malwarepatrol.ndb" ] ; then
-            rm -f "${clam_dbs}/malwarepatrol.ndb";
-          fi
-          if [ "$malwarepatrol_db" == "malwarepatrol.ndb" ] && [ -f "${clam_dbs}/malwarepatrol.db" ] ; then
+          if [ "$malwarepatrol_db" != "malwarepatrol.db" ] && [ -f "${clam_dbs}/malwarepatrol.db" ] ; then
             rm -f "${clam_dbs}/malwarepatrol.db";
+          fi
+          if [ "$malwarepatrol_db" != "malwarepatrol.ndb" ] && [ -f "${clam_dbs}/malwarepatrol.ndb" ] ; then
+            rm -f "${clam_dbs}/malwarepatrol.ndb";
           fi
 
             if [ "$loop" == "1" ] ; then

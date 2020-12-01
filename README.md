@@ -209,6 +209,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Replace $PWD with readlink -f "$0"
  - Fix: URLhaus log message
  - Fix wrong download URL for MalwarePatrol
+ - Added malwarepatrol_db to specifiy the extact database name (default: malwarepatrol.db)
  - Fix: set ownership of last-version-check.txt
  - Incremented the config to version 92
  - Thank you @
