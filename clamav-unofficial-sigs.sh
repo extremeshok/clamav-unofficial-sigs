@@ -2170,9 +2170,11 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${sanesecurity_dbs[@]}")"
     fi
-    sanesecurity_dbs=( )
-    #sanesecurity_dbs=( $temp_db )
-    read -r -a sanesecurity_dbs <<< "$temp_db"
+		sanesecurity_dbs=( )
+		if [ ! -z $temp_db ] ; then
+	    #sanesecurity_dbs=( $temp_db )
+	    read -r -a sanesecurity_dbs <<< "$temp_db"
+		fi
   fi
 fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
@@ -2182,9 +2184,11 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${securiteinfo_dbs[@]}")"
     fi
-    securiteinfo_dbs=( )
-    #securiteinfo_dbs=( $temp_db )
-    read -r -a securiteinfo_dbs <<< "$temp_db"
+		securiteinfo_dbs=( )
+		if [ ! -z $temp_db ] ; then
+	    #securiteinfo_dbs=( $temp_db )
+	    read -r -a securiteinfo_dbs <<< "$temp_db"
+		fi
   fi
 fi
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
@@ -2194,9 +2198,11 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
     fi
-    linuxmalwaredetect_dbs=( )
-    #linuxmalwaredetect_dbs=( $temp_db )
-    read -r -a linuxmalwaredetect_dbs <<< "$temp_db"
+		linuxmalwaredetect_dbs=( )
+		if [ ! -z $temp_db ] ; then
+	    #linuxmalwaredetect_dbs=( $temp_db )
+	    read -r -a linuxmalwaredetect_dbs <<< "$temp_db"
+		fi
   fi
 fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
@@ -2207,8 +2213,10 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
       temp_db="$(xshok_database "$default_dbs_rating" "${yararulesproject_dbs[@]}")"
     fi
     yararulesproject_dbs=( )
-    #yararulesproject_dbs=( $temp_db )
-    read -r -a yararulesproject_dbs <<< "$temp_db"
+		if [ ! -z $temp_db ] ; then
+	    #yararulesproject_dbs=( $temp_db )
+	    read -r -a yararulesproject_dbs <<< "$temp_db"
+		fi
   fi
 fi
 if [ "$urlhaus_enabled" == "yes" ] ; then
@@ -2219,8 +2227,10 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
       temp_db="$(xshok_database "$default_dbs_rating" "${urlhaus_dbs[@]}")"
     fi
     urlhaus_dbs=( )
-    #urlhaus_dbs=( $temp_db )
-    read -r -a urlhaus_dbs <<< "$temp_db"
+		if [ ! -z $temp_db ] ; then
+	    #urlhaus_dbs=( $temp_db )
+	    read -r -a urlhaus_dbs <<< "$temp_db"
+		fi
   fi
 fi
 # Set the variables for MalwarePatrol
