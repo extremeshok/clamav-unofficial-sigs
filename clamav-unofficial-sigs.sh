@@ -2985,7 +2985,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "Checking for updated MalwarePatrol database file: ${malwarepatrol_db}"
             malwarepatrol_db_update="0"
 
-            xshok_file_download "${work_dir_malwarepatrol}/${malwarepatrol_db}" "${malwarepatrol_url}&receipt=${malwarepatrol_receipt_code}"
+            xshok_file_download "${work_dir_malwarepatrol}/${malwarepatrol_db}" "${malwarepatrol_url}"
 
             ret="$?"
             if [ "$ret" -eq 0 ] ; then
@@ -3104,7 +3104,7 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
       if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
         echo "$current_time" > "${work_dir_work_configs}/last-urlhaus-update.txt"
 
-        xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
+        xshok_pretty_echo_and_log "URLhaus Database File Updates" "="
         xshok_pretty_echo_and_log "Checking for urlhaus updates..."
         urlhaus_updates="0"
         for db_file in "${urlhaus_dbs[@]}" ; do
@@ -3191,7 +3191,7 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
         fi
       else
 
-        xshok_pretty_echo_and_log "Yara-Rules Database File Updates" "="
+        xshok_pretty_echo_and_log "URLhaus Database File Updates" "="
         xshok_draw_time_remaining "$((update_interval - time_interval))" "$urlhaus_update_hours" "urlhaus"
       fi
     fi
