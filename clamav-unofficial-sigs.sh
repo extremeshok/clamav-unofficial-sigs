@@ -2171,7 +2171,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
       temp_db="$(xshok_database "$default_dbs_rating" "${sanesecurity_dbs[@]}")"
     fi
 		sanesecurity_dbs=( )
-		if [ ! -z $temp_db ] ; then
+		if [ ! -z "$temp_db" ] ; then
 	    #sanesecurity_dbs=( $temp_db )
 	    read -r -a sanesecurity_dbs <<< "$temp_db"
 		fi
@@ -2185,7 +2185,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
       temp_db="$(xshok_database "$default_dbs_rating" "${securiteinfo_dbs[@]}")"
     fi
 		securiteinfo_dbs=( )
-		if [ ! -z $temp_db ] ; then
+		if [ ! -z "$temp_db" ] ; then
 	    #securiteinfo_dbs=( $temp_db )
 	    read -r -a securiteinfo_dbs <<< "$temp_db"
 		fi
@@ -2199,7 +2199,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
       temp_db="$(xshok_database "$default_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
     fi
 		linuxmalwaredetect_dbs=( )
-		if [ ! -z $temp_db ] ; then
+		if [ ! -z "$temp_db" ] ; then
 	    #linuxmalwaredetect_dbs=( $temp_db )
 	    read -r -a linuxmalwaredetect_dbs <<< "$temp_db"
 		fi
@@ -2213,7 +2213,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
       temp_db="$(xshok_database "$default_dbs_rating" "${yararulesproject_dbs[@]}")"
     fi
     yararulesproject_dbs=( )
-		if [ ! -z $temp_db ] ; then
+		if [ ! -z "$temp_db" ] ; then
 	    #yararulesproject_dbs=( $temp_db )
 	    read -r -a yararulesproject_dbs <<< "$temp_db"
 		fi
@@ -2227,7 +2227,7 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
       temp_db="$(xshok_database "$default_dbs_rating" "${urlhaus_dbs[@]}")"
     fi
     urlhaus_dbs=( )
-		if [ ! -z $temp_db ] ; then
+		if [ ! -z "$temp_db" ] ; then
 	    #urlhaus_dbs=( $temp_db )
 	    read -r -a urlhaus_dbs <<< "$temp_db"
 		fi
@@ -2250,7 +2250,7 @@ else
     malwarepatrol_product_code=8
   fi
 fi
-if [ -z $malwarepatrol_db ] ; then
+if [ -z "$malwarepatrol_db" ] ; then
 	malwarepatrol_db="malwarepatrol.db"
 fi
 
