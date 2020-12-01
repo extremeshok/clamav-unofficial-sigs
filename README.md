@@ -46,7 +46,7 @@ Please use the sample package os.*.conf as a base for your os.conf, this will di
 * Default configs are loaded in the following order if they exist:
 * master.conf -> os.conf -> os.*.conf -> user.conf or your-specified.config
 * user.conf will always override os.conf and master.conf, os.conf will override master.conf
-* please do not alter the master.conf, rather create a user.conf 
+* please do not alter the master.conf, rather create a user.conf
 * A minimum of 1 config is required.
 * Specifying a config on the command line (-c | --config) will override the loading of the default configs
 
@@ -97,7 +97,7 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
 ### Linux Malware Detect support (as of May 2015, updated January 2020)
 Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/projects/linux-malware-detect/
  - Enabled by default, no configuration required
- 
+
 ### Need a database added ? Missing a database or a database not working ?
 Please post on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
 
@@ -199,11 +199,15 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   its associated files and databases from the system
 
 ## Change Log
-### Version 7.0.1 (Updated 25 January 2020)
+
+### Version 7.2 ( XX December 2020 : Under Development)
+ - Enforce HTTPS validation by default
+
+### Version 7.0.1 (25 January 2020)
  - Disable yara project rules duplicated in rxfn.yara (Thanks @dominicraf)
  - Incremented the config to version 91
- 
-### Version 7.0.0 (Updated 24 January 2020)
+
+### Version 7.0.0 (24 January 2020)
  - eXtremeSHOK.com Maintenance
  - Added urlhaus database
  - Added extra yararulesproject databases
@@ -235,7 +239,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Only check for and notify about script updates every 12hours
  - Incremented the config to version 90
 
-### Version 6.1.1 (Updated 02 September 2019)
+### Version 6.1.1 (02 September 2019)
  - eXtremeSHOK.com Maintenance
  - Update os.archlinux.conf, thanks @amishmm
  - master.conf set default dbs rating to medium
@@ -249,7 +253,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Minor enhancement to travis-ci checks
  - Incremented the config to version 77
 
-### Version 6.1.0 (Updated 27 August 2019)
+### Version 6.1.0 (27 August 2019)
  - eXtremeSHOK.com Maintenance
  - Thanks Reio Remma & Oliver Nissen
  - fail added to all curl commands
