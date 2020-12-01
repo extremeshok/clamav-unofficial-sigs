@@ -4,7 +4,8 @@
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
 # License: BSD (Berkeley Software Distribution)
 ##################
-language: bash
+language: shell
+os: linux
 
 # Required travis ci environment variables
 #ci_securiteinfo_authorisation_signature=[secure]
@@ -12,7 +13,7 @@ language: bash
 #ci_malwarepatrol_product_code=[secure]
 #ci_malwarepatrol_list=[secure]
 #ci_malwarepatrol_free=[secure]
-
+#ci_codeclimate_repo_token=[secure]
 
 #Enable modern build platform, not container based.
 dist: bionic
@@ -59,4 +60,4 @@ script:
 
 addons:
   code_climate:
-    repo_token: 270be84579d01fcbe78b21b91719c2c55cd627f074c8abb83699a8319c980b60
+    repo_token: $ci_codeclimate_repo_token
