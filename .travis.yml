@@ -4,8 +4,7 @@
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
 # License: BSD (Berkeley Software Distribution)
 ##################
-language: shell
-os: linux
+language: bash
 
 # Required travis ci environment variables
 #ci_securiteinfo_authorisation_signature=[secure]
@@ -13,7 +12,6 @@ os: linux
 #ci_malwarepatrol_product_code=[secure]
 #ci_malwarepatrol_list=[secure]
 #ci_malwarepatrol_free=[secure]
-#ci_codeclimate_repo_token=[secure]
 
 
 #Enable modern build platform, not container based.
@@ -28,6 +26,7 @@ dist: bionic
 #    - tmp/cache
 
 before_install:
+  - sudo su
   - apt-get update -qq
   - apt-get install -y ca-certificates curl wget rsync p7zip-full shellcheck -qq
   #- pip install bashate
@@ -42,12 +41,14 @@ before_install:
   # - "ls -laFh tmp/cache/clamav-dbs/"
 
 install:
+  - sudo su
   - mkdir -p /etc/clamav-unofficial-sigs
   - cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf
   - cp -f config/os/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
   - cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs
 
 script:
+  - sudo su
   - sh -e .t/ci-shellcheck.sh
   - sh -e .t/ci-clamav-download-default-databases.sh
   #- sh -e .t/ci-clamav-download-default-databases-git.sh
@@ -58,4 +59,4 @@ script:
 
 addons:
   code_climate:
-    repo_token: $ci_codeclimate_repo_token
+    repo_token: 270be84579d01fcbe78b21b91719c2c55cd627f074c8abb83699a8319c980b60
