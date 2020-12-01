@@ -1606,13 +1606,17 @@ if [ -x /usr/gnu/bin/grep ] ; then
 else
   grep_bin="$(command -v grep 2> /dev/null)"
 fi
-# Detect support for tar or custom tar_executable
+# Detect support for tar or gtar
+
+if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
+	tar_executable="gtar"
+else
+	tar_executable="tar"
+fi
 if [ -z "$tar_bin" ]; then
-	if [ -z "$tar_executable" ]; then
-		tar_bin="$(command -v tar 2> /dev/null)"
-	else
 		tar_bin="$(command -v "$tar_executable" 2> /dev/null)"
-	fi
+	else
+		xshok_pretty_echo_and_log "ERROR: gtar (gnu tar) is missing"
 fi
 # Detect support for curl
 if [ -z "$curl_bin" ]; then
@@ -1756,8 +1760,8 @@ for config_file in "${config_files[@]}" ; do
       clean_config="$(echo "$clean_config" | xargs)"
       clean_config="$(echo "$clean_config" | sed -e '/^\s*$/d')" # Blank lines
 
-    elif [ "$(uname -s)" == "Darwin" ] ; then
-      # MacOS / OS X fixes, had issues with running with a single command and with SunOS work around..
+    elif [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
+      # MacOS / OSX / BSD fixes, had issues with running with a single command and with SunOS work around..
       clean_config="$(command sed -e '/^#.*/d' "$config_file")" # Comment line
       clean_config="$(echo "$clean_config" | sed -e 's/#[[:space:]].*//')" # Comment line (duplicated)
       clean_config="$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
@@ -1772,7 +1776,7 @@ for config_file in "${config_files[@]}" ; do
       # Delete both trailing and leading whitespace
       # Delete all trailing whitespace
       # Delete all empty lines
-      clean_config="$(command sed -e '/^#./d' -e 's/[[:space:]]#.//' -e 's/#[[:space:]].//' -e $'s/^[ \t]//;s/[ \t]$//' -e '/^\s$/d' "$config_file")"
+      clean_config="$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")"
 
     fi
 
