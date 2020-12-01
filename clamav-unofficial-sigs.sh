@@ -672,7 +672,8 @@ function install_cron() {
 # script itself is set to randomize the actual execution time between
 # 60 - 600 seconds.  To Adjust the cron values, edit your configs and run
 # bash clamav-unofficial-sigs.sh --install-cron to generate a new file.
-MAILTO=root
+# Uncomment to enable emails to the root user
+#MAILTO=root
 $cron_minute * * * * ${cron_sudo} ${cron_user} [ -x ${cron_script_full_path} ] && ${cron_bash} ${cron_script_full_path}
 
 # https://eXtremeSHOK.com ######################################################
@@ -1498,7 +1499,7 @@ EOF
 # Script Info
 script_version="7.0.1"
 script_version_date="2020-01-25"
-minimum_required_config_version="91"
+minimum_required_config_version="92"
 minimum_yara_clamav_version="0.100"
 
 # Discover script: name, full_path and path
@@ -2098,7 +2099,7 @@ else
 fi
 
 # Suppress ssl warnings
-if [ "$downloader_ignore_ssl" == "yes" ] ; then
+if [ "$downloader_ignore_ssl_errors" == "yes" ] ; then
   wget_insecure="--no-check-certificate"
   curl_insecure="--insecure"
 else
