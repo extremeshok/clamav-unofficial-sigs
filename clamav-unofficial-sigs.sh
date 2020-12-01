@@ -3039,149 +3039,128 @@ else
 fi
 
 ##############################################################################################################################################
-# Check for updated malware.expert database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
+# Check for updated malware.expert database files every set number of hours as defined in the "USER CONFIGURATION" section of this script      #
 ##############################################################################################################################################
 if [ "$malwareexpert_enabled" == "yes" ] ; then
-    if [ "$malwareexpert_serial_key" != "YOUR-SERIAL-KEY" ] ; then
-      if [ -n "${malwareexpert_dbs[0]}" ] ; then
-        if [ ${#malwareexpert_dbs} -lt 1 ] ; then
-          xshok_pretty_echo_and_log "Failed malwareexpert_dbs config is invalid or not defined - SKIPPING"
+  if [ "$malwareexpert_serial_key" != "YOUR-SERIAL-KEY" ] ; then
+    if [ -n "${malwareexpert_dbs[0]}" ] ; then
+      if [ ${#malwareexpert_dbs} -lt 1 ] ; then
+        xshok_pretty_echo_and_log "Failed malwareexpert_dbs config is invalid or not defined - SKIPPING"
+      else
+        rm -f "${work_dir_malwareexpert}/*.gz"
+        if [ -r "${work_dir_work_configs}/last-si-update.txt" ] ; then
+          last_malwareexpert_update="$(cat "${work_dir_work_configs}/last-si-update.txt")"
         else
-          rm -f "${work_dir_malwareexpert}/*.gz"
-          if [ -r "${work_dir_work_configs}/last-malwareexpert-update.txt" ] ; then
-            last_malwareexpert_update="$(cat "${work_dir_work_configs}/last-malwareexpert-update.txt")"
-          else
-            last_malwareexpert_update="0"
-          fi
-          db_file=""
-          loop=""
-          update_interval="$((malwareexpert_update_hours * 3600))"
-          time_interval="$((current_time - last_malwareexpert_update))"
-          if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
-            echo "$current_time" > "${work_dir_work_configs}/last-malwareexpert-update.txt"
-
-            xshok_pretty_echo_and_log "malwareexpert Database File Updates" "="
-            xshok_pretty_echo_and_log "Checking for malwareexpert updates..."
-
-            # Check for a new version
-            found_upgrade="no"
-            if [ -n "$curl_bin" ] ; then
-              # shellcheck disable=SC2086
-              latest_malwareexpert_version="$($curl_bin --compressed $curl_proxy $curl_insecure $curl_output_level --connect-timeout "${downloader_connect_timeout}" --remote-time --location --retry "${downloader_tries}" --max-time "${downloader_max_time}" "$malwareexpert_version_url" 2>&11 | head -n1 | xargs)"
-            else
-              # shellcheck disable=SC2086
-              latest_malwareexpert_version="$($wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" "$malwareexpert_version_url" -O - 2>&12 | $grep_bin "^script_version=" | head -n1 | xargs)"
+          last_malwareexpert_update="0"
+        fi
+        db_file=""
+        loop=""
+        if [ "$malwareexpert_premium" == "yes" ] ; then
+            update_interval="$((malwareexpert_premium_update_hours * 3600))"
+        else
+            update_interval="$((malwareexpert_update_hours * 3600))"
+        fi
+        time_interval="$((current_time - last_malwareexpert_update))"
+        if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
+          echo "$current_time" > "${work_dir_work_configs}/last-si-update.txt"
+          xshok_pretty_echo_and_log "malwareexpert Database File Updates" "="
+          xshok_pretty_echo_and_log "Checking for malwareexpert updates..."
+          malwareexpert_updates="0"
+          for db_file in "${malwareexpert_dbs[@]}" ; do
+            if [ "$loop" == "1" ] ; then
+              xshok_pretty_echo_and_log "---"
             fi
+            xshok_pretty_echo_and_log "Checking for updated malware.expert database file: ${db_file}"
+            malwareexpert_db_update="0"
+            xshok_file_download "${work_dir_malwareexpert}/${db_file}" "${malwareexpert_url}/${malwareexpert_serial_key}/${db_file}"
+            ret="$?"
+            if [ "$ret" -eq 0 ] ; then
+              loop="1"
+              if ! cmp -s "${work_dir_malwareexpert}/${db_file}" "${clam_dbs}/${db_file}" ; then
+                db_ext="${db_file#*.}"
 
-            if [ "$latest_malwareexpert_version" ] ; then
-              # shellcheck disable=SC2183,SC2086
-              if [ -f "${work_dir_malwareexpert}/current_malwareexpert_version" ] ; then
-                current_malwareexpert_version="$(head -n1 "${work_dir_malwareexpert}/current_malwareexpert_version" | xargs)"
-              else
-                current_malwareexpert_version="-1"
-              fi
-              if [ "$latest_malwareexpert_version" != "$current_malwareexpert_version" ] ; then
-                xshok_pretty_echo_and_log "malwareexpert Database File Updates" "="
-                found_upgrade="yes"
-              fi
-            fi
-
-            if [ "$found_upgrade" == "yes" ] ; then
-              xshok_file_download "${work_dir_malwareexpert}/sigpack.tgz" "${malwareexpert_sigpack_url}"
-              ret="$?"
-              if [ "$ret" -eq 0 ] ; then
-                            # shellcheck disable=SC2035
-                $tar_bin --strip-components=1 --wildcards --overwrite -xzf "${work_dir_malwareexpert}/sigpack.tgz" --directory "${work_dir_malwareexpert}" */rfxn.*
-                for db_file in "${malwareexpert_dbs[@]}" ; do
-                  if [ "$loop" == "1" ] ; then
-                    xshok_pretty_echo_and_log "---"
-                  fi
-                  loop="1"
-                  if ! cmp -s "${work_dir_malwareexpert}/${db_file}" "${clam_dbs}/${db_file}" ; then
-                    db_ext="${db_file#*.}"
-
-                    xshok_pretty_echo_and_log "Testing updated malwareexpert database file: ${db_file}"
-                    if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
-                      if $clamscan_bin --quiet -d "${work_dir_malwareexpert}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>&10 ; then
-                        xshok_pretty_echo_and_log "Clamscan reports malwareexpert ${db_file} database integrity tested good"
-                        true
-                      else
-                        xshok_pretty_echo_and_log "Clamscan reports malwareexpert ${db_file} database integrity tested BAD"
-                        if [ "$remove_bad_database" == "yes" ] ; then
-                          if rm -f "${work_dir_malwareexpert}/${db_file}" ; then
-                            xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_malwareexpert}/${db_file}"
-                          fi
-                        fi
-                        false
-                        fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${work_dir_malwareexpert}/${db_file}" "$clam_dbs" 2>&13 ; then
-                        perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
-                        if [ "$selinux_fixes" == "yes" ] ; then
-                          restorecon "${clam_dbs}/local.ign"
-                        fi
-                        xshok_pretty_echo_and_log "Successfully updated malwareexpert production database file: ${db_file}"
-                        do_clamd_reload=1
-                      else
-                        xshok_pretty_echo_and_log "Failed to successfully update malwareexpert production database file: ${db_file} - SKIPPING"
-                      fi
-                    else
-                      $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_malwareexpert}/${db_file}" > "${test_dir}/${db_file}"
-                      $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
-                      $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
-                      $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
-                      mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
-                      if $clamscan_bin --quiet -d "${test_dir}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>&10 ; then
-                        xshok_pretty_echo_and_log "Clamscan reports malwareexpert ${db_file} database integrity tested good"
-                        true
-                      else
-                        xshok_pretty_echo_and_log "Clamscan reports malwareexpert ${db_file} database integrity tested BAD"
-                        if [ "$remove_bad_database" == "yes" ] ; then
-                          if rm -f "${work_dir_malwareexpert}/${db_file}" ; then
-                            xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_malwareexpert}/${db_file}"
-                          fi
-                        fi
-                        false
-                        fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${test_dir}/${db_file}" "$clam_dbs" 2>&13 ; then
-                        perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
-                        if [ "$selinux_fixes" == "yes" ] ; then
-                          restorecon "${clam_dbs}/${db_file}"
-                        fi
-                        xshok_pretty_echo_and_log "Successfully updated malwareexpert production database file: ${db_file}"
-                        do_clamd_reload=1
-                      else
-                        xshok_pretty_echo_and_log "Failed to successfully update malwareexpert production database file: ${db_file} - SKIPPING"
+                xshok_pretty_echo_and_log "Testing updated malware.expert database file: ${db_file}"
+                if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
+                  if $clamscan_bin --quiet -d "${work_dir_malwareexpert}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>&10 ; then
+                    xshok_pretty_echo_and_log "Clamscan reports malware.expert ${db_file} database integrity tested good"
+                    true
+                  else
+                    xshok_pretty_echo_and_log "Clamscan reports malware.expert ${db_file} database integrity tested BAD"
+                    if [ "$remove_bad_database" == "yes" ] ; then
+                      if rm -f "${work_dir_malwareexpert}/${db_file}" ; then
+                        xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_malwareexpert}/${db_file}"
                       fi
                     fi
+                    false
+                    fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${work_dir_malwareexpert}/${db_file}" "$clam_dbs" 2>&13 ; then
+                    perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
+                    if [ "$selinux_fixes" == "yes" ] ; then
+                      restorecon "${clam_dbs}/${db_file}"
+                    fi
+                    xshok_pretty_echo_and_log "Successfully updated malware.expert production database file: ${db_file}"
+                    malwareexpert_updates=1
+                    malwareexpert_db_update=1
+                    do_clamd_reload=1
+                  else
+                    xshok_pretty_echo_and_log "Failed to successfully update malware.expert production database file: ${db_file} - SKIPPING"
                   fi
-
-                done
-                #save the current version
-                echo "$latest_malwareexpert_version" > "${work_dir_malwareexpert}/current_malwareexpert_version"
-
-              else
-                xshok_pretty_echo_and_log "WARNING: Failed connection to ${malwareexpert_sigpack_url} - SKIPPED malwareexpert update"
+                else
+                  $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_malwareexpert}/${db_file}" > "${test_dir}/${db_file}"
+                  $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                  $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
+                  $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
+                  mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
+                  if $clamscan_bin --quiet -d "${test_dir}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>&10 ; then
+                    xshok_pretty_echo_and_log "Clamscan reports malware.expert ${db_file} database integrity tested good"
+                    true
+                  else
+                    xshok_pretty_echo_and_log "Clamscan reports malware.expert ${db_file} database integrity tested BAD"
+                    rm -f "${work_dir_malwareexpert}/${db_file}"
+                    if [ "$remove_bad_database" == "yes" ] ; then
+                      if rm -f "${work_dir_malwareexpert}/${db_file}" ; then
+                        xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_malwareexpert}/${db_file}"
+                      fi
+                    fi
+                    false
+                    fi && (test "$keep_db_backup" = "yes" && cp -f -p  "${clam_dbs}/${db_file}" "${clam_dbs}/${db}_file-bak" 2>/dev/null ; true) && if $rsync_bin -pcqt "${test_dir}/${db_file}" "$clam_dbs" 2>&13 ; then
+                    perms chown -f "${clam_user}:${clam_group}" "${clam_dbs}/${db_file}"
+                    if [ "$selinux_fixes" == "yes" ] ; then
+                      restorecon "${clam_dbs}/${db_file}"
+                    fi
+                    xshok_pretty_echo_and_log "Successfully updated malware.expert production database file: ${db_file}"
+                    malwareexpert_updates=1
+                    malwareexpert_db_update=1
+                    do_clamd_reload=1
+                  else
+                    xshok_pretty_echo_and_log "Failed to successfully update malware.expert production database file: ${db_file} - SKIPPING"
+                  fi
+                fi
               fi
             else
-              xshok_pretty_echo_and_log "No malwareexpert database file updates found" "-"
+              xshok_pretty_echo_and_log "Failed connection to ${malwareexpert_url} - SKIPPED malware.expert ${db_file} update"
             fi
+            if [ "$malwareexpert_db_update" != "1" ] ; then
+              xshok_pretty_echo_and_log "No updated malware.expert ${db_file} database file found" "-"
+            fi
+          done
+          if [ "$malwareexpert_updates" != "1" ] ; then
+            xshok_pretty_echo_and_log "No malware.expert database file updates found" "-"
+          fi
+        else
+          xshok_pretty_echo_and_log "malware.expert Database File Updates" "="
+          if [ "$malwareexpert_premium" == "yes" ] ; then
+              xshok_draw_time_remaining "$((update_interval - time_interval))" "$malwareexpert_premium_update_hours" "malwareexpert"
           else
-            xshok_pretty_echo_and_log "malwareexpert Database File Updates" "="
-            xshok_draw_time_remaining "$((update_interval - time_interval))" "$malwareexpert_update_hours" "malwareexpert"
+              xshok_draw_time_remaining "$((update_interval - time_interval))" "$malwareexpert_update_hours" "malwareexpert"
           fi
         fi
       fi
     fi
+  fi
 else
-  if [ -n "${malwareexpert_dbs[0]}" ] ; then
+  if [ -n "$malwareexpert_dbs" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
-      xshok_pretty_echo_and_log "Removing disabled malwareexpert Database files"
-
-      if [ -f "${work_dir_malwareexpert}/current_malwareexpert_version" ] ; then
-        rm -f "${work_dir_malwareexpert}/current_malwareexpert_version"
-      fi
-      if [ -f "${work_dir_malwareexpert}/sigpack.tgz" ] ; then
-        rm -f "${work_dir_malwareexpert}/sigpack.tgz"
-      fi
-
+      xshok_pretty_echo_and_log "Removing disabled malware.expert Database files"
       for db_file in "${malwareexpert_dbs[@]}" ; do
         if echo "$db_file" | $grep_bin -q "|" ; then
           db_file="${db_file%|*}"
