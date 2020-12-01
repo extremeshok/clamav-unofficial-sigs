@@ -35,7 +35,7 @@ else
 fi
 
 echo "running script as clamav and silence"
--u clamav  [ -x /usr/sbin/clamav-unofficial-sigs ] && bash /usr/sbin/clamav-unofficial-sigs --force --silence
+sudo -u clamav  [ -x /usr/sbin/clamav-unofficial-sigs ] && bash /usr/sbin/clamav-unofficial-sigs --force --silence
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
