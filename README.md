@@ -206,6 +206,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Ignore yara files that include modules
  - Enabled yararulesproject rules by default
  - os.gentoo.conf: disable updates and upgrade checks
+ - Replace $PWD with readlink -f "$0"
  - Fix: URLhaus log message
  - Fix wrong download URL for MalwarePatrol
  - Fix: set ownership of last-version-check.txt

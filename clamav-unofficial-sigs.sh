@@ -346,7 +346,7 @@ function xshok_file_download() { #outputfile #url #notimestamp
 		else
 			if [ ! "${3}" ] ; then
 				# the following is required because wget, cannot do --timestamping and --output-document together
-				this_dir="$PWD"
+				this_dir="$(readlink -f "$0")"
 				output_file="$1"
 				url="$2"
 				output_dir="${output_file%/*}"
@@ -1505,14 +1505,14 @@ minimum_yara_clamav_version="0.100"
 this_script_full_path="${BASH_SOURCE[0]}"
 # follow the symlinks
 while [ -h "$this_script_full_path" ]; do
-  this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>&1 && pwd )"
+  this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>&1 && readlink -f "$0" )"
   this_script_full_path="$(readlink "$this_script_full_path")"
 	# if relative symlink, then resolve the path
   if [[ $this_script_full_path != /* ]] ; then
     this_script_full_path="$this_script_path/$this_script_full_path"
   fi
 done
-this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>&1 && pwd )"
+this_script_path="$( cd -P "$( dirname "$this_script_full_path" )" >/dev/null 2>&1 && readlink -f "$0" )"
 this_script_name="$(basename "$this_script_full_path")"
 
 if [ -z "$this_script_full_path" ] || [ -z "$this_script_path" ] || [ -z "$this_script_name" ] ; then
