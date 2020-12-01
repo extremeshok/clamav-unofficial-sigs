@@ -38,7 +38,7 @@ wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf -O /etc/clamav-unofficial-sigs/user.conf
 ```
 Select your operating system config from https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/
-**replace os.ubuntu.conf with your required config, centos7 = os.centos7.conf**
+**replace os.ubuntu.conf with your required config, centos7/8 = os.centos.conf , debian9/10 = os.debian.conf **
 ```
 os_conf="os.ubuntu.conf"
 wget "https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/${os_conf}" -O /etc/clamav-unofficial-sigs/os.conf
@@ -67,9 +67,13 @@ script must run once as your superuser to set all the permissions and create the
 ### OR
 #### systemd
 ```
+mkdir -p /etc/systemd/system/
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.service -O /etc/systemd/system/clamav-unofficial-sigs.service
 wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamav-unofficial-sigs.timer -O /etc/systemd/system/clamav-unofficial-sigs.timer
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/systemd/clamd.scan.service -O /etc/systemd/system/clamd.scan.service
+
+systemctl enable clamav-unofficial-sigs.service
+systemctl enable clamav-unofficial-sigs.timer
+systemctl start clamav-unofficial-sigs.timer
 ```
 
 ### Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs

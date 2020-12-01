@@ -2,14 +2,12 @@
 
 ClamAV Unofficial Signatures Updater
 
-Github fork of the sourceforge hosted and non maintained utility.
-
 ## Maintained and provided by https://eXtremeSHOK.com
 
 ## Description
 The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, etc. The script will also generate and install cron, logrotate, and man files.
 
-## Checkout some of our other solutions: https://github.com/extremeshok?tab=repositories
+### Checkout some of our other solutions: https://github.com/extremeshok?tab=repositories
 
 ### Support / Suggestions / Comments
 Please post them on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
@@ -39,12 +37,16 @@ clamav-unofficial-sigs.sh --upgrade
 clamav-unofficial-sigs.sh
 ```
 
+### FOR PACKAGE MAINTAINERS / PACKAGERS
+Please use the sample package os.*.conf as a base for your os.conf, this will disable automatic updates, update notifications and the uninstallation feature. https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/packaging
+
 ### Always Run the script once as your superuser to set all the permissions and create the relevant directories
 
 ### Advanced Config Overrides
 * Default configs are loaded in the following order if they exist:
-* master.conf -> os.conf -> user.conf or your-specified.config
-* user.conf will override os.conf and master.conf, os.conf will override master.conf
+* master.conf -> os.conf -> os.*.conf -> user.conf or your-specified.config
+* user.conf will always override os.conf and master.conf, os.conf will override master.conf
+* please do not alter the master.conf, rather create a user.conf 
 * A minimum of 1 config is required.
 * Specifying a config on the command line (-c | --config) will override the loading of the default configs
 
@@ -63,7 +65,12 @@ clamav-unofficial-sigs.sh
 ### Yara Rule Support automatically enabled (as of April 2016)
 Since usage yara rules requires clamav 0.100 or above, they will be automatically deactivated if your clamav is older than the required version
 
-### Yara-Rules Project Support (as of June 2015)
+
+### URLhaus Support (as of January 2020)
+Usage of free URLhaus Database: https://urlhaus.abuse.ch
+- Enabled by default
+
+### Yara-Rules Project Support (as of June 2015, updated January 2020)
 Usage of free Yara-Rules Project: http://yararules.com
 - Enabled by default
 
@@ -87,9 +94,12 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
    Your 128 character authorisation signature would be : your_unique_and_very_long_random_string_of_characters
  - 6. Enter the authorisation signature into the config securiteinfo_authorisation_signature: replacing YOUR-SIGNATURE-NUMBER with your authorisation signature from the link
 
-### Linux Malware Detect support (as of May 2015)
+### Linux Malware Detect support (as of May 2015, updated January 2020)
 Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/projects/linux-malware-detect/
  - Enabled by default, no configuration required
+ 
+### Need a database added ? Missing a database or a database not working ?
+Please post on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
 
 ## USAGE
 
@@ -189,6 +199,10 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   its associated files and databases from the system
 
 ## Change Log
+### Version 7.0.1 (Updated 25 January 2020)
+ - Disable yara project rules duplicated in rxfn.yara (Thanks @dominicraf)
+ - Incremented the config to version 91
+ 
 ### Version 7.0.0 (Updated 24 January 2020)
  - eXtremeSHOK.com Maintenance
  - Added urlhaus database
@@ -679,7 +693,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - sig-boundary patch by Alan Stern
  - create intermediate monitor-ign-old.txt to prevent reading and writing of local.ign by Alan Stern
 
-### Version 4.0.0
+### Version 4.0.0 (Released 9 May 2015)
  - eXtremeSHOK.com Maintenance
  - Enabled all low false positive sources by default
  - Added all Sanesecurity database files
@@ -696,5 +710,3 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
 
 ## Script updates can be found at:
 ### https://github.com/extremeshok/clamav-unofficial-sigs
-
-Original Script can be found at: http://sourceforge.net/projects/unofficial-sigs
