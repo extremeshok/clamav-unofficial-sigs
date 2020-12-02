@@ -14,7 +14,7 @@ if [ -e "/var/lib/clamav/sanesecurity.ftm" ] ; then
 	rm -f /var/lib/clamav/sanesecurity.ftm
 fi
 
-echo "running script as root and verbose and force_wget"
+echo "running script verbose and force_wget"
 cp -f .t/tests/user_wget.conf /etc/clamav-unofficial-sigs/user.conf
 bash /usr/sbin/clamav-unofficial-sigs --verbose
 if [ "$?" -eq "0" ] ; then
@@ -24,7 +24,7 @@ else
   exit 1
 fi
 
-echo "running script as root and verbose"
+echo "running script verbose default curl"
 cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
 bash /usr/sbin/clamav-unofficial-sigs --verbose
 if [ "$?" -eq "0" ] ; then
@@ -120,3 +120,23 @@ else
  	echo .. ERROR
   exit 1
 fi
+
+echo "running script verbose with LOW ratings"
+cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user_low.conf
+bash /usr/sbin/clamav-unofficial-sigs --verbose
+if [ "$?" -eq "0" ] ; then
+	echo .. OK
+else
+ 	echo .. ERROR
+  exit 1
+fi
+
+echo "EXTRA DEBUG INFORMATION"
+echo "================"
+echo "/var/lib/clamav/"
+echo "================"
+ls -laFh /var/lib/clamav/
+echo "================"
+echo "/var/lib/clamav-unofficial-sigs/dbs-si"
+echo "================"
+ls -laFh /var/lib/clamav-unofficial-sigs/dbs-si
