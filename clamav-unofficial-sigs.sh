@@ -393,7 +393,7 @@ function clamav_files() {
 
 # Manage the databases and allow multi-dimensions as well as global overrides
 # Since the datbases are basically a multi-dimentional associative arrays in bash
-# ratings: LOW | MEDIUM | HIGH | REQUIRED | LOWONLY | MEDIUMONLY | LOWMEDIUMONLY | MEDIUMHIGHONLY | HIGHONLY | DISABLED
+# ratings: LOW | MEDIUM | HIGH | REQUIRED | LOWONLY | MEDIUMONLY | LOWMEDIUMONLY | DISABLED
 function xshok_database() { # rating database_array
   # Assign
   current_rating="${1}"
@@ -428,35 +428,25 @@ function xshok_database() { # rating database_array
                   new_dbs+=( "$db_name" )
                 fi
               elif [ "$current_rating" == "MEDIUM" ] ; then
-                if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] || [ "$db_name_rating" == "LOWMEDIUMONLY" ]  || [ "$db_name_rating" == "MEDIUMHIGHONLY" ] ; then
+                if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] || [ "$db_name_rating" == "LOWMEDIUMONLY" ] ; then
                   new_dbs+=( "$db_name" )
                 fi
               elif [ "$current_rating" == "HIGH" ] ; then
-                if [ "$db_name_rating" == "HIGHONLY" ] || [ "$db_name_rating" == "HIGH" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ] || [ "$db_name_rating" == "MEDIUMHIGHONLY" ] ; then
+                if [ "$db_name_rating" == "HIGH" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "LOW" ]; then
                   new_dbs+=( "$db_name" )
                 fi
-                            elif [ "$current_rating" == "LOWONLY" ] ; then
-                                if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ] ; then
-                                    new_dbs+=( "$db_name" )
-                                fi
-                            elif [ "$current_rating" == "MEDIUMONLY" ] ; then
-                                if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] ; then
-                                    new_dbs+=( "$db_name" )
-                                fi
-                            elif [ "$current_rating" == "LOWMEDIUMONLY" ] ; then
-                                if [ "$db_name_rating" == "LOWMEDIUMONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "MEDIUM" ] ; then
-                                    new_dbs+=( "$db_name" )
-                                fi
-                            elif [ "$current_rating" == "MEDIUMHIGHONLY" ] ; then
-                                if [ "$db_name_rating" == "MEDIUMHIGHONLY" ] || [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "HIGH" ] ; then
-                                    new_dbs+=( "$db_name" )
-                                fi
-                            elif [ "$current_rating" == "HIGHONLY" ] ; then
-                                if [ "$db_name_rating" == "HIGHONLY" ] || [ "$db_name_rating" == "HIGH" ] ; then
-                                    new_dbs+=( "$db_name" )
-                                fi
-                            fi
-            fi
+            elif [ "$current_rating" == "LOWONLY" ] ; then
+                if [ "$db_name_rating" == "LOWONLY" ] || [ "$db_name_rating" == "LOW" ] ; then
+                    new_dbs+=( "$db_name" )
+                fi
+            elif [ "$current_rating" == "MEDIUMONLY" ] ; then
+                if [ "$db_name_rating" == "MEDIUMONLY" ] || [ "$db_name_rating" == "MEDIUM" ] ; then
+                    new_dbs+=( "$db_name" )
+                fi
+            elif [ "$current_rating" == "LOWMEDIUMONLY" ] ; then
+                if [ "$db_name_rating" == "LOWMEDIUMONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "MEDIUM" ] ; then
+                    new_dbs+=( "$db_name" )
+                fi
           fi
         fi
       done
@@ -464,6 +454,8 @@ function xshok_database() { # rating database_array
   fi
   echo "${new_dbs[@]}" | xargs # Remove extra whitespace
 }
+
+
 
 ################################################################################
 # ADDITIONAL PROGRAM FUNCTIONS
