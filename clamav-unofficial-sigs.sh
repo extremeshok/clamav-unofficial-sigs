@@ -2207,16 +2207,29 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
   if [ -n "$sanesecurity_dbs" ] ; then
     if [ -n "$sanesecurity_dbs_rating" ] ; then
       temp_db="$(xshok_database "$sanesecurity_dbs_rating" "${sanesecurity_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$sanesecurity_dbs_rating" "${sanesecurity_dbs[@]}")"
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${sanesecurity_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${sanesecurity_dbs[@]}")"
     fi
-        sanesecurity_dbs=( )
-        if [ -n "$temp_db" ] ; then
-            #sanesecurity_dbs=( $temp_db )
-            read -r -a sanesecurity_dbs <<< "$temp_db"
-        fi
+    sanesecurity_dbs=( )
+    if [ -n "$temp_db" ] ; then
+        read -r -a sanesecurity_dbs <<< "$temp_db"
+    fi
   fi
+else
+    temp__remove_db="$(xshok_remove_database "DISABLED" "${sanesecurity_dbs[@]}")"
 fi
+sanesecurity_remove_dbs=( )
+if [ -n "$temp__remove_db" ] ; then
+    read -r -a sanesecurity_remove_dbs <<< "$temp__remove_db"
+fi
+
+echo "**********DEBUG :: BEGIN :: FAIL CI *************"
+echo "${sanesecurity_remove_dbs[@]}"
+echo "**********DEBUG :: END :: FAIL CI *************"
+
+
 ############################################################################################
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_dbs" ] ; then
