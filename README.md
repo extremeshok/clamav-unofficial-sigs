@@ -117,58 +117,44 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   master.conf, os.conf or user.conf
   Default Directory: /etc/clamav-unofficial-sigs
 
-
 -F, --force 	 Force all databases to be downloaded, could cause ip to be blocked
-
 
 -h, --help 	 Display this script's help and usage information
 
-
 -V, --version 	 Output script version and date information
-
 
 -v, --verbose 	 Be verbose, enabled when not run under cron
 
-
 -s, --silence 	 Only output error messages, enabled when run under cron
-
 
 -d, --decode-sig 	 Decode a third-party signature either by signature name
   (eg: Sanesecurity.Junk.15248) or hexadecimal string.
   This flag will 'NOT' decode image signatures
 
-
 -e, --encode-string 	 Hexadecimal encode an entire input string that can
   be used in any '*.ndb' signature database file
-
 
 -f, --encode-formatted 	 Hexadecimal encode a formatted input string containing
   signature spacing fields '{}, (), *', without encoding
   the spacing fields, so that the encoded signature
   can be used in any '*.ndb' signature database file
 
-
 -g, --gpg-verify 	 GPG verify a specific Sanesecurity database file
   eg: '-g filename.ext' (do not include file path)
 
-
 -i, --information 	 Output system and configuration information for
   viewing or possible debugging purposes
-
 
 -m, --make-database 	 Make a signature database from an ascii file containing
   data strings, with one data string per line.  Additional
   information is provided when using this flag
 
-
 -t, --test-database 	 Clamscan integrity test a specific database file
   eg: '-t filename.ext' (do not include file path)
-
 
 -o, --output-triggered 	 If HAM directory scanning is enabled in the script's
   configuration file, then output names of any third-party
   signatures that triggered during the HAM directory scan
-
 
 -w, --whitelist <signature-name> 	 Adds a signature whitelist entry in the newer ClamAV IGN2
   format to 'my-whitelist.ign2' in order to temporarily resolve
@@ -177,35 +163,30 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   if the original signature is either modified or removed from
   the third-party signature database
 
-
 --check-clamav 	 If ClamD status check is enabled and the socket path is correctly
   specifiedthen test to see if clamd is running or not
 
-
 --upgrade 	 Upgrades this script and master.conf to the latest available version
-
 
 --install-all 	 Install and generate the cron, logroate and man files, autodetects the values
   based on your config files
 
-
 --install-cron 	 Install and generate the cron file, autodetects the values
   based on your config files
-
 
 --install-logrotate 	 Install and generate the logrotate file, autodetects the
   values based on your config files
 
-
 --install-man 	 Install and generate the man file, autodetects the
   values based on your config files
-
 
 --remove-script 	 Remove the clamav-unofficial-sigs script and all of
   its associated files and databases from the system
 
 ## Change Log
 ### Version 7.2 ( XX December 2020 : Under Development)
+ - Database rating downgrades are now supported, eg, changing from HIGH to LOW will remove the HIGH and MEDIUM rated databases.
+ - Disabled datbaases are automatically removed
  - Added Malware.expert databases (non-free)
  - Reworked securiteinfo premium databases (non-free)
  - Added malwarepatrol_db to specifiy the extact database name (default: malwarepatrol.db)
