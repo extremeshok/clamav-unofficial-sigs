@@ -120,14 +120,12 @@ else
  	echo .. ERROR
   exit 1
 fi
-echo "===== BEFORE /var/lib/clamav/ ====="
+echo "===== HIGH /var/lib/clamav/ ====="
 ls -laFh /var/lib/clamav/
-echo "===== BEFORE /var/lib/clamav-unofficial-sigs/dbs-si ====="
-ls -laFh /var/lib/clamav-unofficial-sigs/dbs-si
 echo "================"
 
 echo "running script verbose with LOW ratings"
-cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user_low.conf
+cp -f .t/tests/user_low.conf /etc/clamav-unofficial-sigs/user.conf
 bash /usr/sbin/clamav-unofficial-sigs --verbose
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
@@ -135,10 +133,8 @@ else
  	echo .. ERROR
   exit 1
 fi
-echo "===== AFTER /var/lib/clamav/ ====="
+echo "===== LOW /var/lib/clamav/ ====="
 ls -laFh /var/lib/clamav/
-echo "===== AFTER /var/lib/clamav-unofficial-sigs/dbs-si ====="
-ls -laFh /var/lib/clamav-unofficial-sigs/dbs-si
 echo "================"
 
 echo "Was /var/lib/clamav-unofficial-sigs/dbs-ss/jurlbl.ndb removed ?"
@@ -150,6 +146,55 @@ else
 fi
 echo "Was /var/lib/clamav/phish.ndb removed ?"
 if [ ! -e "/var/lib/clamav/phish.ndb" ] ; then
+    echo .. OK
+else
+    echo .. ERROR
+    exit 1
+fi
+
+echo "running script verbose with malwareexpert databases"
+cp -f .t/tests/user_malwareexpert.conf /etc/clamav-unofficial-sigs/user.conf
+bash /usr/sbin/clamav-unofficial-sigs --verbose
+if [ "$?" -eq "0" ] ; then
+	echo .. OK
+else
+ 	echo .. ERROR
+  exit 1
+fi
+echo "===== MALWAREEXPERT /var/lib/clamav/ ====="
+ls -laFh /var/lib/clamav/
+echo "================"
+
+echo "Was /var/lib/clamav-unofficial-sigs/dbs-ss/jurlbl.ndb removed ?"
+if [ ! -e "/var/lib/clamav-unofficial-sigs/dbs-ss/jurlbl.ndb" ] ; then
+    echo .. OK
+else
+    echo .. ERROR
+    exit 1
+fi
+echo "Was /var/lib/clamav/malware.expert.hdb added ?"
+if [ -e "/var/lib/clamav/malware.expert.hdb" ] ; then
+    echo .. OK
+else
+    echo .. ERROR
+    exit 1
+fi
+echo "Was /var/lib/clamav/malware.expert.fp added ?"
+if [ -e "/var/lib/clamav/malware.expert.fp" ] ; then
+    echo .. OK
+else
+    echo .. ERROR
+    exit 1
+fi
+echo "Was /var/lib/clamav/malware.expert.ldb added ?"
+if [ -e "/var/lib/clamav/malware.expert.ldb" ] ; then
+    echo .. OK
+else
+    echo .. ERROR
+    exit 1
+fi
+echo "Was /var/lib/clamav/malware.expert.ndb added ?"
+if [ -e "/var/lib/clamav/malware.expert.ndb" ] ; then
     echo .. OK
 else
     echo .. ERROR
