@@ -2407,70 +2407,84 @@ echo "**********DEBUG :: END *************"
 if [ -n "${sanesecurity_remove_dbs[0]}" ] ; then
   for db_file in "${sanesecurity_dbs[@]}" ; do
     if [ -f "${work_dir_sanesecurity}/${db_file}" ] ; then
-        echo "Found: ${work_dir_sanesecurity}/${db_file}"
+        echo "Removing unused file: ${work_dir_sanesecurity}/${db_file}"
+        rm -f "${work_dir_sanesecurity}/${db_file}"
     fi
     if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Found: ${clam_dbs}/${db_file}"
+        echo "Removing unused file: ${clam_dbs}/${db_file}"
+        rm -f "${clam_dbs}/${db_file}"
     fi
   done
 fi
 if [ -n "${securiteinfo_remove_dbs[0]}" ] ; then
   for db_file in "${securiteinfo_remove_dbs[@]}" ; do
     if [ -f "${work_dir_securiteinfo}/${db_file}" ] ; then
-        echo "Found: ${work_dir_securiteinfo}/${db_file}"
+        echo "Removing unused file: ${work_dir_securiteinfo}/${db_file}"
+        rm -f "${work_dir_securiteinfo}/${db_file}"
     fi
     if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Found: ${clam_dbs}/${db_file}"
+        echo "Removing unused file: ${clam_dbs}/${db_file}"
+        rm -f "${clam_dbs}/${db_file}"
     fi
   done
 fi
 if [ -n "${linuxmalwaredetect_remove_dbs[0]}" ] ; then
   for db_file in "${linuxmalwaredetect_remove_dbs[@]}" ; do
     if [ -f "${work_dir_linuxmalwaredetect}/${db_file}" ] ; then
-        echo "Found: ${work_dir_linuxmalwaredetect}/${db_file}"
+        echo "Removing unused file: ${work_dir_linuxmalwaredetect}/${db_file}"
+        rm -f "${work_dir_linuxmalwaredetect}/${db_file}"
     fi
     if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Found: ${clam_dbs}/${db_file}"
+        echo "Removing unused file: ${clam_dbs}/${db_file}"
+        rm -f "${clam_dbs}/${db_file}"
     fi
   done
 fi
 if [ -n "${malwareexpert_remove_dbs[0]}" ] ; then
   for db_file in "${malwareexpert_remove_dbs[@]}" ; do
     if [ -f "${work_dir_malwareexpert}/${db_file}" ] ; then
-        echo "Found: ${work_dir_malwareexpert}/${db_file}"
+        echo "Removing unused file: ${work_dir_malwareexpert}/${db_file}"
+        rm -f "${work_dir_malwareexpert}/${db_file}"
     fi
     if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Found: ${clam_dbs}/${db_file}"
+        echo "Removing unused file: ${clam_dbs}/${db_file}"
+        rm -f "${clam_dbs}/${db_file}"
     fi
   done
 fi
 if [ -n "${yararulesproject_remove_dbs[0]}" ] ; then
   for db_file in "${yararulesproject_remove_dbs[@]}" ; do
     if [ -f "${work_dir_yararulesproject}/${db_file}" ] ; then
-        echo "Found: ${work_dir_yararulesproject}/${db_file}"
+        echo "Removing unused file: ${work_dir_yararulesproject}/${db_file}"
+        rm -f "${work_dir_yararulesproject}/${db_file}"
     fi
     if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Found: ${clam_dbs}/${db_file}"
+        echo "Removing unused file: ${clam_dbs}/${db_file}"
+        rm -f "${clam_dbs}/${db_file}"
     fi
   done
 fi
 if [ -n "${urlhaus_remove_dbs[0]}" ] ; then
   for db_file in "${urlhaus_remove_dbs[@]}" ; do
     if [ -f "${work_dir_urlhaus}/${db_file}" ] ; then
-        echo "Found: ${work_dir_urlhaus}/${db_file}"
+        echo "Removing unused file: ${work_dir_urlhaus}/${db_file}"
+        rm -f "${work_dir_urlhaus}/${db_file}"
     fi
     if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Found: ${clam_dbs}/${db_file}"
+        echo "Removing unused file: ${clam_dbs}/${db_file}"
+        rm -f "${clam_dbs}/${db_file}"
     fi
   done
 fi
 if [ -n "${malwarepatrol_remove_dbs[0]}" ] ; then
   for db_file in "${malwarepatrol_remove_dbs[@]}" ; do
     if [ -f "${work_dir_malwarepatrol}/${db_file}" ] ; then
-        echo "Found: ${work_dir_malwarepatrol}/${db_file}"
+        echo "Removing unused file: ${work_dir_malwarepatrol}/${db_file}"
+        rm -f "${work_dir_malwarepatrol}/${db_file}"
     fi
     if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Found: ${clam_dbs}/${db_file}"
+        echo "Removing unused file: ${clam_dbs}/${db_file}"
+        rm -f "${clam_dbs}/${db_file}"
     fi
   done
 fi

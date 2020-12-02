@@ -130,13 +130,24 @@ else
  	echo .. ERROR
   exit 1
 fi
-
-echo "EXTRA DEBUG INFORMATION"
-echo "================"
-echo "/var/lib/clamav/"
-echo "================"
+echo "===== /var/lib/clamav/ ====="
 ls -laFh /var/lib/clamav/
-echo "================"
-echo "/var/lib/clamav-unofficial-sigs/dbs-si"
-echo "================"
+echo "===== /var/lib/clamav-unofficial-sigs/dbs-si ====="
 ls -laFh /var/lib/clamav-unofficial-sigs/dbs-si
+echo "================"
+
+
+echo "Was /var/lib/clamav//spam_marketing.ndb removed ?"
+if [ -e "/var/lib/clamav//spam_marketing.ndb" ] ; then
+    echo .. OK
+else
+    echo .. ERROR
+    exit 1
+fi
+echo "Was /var/lib/clamav-unofficial-sigs/dbs-si/spam_marketing.ndb removed ?"
+if [ -e "/var/lib/clamav-unofficial-sigs/dbs-si/spam_marketing.ndb" ] ; then
+    echo .. OK
+else
+    echo .. ERROR
+    exit 1
+fi
