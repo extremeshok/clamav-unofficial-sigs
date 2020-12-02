@@ -2221,22 +2221,18 @@ else
     temp_remove_db="$(xshok_remove_database "DISABLED" "${sanesecurity_dbs[@]}")"
 fi
 sanesecurity_remove_dbs=( )
-if [ -n "$temp__remove_db" ] ; then
+if [ -n "$temp_remove_db" ] ; then
     read -r -a sanesecurity_remove_dbs <<< "$temp_remove_db"
 fi
-
-echo "**********DEBUG :: BEGIN :: FAIL CI *************"
-echo "${sanesecurity_remove_dbs[@]}"
-echo "**********DEBUG :: END :: FAIL CI *************"
-
-
 ############################################################################################
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_dbs" ] ; then
     if [ -n "$securiteinfo_dbs_rating" ] ; then
       temp_db="$(xshok_database "$securiteinfo_dbs_rating" "${securiteinfo_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$securiteinfo_dbs_rating" "${securiteinfo_dbs[@]}")"
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${securiteinfo_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${securiteinfo_dbs[@]}")"
     fi
         securiteinfo_dbs=( )
         if [ -n "$temp_db" ] ; then
@@ -2244,18 +2240,38 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
             read -r -a securiteinfo_dbs <<< "$temp_db"
         fi
   fi
+else
+    temp_remove_db="$(xshok_remove_database "DISABLED" "${securiteinfo_dbs[@]}")"
+fi
+securiteinfo_remove_dbs=( )
+if [ -n "$temp_remove_db" ] ; then
+    read -r -a securiteinfo_remove_dbs <<< "$temp_remove_db"
+fi
+if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_premium_dbs" ] && [ "$securiteinfo_premium" == "yes" ] ; then
     if [ -n "$securiteinfo_dbs_rating" ] ; then
       temp_db="$(xshok_database "$securiteinfo_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$securiteinfo_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
     fi
-        if [ -n "$temp_db" ] ; then
-            #securiteinfo_dbs=( $temp_db )
-            read -r -a securiteinfo_dbs <<< "$temp_db"
-        fi
+    if [ -n "$temp_db" ] ; then
+        #securiteinfo_dbs=( $temp_db )
+        read -r -a securiteinfo_dbs <<< "$temp_db"
+    fi
   fi
+else
+    temp_remove_db="$(xshok_remove_database "DISABLED" "${securiteinfo_premium_dbs[@]}")"
 fi
+
+if [ -n "$temp_remove_db" ] ; then
+    read -r -a securiteinfo_remove_dbs <<< "$temp_remove_db"
+fi
+
+echo "**********DEBUG :: BEGIN :: FAIL CI *************"
+echo "${securiteinfo_remove_dbs[@]}"
+echo "**********DEBUG :: END :: FAIL CI *************"
 ############################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
