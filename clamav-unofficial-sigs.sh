@@ -2386,24 +2386,7 @@ else
     malwarepatrol_remove_dbs=( "malwarepatrol.db" )
 fi
 ############################################################################################
-
-echo "**********DEBUG :: BEGIN *************"
-echo "sanesecurity_remove_dbs:"
-echo "${sanesecurity_remove_dbs[@]}"
-echo "securiteinfo_remove_dbs:"
-echo "${securiteinfo_remove_dbs[@]}"
-echo "linuxmalwaredetect_remove_dbs:"
-echo "${linuxmalwaredetect_remove_dbs[@]}"
-echo "malwareexpert_remove_dbs:"
-echo "${malwareexpert_remove_dbs[@]}"
-echo "yararulesproject_remove_dbs:"
-echo "${yararulesproject_remove_dbs[@]}"
-echo "urlhaus_remove_dbs:"
-echo "${urlhaus_remove_dbs[@]}"
-echo "malwarepatrol_remove_dbs:"
-echo "${malwarepatrol_remove_dbs[@]}"
-echo "**********DEBUG :: END *************"
-
+# CLEANUP UNUSED DATABASES, eg when downgrading a database rating or disabling a database
 if [ -n "${sanesecurity_remove_dbs[0]}" ] ; then
   for db_file in "${sanesecurity_dbs[@]}" ; do
     if [ -f "${work_dir_sanesecurity}/${db_file}" ] ; then
@@ -2489,11 +2472,7 @@ if [ -n "${malwarepatrol_remove_dbs[0]}" ] ; then
   done
 fi
 
-
-
 ############################################################################################
-
-
 
 # If "ham_dir" variable is set, then create initial whitelist files (skipped if first-time script run).
 test_dir="$work_dir/test"

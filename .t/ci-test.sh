@@ -141,15 +141,15 @@ echo "===== AFTER /var/lib/clamav-unofficial-sigs/dbs-si ====="
 ls -laFh /var/lib/clamav-unofficial-sigs/dbs-si
 echo "================"
 
-echo "Was /var/lib/clamav/spam_marketing.ndb removed ?"
-if [ ! -e "/var/lib/clamav/spam_marketing.ndb" ] ; then
+echo "Was /var/lib/clamav-unofficial-sigs/dbs-ss/jurlbl.ndb removed ?"
+if [ ! -e "/var/lib/clamav-unofficial-sigs/dbs-ss/jurlbl.ndb" ] ; then
     echo .. OK
 else
     echo .. ERROR
     exit 1
 fi
-echo "Was /var/lib/clamav-unofficial-sigs/dbs-si/spam_marketing.ndb removed ?"
-if [ ! -e "/var/lib/clamav-unofficial-sigs/dbs-si/spam_marketing.ndb" ] ; then
+echo "Was /var/lib/clamav/phish.ndb removed ?"
+if [ ! -e "/var/lib/clamav/phish.ndb" ] ; then
     echo .. OK
 else
     echo .. ERROR
