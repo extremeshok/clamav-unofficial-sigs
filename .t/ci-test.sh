@@ -120,6 +120,11 @@ else
  	echo .. ERROR
   exit 1
 fi
+echo "===== BEFORE /var/lib/clamav/ ====="
+ls -laFh /var/lib/clamav/
+echo "===== BEFORE /var/lib/clamav-unofficial-sigs/dbs-si ====="
+ls -laFh /var/lib/clamav-unofficial-sigs/dbs-si
+echo "================"
 
 echo "running script verbose with LOW ratings"
 cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user_low.conf
@@ -130,22 +135,21 @@ else
  	echo .. ERROR
   exit 1
 fi
-echo "===== /var/lib/clamav/ ====="
+echo "===== AFTER /var/lib/clamav/ ====="
 ls -laFh /var/lib/clamav/
-echo "===== /var/lib/clamav-unofficial-sigs/dbs-si ====="
+echo "===== AFTER /var/lib/clamav-unofficial-sigs/dbs-si ====="
 ls -laFh /var/lib/clamav-unofficial-sigs/dbs-si
 echo "================"
 
-
-echo "Was /var/lib/clamav//spam_marketing.ndb removed ?"
-if [ -e "/var/lib/clamav//spam_marketing.ndb" ] ; then
+echo "Was /var/lib/clamav/spam_marketing.ndb removed ?"
+if [ ! -e "/var/lib/clamav/spam_marketing.ndb" ] ; then
     echo .. OK
 else
     echo .. ERROR
     exit 1
 fi
 echo "Was /var/lib/clamav-unofficial-sigs/dbs-si/spam_marketing.ndb removed ?"
-if [ -e "/var/lib/clamav-unofficial-sigs/dbs-si/spam_marketing.ndb" ] ; then
+if [ ! -e "/var/lib/clamav-unofficial-sigs/dbs-si/spam_marketing.ndb" ] ; then
     echo .. OK
 else
     echo .. ERROR
