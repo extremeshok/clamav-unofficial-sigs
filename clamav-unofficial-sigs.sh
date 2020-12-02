@@ -412,9 +412,6 @@ function xshok_database() { # rating database_array
         if [ -z "$current_rating" ] ; then # YARA rules are disabled
           new_dbs+=( "$db_name" )
         else
-          if [[ ! "$db_name" = *"|"* ]] ; then # This old format
-            new_dbs+=( "$db_name" )
-          else
             db_name_rating="${db_name#*|}"
             db_name="${db_name%|*}"
 
@@ -447,8 +444,51 @@ function xshok_database() { # rating database_array
                 if [ "$db_name_rating" == "LOWMEDIUMONLY" ] || [ "$db_name_rating" == "LOW" ]  || [ "$db_name_rating" == "MEDIUM" ] ; then
                     new_dbs+=( "$db_name" )
                 fi
-          fi
+            fi
         fi
+    fi
+      done
+    fi
+  fi
+  echo "${new_dbs[@]}" | xargs # Remove extra whitespace
+}
+
+# Manage the databases to be removed and allow multi-dimensions as well as global overrides
+# Since the datbases are basically a multi-dimentional associative arrays in bash
+# ratings: LOW | MEDIUM | HIGH | REQUIRED | LOWONLY | MEDIUMONLY | LOWMEDIUMONLY | DISABLED
+function xshok_remove_database() { # rating database_array
+  # Assign
+  current_rating="${1}"
+  declare -a current_dbs=( "${@:2}" )
+  # Zero
+  declare -a new_dbs=( )
+  if [ -n "${current_dbs[0]}" ] ; then
+    if [ ${#current_dbs} -ge 1 ] ; then
+      for db_name in "${current_dbs[@]}" ; do
+          db_name_rating="${db_name#*|}"
+          db_name="${db_name%|*}"
+        # Checks
+            if [ "$enable_yararules" == "no" ] ; then # YARA rules are disabled
+                if [[ "$db_name" == *".yar"* ]] ; then # If it's the value you want to delete
+                    new_dbs+=( "$db_name" )
+                fi
+            else
+                if [ "$db_name_rating" == "DISABLED" ] ; then
+                    new_dbs+=( "$db_name" )
+                elif [ "$current_rating" == "HIGH" ] ; then
+                    if [ "$db_name_rating" == "LOWONLY" ] ||  [ "$db_name_rating" == "LOWMEDIUMONLY" ] ||[ "$db_name_rating" == "MEDIUMONLY" ] ; then
+                        new_dbs+=( "$db_name" )
+                    fi
+                elif [ "$current_rating" == "MEDIUM" ] ; then
+                    if [ "$db_name_rating" == "HIGH" ] ; then
+                        new_dbs+=( "$db_name" )
+                    fi
+                elif [ "$current_rating" == "LOW" ] ; then
+                    if [ "$db_name_rating" == "MEDIUMONLY" ] ||  [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "HIGH" ]; then
+                        new_dbs+=( "$db_name" )
+                    fi
+                fi
+              fi
       done
     fi
   fi
