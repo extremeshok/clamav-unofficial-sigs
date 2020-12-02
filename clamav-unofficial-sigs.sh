@@ -412,6 +412,9 @@ function xshok_database() { # rating database_array
         if [ -z "$current_rating" ] ; then # YARA rules are disabled
           new_dbs+=( "$db_name" )
         else
+            if [[ ! "$db_name" = *"|"* ]] ; then # This old format
+                new_dbs+=( "$db_name" )
+            else
             db_name_rating="${db_name#*|}"
             db_name="${db_name%|*}"
 
@@ -433,6 +436,7 @@ function xshok_database() { # rating database_array
                   new_dbs+=( "$db_name" )
                 fi
             fi
+        fi
         fi
     fi
       done
@@ -2399,6 +2403,41 @@ echo "${urlhaus_remove_dbs[@]}"
 echo "malwarepatrol_remove_dbs:"
 echo "${malwarepatrol_remove_dbs[@]}"
 echo "**********DEBUG :: END *************"
+
+if [ -n "${sanesecurity_remove_dbs[0]}" ] ; then
+  for db_file in "${sanesecurity_dbs[@]}" ; do
+    if [ -f "${work_dir_sanesecurity}/${db_file}" ] ; then
+        echo "Found: ${work_dir_sanesecurity}/${db_file}"
+    else
+        echo "Not: ${work_dir_sanesecurity}/${db_file}"
+    fi
+    if [ -f "${clam_dbs}/${db_file}" ] ; then
+        echo "Found: ${clam_dbs}/${db_file}"
+    else
+        echo "Not: ${clam_dbs}/${db_file}"
+    fi
+  done
+fi
+if [ -n "${securiteinfo_remove_dbs[0]}" ] ; then
+  for db_file in "${securiteinfo_remove_dbs[@]}" ; do
+    if [ -f "${work_dir_securiteinfo}/${db_file}" ] ; then
+        echo "Found: ${work_dir_securiteinfo}/${db_file}"
+    else
+        echo "Not: ${work_dirsecuriteinfo}/${db_file}"
+    fi
+    if [ -f "${clam_dbs}/${db_file}" ] ; then
+        echo "Found: ${clam_dbs}/${db_file}"
+    else
+        echo "Not: ${clam_dbs}/${db_file}"
+    fi
+  done
+fi
+
+
+
+############################################################################################
+
+
 
 # If "ham_dir" variable is set, then create initial whitelist files (skipped if first-time script run).
 test_dir="$work_dir/test"
