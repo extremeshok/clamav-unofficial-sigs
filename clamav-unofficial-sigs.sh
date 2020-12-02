@@ -2269,9 +2269,12 @@ if [ -n "$temp_remove_db" ] ; then
     read -r -a securiteinfo_remove_dbs <<< "$temp_remove_db"
 fi
 
-echo "**********DEBUG :: BEGIN :: FAIL CI *************"
+echo "**********DEBUG :: BEGIN *************"
+echo "sanesecurity_remove_dbs"
+echo "${sanesecurity_remove_dbs[@]}"
+echo "securiteinfo_remove_dbs"
 echo "${securiteinfo_remove_dbs[@]}"
-echo "**********DEBUG :: END :: FAIL CI *************"
+echo "**********DEBUG :: END *************"
 ############################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
