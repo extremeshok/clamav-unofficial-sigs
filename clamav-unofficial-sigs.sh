@@ -2218,11 +2218,11 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
     fi
   fi
 else
-    temp__remove_db="$(xshok_remove_database "DISABLED" "${sanesecurity_dbs[@]}")"
+    temp_remove_db="$(xshok_remove_database "DISABLED" "${sanesecurity_dbs[@]}")"
 fi
 sanesecurity_remove_dbs=( )
 if [ -n "$temp__remove_db" ] ; then
-    read -r -a sanesecurity_remove_dbs <<< "$temp__remove_db"
+    read -r -a sanesecurity_remove_dbs <<< "$temp_remove_db"
 fi
 
 echo "**********DEBUG :: BEGIN :: FAIL CI *************"
