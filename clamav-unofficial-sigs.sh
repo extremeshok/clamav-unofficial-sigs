@@ -1171,7 +1171,7 @@ function clamscan_integrity_test_specific_database_file() { # databasefile
       xshok_pretty_echo_and_log "=== Linux Malware Detect ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_linuxmalwaredetect"
 
-      xshok_pretty_echo_and_log "=== malware.expert Detect ==="
+      xshok_pretty_echo_and_log "=== Malware Expert Detect ==="
       ls --ignore "*.sig" --ignore "*.md5" --ignore "*.ign2" "$work_dir_malwareexpert"
 
       xshok_pretty_echo_and_log "=== Linux Malware Detect ==="
@@ -3206,7 +3206,7 @@ else
 fi
 
 ##############################################################################################################################################
-# Check for updated malware.expert database files every set number of hours as defined in the "USER CONFIGURATION" section of this script      #
+# Check for updated Malware Expert database files every set number of hours as defined in the "USER CONFIGURATION" section of this script      #
 ##############################################################################################################################################
 if [ "$malwareexpert_enabled" == "yes" ] ; then
   if [ "$malwareexpert_serial_key" != "YOUR-SERIAL-KEY" ] ; then
@@ -3237,7 +3237,7 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
             if [ "$loop" == "1" ] ; then
               xshok_pretty_echo_and_log "---"
             fi
-            xshok_pretty_echo_and_log "Checking for updated malware.expert database file: ${db_file}"
+            xshok_pretty_echo_and_log "Checking for updated Malware Expert database file: ${db_file}"
             malwareexpert_db_update="0"
             xshok_file_download "${work_dir_malwareexpert}/${db_file}" "${malwareexpert_url}/${malwareexpert_serial_key}/${db_file}"
             ret="$?"
@@ -3246,13 +3246,13 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
               if ! cmp -s "${work_dir_malwareexpert}/${db_file}" "${clam_dbs}/${db_file}" ; then
                 db_ext="${db_file#*.}"
 
-                xshok_pretty_echo_and_log "Testing updated malware.expert database file: ${db_file}"
+                xshok_pretty_echo_and_log "Testing updated Malware Expert database file: ${db_file}"
                 if [ -z "$ham_dir" ] || [ "$db_ext" != "ndb" ] ; then
                   if $clamscan_bin --quiet -d "${work_dir_malwareexpert}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>&10 ; then
-                    xshok_pretty_echo_and_log "Clamscan reports malware.expert ${db_file} database integrity tested good"
+                    xshok_pretty_echo_and_log "Clamscan reports Malware Expert ${db_file} database integrity tested good"
                     true
                   else
-                    xshok_pretty_echo_and_log "Clamscan reports malware.expert ${db_file} database integrity tested BAD"
+                    xshok_pretty_echo_and_log "Clamscan reports Malware Expert ${db_file} database integrity tested BAD"
                     if [ "$remove_bad_database" == "yes" ] ; then
                       if rm -f "${work_dir_malwareexpert}/${db_file}" ; then
                         xshok_pretty_echo_and_log "Removed invalid database: ${work_dir_malwareexpert}/${db_file}"
@@ -3264,12 +3264,12 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
                     if [ "$selinux_fixes" == "yes" ] ; then
                       restorecon "${clam_dbs}/${db_file}"
                     fi
-                    xshok_pretty_echo_and_log "Successfully updated malware.expert production database file: ${db_file}"
+                    xshok_pretty_echo_and_log "Successfully updated Malware Expert production database file: ${db_file}"
                     malwareexpert_updates=1
                     malwareexpert_db_update=1
                     do_clamd_reload=1
                   else
-                    xshok_pretty_echo_and_log "Failed to successfully update malware.expert production database file: ${db_file} - SKIPPING"
+                    xshok_pretty_echo_and_log "Failed to successfully update Malware Expert production database file: ${db_file} - SKIPPING"
                   fi
                 else
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_malwareexpert}/${db_file}" > "${test_dir}/${db_file}"
@@ -3278,10 +3278,10 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
                   mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
                   if $clamscan_bin --quiet -d "${test_dir}/${db_file}" "${work_dir_work_configs}/scan-test.txt" 2>&10 ; then
-                    xshok_pretty_echo_and_log "Clamscan reports malware.expert ${db_file} database integrity tested good"
+                    xshok_pretty_echo_and_log "Clamscan reports Malware Expert ${db_file} database integrity tested good"
                     true
                   else
-                    xshok_pretty_echo_and_log "Clamscan reports malware.expert ${db_file} database integrity tested BAD"
+                    xshok_pretty_echo_and_log "Clamscan reports Malware Expert ${db_file} database integrity tested BAD"
                     rm -f "${work_dir_malwareexpert}/${db_file}"
                     if [ "$remove_bad_database" == "yes" ] ; then
                       if rm -f "${work_dir_malwareexpert}/${db_file}" ; then
@@ -3294,27 +3294,27 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
                     if [ "$selinux_fixes" == "yes" ] ; then
                       restorecon "${clam_dbs}/${db_file}"
                     fi
-                    xshok_pretty_echo_and_log "Successfully updated malware.expert production database file: ${db_file}"
+                    xshok_pretty_echo_and_log "Successfully updated Malware Expert production database file: ${db_file}"
                     malwareexpert_updates=1
                     malwareexpert_db_update=1
                     do_clamd_reload=1
                   else
-                    xshok_pretty_echo_and_log "Failed to successfully update malware.expert production database file: ${db_file} - SKIPPING"
+                    xshok_pretty_echo_and_log "Failed to successfully update Malware Expert production database file: ${db_file} - SKIPPING"
                   fi
                 fi
               fi
             else
-              xshok_pretty_echo_and_log "Failed connection to ${malwareexpert_url} - SKIPPED malware.expert ${db_file} update"
+              xshok_pretty_echo_and_log "Failed connection to ${malwareexpert_url} - SKIPPED Malware Expert ${db_file} update"
             fi
             if [ "$malwareexpert_db_update" != "1" ] ; then
-              xshok_pretty_echo_and_log "No updated malware.expert ${db_file} database file found" "-"
+              xshok_pretty_echo_and_log "No updated Malware Expert ${db_file} database file found" "-"
             fi
           done
           if [ "$malwareexpert_updates" != "1" ] ; then
-            xshok_pretty_echo_and_log "No malware.expert database file updates found" "-"
+            xshok_pretty_echo_and_log "No Malware Expert database file updates found" "-"
           fi
         else
-          xshok_pretty_echo_and_log "malware.expert Database File Updates" "="
+          xshok_pretty_echo_and_log "Malware Expert Database File Updates" "="
           if [ "$malwareexpert_premium" == "yes" ] ; then
               xshok_draw_time_remaining "$((update_interval - time_interval))" "$malwareexpert_premium_update_hours" "malwareexpert"
           else
@@ -3327,7 +3327,7 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
 else
   if [ -n "$malwareexpert_dbs" ] ; then
     if [ "$remove_disabled_databases" == "yes" ] ; then
-      xshok_pretty_echo_and_log "Removing disabled malware.expert Database files"
+      xshok_pretty_echo_and_log "Removing disabled Malware Expert Database files"
       for db_file in "${malwareexpert_dbs[@]}" ; do
         if echo "$db_file" | $grep_bin -q "|" ; then
           db_file="${db_file%|*}"

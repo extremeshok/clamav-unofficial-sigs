@@ -77,8 +77,8 @@ Usage of free Yara-Rules Project: http://yararules.com
 Current limitations of clamav support : http://blog.clamav.net/search/label/yara
 
 ### malware.experrt non-free database support (as of December 2020)
-Usage of malware.expert : https://www.malware.expert
- - 1. Sign up for an account :  https://www.malware.expert
+Usage of Malware Expert : https://www.Malware Expert
+ - 1. Sign up for an account :  https://www.Malware Expert
  - 2. You will recieve an email containing your serial key/number
  - 3. Enter the serial key into the config malwareexpert_serial_key: replacing YOUR-SERIAL-KEY with your serial key from the email
 
@@ -187,7 +187,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
 ### Version 7.2 ( XX December 2020 : Under Development)
  - Database rating downgrades are now supported, eg, changing from HIGH to LOW will remove the HIGH and MEDIUM rated databases.
  - Disabled databases are automatically removed
- - Added Malware.expert databases (non-free)
+ - Added Malware Expert databases (non-free)
  - Reworked securiteinfo premium databases (non-free)
  - Added malwarepatrol_db to specifiy the extact database name (default: malwarepatrol.db)
  - Added detection of tar executable (use gtar on mac and bsd)
