@@ -2257,76 +2257,90 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
       temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
     fi
     if [ -n "$temp_db" ] ; then
-        #securiteinfo_dbs=( $temp_db )
         read -r -a securiteinfo_dbs <<< "$temp_db"
     fi
   fi
 else
     temp_remove_db="$(xshok_remove_database "DISABLED" "${securiteinfo_premium_dbs[@]}")"
 fi
-
 if [ -n "$temp_remove_db" ] ; then
     read -r -a securiteinfo_remove_dbs <<< "$temp_remove_db"
 fi
-
-echo "**********DEBUG :: BEGIN *************"
-echo "sanesecurity_remove_dbs"
-echo "${sanesecurity_remove_dbs[@]}"
-echo "securiteinfo_remove_dbs"
-echo "${securiteinfo_remove_dbs[@]}"
-echo "**********DEBUG :: END *************"
 ############################################################################################
 if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
     if [ -n "$linuxmalwaredetect_dbs_rating" ] ; then
       temp_db="$(xshok_database "$linuxmalwaredetect_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$linuxmalwaredetect_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
     fi
         linuxmalwaredetect_dbs=( )
         if [ -n "$temp_db" ] ; then
-            #linuxmalwaredetect_dbs=( $temp_db )
             read -r -a linuxmalwaredetect_dbs <<< "$temp_db"
         fi
   fi
+else
+  temp_remove_db="$(xshok_remove_database "DISABLED" "${linuxmalwaredetect_dbs[@]}")"
+fi
+linuxmalwaredetect_remove_dbs=( )
+if [ -n "$temp_remove_db" ] ; then
+  read -r -a linuxmalwaredetect_remove_dbs <<< "$temp_remove_db"
 fi
 ############################################################################################
 if [ "$malwareexpert_enabled" == "yes" ] ; then
   if [ -n "$malwareexpert_dbs" ] ; then
     if [ -n "$malwareexpert_dbs_rating" ] ; then
       temp_db="$(xshok_database "$malwareexpert_dbs_rating" "${malwareexpert_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$malwareexpert_dbs_rating" "${malwareexpert_dbs[@]}")"
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${malwareexpert_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${malwareexpert_dbs[@]}")"
     fi
         malwareexpert_dbs=( )
         if [ -n "$temp_db" ] ; then
-            #malwareexpert_dbs=( $temp_db )
             read -r -a malwareexpert_dbs <<< "$temp_db"
         fi
   fi
+else
+  temp_remove_db="$(xshok_remove_database "DISABLED" "${malwareexpert_dbs[@]}")"
+fi
+malwareexpert_remove_dbs=( )
+if [ -n "$temp_remove_db" ] ; then
+  read -r -a malwareexpert_remove_dbs <<< "$temp_remove_db"
 fi
 ############################################################################################
 if [ "$yararulesproject_enabled" == "yes" ] ; then
   if [ -n "$yararulesproject_dbs" ] ; then
     if [ -n "$yararulesproject_dbs_rating" ] ; then
       temp_db="$(xshok_database "$yararulesproject_dbs_rating" "${yararulesproject_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$yararulesproject_dbs_rating" "${yararulesproject_dbs[@]}")"
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${yararulesproject_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${yararulesproject_dbs[@]}")"
     fi
     yararulesproject_dbs=( )
         if [ -n "$temp_db" ] ; then
-            #yararulesproject_dbs=( $temp_db )
             read -r -a yararulesproject_dbs <<< "$temp_db"
         fi
   fi
+else
+  temp_remove_db="$(xshok_remove_database "DISABLED" "${yararulesproject_dbs[@]}")"
+fi
+yararulesproject_remove_dbs=( )
+if [ -n "$temp_remove_db" ] ; then
+  read -r -a yararulesproject_remove_dbs <<< "$temp_remove_db"
 fi
 ############################################################################################
 if [ "$urlhaus_enabled" == "yes" ] ; then
   if [ -n "$urlhaus_dbs" ] ; then
     if [ -n "$urlhaus_dbs_rating" ] ; then
       temp_db="$(xshok_database "$urlhaus_dbs_rating" "${urlhaus_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$urlhaus_dbs_rating" "${urlhaus_dbs[@]}")"
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${urlhaus_dbs[@]}")"
+      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${urlhaus_dbs[@]}")"
     fi
     urlhaus_dbs=( )
         if [ -n "$temp_db" ] ; then
@@ -2334,30 +2348,57 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
         read -r -a urlhaus_dbs <<< "$temp_db"
         fi
   fi
+else
+  temp_remove_db="$(xshok_remove_database "DISABLED" "${urlhaus_dbs[@]}")"
+fi
+urlhaus_remove_dbs=( )
+if [ -n "$temp_remove_db" ] ; then
+  read -r -a urlhaus_remove_dbs <<< "$temp_remove_db"
 fi
 ############################################################################################
-# Set the variables for MalwarePatrol
-if [ "$malwarepatrol_product_code" != "8" ] ; then
-    # assumption, free product code is always 8 (non-free product code is never 8)
-    malwarepatrol_free="no"
-fi
-if [ "$malwarepatrol_free" == "yes" ] ; then
-  malwarepatrol_product_code="8"
-  malwarepatrol_list="clamav_basic"
+if [ "$malwarepatrol_enabled" == "yes" ] ; then
+    # Set the variables for MalwarePatrol
+    if [ "$malwarepatrol_product_code" != "8" ] ; then
+        # assumption, free product code is always 8 (non-free product code is never 8)
+        malwarepatrol_free="no"
+    fi
+    if [ "$malwarepatrol_free" == "yes" ] ; then
+      malwarepatrol_product_code="8"
+      malwarepatrol_list="clamav_basic"
+    else
+      if [ -z $malwarepatrol_list ] ; then
+        malwarepatrol_list="clamav_basic"
+      fi
+      if [ -z $malwarepatrol_product_code ] ; then
+        # Not sure, it may be better to return an error.
+        malwarepatrol_product_code=8
+      fi
+    fi
+    if [ -z "$malwarepatrol_db" ] ; then
+        malwarepatrol_db="malwarepatrol.db"
+    fi
+    malwarepatrol_url="${malwarepatrol_url}?receipt=${malwarepatrol_receipt_code}&product=${malwarepatrol_product_code}&list=${malwarepatrol_list}"
 else
-  if [ -z $malwarepatrol_list ] ; then
-    malwarepatrol_list="clamav_basic"
-  fi
-  if [ -z $malwarepatrol_product_code ] ; then
-    # Not sure, it may be better to return an error.
-    malwarepatrol_product_code=8
-  fi
+    malwarepatrol_remove_dbs=( "malwarepatrol.db" )
 fi
-if [ -z "$malwarepatrol_db" ] ; then
-    malwarepatrol_db="malwarepatrol.db"
-fi
+############################################################################################
 
-malwarepatrol_url="${malwarepatrol_url}?receipt=${malwarepatrol_receipt_code}&product=${malwarepatrol_product_code}&list=${malwarepatrol_list}"
+echo "**********DEBUG :: BEGIN *************"
+echo "sanesecurity_remove_dbs:"
+echo "${sanesecurity_remove_dbs[@]}"
+echo "securiteinfo_remove_dbs:"
+echo "${securiteinfo_remove_dbs[@]}"
+echo "linuxmalwaredetect_remove_dbs:"
+echo "${linuxmalwaredetect_remove_dbs[@]}"
+echo "malwareexpert_remove_dbs:"
+echo "${malwareexpert_remove_dbs[@]}"
+echo "yararulesproject_remove_dbs:"
+echo "${yararulesproject_remove_dbs[@]}"
+echo "urlhaus_remove_dbs:"
+echo "${urlhaus_remove_dbs[@]}"
+echo "malwarepatrol_remove_dbs:"
+echo "${malwarepatrol_remove_dbs[@]}"
+echo "**********DEBUG :: END *************"
 
 # If "ham_dir" variable is set, then create initial whitelist files (skipped if first-time script run).
 test_dir="$work_dir/test"
