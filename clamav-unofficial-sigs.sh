@@ -2388,7 +2388,7 @@ fi
 ############################################################################################
 # CLEANUP UNUSED DATABASES, eg when downgrading a database rating or disabling a database
 if [ -n "${sanesecurity_remove_dbs[0]}" ] ; then
-  for db_file in "${sanesecurity_dbs[@]}" ; do
+  for db_file in "${sanesecurity_remove_dbs[@]}" ; do
     if [ -f "${work_dir_sanesecurity}/${db_file}" ] ; then
         echo "Removing unused file: ${work_dir_sanesecurity}/${db_file}"
         rm -f "${work_dir_sanesecurity}/${db_file}"
