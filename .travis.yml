@@ -4,7 +4,8 @@
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
 # License: BSD (Berkeley Software Distribution)
 ##################
-language: bash
+language: shell
+os: linux
 
 # Required travis ci environment variables
 #ci_securiteinfo_authorisation_signature=[secure]
@@ -12,13 +13,12 @@ language: bash
 #ci_malwarepatrol_product_code=[secure]
 #ci_malwarepatrol_list=[secure]
 #ci_malwarepatrol_free=[secure]
-
+#ci_codeclimate_repo_token=[secure]
 
 #Enable modern build platform, not container based.
-sudo: required
 dist: bionic
 
-# Apparently caching is disabled, since we used modern build platform as we require clamav and sudo ;/
+# Apparently caching is disabled, since we used modern build platform as we require clamav and ;/
 # caching the /var/lib/clamav/ will save +/-9mins of run time and allow the use of freshclam signatures
 
 #Enable Caching
@@ -29,15 +29,15 @@ dist: bionic
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y ca-certificates curl wget rsync p7zip-full shellcheck -qq
-  #- sudo pip install bashate
-  # - "sudo mkdir -p tmp/cache/"
+  #- pip install bashate
+  # - "mkdir -p tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs"
-  # - "sudo rsync -rlptDv tmp/cache/  /var/lib/clamav/"
-  # - "sudo freshclam"
+  # - "rsync -rlptDv tmp/cache/  /var/lib/clamav/"
+  # - "freshclam"
   # - "ls -laFh /var/lib/clamav/"
-  # - "sudo rsync -rlptDav /var/lib/clamav/ tmp/cache/"
-  # - "sudo chown -R travis:travis tmp/cache"
-  # - "sudo chmod -R 777 tmp/cache/"
+  # - "rsync -rlptDav /var/lib/clamav/ tmp/cache/"
+  # - "chown -R travis:travis tmp/cache"
+  # - "chmod -R 777 tmp/cache/"
   # - "ls -laFh tmp/cache/clamav-dbs/"
 
 install:
@@ -57,4 +57,4 @@ script:
 
 addons:
   code_climate:
-    repo_token: 270be84579d01fcbe78b21b91719c2c55cd627f074c8abb83699a8319c980b60
+    repo_token: $ci_codeclimate_repo_token

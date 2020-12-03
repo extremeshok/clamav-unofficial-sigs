@@ -46,7 +46,7 @@ Please use the sample package os.*.conf as a base for your os.conf, this will di
 * Default configs are loaded in the following order if they exist:
 * master.conf -> os.conf -> os.*.conf -> user.conf or your-specified.config
 * user.conf will always override os.conf and master.conf, os.conf will override master.conf
-* please do not alter the master.conf, rather create a user.conf 
+* please do not alter the master.conf, rather create a user.conf
 * A minimum of 1 config is required.
 * Specifying a config on the command line (-c | --config) will override the loading of the default configs
 
@@ -76,6 +76,12 @@ Usage of free Yara-Rules Project: http://yararules.com
 
 Current limitations of clamav support : http://blog.clamav.net/search/label/yara
 
+### malware.experrt non-free database support (as of December 2020)
+Usage of Malware Expert : https://www.Malware Expert
+ - 1. Sign up for an account :  https://www.Malware Expert
+ - 2. You will recieve an email containing your serial key/number
+ - 3. Enter the serial key into the config malwareexpert_serial_key: replacing YOUR-SERIAL-KEY with your serial key from the email
+
 ### MalwarePatrol Free/Delayed list support (as of May 2015)
 Usage of MalwarePatrol 2015 free clamav signatures : https://www.malwarepatrol.net
  - 1. Sign up for a free account : https://www.malwarepatrol.net/free-guard-upgrade-option/
@@ -97,7 +103,7 @@ Usage of SecuriteInfo 2015 free clamav signatures : https://www.securiteinfo.com
 ### Linux Malware Detect support (as of May 2015, updated January 2020)
 Usage of free Linux Malware Detect clamav signatures: https://www.rfxn.com/projects/linux-malware-detect/
  - Enabled by default, no configuration required
- 
+
 ### Need a database added ? Missing a database or a database not working ?
 Please post on the issue tracker : https://github.com/extremeshok/clamav-unofficial-sigs/issues
 
@@ -111,58 +117,44 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   master.conf, os.conf or user.conf
   Default Directory: /etc/clamav-unofficial-sigs
 
-
 -F, --force 	 Force all databases to be downloaded, could cause ip to be blocked
-
 
 -h, --help 	 Display this script's help and usage information
 
-
 -V, --version 	 Output script version and date information
-
 
 -v, --verbose 	 Be verbose, enabled when not run under cron
 
-
 -s, --silence 	 Only output error messages, enabled when run under cron
-
 
 -d, --decode-sig 	 Decode a third-party signature either by signature name
   (eg: Sanesecurity.Junk.15248) or hexadecimal string.
   This flag will 'NOT' decode image signatures
 
-
 -e, --encode-string 	 Hexadecimal encode an entire input string that can
   be used in any '*.ndb' signature database file
-
 
 -f, --encode-formatted 	 Hexadecimal encode a formatted input string containing
   signature spacing fields '{}, (), *', without encoding
   the spacing fields, so that the encoded signature
   can be used in any '*.ndb' signature database file
 
-
 -g, --gpg-verify 	 GPG verify a specific Sanesecurity database file
   eg: '-g filename.ext' (do not include file path)
 
-
 -i, --information 	 Output system and configuration information for
   viewing or possible debugging purposes
-
 
 -m, --make-database 	 Make a signature database from an ascii file containing
   data strings, with one data string per line.  Additional
   information is provided when using this flag
 
-
 -t, --test-database 	 Clamscan integrity test a specific database file
   eg: '-t filename.ext' (do not include file path)
-
 
 -o, --output-triggered 	 If HAM directory scanning is enabled in the script's
   configuration file, then output names of any third-party
   signatures that triggered during the HAM directory scan
-
 
 -w, --whitelist <signature-name> 	 Adds a signature whitelist entry in the newer ClamAV IGN2
   format to 'my-whitelist.ign2' in order to temporarily resolve
@@ -171,43 +163,61 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
   if the original signature is either modified or removed from
   the third-party signature database
 
-
 --check-clamav 	 If ClamD status check is enabled and the socket path is correctly
   specifiedthen test to see if clamd is running or not
 
-
 --upgrade 	 Upgrades this script and master.conf to the latest available version
-
 
 --install-all 	 Install and generate the cron, logroate and man files, autodetects the values
   based on your config files
 
-
 --install-cron 	 Install and generate the cron file, autodetects the values
   based on your config files
-
 
 --install-logrotate 	 Install and generate the logrotate file, autodetects the
   values based on your config files
 
-
 --install-man 	 Install and generate the man file, autodetects the
   values based on your config files
-
 
 --remove-script 	 Remove the clamav-unofficial-sigs script and all of
   its associated files and databases from the system
 
 ## Change Log
-### Version 7.0.1 (Updated 25 January 2020)
+### Version 7.2 ( XX December 2020 : Under Development)
+ - Database rating downgrades are now supported, eg, changing from HIGH to LOW will remove the HIGH and MEDIUM rated databases.
+ - Disabled databases are automatically removed
+ - Added Malware Expert databases (non-free)
+ - Reworked securiteinfo premium databases (non-free)
+ - Added malwarepatrol_db to specifiy the extact database name (default: malwarepatrol.db)
+ - Added detection of tar executable (use gtar on mac and bsd)
+ - Config os.macosx.conf renamed to os.macos.conf
+ - Fix: set ownership of last-version-check.txt
+ - Incremented the config to version 93
+
+### Version 7.1 ( Not Released)
+ - Enforce HTTPS validation by default
+ - Updated sanesecurity publickey.gpg url to use SSL
+ - Ignore yara files that include modules
+ - Enabled yararulesproject rules by default
+ - os.gentoo.conf: disable updates and upgrade checks
+ - Fix: URLhaus log message
+ - Fix wrong download URL for MalwarePatrol
+ - Fix: fallback to host if dig is not used
+ - Disable cron MAILTO
+ - BSD read config fix
+ - Incremented the config to version 92
+ - Thank you @dandanio @Mrothyr @m0urs @msapiro @orlitzky @SlothOfAnarchy @jkellerer @RobbieTheK
+
+### Version 7.0.1 (25 January 2020)
  - Disable yara project rules duplicated in rxfn.yara (Thanks @dominicraf)
  - Incremented the config to version 91
- 
-### Version 7.0.0 (Updated 24 January 2020)
+
+### Version 7.0.0 (24 January 2020)
  - eXtremeSHOK.com Maintenance
  - Added urlhaus database
  - Added extra yararulesproject databases
-- Added new linuxmalwaredetect yara file
+ - Added new linuxmalwaredetect yara file
  - Automatic upgrades ( --upgrade )
  - Added --upgrade command line option
  - Option to disable automatic upgrades ( allow_upgrades )
@@ -235,7 +245,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Only check for and notify about script updates every 12hours
  - Incremented the config to version 90
 
-### Version 6.1.1 (Updated 02 September 2019)
+### Version 6.1.1 (02 September 2019)
  - eXtremeSHOK.com Maintenance
  - Update os.archlinux.conf, thanks @amishmm
  - master.conf set default dbs rating to medium
@@ -249,7 +259,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
  - Minor enhancement to travis-ci checks
  - Incremented the config to version 77
 
-### Version 6.1.0 (Updated 27 August 2019)
+### Version 6.1.0 (27 August 2019)
  - eXtremeSHOK.com Maintenance
  - Thanks Reio Remma & Oliver Nissen
  - fail added to all curl commands
