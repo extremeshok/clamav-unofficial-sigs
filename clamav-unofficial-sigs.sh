@@ -464,23 +464,22 @@ function xshok_remove_database() { # rating database_array
                 if [[ "$db_name" == *".yar"* ]] ; then # If it's the value you want to delete
                     new_dbs+=( "$db_name" )
                 fi
-            else
-                if [ "$db_name_rating" == "DISABLED" ] ; then
+            fi
+            if [ "$db_name_rating" == "DISABLED" ] ; then
+                new_dbs+=( "$db_name" )
+            elif [ "$current_rating" == "HIGH" ] ; then
+                if [ "$db_name_rating" == "LOWONLY" ] ||  [ "$db_name_rating" == "LOWMEDIUMONLY" ] ||[ "$db_name_rating" == "MEDIUMONLY" ] ; then
                     new_dbs+=( "$db_name" )
-                elif [ "$current_rating" == "HIGH" ] ; then
-                    if [ "$db_name_rating" == "LOWONLY" ] ||  [ "$db_name_rating" == "LOWMEDIUMONLY" ] ||[ "$db_name_rating" == "MEDIUMONLY" ] ; then
-                        new_dbs+=( "$db_name" )
-                    fi
-                elif [ "$current_rating" == "MEDIUM" ] ; then
-                    if [ "$db_name_rating" == "HIGH" ] ; then
-                        new_dbs+=( "$db_name" )
-                    fi
-                elif [ "$current_rating" == "LOW" ] ; then
-                    if [ "$db_name_rating" == "MEDIUMONLY" ] ||  [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "HIGH" ]; then
-                        new_dbs+=( "$db_name" )
-                    fi
                 fi
-              fi
+            elif [ "$current_rating" == "MEDIUM" ] ; then
+                if [ "$db_name_rating" == "HIGH" ] || [ "$db_name_rating" == "LOWONLY" ] ; then
+                    new_dbs+=( "$db_name" )
+                fi
+            elif [ "$current_rating" == "LOW" ] ; then
+                if [ "$db_name_rating" == "MEDIUMONLY" ] ||  [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "HIGH" ]; then
+                    new_dbs+=( "$db_name" )
+                fi
+            fi
       done
     fi
   fi
