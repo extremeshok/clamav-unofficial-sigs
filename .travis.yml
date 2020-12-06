@@ -7,6 +7,8 @@
 matrix:
   include:
     - language: node_js
+      dist:
+      - 'bionic'
       node_js:
       - '6'
       install:
