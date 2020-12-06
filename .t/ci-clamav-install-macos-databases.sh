@@ -9,9 +9,15 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/lo
 
 pwd
 
-echo "Installing default Clamav"
+echo "Installing latest clamav databases"
 
-apt-get install -y clamav-base clamav-freshclam clamav clamav-daemon -qq
+mkdir -p /var/lib/clamav
+cp -f bytecode.cvd /usr/local/var/clamav/db/bytecode.cvd
+cp -f daily.cvd /usr/local/var/clamav/db/daily.cvd
+cp -f main.cvd /usr/local/var/clamav/db/main.cvd
+chown -R clamav:clamav /usr/local/var/clamav/db/
+
+launchctl kickstart -k system/clamav.clamd
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else

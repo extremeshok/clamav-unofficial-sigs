@@ -45,6 +45,7 @@ matrix:
       before_install:
         - sudo apt-get update -qq
         - sudo apt-get install -y ca-certificates curl wget rsync p7zip-full -qq
+        - sudo apt-get install -y clamav-base clamav-freshclam clamav clamav-daemon -qq
         #- pip install bashate
         # - "mkdir -p tmp/cache/"
         # - "ls -laFh tmp/cache/clamav-dbs"
@@ -65,8 +66,7 @@ matrix:
       script:
         - sudo sh -e .t/ci-clamav-download-default-databases.sh
         #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
-        - sudo sh -e .t/ci-clamav-install-default.sh
-        - sudo sh -e .t/ci-clamav-install-default-database.sh
+        - sudo sh -e .t/ci-clamav-install-ubuntu-databases.sh
         - sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
         - sudo sh -e .t/ci-test.sh
 
@@ -91,6 +91,9 @@ matrix:
         - sudo cp -f config/os/os.macos.conf /usr/local/etc/clamav-unofficial-sigs/os.conf
 
       script:
+        - sudo sh -e .t/ci-clamav-download-default-databases.sh
+        - sudo sh -e .t/ci-clamav-install-macos.sh
+        - sudo sh -e .t/ci-clamav-install-macos-databases.sh
         - sudo cp -f .t/tests/user.conf /usr/local/etc/clamav-unofficial-sigs/user.conf
         #- sudo /usr/local/bin/clamav-unofficial-sigs.sh --force
         #- sudo sh -e .t/ci-clamav-download-default-databases.sh
