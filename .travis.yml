@@ -83,8 +83,19 @@ matrix:
             packages:
             - gtar clamav
       install:
-        - mkdir -p /usr/local/bin
-        - mkdir -p /etc/clamav-unofficial-sigs
-        - cp -f clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
-        - cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf
-        - cp -f config/os/os.macos.conf /etc/clamav-unofficial-sigs/os.conf
+        - sudo mkdir -p /usr/local/bin
+        - sudo mkdir -p /etc/clamav-unofficial-sigs
+        - sudo cp -f clamav-unofficial-sigs.sh /usr/local/bin/clamav-unofficial-sigs.sh
+        - sudo chmod 755 /usr/local/bin/clamav-unofficial-sigs.sh
+        - sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf
+        - sudo cp -f config/os/os.macos.conf /etc/clamav-unofficial-sigs/os.conf
+
+      script:
+        - sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
+        - sudo clamav-unofficial-sigs.sh --force
+        #- sudo sh -e .t/ci-clamav-download-default-databases.sh
+        #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
+        #- sudo sh -e .t/ci-clamav-install-default.sh
+        #- sudo sh -e .t/ci-clamav-install-default-database.sh
+        #- sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
+        #- sudo sh -e .t/ci-test.sh
