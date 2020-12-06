@@ -56,8 +56,13 @@ matrix:
         code_climate:
           repo_token:  $ci_codeclimate_repo_token
 #### LOGIC AND CLAMAV TESTING : macOS / OSX
-    - language: shell
-      os: osx
+    - os: osx
+      osx_image: xcode12
+      before_cache:
+        - brew cleanup
+      cache:
+        directories:
+          - $HOME/Library/Caches/Homebrew
       addons:
           homebrew:
             packages:
