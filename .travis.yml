@@ -73,7 +73,7 @@ matrix:
       addons:
         code_climate:
           repo_token:  $ci_codeclimate_repo_token
-#### LOGIC AND CLAMAV TESTING : MACOS / OSX
+#### LOGIC AND CLAMAV TESTING : macOS / OSX
     - language: shell
       os: osx
       #Enable modern build platform, not container based.
@@ -92,7 +92,7 @@ matrix:
 
       script:
         - sudo cp -f .t/tests/user.conf /usr/local/etc/clamav-unofficial-sigs/user.conf
-        - sudo /usr/local/bin/clamav-unofficial-sigs.sh --force
+        #- sudo /usr/local/bin/clamav-unofficial-sigs.sh --force
         #- sudo sh -e .t/ci-clamav-download-default-databases.sh
         #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
         #- sudo sh -e .t/ci-clamav-install-default.sh

@@ -1804,7 +1804,7 @@ for config_file in "${config_files[@]}" ; do
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
 
     elif [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
-      # MacOS / OSX / BSD fixes, had issues with running with a single command and with SunOS work around..
+      # macOS / OSX / BSD fixes, had issues with running with a single command and with SunOS work around..
       # shellcheck disable=SC2001
       clean_config="$(command "$sed_bin" -e '/^#.*/d' "$config_file")" # Comment line
       # shellcheck disable=SC2001
