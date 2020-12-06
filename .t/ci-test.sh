@@ -154,7 +154,7 @@ fi
 
 echo "running script verbose with malware expert databases"
 cp -f .t/tests/user_malwareexpert.conf /etc/clamav-unofficial-sigs/user.conf
-bash /usr/sbin/clamav-unofficial-sigs --verbose --force
+bash /usr/sbin/clamav-unofficial-sigs --verbose
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
@@ -177,26 +177,26 @@ if [ -e "/var/lib/clamav/malware.expert.hdb" ] ; then
     echo .. OK
 else
     echo .. ERROR
-    #exit 1
+    exit 1
 fi
 echo "Was /var/lib/clamav/malware.expert.fp added ?"
 if [ -e "/var/lib/clamav/malware.expert.fp" ] ; then
     echo .. OK
 else
     echo .. ERROR
-    #exit 1
+    exit 1
 fi
 echo "Was /var/lib/clamav/malware.expert.ldb added ?"
 if [ -e "/var/lib/clamav/malware.expert.ldb" ] ; then
     echo .. OK
 else
     echo .. ERROR
-    #exit 1
+    exit 1
 fi
 echo "Was /var/lib/clamav/malware.expert.ndb added ?"
 if [ -e "/var/lib/clamav/malware.expert.ndb" ] ; then
     echo .. OK
 else
     echo .. ERROR
-    #exit 1
+    exit 1
 fi

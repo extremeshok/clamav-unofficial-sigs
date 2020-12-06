@@ -3229,8 +3229,8 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
         xshok_pretty_echo_and_log "Failed malwareexpert_dbs config is invalid or not defined - SKIPPING"
       else
         rm -f "${work_dir_malwareexpert}/*.gz"
-        if [ -r "${work_dir_work_configs}/last-si-update.txt" ] ; then
-          last_malwareexpert_update="$(cat "${work_dir_work_configs}/last-si-update.txt")"
+        if [ -r "${work_dir_work_configs}/last-me-update.txt" ] ; then
+          last_malwareexpert_update="$(cat "${work_dir_work_configs}/last-me-update.txt")"
         else
           last_malwareexpert_update="0"
         fi
@@ -3243,7 +3243,7 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
         fi
         time_interval="$((current_time - last_malwareexpert_update))"
         if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
-          echo "$current_time" > "${work_dir_work_configs}/last-si-update.txt"
+          echo "$current_time" > "${work_dir_work_configs}/last-me-update.txt"
           xshok_pretty_echo_and_log "malwareexpert Database File Updates" "="
           xshok_pretty_echo_and_log "Checking for malwareexpert updates..."
           malwareexpert_updates="0"
