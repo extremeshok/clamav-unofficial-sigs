@@ -216,7 +216,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
-### Version 7.2 ( XX December 2020: Under Development)
+### Version 7.2 (07 December 2020)
 
 * Database rating downgrades are now supported, eg, changing from HIGH to LOW will remove the HIGH and MEDIUM rated databases.
 * Disabled databases are automatically removed
@@ -230,8 +230,9 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * More automated linting and testing (markdown and macOS / osx) via travis-ci
 * Updated macOS installation guide for Big Sur (OSX 11)
 * Incremented the config to version 93
+* Thank you @dandanio @jkellerer @msapiro @shawniverson
 
-### Version 7.1 ( Not Released)
+### Version 7.1 (Not Released)
 
 * Enforce HTTPS validation by default
 * Updated sanesecurity publickey.gpg url to use SSL
@@ -244,7 +245,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Disable cron MAILTO
 * BSD read config fix
 * Incremented the config to version 92
-* Thank you @dandanio @Mrothyr @m0urs @msapiro @orlitzky @SlothOfAnarchy @jkellerer @RobbieTheK
+* Thank you @dandanio @jkellerer @m0urs @Mrothyr @msapiro @orlitzky @RobbieTheK @SlothOfAnarchy
 
 ### Version 7.0.1 (25 January 2020)
 
