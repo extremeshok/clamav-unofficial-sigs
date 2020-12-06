@@ -81,7 +81,7 @@ matrix:
       addons:
           homebrew:
             packages:
-            - gtar clamav
+            - gnu-tar gnu-sed clamav
       install:
         - sudo mkdir -p /usr/local/bin
         - sudo mkdir -p /etc/clamav-unofficial-sigs
@@ -92,7 +92,7 @@ matrix:
 
       script:
         - sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
-        - sudo clamav-unofficial-sigs.sh --force
+        - sudo /usr/local/bin/clamav-unofficial-sigs.sh --force
         #- sudo sh -e .t/ci-clamav-download-default-databases.sh
         #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
         #- sudo sh -e .t/ci-clamav-install-default.sh

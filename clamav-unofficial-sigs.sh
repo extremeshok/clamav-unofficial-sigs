@@ -1012,7 +1012,7 @@ function make_signature_database_from_ascii_file() {
   target type is used and full file scanning is enabled (see ClamAV signatures.pdf for details).
 
   - Line numbering will be done automatically by the script.
-  " | command sed 's/^          //g'
+  " | command $sed_bin 's/^          //g'
   echo -n "Do you wish to continue? "
   if xshok_prompt_confirm ; then
 
@@ -1026,7 +1026,7 @@ function make_signature_database_from_ascii_file() {
 
       echo -n "Enter signature prefix: "
       read -r prefix
-      path_file="$(echo "$source" | cut -d "." -f -1 | command sed 's/$/.ndb/')"
+      path_file="$(echo "$source" | cut -d "." -f -1 | command $sed_bin 's/$/.ndb/')"
       db_file="$(basename "$path_file")"
       rm -f "$path_file"
       total="$(wc -l "$source" | cut -d " " -f 1)"
@@ -1035,11 +1035,11 @@ function make_signature_database_from_ascii_file() {
       while read -r line ; do
         line_prefix="$(echo "$line" | awk -F ":" '{print $1}')"
         if [ "$line_prefix" == "-" ] ; then
-          echo "$line" | cut -d ":" -f 2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
+          echo "$line" | cut -d ":" -f 2- | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command $sed_bin "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
         elif [ "$line_prefix" == "=" ] ; then
-          echo "$line" | cut -d ":" -f 2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | command sed "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
+          echo "$line" | cut -d ":" -f 2- | perl -pe 's/(\{[^}]*\}|\([^)]*\)|\*)|(.)/defined $1 ? $1 : sprintf("%02lx", ord $2)/eg' | command $sed_bin "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
         else
-          echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command sed "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
+          echo "$line" | perl -pe 's/(.)/sprintf("%02lx", ord $1)/eg' | command $sed_bin "s/^/$prefix\\.$line_num:4:\\*:/" >> "$path_file"
         fi
         xshok_pretty_echo_and_log "Hexadecimal encoding ${source_file} line: ${line_num} of ${total}"
         line_num="$((line_num + 1))"
@@ -1636,8 +1636,18 @@ if [ -x /usr/gnu/bin/grep ] ; then
 else
   grep_bin="$(command -v grep 2> /dev/null)"
 fi
-# Detect support for tar or gtar
+if [ -z "$grep_bin" ] ; then
+    xshok_pretty_echo_and_log "ERROR: grep command is missing"
+    exit 1
+  fi
+# Detect supprot for sed
+sed_bin="$(command -v sed 2> /dev/null)"
+if [ -z "$grep_bin" ] ; then
+  xshok_pretty_echo_and_log "ERROR: sed command is missing"
+  exit 1
+fi
 
+# Detect support for tar or gtar
 if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
     tar_executable="gtar"
 else
@@ -1647,6 +1657,7 @@ if [ -z "$tar_bin" ]; then
         tar_bin="$(command -v "$tar_executable" 2> /dev/null)"
     else
         xshok_pretty_echo_and_log "ERROR: gtar (gnu tar) is missing"
+        exit 1
 fi
 # Detect support for curl
 if [ -z "$curl_bin" ]; then
@@ -1782,28 +1793,28 @@ for config_file in "${config_files[@]}" ; do
 
     if [ "$(uname -s)" == "SunOS" ] ; then
       # Solaris FIXES only, i had issues with running with a single command..
-      clean_config="$(command sed -e '/^#.*/d' "$config_file")" # Comment line
-      #clean_config="$(echo "$clean_config" | sed -e 's/#[[:space:]].*//')" # Comment line (duplicated)
+      clean_config="$(command $sed_bin -e '/^#.*/d' "$config_file")" # Comment line
+      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/#[[:space:]].*//')" # Comment line (duplicated)
       clean_config=${clean_config//\#*/} # Comment line (duplicated)
       # shellcheck disable=SC2001
-      clean_config="$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
-      #clean_config="$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
+      clean_config="$(echo "$clean_config" | $sed_bin -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
+      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
       clean_config="$(echo "$clean_config" | xargs)"
       # shellcheck disable=SC2001
-      clean_config="$(echo "$clean_config" | sed -e '/^\s*$/d')" # Blank lines
+      clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
 
     elif [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
       # MacOS / OSX / BSD fixes, had issues with running with a single command and with SunOS work around..
       # shellcheck disable=SC2001
-      clean_config="$(command sed -e '/^#.*/d' "$config_file")" # Comment line
+      clean_config="$(command $sed_bin -e '/^#.*/d' "$config_file")" # Comment line
       # shellcheck disable=SC2001
-      clean_config="$(echo "$clean_config" | sed -e 's/#[[:space:]].*//')" # Comment line (duplicated)
+      clean_config="$(echo "$clean_config" | $sed_bin -e 's/#[[:space:]].*//')" # Comment line (duplicated)
       # shellcheck disable=SC2001
-      clean_config="$(echo "$clean_config" | sed -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
-      #clean_config="$(echo "$clean_config" | sed -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
+      clean_config="$(echo "$clean_config" | $sed_bin -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
+      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
       #clean_config="$(echo "$clean_config" | xargs)"
       # shellcheck disable=SC2001
-      clean_config="$(echo "$clean_config" | sed -e '/^\s*$/d')" # Blank lines
+      clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
 
     else
       # Delete lines beginning with #
@@ -1812,7 +1823,7 @@ for config_file in "${config_files[@]}" ; do
       # Delete both trailing and leading whitespace
       # Delete all trailing whitespace
       # Delete all empty lines
-      clean_config="$(command sed -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")"
+      clean_config="$(command $sed_bin -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")"
 
     fi
 
@@ -1840,7 +1851,7 @@ for config_file in "${config_files[@]}" ; do
 
     # Config loading
     for i in "${clean_config[@]}" ; do
-      eval "$(echo "${i}" | command sed -e 's/[[:space:]]*$//' 2> /dev/null)"
+      eval "$(echo "${i}" | command $sed_bin -e 's/[[:space:]]*$//' 2> /dev/null)"
     done
   fi
 done
@@ -1887,58 +1898,58 @@ shopt -s extglob; work_dir="${work_dir%%+(/)}"
 
 # Allow overriding of all the individual workdirs, this is mainly to aid package maintainers
 if [ -z "$work_dir_sanesecurity" ] ; then
-  work_dir_sanesecurity="$(echo "${work_dir}/${sanesecurity_dir}" | sed 's:/*$::')"
+  work_dir_sanesecurity="$(echo "${work_dir}/${sanesecurity_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_sanesecurity="${work_dir_sanesecurity%%+(/)}"
 fi
 if [ -z "$work_dir_securiteinfo" ] ; then
-  work_dir_securiteinfo="$(echo "${work_dir}/${securiteinfo_dir}" | sed 's:/*$::')"
+  work_dir_securiteinfo="$(echo "${work_dir}/${securiteinfo_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_securiteinfo="${work_dir_securiteinfo%%+(/)}"
 fi
 if [ -z "$work_dir_linuxmalwaredetect" ] ; then
-  work_dir_linuxmalwaredetect="$(echo "${work_dir}/${linuxmalwaredetect_dir}" | sed 's:/*$::')"
+  work_dir_linuxmalwaredetect="$(echo "${work_dir}/${linuxmalwaredetect_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_malwarepatrol="${work_dir_malwarepatrol%%+(/)}"
 fi
 if [ -z "$work_dir_malwareexpert" ] ; then
-  work_dir_malwareexpert="$(echo "${work_dir}/${malwareexpert_dir}" | sed 's:/*$::')"
+  work_dir_malwareexpert="$(echo "${work_dir}/${malwareexpert_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_malwareexpert="${work_dir_malwareexpert%%+(/)}"
 fi
 if [ -z "$work_dir_malwarepatrol" ] ; then
-  work_dir_malwarepatrol="$(echo "${work_dir}/${malwarepatrol_dir}" | sed 's:/*$::')"
+  work_dir_malwarepatrol="$(echo "${work_dir}/${malwarepatrol_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_malwarepatrol="${work_dir_malwarepatrol%%+(/)}"
 fi
 if [ -z "$work_dir_urlhaust" ] ; then
-  work_dir_urlhaus="$(echo "${work_dir}/${urlhaus_dir}" | sed 's:/*$::')"
+  work_dir_urlhaus="$(echo "${work_dir}/${urlhaus_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_urlhaus="${work_dir_urlhaus%%+(/)}"
 fi
 if [ -z "$work_dir_yararulesproject" ] ; then
-  work_dir_yararulesproject="$(echo "${work_dir}/${yararulesproject_dir}" | sed 's:/*$::')"
+  work_dir_yararulesproject="$(echo "${work_dir}/${yararulesproject_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_yararulesproject="${work_dir_yararulesproject%%+(/)}"
 fi
 if [ -z "$work_dir_add" ] ; then
-  work_dir_add="$(echo "${work_dir}/${add_dir}" | sed 's:/*$::')"
+  work_dir_add="$(echo "${work_dir}/${add_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_add="${work_dir_add%%+(/)}"
 fi
 if [ -z "$work_dir_work_configs" ] ; then
-  work_dir_work_configs="$(echo "${work_dir}/${work_dir_configs}" | sed 's:/*$::')"
+  work_dir_work_configs="$(echo "${work_dir}/${work_dir_configs}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_work_configs="${work_dir_work_configs%%+(/)}"
 fi
 if [ -z "${work_dir_gpg}" ] ; then
-  work_dir_gpg="$(echo "${work_dir}/${gpg_dir}" | sed 's:/*$::')"
+  work_dir_gpg="$(echo "${work_dir}/${gpg_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_gpg="${work_dir_gpg%%+(/)}"
 fi
 
 if [ -z "$work_dir_pid" ] ; then
-  work_dir_pid="$(echo "${work_dir}/${pid_dir}" | sed 's:/*$::')"
+  work_dir_pid="$(echo "${work_dir}/${pid_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_pid="${work_dir_pid%%+(/)}"
 fi
@@ -2535,7 +2546,7 @@ if [ -n "$ham_dir" ] && [ -d "$work_dir" ] && [ ! -d "$test_dir" ] ; then
     xshok_mkdir_ownership "$test_dir"
     cp -f -p "$work_dir"/*/*.ndb "$test_dir"
     cp -f -p "$work_dir"/*/*.db "$test_dir"
-    $clamscan_bin --infected --no-summary -d "$test_dir" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "${work_dir_work_configs}/whitelist.txt"
+    $clamscan_bin --infected --no-summary -d "$test_dir" "$ham_dir"/* | command $sed_bin 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' >> "${work_dir_work_configs}/whitelist.txt"
     $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/*.ndb" | cut -d "*" -f 2 | sort | uniq > "${work_dir_work_configs}/whitelist.hex"
     $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/*.db" | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
     cd "$test_dir" || exit
@@ -2814,21 +2825,21 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                 # Add fallback to host if dig returns no records or dig is not used
         if [ ${#sanesecurity_mirror_ips} -lt 1 ] ; then
                     # shellcheck disable=SC2086
-          sanesecurity_mirror_ips="$($host_bin $host_proxy -t A "$sanesecurity_url" | sed -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')"
+          sanesecurity_mirror_ips="$($host_bin $host_proxy -t A "$sanesecurity_url" | $sed_bin -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')"
         fi
 
         if [ ${#sanesecurity_mirror_ips} -ge 1 ] ; then
           for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
                         if [ -n "$dig_bin" ] ; then
                             # shellcheck disable=SC2086
-                sanesecurity_mirror_name="$($dig_bin $dig_proxy +short -x "$sanesecurity_mirror_ip" | command sed 's/\.$//')"
+                sanesecurity_mirror_name="$($dig_bin $dig_proxy +short -x "$sanesecurity_mirror_ip" | command $sed_bin 's/\.$//')"
                         else
                             sanesecurity_mirror_name=""
                         fi
             # Add fallback to host if dig returns no records or dig is not used
             if [ -z "$sanesecurity_mirror_name" ] ; then
                             # shellcheck disable=SC2086
-              sanesecurity_mirror_name="$($host_bin $host_proxy "$sanesecurity_mirror_ip" | sed -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')"
+              sanesecurity_mirror_name="$($host_bin $host_proxy "$sanesecurity_mirror_ip" | $sed_bin -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')"
             fi
             sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: ${sanesecurity_mirror_site_info}"
@@ -2883,7 +2894,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                       fi
                     else
                       $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_sanesecurity}/${db_file}" > "${test_dir}/${db_file}"
-                      $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                      $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command $sed_bin 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
                       $grep_bin -h -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex-tmp"
                       mv -f "${work_dir_work_configs}/whitelist.hex-tmp" "${work_dir_work_configs}/whitelist.hex"
                       $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
@@ -3024,7 +3035,7 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
                   fi
                 else
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_securiteinfo}/${db_file}" > "${test_dir}/${db_file}"
-                  $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                  $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command $sed_bin 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
                   $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
                   mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
@@ -3184,7 +3195,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
                   fi
                 else
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_linuxmalwaredetect}/${db_file}" > "${test_dir}/${db_file}"
-                  $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                  $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command $sed_bin 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
                   $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
                   mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
@@ -3327,7 +3338,7 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
                   fi
                 else
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_malwareexpert}/${db_file}" > "${test_dir}/${db_file}"
-                  $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                  $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command $sed_bin 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
                   $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
                   mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
@@ -3471,7 +3482,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
                   fi
                 else
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_malwarepatrol}/${malwarepatrol_db}" > "${test_dir}/${malwarepatrol_db}"
-                  $clamscan_bin --infected --no-summary -d "${test_dir}/${malwarepatrol_db}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                  $clamscan_bin --infected --no-summary -d "${test_dir}/${malwarepatrol_db}" "$ham_dir"/* | command $sed_bin 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
                   $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${malwarepatrol_db}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
                   $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${malwarepatrol_db}" > "${test_dir}/${malwarepatrol_db}-tmp"
                   mv -f "${test_dir}/${malwarepatrol_db}-tmp" "${test_dir}/${malwarepatrol_db}"
@@ -3600,7 +3611,7 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
                 fi
               else
                 $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_urlhaus}/${db_file}" > "${test_dir}/${db_file}"
-                $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command $sed_bin 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
                 $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
                 $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
                 mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
@@ -3737,7 +3748,7 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
                 fi
               else
                 $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_yararulesproject}/${db_file}" > "${test_dir}/${db_file}"
-                $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command $sed_bin 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
                 $grep_bin -h -f "${work_dir_work_configs}/whitelist.txt" "${test_dir}/${db_file}" | cut -d "*" -f 2 | sort | uniq >> "${work_dir_work_configs}/whitelist.hex"
                 $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" > "${test_dir}/${db_file}-tmp"
                 mv -f "${test_dir}/${db_file}-tmp" "${test_dir}/${db_file}"
@@ -3842,7 +3853,7 @@ if [ "$additional_enabled" == "yes" ] ; then
           # fi
 
           #cleanup any leading and trailing whitespace.
-          db_url="$(echo -e "$db_url" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+          db_url="$(echo -e "$db_url" | $sed_bin -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 
           db_file="$(basename "$db_url")"
 
@@ -3895,7 +3906,7 @@ if [ "$additional_enabled" == "yes" ] ; then
                 fi
               else
                 $grep_bin -h -v -f "${work_dir_work_configs}/whitelist.hex" "${work_dir_add}/${db_file}" > "${test_dir}/${db_file}"
-                $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command sed 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
+                $clamscan_bin --infected --no-summary -d "${test_dir}/${db_file}" "$ham_dir"/* | command $sed_bin 's/\.UNOFFICIAL FOUND//' | awk '{print $NF}' > "${work_dir_work_configs}/whitelist.txt"
                 if [[ "${work_dir_add}/${db_file}" == *.db ]] ; then
                   $grep_bin -h -f "${work_dir_work_configs}/whitelist.hex" "${test_dir}/${db_file}" | cut -d "=" -f 2 | awk '{ printf("=%s\n", $1);}' |sort | uniq >> "${work_dir_work_configs}/whitelist.hex-tmp"
                   mv -f "${work_dir_work_configs}/whitelist.hex-tmp" "${work_dir_work_configs}/whitelist.hex"
