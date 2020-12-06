@@ -173,8 +173,7 @@ else
     exit 1
 fi
 
-if [ "$malwareexpert_serial_key" != "" ] && [ -n "$ci_malwareexpert_serial_key" ]; then
-
+if [ -z "$ci_malwareexpert_serial_key" ]; then
     echo "Was /var/lib/clamav/malware.expert.hdb added ?"
     if [ -e "/var/lib/clamav/malware.expert.hdb" ] ; then
         echo .. OK
