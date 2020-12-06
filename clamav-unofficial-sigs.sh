@@ -449,23 +449,19 @@ function xshok_database() { # rating database_array
 # Since the datbases are basically a multi-dimentional associative arrays in bash
 # ratings: LOW | MEDIUM | HIGH | REQUIRED | LOWONLY | MEDIUMONLY | LOWMEDIUMONLY | DISABLED
 function xshok_remove_database() { # rating database_array
-  # Assign
-  current_rating="${1}"
-  declare -a current_dbs=( "${@:2}" )
-  # Zero
-  declare -a new_dbs=( )
-  if [ -n "${current_dbs[0]}" ] ; then
+    # Assign
+    current_rating="${1}"
+    declare -a current_dbs=( "${@:2}" )
+    # Zero
+    declare -a new_dbs=( )
     if [ ${#current_dbs} -ge 1 ] ; then
       for db_name in "${current_dbs[@]}" ; do
           db_name_rating="${db_name#*|}"
           db_name="${db_name%|*}"
         # Checks
-            if [ "$enable_yararules" == "no" ] ; then # YARA rules are disabled
-                if [[ "$db_name" == *".yar"* ]] ; then # If it's the value you want to delete
-                    new_dbs+=( "$db_name" )
-                fi
-            fi
-            if [ "$db_name_rating" == "DISABLED" ] ; then
+            if [ "$enable_yararules" == "no" ] && [[ "$db_name" == *".yar"* ]] ; then # YARA rules are disabled AND it's the value you want to delete
+                new_dbs+=( "$db_name" )
+            elif [ "$db_name_rating" == "DISABLED" ] ; then
                 new_dbs+=( "$db_name" )
             elif [ "$current_rating" == "HIGH" ] ; then
                 if [ "$db_name_rating" == "LOWONLY" ] ||  [ "$db_name_rating" == "LOWMEDIUMONLY" ] ||[ "$db_name_rating" == "MEDIUMONLY" ] ; then
@@ -482,8 +478,7 @@ function xshok_remove_database() { # rating database_array
             fi
       done
     fi
-  fi
-  echo "${new_dbs[@]}" | xargs # Remove extra whitespace
+    echo "${new_dbs[@]}" | xargs # Remove extra whitespace
 }
 
 
@@ -2335,6 +2330,9 @@ yararulesproject_remove_dbs=( )
 if [ -n "$temp_remove_db" ] ; then
   read -r -a yararulesproject_remove_dbs <<< "$temp_remove_db"
 fi
+
+
+
 ############################################################################################
 if [ "$urlhaus_enabled" == "yes" ] ; then
   if [ -n "$urlhaus_dbs" ] ; then
@@ -2436,7 +2434,13 @@ if [ -n "${malwareexpert_remove_dbs[0]}" ] ; then
 fi
 if [ -n "${yararulesproject_remove_dbs[0]}" ] ; then
   for db_file in "${yararulesproject_remove_dbs[@]}" ; do
-    if [ -f "${work_dir_yararulesproject}/${db_file}" ] ; then
+      if echo "$db_file" | $grep_bin -q "/" ; then
+        yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
+        db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+      else
+          yr_dir=""
+      fi
+    if [ -f "${work_dir_yararulesproject}/${yr_dir}${db_file}" ] ; then
         echo "Removing unused file: ${work_dir_yararulesproject}/${db_file}"
         rm -f "${work_dir_yararulesproject}/${db_file}"
     fi
