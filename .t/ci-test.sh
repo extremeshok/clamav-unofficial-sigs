@@ -172,31 +172,35 @@ else
     echo .. ERROR
     exit 1
 fi
-echo "Was /var/lib/clamav/malware.expert.hdb added ?"
-if [ -e "/var/lib/clamav/malware.expert.hdb" ] ; then
-    echo .. OK
-else
-    echo .. ERROR
-    exit 1
-fi
-echo "Was /var/lib/clamav/malware.expert.fp added ?"
-if [ -e "/var/lib/clamav/malware.expert.fp" ] ; then
-    echo .. OK
-else
-    echo .. ERROR
-    exit 1
-fi
-echo "Was /var/lib/clamav/malware.expert.ldb added ?"
-if [ -e "/var/lib/clamav/malware.expert.ldb" ] ; then
-    echo .. OK
-else
-    echo .. ERROR
-    exit 1
-fi
-echo "Was /var/lib/clamav/malware.expert.ndb added ?"
-if [ -e "/var/lib/clamav/malware.expert.ndb" ] ; then
-    echo .. OK
-else
-    echo .. ERROR
-    exit 1
+
+if [ "$malwareexpert_serial_key" != "" ] && [ -n "$ci_malwareexpert_serial_key" ]; then
+
+    echo "Was /var/lib/clamav/malware.expert.hdb added ?"
+    if [ -e "/var/lib/clamav/malware.expert.hdb" ] ; then
+        echo .. OK
+    else
+        echo .. ERROR
+        exit 1
+    fi
+    echo "Was /var/lib/clamav/malware.expert.fp added ?"
+    if [ -e "/var/lib/clamav/malware.expert.fp" ] ; then
+        echo .. OK
+    else
+        echo .. ERROR
+        exit 1
+    fi
+    echo "Was /var/lib/clamav/malware.expert.ldb added ?"
+    if [ -e "/var/lib/clamav/malware.expert.ldb" ] ; then
+        echo .. OK
+    else
+        echo .. ERROR
+        exit 1
+    fi
+    echo "Was /var/lib/clamav/malware.expert.ndb added ?"
+    if [ -e "/var/lib/clamav/malware.expert.ndb" ] ; then
+        echo .. OK
+    else
+        echo .. ERROR
+        exit 1
+    fi
 fi
