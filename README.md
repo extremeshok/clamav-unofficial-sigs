@@ -187,6 +187,7 @@ Usage: clamav-unofficial-sigs.sh 	 [OPTION] [PATH|FILE]
 ### Version 7.2 ( XX December 2020 : Under Development)
  - Database rating downgrades are now supported, eg, changing from HIGH to LOW will remove the HIGH and MEDIUM rated databases.
  - Disabled databases are automatically removed
+ - Disable databases by  setting the rating to "DISABLED" eg. securiteinfo_dbs_rating="DISABLED" will disable all securiteinfo databases
  - Added Malware Expert databases (non-free)
  - Reworked securiteinfo premium databases (non-free)
  - Added malwarepatrol_db to specifiy the extact database name (default: malwarepatrol.db)

@@ -2194,6 +2194,46 @@ done
 
 xshok_pretty_echo_and_log "Preparing Databases" "="
 
+if [ "$default_dbs_rating" == "DISABLE" ] ; then
+    if [ "$sanesecurity_dbs_rating" != "LOW" ] && [ "$sanesecurity_dbs_rating" != "MEDIUM" ] && [ "$sanesecurity_dbs_rating" != "HIGH" ]; then
+        sanesecurity_enabled="no"
+    fi
+    if [ "$linuxmalwaredetect_dbs_rating" != "LOW" ] && [ "$linuxmalwaredetect_dbs_rating" != "MEDIUM" ] && [ "$linuxmalwaredetect_dbs_rating" != "HIGH" ]; then
+        linuxmalwaredetect_enabled="no"
+    fi
+    if [ "$malwareexpert_dbs_rating" != "LOW" ] && [ "$malwareexpert_dbs_rating" != "MEDIUM" ] && [ "$malwareexpert_dbs_rating" != "HIGH" ]; then
+        malwareexpert_enabled="no"
+    fi
+    if [ "$securiteinfo_dbs_rating" != "LOW" ] && [ "$securiteinfo_dbs_rating" != "MEDIUM" ] && [ "$securiteinfo_dbs_rating" != "HIGH" ]; then
+        securiteinfo_enabled="no"
+    fi
+    if [ "$urlhaus_dbs_rating" != "LOW" ] && [ "$urlhaus_dbs_rating" != "MEDIUM" ] && [ "$urlhaus_dbs_rating" != "HIGH" ]; then
+        urlhaus_enabled="no"
+    fi
+    if [ "$yararulesproject_dbs_rating" != "LOW" ] && [ "$yararulesproject_dbs_rating" != "MEDIUM" ] && [ "$yararulesproject_dbs_rating" != "HIGH" ]; then
+        yararulesproject_enabled="no"
+    fi
+else
+    if [ "$sanesecurity_dbs_rating" == "DISABLE" ] ; then
+        sanesecurity_enabled="no"
+    fi
+    if [ "$linuxmalwaredetect_dbs_rating" == "DISABLE" ] ; then
+        linuxmalwaredetect_enabled="no"
+    fi
+    if [ "$malwareexpert_dbs_rating" == "DISABLE" ] ; then
+        malwareexpert_enabled="no"
+    fi
+    if [ "$securiteinfo_dbs_rating" == "DISABLE" ] ; then
+        securiteinfo_enabled="no"
+    fi
+    if [ "$urlhaus_dbs_rating" == "DISABLE" ] ; then
+        urlhaus_enabled="no"
+    fi
+    if [ "$yararulesproject_dbs_rating" == "DISABLE" ] ; then
+        yararulesproject_enabled="no"
+    fi
+fi
+
 # Check yararule support is available
 if [ "$enable_yararules" == "yes" ] ; then
   current_clamav_version="$($clamscan_bin -V | cut -d " " -f 2 | cut -d "/" -f 1 | awk -F "." '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')"
