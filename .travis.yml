@@ -4,58 +4,68 @@
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
 # License: BSD (Berkeley Software Distribution)
 ##################
-language: shell
-os: linux
+matrix:
+  include:
+    - language: node_js
+      node_js:
+      - '8'
+      install:
+      - npm install -g markdownlint-cli
+      script:
+      - markdownlint *.md
+    
+    - language: shell
+      os: linux
 
-# Required travis ci environment variables
-#ci_malwareexpert_serial_key=[secure]
-#ci_securiteinfo_authorisation_signature=[secure]
-#ci_malwarepatrol_receipt_code=[secure]
-#ci_malwarepatrol_product_code=[secure]
-#ci_malwarepatrol_list=[secure]
-#ci_malwarepatrol_free=[secure]
-#ci_codeclimate_repo_token=[secure]
+      # Required travis ci environment variables
+      #ci_malwareexpert_serial_key=[secure]
+      #ci_securiteinfo_authorisation_signature=[secure]
+      #ci_malwarepatrol_receipt_code=[secure]
+      #ci_malwarepatrol_product_code=[secure]
+      #ci_malwarepatrol_list=[secure]
+      #ci_malwarepatrol_free=[secure]
+      #ci_codeclimate_repo_token=[secure]
 
-#Enable modern build platform, not container based.
-dist: bionic
+      #Enable modern build platform, not container based.
+      dist: bionic
 
-# Apparently caching is disabled, since we used modern build platform as we require clamav and ;/
-# caching the /var/lib/clamav/ will save +/-9mins of run time and allow the use of freshclam signatures
+      # Apparently caching is disabled, since we used modern build platform as we require clamav and ;/
+      # caching the /var/lib/clamav/ will save +/-9mins of run time and allow the use of freshclam signatures
 
-#Enable Caching
-#cache:
-#  directories:
-#    - tmp/cache
+      #Enable Caching
+      #cache:
+      #  directories:
+      #    - tmp/cache
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y ca-certificates curl wget rsync p7zip-full shellcheck -qq
-  #- pip install bashate
-  # - "mkdir -p tmp/cache/"
-  # - "ls -laFh tmp/cache/clamav-dbs"
-  # - "rsync -rlptDv tmp/cache/  /var/lib/clamav/"
-  # - "freshclam"
-  # - "ls -laFh /var/lib/clamav/"
-  # - "rsync -rlptDav /var/lib/clamav/ tmp/cache/"
-  # - "chown -R travis:travis tmp/cache"
-  # - "chmod -R 777 tmp/cache/"
-  # - "ls -laFh tmp/cache/clamav-dbs/"
+      before_install:
+        - sudo apt-get update -qq
+        - sudo apt-get install -y ca-certificates curl wget rsync p7zip-full shellcheck -qq
+        #- pip install bashate
+        # - "mkdir -p tmp/cache/"
+        # - "ls -laFh tmp/cache/clamav-dbs"
+        # - "rsync -rlptDv tmp/cache/  /var/lib/clamav/"
+        # - "freshclam"
+        # - "ls -laFh /var/lib/clamav/"
+        # - "rsync -rlptDav /var/lib/clamav/ tmp/cache/"
+        # - "chown -R travis:travis tmp/cache"
+        # - "chmod -R 777 tmp/cache/"
+        # - "ls -laFh tmp/cache/clamav-dbs/"
 
-install:
-  - sudo mkdir -p /etc/clamav-unofficial-sigs
-  - sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf
-  - sudo cp -f config/os/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
-  - sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs
+      install:
+        - sudo mkdir -p /etc/clamav-unofficial-sigs
+        - sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf
+        - sudo cp -f config/os/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
+        - sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs
 
-script:
-  - sudo sh -e .t/ci-shellcheck.sh
-  - sudo sh -e .t/ci-clamav-download-default-databases.sh
-  #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
-  - sudo sh -e .t/ci-clamav-install-default.sh
-  - sudo sh -e .t/ci-clamav-install-default-database.sh
-  - sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
-  - sudo sh -e .t/ci-test.sh
+      script:
+        - sudo sh -e .t/ci-shellcheck.sh
+        - sudo sh -e .t/ci-clamav-download-default-databases.sh
+        #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
+        - sudo sh -e .t/ci-clamav-install-default.sh
+        - sudo sh -e .t/ci-clamav-install-default-database.sh
+        - sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
+        - sudo sh -e .t/ci-test.sh
 
-addons:
-  code_climate:
-    repo_token: $ci_codeclimate_repo_token
+      addons:
+        code_climate:
+          repo_token: $ci_codeclimate_repo_token
