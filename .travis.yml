@@ -8,6 +8,7 @@ language: shell
 os: linux
 
 # Required travis ci environment variables
+#ci_malwareexpert_serial_key=[secure]
 #ci_securiteinfo_authorisation_signature=[secure]
 #ci_malwarepatrol_receipt_code=[secure]
 #ci_malwarepatrol_product_code=[secure]
