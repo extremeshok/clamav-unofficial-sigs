@@ -458,21 +458,29 @@ function xshok_remove_database() { # rating database_array
       for db_name in "${current_dbs[@]}" ; do
           db_name_rating="${db_name#*|}"
           db_name="${db_name%|*}"
+          removed="no"
         # Checks
-            if [ "$enable_yararules" == "no" ] && [[ "$db_name" == *".yar"* ]] ; then # YARA rules are disabled AND it's the value you want to delete
+            if [ "$db_name_rating" == "DISABLED" ] ; then
                 new_dbs+=( "$db_name" )
-            elif [ "$db_name_rating" == "DISABLED" ] ; then
-                new_dbs+=( "$db_name" )
+                removed="yes"
             elif [ "$current_rating" == "HIGH" ] ; then
                 if [ "$db_name_rating" == "LOWONLY" ] ||  [ "$db_name_rating" == "LOWMEDIUMONLY" ] ||[ "$db_name_rating" == "MEDIUMONLY" ] ; then
                     new_dbs+=( "$db_name" )
+                    removed="yes"
                 fi
             elif [ "$current_rating" == "MEDIUM" ] ; then
                 if [ "$db_name_rating" == "HIGH" ] || [ "$db_name_rating" == "LOWONLY" ] ; then
                     new_dbs+=( "$db_name" )
+                    removed="yes"
                 fi
             elif [ "$current_rating" == "LOW" ] ; then
                 if [ "$db_name_rating" == "MEDIUMONLY" ] ||  [ "$db_name_rating" == "MEDIUM" ] || [ "$db_name_rating" == "HIGH" ]; then
+                    new_dbs+=( "$db_name" )
+                    removed="yes"
+                fi
+            fi
+            if [ "$removed" == "no" ] ; then # not already removed, process futher
+                if [ "$enable_yararules" == "no" ] && [[ "$db_name" == *".yar"* ]] ; then # YARA rules are disabled AND it's the value you want to delete
                     new_dbs+=( "$db_name" )
                 fi
             fi
@@ -2218,10 +2226,12 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
 else
     temp_remove_db="$(xshok_remove_database "DISABLED" "${sanesecurity_dbs[@]}")"
 fi
+
 sanesecurity_remove_dbs=( )
 if [ -n "$temp_remove_db" ] ; then
     read -r -a sanesecurity_remove_dbs <<< "$temp_remove_db"
 fi
+
 ############################################################################################
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_dbs" ] ; then
@@ -3212,7 +3222,7 @@ fi
 # Check for updated Malware Expert database files every set number of hours as defined in the "USER CONFIGURATION" section of this script      #
 ##############################################################################################################################################
 if [ "$malwareexpert_enabled" == "yes" ] ; then
-  if [ "$malwareexpert_serial_key" != "YOUR-SERIAL-KEY" ] ; then
+  if [ "$malwareexpert_serial_key" != "YOUR-SERIAL-KEY" ] && [ -n "$malwareexpert_serial_key" ]; then
     if [ -n "${malwareexpert_dbs[0]}" ] ; then
       if [ ${#malwareexpert_dbs} -lt 1 ] ; then
         xshok_pretty_echo_and_log "Failed malwareexpert_dbs config is invalid or not defined - SKIPPING"
