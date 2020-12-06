@@ -9,7 +9,6 @@ matrix:
 #### MARKDOWN-LINT
     - language: node_js
       os: linux
-      #Enable modern build platform, not container based.
       dist: focal
       before_install:
        - nvm install 14.6.0
@@ -21,7 +20,6 @@ matrix:
 #### SHELLCHECK
     - language: shell
       os: linux
-      #Enable modern build platform, not container based.
       dist: focal
       install:
       - sudo apt-get install -y shellcheck -qq
@@ -30,9 +28,7 @@ matrix:
 #### LOGIC AND CLAMAV TESTING : UBUNTU LINUX
     - language: shell
       os: linux
-      #Enable modern build platform, not container based.
       dist: focal
-
       # Required travis ci environment variables
       #ci_malwareexpert_serial_key=[secure]
       #ci_securiteinfo_authorisation_signature=[secure]
@@ -41,50 +37,34 @@ matrix:
       #ci_malwarepatrol_list=[secure]
       #ci_malwarepatrol_free=[secure]
       #ci_codeclimate_repo_token=[secure]
-
       before_install:
         - sudo apt-get update -qq
         - sudo apt-get install -y ca-certificates curl wget rsync p7zip-full -qq
         - sudo apt-get install -y clamav-base clamav-freshclam clamav clamav-daemon -qq
-        #- pip install bashate
-        # - "mkdir -p tmp/cache/"
-        # - "ls -laFh tmp/cache/clamav-dbs"
-        # - "rsync -rlptDv tmp/cache/  /var/lib/clamav/"
-        # - "freshclam"
-        # - "ls -laFh /var/lib/clamav/"
-        # - "rsync -rlptDav /var/lib/clamav/ tmp/cache/"
-        # - "chown -R travis:travis tmp/cache"
-        # - "chmod -R 777 tmp/cache/"
-        # - "ls -laFh tmp/cache/clamav-dbs/"
-
       install:
         - sudo mkdir -p /etc/clamav-unofficial-sigs
         - sudo cp -f config/master.conf /etc/clamav-unofficial-sigs/master.conf
         - sudo cp -f config/os/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
         - sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs
-
       script:
         - sudo sh -e .t/ci-clamav-download-default-databases.sh
         #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
         - sudo sh -e .t/ci-clamav-install-ubuntu-databases.sh
         - sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
-        - sudo sh -e .t/ci-test.sh
-
+        - sudo sh -e .t/ci-test-ubuntu.sh
       addons:
         code_climate:
           repo_token:  $ci_codeclimate_repo_token
 #### LOGIC AND CLAMAV TESTING : macOS / OSX
     - language: shell
       os: osx
-      #Enable modern build platform, not container based.
-      dist: focal
       addons:
           homebrew:
             packages:
             - gnu-tar
             - gnu-sed
             - clamav
-            update: false
+            update: true
       install:
         - sudo mkdir -p /usr/local/bin
         - sudo mkdir -p /usr/local/etc/clamav-unofficial-sigs
@@ -95,13 +75,8 @@ matrix:
 
       script:
         - sudo sh -e .t/ci-clamav-download-default-databases.sh
+        #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
         - sudo sh -e .t/ci-clamav-install-macos-clamav.sh
         - sudo sh -e .t/ci-clamav-install-macos-databases.sh
         - sudo cp -f .t/tests/user.conf /usr/local/etc/clamav-unofficial-sigs/user.conf
-        - sudo /usr/local/bin/clamav-unofficial-sigs.sh --force
-        #- sudo sh -e .t/ci-clamav-download-default-databases.sh
-        #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
-        #- sudo sh -e .t/ci-clamav-install-default.sh
-        #- sudo sh -e .t/ci-clamav-install-default-database.sh
-        #- sudo cp -f .t/tests/user.conf /etc/clamav-unofficial-sigs/user.conf
-        #- sudo sh -e .t/ci-test.sh
+        - sudo sh -e .t/ci-test-macos.sh
