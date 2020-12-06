@@ -12,22 +12,28 @@ pwd
 echo "Installing default Clamav"
 
 # Create clamav user and group
-sudo dscl . create /Groups/clamav
-sudo dscl . create /Groups/clamav RealName "Clam Antivirus Group"
-sudo dscl . create /Groups/clamav gid 799
-sudo dscl . create /Users/clamav
-sudo dscl . create /Users/clamav RealName "Clam Antivirus User"
-sudo dscl . create /Users/clamav UserShell /bin/false
-sudo dscl . create /Users/clamav UniqueID 599
-sudo dscl . create /Users/clamav PrimaryGroupID 799
+dscl . create /Groups/clamav
+dscl . create /Groups/clamav RealName "Clam Antivirus Group"
+dscl . create /Groups/clamav gid 799
+dscl . create /Users/clamav
+dscl . create /Users/clamav RealName "Clam Antivirus User"
+dscl . create /Users/clamav UserShell /bin/false
+dscl . create /Users/clamav UniqueID 599
+dscl . create /Users/clamav PrimaryGroupID 799
 
 # Create the dirs
-sudo mkdir -p /usr/local/var/clamav/run
-sudo mkdir -p /usr/local/var/clamav/log
-sudo mkdir -p /usr/local/var/clamav/db
-sudo mkdir -p "/Library/LaunchDaemons"
+mkdir -p /usr/local/var/clamav/run
+mkdir -p /usr/local/var/clamav/log
+mkdir -p /usr/local/var/clamav/db
+mkdir -p /Library/LaunchDaemons
+
+ls -laFh /usr/local/etc/clamav/
 
 # Generate the configs
+if [ ! -f "/usr/local/etc/clamav/clamd.conf.sample" ] ; then
+    echo "Missing: /usr/local/etc/clamav/clamd.conf"
+    exit 1
+fi
 cp "/usr/local/etc/clamav/clamd.conf.sample" "/usr/local/etc/clamav/clamd.conf"
 sed -e "s|# Example config file|# Config file|" \
        -e "s|^Example$|# Example|" \
@@ -39,23 +45,14 @@ sed -e "s|# Example config file|# Config file|" \
        -e "s|^#FixStaleSocket|FixStaleSocket|" \"
        -i -n "/usr/local/etc/clamav/clamd.conf"
 
-cp "/usr/local/etc/clamav/freshclam.conf.sample" "/usr/local/etc/clamav/freshclam.conf"
-sed -e "s|# Example config file|# Config file|" \
-       -e "s|^Example$|# Example|" \
-       -e "s|^#DatabaseDirectory .*|DatabaseDirectory /usr/local/var/clamav/db|" \
-       -e "s|^#UpdateLogFile .*|UpdateLogFile /usr/local/var/clamav/log/freshclam.log|" \
-       -e "s|^#PidFile .*|PidFile /usr/local/var/clamav/run/freshclam.pid|" \
-       -e "s|^#NotifyClamd .*|NotifyClamd /usr/local/etc/clamav/clamd.conf|" \
-       -i -n "/usr/local/etc/clamav/freshclam.conf"
-
 # Fix permissions
-sudo chown -R clamav:clamav /usr/local/var/clamav
+chown -R clamav:clamav /usr/local/var/clamav
 
 # Clamd socket
-sudo touch /usr/local/var/clamav/run/clamd.socket
-sudo chown clamav:clamav /usr/local/var/clamav/run/clamd.socket
+touch /usr/local/var/clamav/run/clamd.socket
+chown clamav:clamav /usr/local/var/clamav/run/clamd.socket
 
-sudo tee "/Library/LaunchDaemons/clamav.clamd.plist" << EOF > /dev/null
+tee "/Library/LaunchDaemons/clamav.clamd.plist" << EOF > /dev/null
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -76,6 +73,5 @@ sudo tee "/Library/LaunchDaemons/clamav.clamd.plist" << EOF > /dev/null
 EOF
 
 
-sudo chown root:wheel "/Library/LaunchDaemons/clamav.clamd.plist"
-sudo chmod 0644 "/Library/LaunchDaemons/clamav.clamd.plist"
-sudo launchctl load "/Library/LaunchDaemons/clamav.clamd.plist"
+chown root:wheel "/Library/LaunchDaemons/clamav.clamd.plist"
+chmod 0644 "/Library/LaunchDaemons/clamav.clamd.plist"

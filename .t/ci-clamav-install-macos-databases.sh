@@ -17,7 +17,8 @@ cp -f daily.cvd /usr/local/var/clamav/db/daily.cvd
 cp -f main.cvd /usr/local/var/clamav/db/main.cvd
 chown -R clamav:clamav /usr/local/var/clamav/db/
 
-launchctl kickstart -k system/clamav.clamd
+#launchctl kickstart -k system/clamav.clamd
+launchctl load "/Library/LaunchDaemons/clamav.clamd.plist"
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
