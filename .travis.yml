@@ -84,7 +84,7 @@ matrix:
             - gnu-tar
             - gnu-sed
             - clamav
-            update: true
+            update: false
       install:
         - sudo mkdir -p /usr/local/bin
         - sudo mkdir -p /usr/local/etc/clamav-unofficial-sigs

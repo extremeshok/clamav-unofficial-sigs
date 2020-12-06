@@ -1640,13 +1640,18 @@ if [ -z "$grep_bin" ] ; then
     xshok_pretty_echo_and_log "ERROR: grep command is missing"
     exit 1
   fi
-# Detect supprot for sed
-sed_bin="$(command -v sed 2> /dev/null)"
-if [ -z "$grep_bin" ] ; then
-  xshok_pretty_echo_and_log "ERROR: sed command is missing"
-  exit 1
+# Detect support for sed or gsed
+if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
+    sed_executable="gsed"
+else
+    sed_executable="sed"
 fi
-
+if [ -z "$sed_bin" ]; then
+        sed_bin="$(command -v "$sed_executable" 2> /dev/null)"
+    else
+        xshok_pretty_echo_and_log "ERROR: gsed (gnu sed) is missing"
+        exit 1
+fi
 # Detect support for tar or gtar
 if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
     tar_executable="gtar"

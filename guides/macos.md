@@ -20,7 +20,7 @@ Tested on macOS Big Sur (OSX 11)
 
 # Step 2 Install dependencies : gtar (gnu-tar) sed (gnu-sed)
 ```
-brew install gnu-tar gnu-tar
+brew install gnu-tar gnu-sed
 ```
 
 # Step 3 Install clamav
