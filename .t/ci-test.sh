@@ -152,9 +152,9 @@ else
     exit 1
 fi
 
-echo "running script verbose with malwareexpert databases"
+echo "running script verbose with malware expert databases"
 cp -f .t/tests/user_malwareexpert.conf /etc/clamav-unofficial-sigs/user.conf
-bash /usr/sbin/clamav-unofficial-sigs --verbose
+bash /usr/sbin/clamav-unofficial-sigs --verbose --force
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
