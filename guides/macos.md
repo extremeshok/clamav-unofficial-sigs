@@ -8,14 +8,6 @@ clamav-unofficial-sigs.sh --upgrade
 clamav-unofficial-sigs.sh --force
 ```
 
-# UPGRADE INSTRUCTIONS (version 6.1 and below)
-```
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh -O /usr/local/bin/clamav-unofficial-sigs.sh && chmod 755 /usr/local/sbin/clamav-unofficial-sigs.sh
-wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf -O /etc/clamav-unofficial-sigs/master.conf
-clamav-unofficial-sigs.sh --force
-```
-
-
 ## Notes:
 https://www.clamav.net/documents/installation-on-macos-mac-os-x
 
@@ -26,9 +18,9 @@ https://www.clamav.net/documents/installation-on-macos-mac-os-x
 ```
 
 
-# Step 2 Install gtar (gnu-tar)
+# Step 2 Install dependencies : gtar (gnu-tar) sed (gnu-sed)
 ```
-brew install gnu-tar
+brew install gnu-tar gnu-tar
 ```
 
 # Step 3 Install clamav
@@ -41,17 +33,17 @@ brew install clamav
 sudo su
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh --output /usr/local/bin/clamav-unofficial-sigs.sh
 chmod 755  /usr/local/bin/clamav-unofficial-sigs.sh
-mkdir -p /etc/clamav-unofficial-sigs
-curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf --output /etc/clamav-unofficial-sigs/master.conf
-curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/os.macosx.conf --output /etc/clamav-unofficial-sigs/os.conf
-curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf --output /etc/clamav-unofficial-sigs/user.conf
+mkdir -p /usr/local/etc/clamav-unofficial-sigs
+curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/master.conf --output /usr/local/etc/clamav-unofficial-sigs/master.conf
+curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/os/os.macosx.conf --output /usr/local/etc/clamav-unofficial-sigs/os.conf
+curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/config/user.conf --output /usr/local/etc/clamav-unofficial-sigs/user.conf
 exit
 ```
 
 # Step 5
 set your user options
 ```
-sudo pico /etc/clamav-unofficial-sigs/user.conf
+sudo pico /usr/local/etc/clamav-unofficial-sigs/user.conf
 ```
 
 # Step 6
