@@ -1,0 +1,24 @@
+{
+  "first-header-h1": false,
+  "first-line-h1": false,
+  "line-length": {
+    "code_blocks": false
+  },
+  "no-hard-tabs": {
+    "code_blocks": false
+  },
+  "no-inline-html": {
+    "allowed_elements": [
+      "br",
+      "figcaption",
+      "figure",
+      "p",
+      "span",
+      "ruby",
+      "rt"
+    ]
+  },
+  "no-trailing-punctuation": {
+    "punctuation": ".,;:!"
+  }
+}
