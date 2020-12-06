@@ -6,7 +6,12 @@ ClamAV Unofficial Signatures Updater
 
 ## Description
 
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, etc. The script will also generate and install cron, logrotate, and man files.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, MalwareExpert etc. The script will also generate and install cron, logrotate, and man files.
+
+### Automated Testing and Linting
+* Travis-CI
+* Linting with markdownlint-cli and shellcheck
+* Testing with Ubuntu Focal and MacOS / OSX
 
 ### Checkout some of our other solutions: <https://github.com/extremeshok?tab=repositories>
 
@@ -221,6 +226,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Added detection of tar executable (use gtar on mac and bsd)
 * Config os.macosx.conf renamed to os.macos.conf
 * Fix: set ownership of last-version-check.txt
+- More automated linting and testing (markdown and macos / osx) via travis-ci
 * Incremented the config to version 93
 
 ### Version 7.1 ( Not Released)
