@@ -454,13 +454,14 @@ function xshok_remove_database() { # rating database_array
     declare -a current_dbs=( "${@:2}" )
     # Zero
     declare -a new_dbs=( )
+
     if [ ${#current_dbs} -ge 1 ] ; then
       for db_name in "${current_dbs[@]}" ; do
           db_name_rating="${db_name#*|}"
           db_name="${db_name%|*}"
           removed="no"
         # Checks
-            if [ "$db_name_rating" == "DISABLED" ] ; then
+            if [ "$current_rating" == "DISABLED" ] ; then
                 new_dbs+=( "$db_name" )
                 removed="yes"
             elif [ "$current_rating" == "HIGH" ] ; then
