@@ -142,14 +142,14 @@ if [ ! -e "/var/lib/clamav-unofficial-sigs/dbs-ss/jurlbl.ndb" ] ; then
     echo .. OK
 else
     echo .. ERROR
-    #exit 1
+    exit 1
 fi
 echo "Was /var/lib/clamav/phish.ndb removed ?"
 if [ ! -e "/var/lib/clamav/phish.ndb" ] ; then
     echo .. OK
 else
     echo .. ERROR
-    #exit 1
+    exit 1
 fi
 
 echo "running script verbose with malwareexpert databases"
@@ -170,7 +170,7 @@ if [ ! -e "/var/lib/clamav-unofficial-sigs/dbs-ss/jurlbl.ndb" ] ; then
     echo .. OK
 else
     echo .. ERROR
-    #exit 1
+    exit 1
 fi
 echo "Was /var/lib/clamav/malware.expert.hdb added ?"
 if [ -e "/var/lib/clamav/malware.expert.hdb" ] ; then
