@@ -2,24 +2,33 @@
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
 # Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
-# License: BSD (Berkeley Software Distribution)
+# License:             BSD (Berkeley Software Distribution)
 ##################
 matrix:
   include:
+#### MARKDOWN-LINT
     - language: node_js
       os: linux
       #Enable modern build platform, not container based.
       dist: bionic
-#      node_js:
-#      - '8'
       before_install:
       - nvm install 14.6.0
       - nvm use 14.6.0
       install:
       - npm install --global markdownlint-cli
       script:
+      - cat .markdownlint.json
       - markdownlint *.md
-
+#### SHELLCHECK
+    - language: shell
+      os: linux
+      #Enable modern build platform, not container based.
+      dist: bionic
+      install:
+      - apt-get install -y shellcheck -qq
+      script:
+      - sudo sh -e .t/ci-shellcheck.sh
+#### LOGIC AND CLAMAV TESTING
     - language: shell
       os: linux
       #Enable modern build platform, not container based.
@@ -44,8 +53,8 @@ matrix:
       #    - tmp/cache
 
       before_install:
-        - sudo apt-get update -qq
-        - sudo apt-get install -y ca-certificates curl wget rsync p7zip-full shellcheck -qq
+        - apt-get update -qq
+        - apt-get install -y ca-certificates curl wget rsync p7zip-full -qq
         #- pip install bashate
         # - "mkdir -p tmp/cache/"
         # - "ls -laFh tmp/cache/clamav-dbs"
@@ -64,7 +73,6 @@ matrix:
         - sudo cp -f clamav-unofficial-sigs.sh /usr/sbin/clamav-unofficial-sigs
 
       script:
-        - sudo sh -e .t/ci-shellcheck.sh
         - sudo sh -e .t/ci-clamav-download-default-databases.sh
         #- sudo sh -e .t/ci-clamav-download-default-databases-git.sh
         - sudo sh -e .t/ci-clamav-install-default.sh
@@ -74,4 +82,4 @@ matrix:
 
       addons:
         code_climate:
-          repo_token: $ci_codeclimate_repo_token
+          repo_token:  $ci_codeclimate_repo_token
