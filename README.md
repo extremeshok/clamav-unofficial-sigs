@@ -40,7 +40,7 @@ Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, 
 * CentOS: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md>
 * Ubuntu: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
 * Debian: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
-* Mac OSX: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md>
+* macOS: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macos.md>
 * pFsense: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md>
 
 ### UPGRADE INSTRUCTIONS (version 7.0 +)

@@ -1,4 +1,4 @@
-# Basic guide to Installing and Updating on Mac OS 10.12+ and OS X
+# Basic guide to Installing and Updating on macOS and OSX
 Press Command+Space and type Terminal and press enter/return key.
 Run all the following in the Terminal app:
 
