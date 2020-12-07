@@ -6,7 +6,7 @@ ClamAV Unofficial Signatures Updater
 
 ## Description
 
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, MalwareExpert etc. The script will also generate and install cron, logrotate, and man files.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, MalwareExpert, interServer etc. The script will also generate and install cron, logrotate, and man files.
 
 ### Automated Testing and Linting
 
@@ -96,6 +96,10 @@ Usage of free Yara-Rules Project: <http://yararules.com>
 
 Current limitations of clamav support: <http://blog.clamav.net/search/label/yara>
 
+### interServer free database support (as of December 2020)
+
+Usage of interServer: <http://rbluri.interserver.net>
+
 ### malware.expert non-free database support (as of December 2020)
 
 Usage of Malware Expert: <https://www.malware.expert>
@@ -104,7 +108,7 @@ Usage of Malware Expert: <https://www.malware.expert>
 1. You will receive an email containing your serial key
 1. Enter the serial key into the config malwareexpert_serial_key: replacing YOUR-SERIAL-KEY with your serial key from the email
 
-### MalwarePatrol Free/Delayed list support (as of May 2015)
+### MalwarePatrol free/delayed list support (as of May 2015)
 
 Usage of MalwarePatrol 2015 free clamav signatures: <https://www.malwarepatrol.net>
 
@@ -222,6 +226,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Disabled databases are automatically removed
 * Disable databases by  setting the rating to "DISABLED" eg. securiteinfo_dbs_rating="DISABLED" will disable all securiteinfo databases
 * Added Malware Expert databases (non-free)
+* Added interServer databases (free)
 * Reworked securiteinfo premium databases (non-free)
 * Added malwarepatrol_db to specify the exact database name (default: malwarepatrol.db)
 * Added detection of tar executable (use gtar on mac and bsd)
@@ -229,7 +234,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Fix: set ownership of last-version-check.txt
 * More automated linting and testing (markdown and macOS / osx) via travis-ci
 * Updated macOS installation guide for Big Sur (OSX 11)
-* Incremented the config to version 93
+* Incremented the config to version 94
 * Thank you @dandanio @jkellerer @msapiro @shawniverson
 
 ### Version 7.1 (Not Released)
