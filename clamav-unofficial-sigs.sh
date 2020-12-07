@@ -2985,7 +2985,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
                 fi
               done
               if [ ! "$sanesecurity_update" == "1" ] ; then
-                xshok_pretty_echo_and_log "No Sanesecurity database file updates found" "-"
+                xshok_pretty_echo_and_log "No Sanesecurity database file updates" "-"
                 break
               else
                 break
@@ -3132,11 +3132,11 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
               xshok_pretty_echo_and_log "Failed connection to ${securiteinfo_url} - SKIPPED SecuriteInfo ${db_file} update"
             fi
             if [ "$securiteinfo_db_update" != "1" ] ; then
-              xshok_pretty_echo_and_log "No updated SecuriteInfo ${db_file} database file found" "-"
+              xshok_pretty_echo_and_log "No updated SecuriteInfo ${db_file} database file" "-"
             fi
           done
           if [ "$securiteinfo_updates" != "1" ] ; then
-            xshok_pretty_echo_and_log "No SecuriteInfo database file updates found" "-"
+            xshok_pretty_echo_and_log "No SecuriteInfo database file updates" "-"
           fi
         else
           xshok_pretty_echo_and_log "SecuriteInfo Database File Updates" "="
@@ -3294,7 +3294,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "WARNING: Failed connection to ${linuxmalwaredetect_sigpack_url} - SKIPPED LinuxMalwareDetect update"
           fi
         else
-          xshok_pretty_echo_and_log "No LinuxMalwareDetect database file updates found" "-"
+          xshok_pretty_echo_and_log "No LinuxMalwareDetect database file updates" "-"
         fi
       else
         xshok_pretty_echo_and_log "LinuxMalwareDetect Database File Updates" "="
@@ -3433,11 +3433,11 @@ if [ "$interserver_enabled" == "yes" ] ; then
               xshok_pretty_echo_and_log "Failed connection to ${interserver_url} - SKIPPED interServer ${db_file} update"
             fi
             if [ "$interserver_db_update" != "1" ] ; then
-              xshok_pretty_echo_and_log "No updated interServer ${db_file} database file found" "-"
+              xshok_pretty_echo_and_log "No updated interServer ${db_file} database file" "-"
             fi
           done
           if [ "$interserver_updates" != "1" ] ; then
-            xshok_pretty_echo_and_log "No interServer database file updates found" "-"
+            xshok_pretty_echo_and_log "No interServer database file updates" "-"
           fi
         else
           xshok_pretty_echo_and_log "interServer Database File Updates" "="
@@ -3574,11 +3574,11 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
               xshok_pretty_echo_and_log "Failed connection to ${malwareexpert_url} - SKIPPED Malware Expert ${db_file} update"
             fi
             if [ "$malwareexpert_db_update" != "1" ] ; then
-              xshok_pretty_echo_and_log "No updated Malware Expert ${db_file} database file found" "-"
+              xshok_pretty_echo_and_log "No updated Malware Expert ${db_file} database file" "-"
             fi
           done
           if [ "$malwareexpert_updates" != "1" ] ; then
-            xshok_pretty_echo_and_log "No Malware Expert database file updates found" "-"
+            xshok_pretty_echo_and_log "No Malware Expert database file updates" "-"
           fi
         else
           xshok_pretty_echo_and_log "Malware Expert Database File Updates" "="
@@ -3718,10 +3718,10 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
               xshok_pretty_echo_and_log "Failed connection to ${malwarepatrol_url} - SKIPPED MalwarePatrol ${malwarepatrol_db} update"
             fi
             if [ "$malwarepatrol_db_update" != "1" ] ; then
-              xshok_pretty_echo_and_log "No updated MalwarePatrol ${malwarepatrol_db} database file found" "-"
+              xshok_pretty_echo_and_log "No updated MalwarePatrol ${malwarepatrol_db} database file" "-"
             fi
           if [ "$malwarepatrol_updates" != "1" ] ; then
-            xshok_pretty_echo_and_log "No MalwarePatrol database file updates found" "-"
+            xshok_pretty_echo_and_log "No MalwarePatrol database file updates" "-"
           fi
         else
           xshok_pretty_echo_and_log "MalwarePatrol Database File Updates" "="
@@ -3847,11 +3847,11 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "WARNING: Failed connection to $urlhaus_url - SKIPPED urlhaus ${db_file} update"
           fi
           if [ "$urlhaus_db_update" != "1" ] ; then
-            xshok_pretty_echo_and_log "No updated urlhaus ${db_file} database file found"
+            xshok_pretty_echo_and_log "No updated urlhaus ${db_file} database file"
           fi
         done
         if [ "$urlhaus_updates" != "1" ] ; then
-          xshok_pretty_echo_and_log "No urlhaus database file updates found" "-"
+          xshok_pretty_echo_and_log "No urlhaus database file updates" "-"
         fi
       else
 
@@ -3984,11 +3984,11 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "WARNING: Failed connection to $yararulesproject_url - SKIPPED yararulesproject ${db_file} update"
           fi
           if [ "$yararulesproject_db_update" != "1" ] ; then
-            xshok_pretty_echo_and_log "No updated yararulesproject ${db_file} database file found"
+            xshok_pretty_echo_and_log "No updated yararulesproject ${db_file} database file"
           fi
         done
         if [ "$yararulesproject_updates" != "1" ] ; then
-          xshok_pretty_echo_and_log "No yararulesproject database file updates found" "-"
+          xshok_pretty_echo_and_log "No yararulesproject database file updates" "-"
         fi
       else
 
@@ -4147,11 +4147,11 @@ if [ "$additional_enabled" == "yes" ] ; then
             xshok_pretty_echo_and_log "WARNING: Failed connection to ${db_url} - SKIPPED additional ${db_file} update"
           fi
           if [ "$additional_db_update" != "1" ] ; then
-            xshok_pretty_echo_and_log "No updated additional ${db_file} database file found"
+            xshok_pretty_echo_and_log "No updated additional ${db_file} database file"
           fi
         done
         if [ "$additional_updates" != "1" ] ; then
-          xshok_pretty_echo_and_log "No additional database file updates found" "-"
+          xshok_pretty_echo_and_log "No additional database file updates" "-"
         fi
       else
         xshok_pretty_echo_and_log "Additional Database File Updates" "="
