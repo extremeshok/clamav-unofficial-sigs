@@ -224,6 +224,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 * Fix Disabled databases removed when "$remove_disabled_databases" is set to "no"
 * Change yararule email/Email_generic_phishing.yar to HIGH
+* Incremented the config to version 95
 
 ### Version 7.2 (07 December 2020)
 
