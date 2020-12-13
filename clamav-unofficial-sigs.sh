@@ -1619,7 +1619,7 @@ else
     xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf is not readable"
 fi
 
-# Solaris command -v function returns garbage when the program is not found
+# Solaris command -v function returns garbage when the program is not found k
 # only define the new command -v function if running under Solaris
 if [ "$(uname -s)" == "SunOS" ] ; then
   function which() {
@@ -2280,39 +2280,48 @@ else
   enable_yararules="no"
 fi
 
+############################################################################################
 # Generate the signature databases
+############################################################################################
 if [ "$sanesecurity_enabled" == "yes" ] ; then
   if [ -n "$sanesecurity_dbs" ] ; then
     if [ -n "$sanesecurity_dbs_rating" ] ; then
       temp_db="$(xshok_database "$sanesecurity_dbs_rating" "${sanesecurity_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$sanesecurity_dbs_rating" "${sanesecurity_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$sanesecurity_dbs_rating" "${sanesecurity_dbs[@]}")"
+      fi
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${sanesecurity_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${sanesecurity_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${sanesecurity_dbs[@]}")"
+      fi
     fi
     sanesecurity_dbs=( )
     if [ -n "$temp_db" ] ; then
         read -r -a sanesecurity_dbs <<< "$temp_db"
     fi
   fi
-else
+elif [ "$remove_disabled_databases" == "yes" ] ; then
     temp_remove_db="$(xshok_remove_database "DISABLED" "${sanesecurity_dbs[@]}")"
 fi
 
 sanesecurity_remove_dbs=( )
-if [ -n "$temp_remove_db" ] ; then
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
     read -r -a sanesecurity_remove_dbs <<< "$temp_remove_db"
 fi
-
 ############################################################################################
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_dbs" ] ; then
     if [ -n "$securiteinfo_dbs_rating" ] ; then
       temp_db="$(xshok_database "$securiteinfo_dbs_rating" "${securiteinfo_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$securiteinfo_dbs_rating" "${securiteinfo_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$securiteinfo_dbs_rating" "${securiteinfo_dbs[@]}")"
+      fi
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${securiteinfo_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${securiteinfo_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${securiteinfo_dbs[@]}")"
+      fi
     fi
         securiteinfo_dbs=( )
         if [ -n "$temp_db" ] ; then
@@ -2320,30 +2329,34 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
             read -r -a securiteinfo_dbs <<< "$temp_db"
         fi
   fi
-else
+elif [ "$remove_disabled_databases" == "yes" ] ; then
     temp_remove_db="$(xshok_remove_database "DISABLED" "${securiteinfo_dbs[@]}")"
 fi
 securiteinfo_remove_dbs=( )
-if [ -n "$temp_remove_db" ] ; then
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
     read -r -a securiteinfo_remove_dbs <<< "$temp_remove_db"
 fi
 if [ "$securiteinfo_enabled" == "yes" ] ; then
   if [ -n "$securiteinfo_premium_dbs" ] && [ "$securiteinfo_premium" == "yes" ] ; then
     if [ -n "$securiteinfo_dbs_rating" ] ; then
       temp_db="$(xshok_database "$securiteinfo_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$securiteinfo_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$securiteinfo_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
+      fi
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${securiteinfo_premium_dbs[@]}")"
+      fi
     fi
     if [ -n "$temp_db" ] ; then
         read -r -a securiteinfo_dbs <<< "$temp_db"
     fi
   fi
-else
+elif [ "$remove_disabled_databases" == "yes" ] ; then
     temp_remove_db="$(xshok_remove_database "DISABLED" "${securiteinfo_premium_dbs[@]}")"
 fi
-if [ -n "$temp_remove_db" ] ; then
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
     read -r -a securiteinfo_remove_dbs <<< "$temp_remove_db"
 fi
 ############################################################################################
@@ -2351,21 +2364,25 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
   if [ -n "$linuxmalwaredetect_dbs" ] ; then
     if [ -n "$linuxmalwaredetect_dbs_rating" ] ; then
       temp_db="$(xshok_database "$linuxmalwaredetect_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$linuxmalwaredetect_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$linuxmalwaredetect_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
+      fi
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${linuxmalwaredetect_dbs[@]}")"
+      fi
     fi
         linuxmalwaredetect_dbs=( )
         if [ -n "$temp_db" ] ; then
             read -r -a linuxmalwaredetect_dbs <<< "$temp_db"
         fi
   fi
-else
+elif [ "$remove_disabled_databases" == "yes" ] ; then
   temp_remove_db="$(xshok_remove_database "DISABLED" "${linuxmalwaredetect_dbs[@]}")"
 fi
 linuxmalwaredetect_remove_dbs=( )
-if [ -n "$temp_remove_db" ] ; then
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
   read -r -a linuxmalwaredetect_remove_dbs <<< "$temp_remove_db"
 fi
 ############################################################################################
@@ -2373,21 +2390,25 @@ if [ "$interserver_enabled" == "yes" ] ; then
   if [ -n "$interserver_dbs" ] ; then
     if [ -n "$interserver_dbs_rating" ] ; then
       temp_db="$(xshok_database "$interserver_dbs_rating" "${interserver_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$interserver_dbs_rating" "${interserver_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$interserver_dbs_rating" "${interserver_dbs[@]}")"
+      fi
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${interserver_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${interserver_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${interserver_dbs[@]}")"
+      fi
     fi
         interserver_dbs=( )
         if [ -n "$temp_db" ] ; then
             read -r -a interserver_dbs <<< "$temp_db"
         fi
   fi
-else
+elif [ "$remove_disabled_databases" == "yes" ] ; then
   temp_remove_db="$(xshok_remove_database "DISABLED" "${interserver_dbs[@]}")"
 fi
 interserver_remove_dbs=( )
-if [ -n "$temp_remove_db" ] ; then
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
   read -r -a interserver_remove_dbs <<< "$temp_remove_db"
 fi
 ############################################################################################
@@ -2395,21 +2416,25 @@ if [ "$malwareexpert_enabled" == "yes" ] ; then
   if [ -n "$malwareexpert_dbs" ] ; then
     if [ -n "$malwareexpert_dbs_rating" ] ; then
       temp_db="$(xshok_database "$malwareexpert_dbs_rating" "${malwareexpert_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$malwareexpert_dbs_rating" "${malwareexpert_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$malwareexpert_dbs_rating" "${malwareexpert_dbs[@]}")"
+      fi
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${malwareexpert_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${malwareexpert_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${malwareexpert_dbs[@]}")"
+      fi
     fi
         malwareexpert_dbs=( )
         if [ -n "$temp_db" ] ; then
             read -r -a malwareexpert_dbs <<< "$temp_db"
         fi
   fi
-else
+elif [ "$remove_disabled_databases" == "yes" ] ; then
   temp_remove_db="$(xshok_remove_database "DISABLED" "${malwareexpert_dbs[@]}")"
 fi
 malwareexpert_remove_dbs=( )
-if [ -n "$temp_remove_db" ] ; then
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
   read -r -a malwareexpert_remove_dbs <<< "$temp_remove_db"
 fi
 ############################################################################################
@@ -2417,35 +2442,40 @@ if [ "$yararulesproject_enabled" == "yes" ] ; then
   if [ -n "$yararulesproject_dbs" ] ; then
     if [ -n "$yararulesproject_dbs_rating" ] ; then
       temp_db="$(xshok_database "$yararulesproject_dbs_rating" "${yararulesproject_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$yararulesproject_dbs_rating" "${yararulesproject_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$yararulesproject_dbs_rating" "${yararulesproject_dbs[@]}")"
+      fi
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${yararulesproject_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${yararulesproject_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${yararulesproject_dbs[@]}")"
+      fi
     fi
     yararulesproject_dbs=( )
         if [ -n "$temp_db" ] ; then
             read -r -a yararulesproject_dbs <<< "$temp_db"
         fi
   fi
-else
+elif [ "$remove_disabled_databases" == "yes" ] ; then
   temp_remove_db="$(xshok_remove_database "DISABLED" "${yararulesproject_dbs[@]}")"
 fi
 yararulesproject_remove_dbs=( )
-if [ -n "$temp_remove_db" ] ; then
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
   read -r -a yararulesproject_remove_dbs <<< "$temp_remove_db"
 fi
-
-
-
 ############################################################################################
 if [ "$urlhaus_enabled" == "yes" ] ; then
   if [ -n "$urlhaus_dbs" ] ; then
     if [ -n "$urlhaus_dbs_rating" ] ; then
       temp_db="$(xshok_database "$urlhaus_dbs_rating" "${urlhaus_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$urlhaus_dbs_rating" "${urlhaus_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$urlhaus_dbs_rating" "${urlhaus_dbs[@]}")"
+      fi
     else
       temp_db="$(xshok_database "$default_dbs_rating" "${urlhaus_dbs[@]}")"
-      temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${urlhaus_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${urlhaus_dbs[@]}")"
+      fi
     fi
     urlhaus_dbs=( )
         if [ -n "$temp_db" ] ; then
@@ -2453,11 +2483,11 @@ if [ "$urlhaus_enabled" == "yes" ] ; then
         read -r -a urlhaus_dbs <<< "$temp_db"
         fi
   fi
-else
+elif [ "$remove_disabled_databases" == "yes" ] ; then
   temp_remove_db="$(xshok_remove_database "DISABLED" "${urlhaus_dbs[@]}")"
 fi
 urlhaus_remove_dbs=( )
-if [ -n "$temp_remove_db" ] ; then
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
   read -r -a urlhaus_remove_dbs <<< "$temp_remove_db"
 fi
 ############################################################################################
@@ -2483,112 +2513,114 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
         malwarepatrol_db="malwarepatrol.db"
     fi
     malwarepatrol_url="${malwarepatrol_url}?receipt=${malwarepatrol_receipt_code}&product=${malwarepatrol_product_code}&list=${malwarepatrol_list}"
-else
+elif [ "$remove_disabled_databases" == "yes" ] ; then
     malwarepatrol_remove_dbs=( "malwarepatrol.db" )
 fi
 ############################################################################################
 # CLEANUP UNUSED DATABASES, eg when downgrading a database rating or disabling a database
-if [ -n "${sanesecurity_remove_dbs[0]}" ] ; then
-  for db_file in "${sanesecurity_remove_dbs[@]}" ; do
-    if [ -f "${work_dir_sanesecurity}/${db_file}" ] ; then
-        echo "Removing unused file: ${work_dir_sanesecurity}/${db_file}"
-        rm -f "${work_dir_sanesecurity}/${db_file}"
+if [ "$remove_disabled_databases" == "yes" ] ; then
+    if [ -n "${sanesecurity_remove_dbs[0]}" ] ; then
+      for db_file in "${sanesecurity_remove_dbs[@]}" ; do
+        if [ -f "${work_dir_sanesecurity}/${db_file}" ] ; then
+            echo "Removing unused file: ${work_dir_sanesecurity}/${db_file}"
+            rm -f "${work_dir_sanesecurity}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
     fi
-    if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Removing unused file: ${clam_dbs}/${db_file}"
-        rm -f "${clam_dbs}/${db_file}"
+    if [ -n "${securiteinfo_remove_dbs[0]}" ] ; then
+      for db_file in "${securiteinfo_remove_dbs[@]}" ; do
+        if [ -f "${work_dir_securiteinfo}/${db_file}" ] ; then
+            echo "Removing unused file: ${work_dir_securiteinfo}/${db_file}"
+            rm -f "${work_dir_securiteinfo}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
     fi
-  done
-fi
-if [ -n "${securiteinfo_remove_dbs[0]}" ] ; then
-  for db_file in "${securiteinfo_remove_dbs[@]}" ; do
-    if [ -f "${work_dir_securiteinfo}/${db_file}" ] ; then
-        echo "Removing unused file: ${work_dir_securiteinfo}/${db_file}"
-        rm -f "${work_dir_securiteinfo}/${db_file}"
+    if [ -n "${linuxmalwaredetect_remove_dbs[0]}" ] ; then
+      for db_file in "${linuxmalwaredetect_remove_dbs[@]}" ; do
+        if [ -f "${work_dir_linuxmalwaredetect}/${db_file}" ] ; then
+            echo "Removing unused file: ${work_dir_linuxmalwaredetect}/${db_file}"
+            rm -f "${work_dir_linuxmalwaredetect}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
     fi
-    if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Removing unused file: ${clam_dbs}/${db_file}"
-        rm -f "${clam_dbs}/${db_file}"
+    if [ -n "${interserver_remove_dbs[0]}" ] ; then
+      for db_file in "${interserver_remove_dbs[@]}" ; do
+        if [ -f "${work_dir_interserver}/${db_file}" ] ; then
+            echo "Removing unused file: ${work_dir_interserver}/${db_file}"
+            rm -f "${work_dir_interserver}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
     fi
-  done
-fi
-if [ -n "${linuxmalwaredetect_remove_dbs[0]}" ] ; then
-  for db_file in "${linuxmalwaredetect_remove_dbs[@]}" ; do
-    if [ -f "${work_dir_linuxmalwaredetect}/${db_file}" ] ; then
-        echo "Removing unused file: ${work_dir_linuxmalwaredetect}/${db_file}"
-        rm -f "${work_dir_linuxmalwaredetect}/${db_file}"
+    if [ -n "${malwareexpert_remove_dbs[0]}" ] ; then
+      for db_file in "${malwareexpert_remove_dbs[@]}" ; do
+        if [ -f "${work_dir_malwareexpert}/${db_file}" ] ; then
+            echo "Removing unused file: ${work_dir_malwareexpert}/${db_file}"
+            rm -f "${work_dir_malwareexpert}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
     fi
-    if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Removing unused file: ${clam_dbs}/${db_file}"
-        rm -f "${clam_dbs}/${db_file}"
+    if [ -n "${yararulesproject_remove_dbs[0]}" ] ; then
+      for db_file in "${yararulesproject_remove_dbs[@]}" ; do
+          if echo "$db_file" | $grep_bin -q "/" ; then
+            yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
+            db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+          else
+              yr_dir=""
+          fi
+        if [ -f "${work_dir_yararulesproject}/${yr_dir}${db_file}" ] ; then
+            echo "Removing unused file: ${work_dir_yararulesproject}/${db_file}"
+            rm -f "${work_dir_yararulesproject}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
     fi
-  done
-fi
-if [ -n "${interserver_remove_dbs[0]}" ] ; then
-  for db_file in "${interserver_remove_dbs[@]}" ; do
-    if [ -f "${work_dir_interserver}/${db_file}" ] ; then
-        echo "Removing unused file: ${work_dir_interserver}/${db_file}"
-        rm -f "${work_dir_interserver}/${db_file}"
+    if [ -n "${urlhaus_remove_dbs[0]}" ] ; then
+      for db_file in "${urlhaus_remove_dbs[@]}" ; do
+        if [ -f "${work_dir_urlhaus}/${db_file}" ] ; then
+            echo "Removing unused file: ${work_dir_urlhaus}/${db_file}"
+            rm -f "${work_dir_urlhaus}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
     fi
-    if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Removing unused file: ${clam_dbs}/${db_file}"
-        rm -f "${clam_dbs}/${db_file}"
+    if [ -n "${malwarepatrol_remove_dbs[0]}" ] ; then
+      for db_file in "${malwarepatrol_remove_dbs[@]}" ; do
+        if [ -f "${work_dir_malwarepatrol}/${db_file}" ] ; then
+            echo "Removing unused file: ${work_dir_malwarepatrol}/${db_file}"
+            rm -f "${work_dir_malwarepatrol}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
     fi
-  done
-fi
-if [ -n "${malwareexpert_remove_dbs[0]}" ] ; then
-  for db_file in "${malwareexpert_remove_dbs[@]}" ; do
-    if [ -f "${work_dir_malwareexpert}/${db_file}" ] ; then
-        echo "Removing unused file: ${work_dir_malwareexpert}/${db_file}"
-        rm -f "${work_dir_malwareexpert}/${db_file}"
-    fi
-    if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Removing unused file: ${clam_dbs}/${db_file}"
-        rm -f "${clam_dbs}/${db_file}"
-    fi
-  done
-fi
-if [ -n "${yararulesproject_remove_dbs[0]}" ] ; then
-  for db_file in "${yararulesproject_remove_dbs[@]}" ; do
-      if echo "$db_file" | $grep_bin -q "/" ; then
-        yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
-        db_file="$(echo "$db_file" | cut -d "/" -f 2)"
-      else
-          yr_dir=""
-      fi
-    if [ -f "${work_dir_yararulesproject}/${yr_dir}${db_file}" ] ; then
-        echo "Removing unused file: ${work_dir_yararulesproject}/${db_file}"
-        rm -f "${work_dir_yararulesproject}/${db_file}"
-    fi
-    if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Removing unused file: ${clam_dbs}/${db_file}"
-        rm -f "${clam_dbs}/${db_file}"
-    fi
-  done
-fi
-if [ -n "${urlhaus_remove_dbs[0]}" ] ; then
-  for db_file in "${urlhaus_remove_dbs[@]}" ; do
-    if [ -f "${work_dir_urlhaus}/${db_file}" ] ; then
-        echo "Removing unused file: ${work_dir_urlhaus}/${db_file}"
-        rm -f "${work_dir_urlhaus}/${db_file}"
-    fi
-    if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Removing unused file: ${clam_dbs}/${db_file}"
-        rm -f "${clam_dbs}/${db_file}"
-    fi
-  done
-fi
-if [ -n "${malwarepatrol_remove_dbs[0]}" ] ; then
-  for db_file in "${malwarepatrol_remove_dbs[@]}" ; do
-    if [ -f "${work_dir_malwarepatrol}/${db_file}" ] ; then
-        echo "Removing unused file: ${work_dir_malwarepatrol}/${db_file}"
-        rm -f "${work_dir_malwarepatrol}/${db_file}"
-    fi
-    if [ -f "${clam_dbs}/${db_file}" ] ; then
-        echo "Removing unused file: ${clam_dbs}/${db_file}"
-        rm -f "${clam_dbs}/${db_file}"
-    fi
-  done
 fi
 
 ############################################################################################

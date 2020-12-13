@@ -220,6 +220,11 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### Version 7.2.1 (XX December 2020)
+
+* Fix Disabled databases removed when "$remove_disabled_databases" is set to "no"
+* Change yararule email/Email_generic_phishing.yar to HIGH
+
 ### Version 7.2 (07 December 2020)
 
 * Database rating downgrades are now supported, eg, changing from HIGH to LOW will remove the HIGH and MEDIUM rated databases.
