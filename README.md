@@ -225,6 +225,9 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Fix Disabled databases removed when "$remove_disabled_databases" is set to "no"
 * Change yararule email/Email_generic_phishing.yar to HIGH
 * Incremented the config to version 95
+* New config option: force_host, by default dig is used when dig and host is present.
+* Refactor and correct assign and check Binaries/Commands
+
 
 ### Version 7.2 (07 December 2020)
 

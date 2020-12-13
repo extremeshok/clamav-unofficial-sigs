@@ -1628,82 +1628,21 @@ if [ "$(uname -s)" == "SunOS" ] ; then
   }
 fi
 
-# Default Binaries & Commands
-uname_bin="$(command -v uname 2> /dev/null)"
-clamscan_bin="$(command -v clamscan 2> /dev/null)"
-rsync_bin="$(command -v rsync 2> /dev/null)"
-
-# Detect supprot for gnu grep
-if [ -x /usr/gnu/bin/grep ] ; then
-  grep_bin="/usr/gnu/bin/grep"
-else
-  grep_bin="$(command -v grep 2> /dev/null)"
-fi
-if [ -z "$grep_bin" ] ; then
-    xshok_pretty_echo_and_log "ERROR: grep command is missing"
-    exit 1
-  fi
-# Detect support for sed or gsed
+# Detect support for sed or gsed, this is required to be known upfront, due to how the configs are read.
 if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
-    sed_executable="gsed"
-else
-    sed_executable="sed"
-fi
-if [ -z "$sed_bin" ]; then
-        sed_bin="$(command -v "$sed_executable" 2> /dev/null)"
-    else
+    sed_bin="$(command -v gsed 2> /dev/null)"
+    if [ -z "$sed_bin" ]; then
         xshok_pretty_echo_and_log "ERROR: gsed (gnu sed) is missing"
         exit 1
-fi
-# Detect support for tar or gtar
-if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
-    tar_executable="gtar"
+    fi
 else
-    tar_executable="tar"
-fi
-if [ -z "$tar_bin" ]; then
-        tar_bin="$(command -v "$tar_executable" 2> /dev/null)"
-    else
-        xshok_pretty_echo_and_log "ERROR: gtar (gnu tar) is missing"
+    sed_bin="$(command -v sed 2> /dev/null)"
+    if [ -z "$sed_bin" ]; then
+        xshok_pretty_echo_and_log "ERROR: sed is missing"
         exit 1
-fi
-# Detect support for curl
-if [ -z "$curl_bin" ]; then
-    curl_bin="$(command -v curl 2> /dev/null)"
-fi
-# Detect support for wget
-if [ -z "$wget_bin" ]; then
-    if [ -x /usr/sfw/bin/wget ] ; then
-      wget_bin="/usr/sfw/bin/wget"
-    else
-      wget_bin="$(command -v wget 2> /dev/null)"
     fi
 fi
-if [ -z "$wget_bin" ] && [ -z "$curl_bin" ]; then
-  curl_bin="$(command -v curl 2> /dev/null)"
-  if [ -z "$curl_bin" ] ; then
-    xshok_pretty_echo_and_log "ERROR: both wget and curl commands are missing, One of them is required"
-    exit 1
-  fi
-fi
 
-if [ -n "$wget_bin" ] ; then
-  # wget compression support
-  if $wget_bin --help | $grep_bin -q "compression=TYPE" ; then
-    wget_compression="--compression=auto"
-  else
-    wget_compression=""
-  fi
-fi
-# Detect support for dig or host
-dig_bin="$(command -v dig 2> /dev/null)"
-if [ -n "$dig_bin" ] ; then
-  host_bin="$(command -v host 2> /dev/null)"
-  if [ -z "$host_bin" ] ; then
-    xshok_pretty_echo_and_log "ERROR: both dig and host commands are missing, One of them is required"
-    exit 1
-  fi
-fi
 # Detect if terminal
 if [ -t 1 ] ; then
   # Set fonts
@@ -1721,7 +1660,6 @@ else
   # Silence
   force_verbose="no"
 fi
-
 
 # Generic command line options
 while true ; do
@@ -1995,58 +1933,187 @@ fi
 # dont assign , but remove trailing /
 shopt -s extglob; clam_dbs="${clam_dbs%%+(/)}"
 
-# Force wget over curl.
-if [ -n "$wget_bin" ] && [ "$force_wget" == "yes" ] ; then
-        xshok_pretty_echo_and_log "NOTICE: Forcing wget"
-      curl_bin=""
+#####################################################################################################
+# Assign and Check Binaries/Commands
+# clamscan_bin
+if [ -z "$clamscan_bin" ] && [ "${1}" != "--remove-script" ] ; then
+    clamscan_bin="$(command -v clamscan 2> /dev/null)"
+    if [ -z "$clamscan_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found"
+        exit 1
+    fi
+elif [[ "$clamscan_bin" =~ "/" ]] && [ "${1}" != "--remove-script" ] ; then
+    if [ ! -x "$clamscan_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: clamscan_bin (${clamscan_bin})is not executable"
+        exit 1
+
+    fi
 fi
+# uname_bin
+if [ -z "$uname_bin" ] ; then
+    uname_bin="$(command -v uname 2> /dev/null)"
+    if [ -z "$uname_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: uname binary (uname_bin) not found"
+        exit 1
+    fi
+elif [[ "$uname_bin" =~ "/" ]] ; then
+    if [ ! -x "$uname_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: uname_bin (${uname_bin}) is not executable"
+        exit 1
+
+    fi
+fi
+# rsync_bin
+if [ -z "$rsync_bin" ] ; then
+    rsync_bin="$(command -v rsync 2> /dev/null)"
+    if [ -z "$rsync_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found"
+        exit 1
+    fi
+elif [[ "$rsync_bin" =~ "/" ]] ; then
+    if [ ! -x "$rsync_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: rsync_bin (${rsync_bin}) is not executable"
+        exit 1
+
+    fi
+fi
+# tar_bin
+if [ -z "$tar_bin" ] ; then
+    # Detect support for tar or gtar
+    if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
+        tar_bin="$(command -v gtar 2> /dev/null)"
+    else
+        tar_bin="$(command -v tar 2> /dev/null)"
+    fi
+    if [ -z "$tar_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: tar or gtar binary (tar_bin) not found"
+        exit 1
+    fi
+elif [[ "$tar_bin" =~ "/" ]] ; then
+    if [ ! -x "$tar_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: tar_bin (${tar_bin}) is not executable"
+        exit 1
+
+    fi
+fi
+# gpg_bin
+if [ "$enable_gpg" == "yes" ] ; then
+    if [ -z "$gpg_bin" ] ; then
+        if [ -x "/opt/csw/bin/gpg" ] ; then
+            gpg_bin="/opt/csw/bin/gpg"
+        else
+            gpg_bin="$(command -v gpg 2> /dev/null)"
+            if [ -z "$gpg_bin" ] ; then
+                enable_gpg="no"
+            fi
+        fi
+    elif [[ "$gpg_bin" =~ "/" ]] ; then
+        if [ ! -x "$gpg_bin" ] ; then
+            enable_gpg="no"
+        fi
+    fi
+fi
+# grep_bin
+if [ -z "$grep_bin" ] ; then
+    # Detect support for grep or gnugrep
+    if [ -x /usr/gnu/bin/grep ]  ; then
+        grep_bin="/usr/gnu/bin/grep"
+    else
+        grep_bin="$(command -v grep 2> /dev/null)"
+        if [ -z "$grep_bin" ] ; then
+            xshok_pretty_echo_and_log "ERROR: grep binary (grep_bin) not found"
+            exit 1
+        fi
+    fi
+elif [[ "$grep_bin" =~ "/" ]] ; then
+    if [ ! -x "$grep_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: grep (${grep_bin}) is not executable"
+        exit 1
+
+    fi
+fi
+# curl_bin
+if [ -z "$curl_bin" ] ; then
+    curl_bin="$(command -v curl 2> /dev/null)"
+elif [[ "$curl_bin" =~ "/" ]] ; then
+    if [ ! -x "$curl_bin" ] ; then
+        curl_bin=""
+    fi
+fi
+# wget_bin
+if [ -z "$curl_bin" ] || [ "$force_wget" == "yes" ] ; then
+    if [ -z "$wget_bin" ] ; then
+        if [ -x /usr/sfw/bin/wget ] ; then
+            wget_bin="/usr/sfw/bin/wget"
+        else
+            wget_bin="$(command -v wget 2> /dev/null)"
+            if [ -z "$wget_bin" ] ; then
+                xshok_pretty_echo_and_log "ERROR: both wget (wget_bin) and curl (curl_bin) commands are missing, One of them is required"
+                exit 1
+            fi
+        fi
+    elif [[ "$wget_bin" =~ "/" ]] ; then
+        if [ ! -x "$wget_bin" ] ; then
+            xshok_pretty_echo_and_log "ERROR: wget_bin (${wget_bin}) is not executable"
+            exit 1
+
+        fi
+    fi
+    if [ -n "$wget_bin" ] ; then
+        # wget compression support
+        if $wget_bin --help 2> /dev/null | $grep_bin -q "compression=TYPE" 2> /dev/null ; then
+            wget_compression="--compression=auto"
+        else
+            wget_compression=""
+        fi
+    fi
+else
+    wget_bin=""
+    wget_compression=""
+    force_wget="no"
+fi
+
+
+# dig_bin
+if [ -z "$dig_bin" ] ; then
+    curl_bin="$(command -v dig 2> /dev/null)"
+elif [[ "$dig_bin" =~ "/" ]] ; then
+    if [ ! -x "$dig_bin" ] ; then
+        dig_bin=""
+    fi
+fi
+# wget_bin
+if [ -z "$dig_bin" ] || [ "$force_host" == "yes" ] ; then
+    if [ -z "$host_bin" ] ; then
+        host_bin="$(command -v host 2> /dev/null)"
+        if [ -z "$wget_bin" ] ; then
+            xshok_pretty_echo_and_log "ERROR: both host (host_bin) and dig (dig_bin) commands are missing, One of them is required"
+            exit 1
+        fi
+    elif [[ "$host_bin" =~ "/" ]] ; then
+        if [ ! -x "$host_bin" ] ; then
+            xshok_pretty_echo_and_log "ERROR: host_bin (${host_bin}) is not executable"
+            exit 1
+
+        fi
+    fi
+else
+    host_bin=""
+    force_host="no"
+fi
+
+
+
+#####################################################################################################
+
 
 # SANITY checks
 # Check default Binaries & Commands are defined
 if [ "$reload_dbs" == "yes" ] ; then
-  if [ -z "$clamd_reload_opt" ] ; then
-    xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt"
-    exit 1
-  fi
-fi
-if [ -z "$uname_bin" ] ; then
-  xshok_pretty_echo_and_log "ERROR: uname (uname_bin) not found"
-  exit 1
-fi
-if [ -z "$clamscan_bin" ] ; then
-    if [ "${1}" != "--remove-script" ] ; then
-      xshok_pretty_echo_and_log "ERROR: clamscan binary (clamscan_bin) not found"
+    if [ -z "$clamd_reload_opt" ] ; then
+        xshok_pretty_echo_and_log "ERROR: Missing clamd_reload_opt"
+        exit 1
     fi
-  exit 1
-fi
-if [ -z "$rsync_bin" ] ; then
-  xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found"
-  exit 1
-fi
-if [ -z "$curl_bin" ] ; then
-  if [ -z "$wget_bin" ] ; then
-    xshok_pretty_echo_and_log "ERROR: wget and curl binaries not found, script requires either wget or curl"
-    exit 1
-  fi
-fi
-# Check if GPG is enabled and the binary is found
-if [ "$enable_gpg" == "yes" ] ; then
-  if [ -z "$gpg_bin" ] ; then
-    if [ -x /opt/csw/bin/gpg ] ; then
-      gpg_bin="/opt/csw/bin/gpg"
-    else
-      gpg_bin="$(command -v gpg 2> /dev/null)"
-    fi
-    if [ -z "$gpg_bin" ] ; then
-      gpg_bin="$(command -v gpg2 2> /dev/null)"
-    fi
-  fi
-  if [ -z "$gpg_bin" ] ; then
-    enable_gpg="no"
-  fi
-  if [ ! -x "$gpg_bin" ] ; then
-    enable_gpg="no"
-  fi
 fi
 if [ "$enable_gpg" != "yes" ] ; then
   xshok_pretty_echo_and_log "NOTICE: GnuPG / signature verification disabled"
