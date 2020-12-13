@@ -2166,9 +2166,9 @@ if [ "$enable_locking" == "yes" ] ; then
     else
       xshok_create_pid_file "$pid_file_fullpath"
     fi
-  else
-    xshok_create_pid_file "$pid_file_fullpath"
-  fi
+    else
+        xshok_create_pid_file "$pid_file_fullpath"
+    fi
   # Run this wehen the script exits
   trap -- "rm -f $pid_file_fullpath" EXIT
 fi
@@ -2730,16 +2730,17 @@ fi
 
 # Check to see if the working directories have been created. If not, create them.  Otherwise, ignore and proceed with script.
 xshok_mkdir_ownership "$work_dir"
-xshok_mkdir_ownership "$work_dir_securiteinfo"
-xshok_mkdir_ownership "$work_dir_malwarepatrol"
-xshok_mkdir_ownership "$work_dir_linuxmalwaredetect"
-xshok_mkdir_ownership "$work_dir_interserver"
-xshok_mkdir_ownership "$work_dir_malwareexpert"
-xshok_mkdir_ownership "$work_dir_sanesecurity"
-xshok_mkdir_ownership "$work_dir_yararulesproject"
-xshok_mkdir_ownership "$work_dir_work_configs"
-xshok_mkdir_ownership "${work_dir_gpg}"
+xshok_mkdir_ownership "$work_dir_gpg"
 xshok_mkdir_ownership "$work_dir_add"
+xshok_mkdir_ownership "$work_dir_pid"
+xshok_mkdir_ownership "$work_dir_interserver"
+xshok_mkdir_ownership "$work_dir_linuxmalwaredetect"
+xshok_mkdir_ownership "$work_dir_malwareexpert"
+xshok_mkdir_ownership "$work_dir_malwarepatrol"
+xshok_mkdir_ownership "$work_dir_sanesecurity"
+xshok_mkdir_ownership "$work_dir_securiteinfo"
+xshok_mkdir_ownership "$work_dir_work_configs"
+xshok_mkdir_ownership "$work_dir_yararulesproject"
 
 # Set secured access permissions to the GPG directory
 perms chmod -f 0700 "${work_dir_gpg}"
