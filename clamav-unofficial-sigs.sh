@@ -1628,18 +1628,46 @@ if [ "$(uname -s)" == "SunOS" ] ; then
   }
 fi
 
-# Detect support for sed or gsed, this is required to be known upfront, due to how the configs are read.
-if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
-    sed_bin="$(command -v gsed 2> /dev/null)"
-    if [ -z "$sed_bin" ]; then
-        xshok_pretty_echo_and_log "ERROR: gsed (gnu sed) is missing"
-        exit 1
+# sed_bin, this is required to be known upfront, due to how the configs are read.
+if [ -z "$sed_bin" ] ; then
+    # Detect support for sed or gsed
+    if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
+        sed_bin="$(command -v gsed 2> /dev/null)"
+        if [ -z "$sed_bin" ]; then
+            xshok_pretty_echo_and_log "ERROR: gsed (gnu sed) is missing"
+            exit 1
+        fi
+    else
+        sed_bin="$(command -v sed 2> /dev/null)"
+        if [ -z "$sed_bin" ]; then
+            xshok_pretty_echo_and_log "ERROR: sed is missing"
+            exit 1
+        fi
     fi
-else
-    sed_bin="$(command -v sed 2> /dev/null)"
-    if [ -z "$sed_bin" ]; then
-        xshok_pretty_echo_and_log "ERROR: sed is missing"
+elif [[ "$sed_bin" =~ "/" ]] ; then
+    if [ ! -x "$sed_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: sed (${sed_bin}) is not executable"
         exit 1
+
+    fi
+fi
+# grep_bin, this is required to be known upfront, due to how the configs are read.
+if [ -z "$grep_bin" ] ; then
+    # Detect support for grep or gnugrep
+    if [ -x /usr/gnu/bin/grep ]  ; then
+        grep_bin="/usr/gnu/bin/grep"
+    else
+        grep_bin="$(command -v grep 2> /dev/null)"
+        if [ -z "$grep_bin" ] ; then
+            xshok_pretty_echo_and_log "ERROR: grep binary (grep_bin) not found"
+            exit 1
+        fi
+    fi
+elif [[ "$grep_bin" =~ "/" ]] ; then
+    if [ ! -x "$grep_bin" ] ; then
+        xshok_pretty_echo_and_log "ERROR: grep (${grep_bin}) is not executable"
+        exit 1
+
     fi
 fi
 
@@ -2013,25 +2041,6 @@ if [ "$enable_gpg" == "yes" ] ; then
         fi
     fi
 fi
-# grep_bin
-if [ -z "$grep_bin" ] ; then
-    # Detect support for grep or gnugrep
-    if [ -x /usr/gnu/bin/grep ]  ; then
-        grep_bin="/usr/gnu/bin/grep"
-    else
-        grep_bin="$(command -v grep 2> /dev/null)"
-        if [ -z "$grep_bin" ] ; then
-            xshok_pretty_echo_and_log "ERROR: grep binary (grep_bin) not found"
-            exit 1
-        fi
-    fi
-elif [[ "$grep_bin" =~ "/" ]] ; then
-    if [ ! -x "$grep_bin" ] ; then
-        xshok_pretty_echo_and_log "ERROR: grep (${grep_bin}) is not executable"
-        exit 1
-
-    fi
-fi
 # curl_bin
 if [ -z "$curl_bin" ] ; then
     curl_bin="$(command -v curl 2> /dev/null)"
@@ -2076,17 +2085,17 @@ fi
 
 # dig_bin
 if [ -z "$dig_bin" ] ; then
-    curl_bin="$(command -v dig 2> /dev/null)"
+    dig_bin="$(command -v dig 2> /dev/null)"
 elif [[ "$dig_bin" =~ "/" ]] ; then
     if [ ! -x "$dig_bin" ] ; then
         dig_bin=""
     fi
 fi
-# wget_bin
+# host_bin
 if [ -z "$dig_bin" ] || [ "$force_host" == "yes" ] ; then
     if [ -z "$host_bin" ] ; then
         host_bin="$(command -v host 2> /dev/null)"
-        if [ -z "$wget_bin" ] ; then
+        if [ -z "$host_bin" ] ; then
             xshok_pretty_echo_and_log "ERROR: both host (host_bin) and dig (dig_bin) commands are missing, One of them is required"
             exit 1
         fi
@@ -3002,7 +3011,7 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
             # Add fallback to host if dig returns no records or dig is not used
             if [ -z "$sanesecurity_mirror_name" ] ; then
                             # shellcheck disable=SC2086
-              sanesecurity_mirror_name="$($host_bin $host_proxy "$sanesecurity_mirror_ip" | $sed_bin -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')"
+              sanesecurity_mirror_name="$($host_bin $host_proxy -t A "$sanesecurity_mirror_ip" | $sed_bin -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')"
             fi
             sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: ${sanesecurity_mirror_site_info}"
