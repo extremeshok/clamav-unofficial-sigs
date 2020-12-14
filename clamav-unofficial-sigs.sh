@@ -2988,30 +2988,42 @@ if [ "$sanesecurity_enabled" == "yes" ] ; then
         echo "$current_time" > "${work_dir_work_configs}/last-ss-update.txt"
         xshok_pretty_echo_and_log "Sanesecurity Database & GPG Signature File Updates" "="
         xshok_pretty_echo_and_log "Checking for Sanesecurity updates..."
-                if [ -n "$dig_bin" ] ; then
-                    # shellcheck disable=SC2086
+        if [ -n "$dig_bin" ] ; then
+            # shellcheck disable=SC2086
             sanesecurity_mirror_ips="$($dig_bin $dig_proxy +ignore +short "$sanesecurity_url")"
-                else
-                    sanesecurity_mirror_ips=""
-                fi
-                # Add fallback to host if dig returns no records or dig is not used
+        else
+            # shellcheck disable=SC2086
+            sanesecurity_mirror_ips="$($host_bin $host_proxy -t A "$sanesecurity_url" | $sed_bin -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')"
+        fi
+        # Add fallback if no records are returned
         if [ ${#sanesecurity_mirror_ips} -lt 1 ] ; then
-                    # shellcheck disable=SC2086
-          sanesecurity_mirror_ips="$($host_bin $host_proxy -t A "$sanesecurity_url" | $sed_bin -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')"
+            if [ -n "$dig_bin" ] ; then
+                # shellcheck disable=SC2086
+                sanesecurity_mirror_ips="$($dig_bin $dig_proxy +ignore +short "$sanesecurity_url")"
+            else
+                # shellcheck disable=SC2086
+                sanesecurity_mirror_ips="$($host_bin $host_proxy -t A "$sanesecurity_url" | $sed_bin -n '/has address/{s/.*address \([^ ]*\).*/\1/;p;}')"
+            fi
         fi
 
         if [ ${#sanesecurity_mirror_ips} -ge 1 ] ; then
           for sanesecurity_mirror_ip in $sanesecurity_mirror_ips ; do
-                        if [ -n "$dig_bin" ] ; then
-                            # shellcheck disable=SC2086
+            if [ -n "$dig_bin" ] ; then
+                # shellcheck disable=SC2086
                 sanesecurity_mirror_name="$($dig_bin $dig_proxy +short -x "$sanesecurity_mirror_ip" | command "$sed_bin" 's/\.$//')"
-                        else
-                            sanesecurity_mirror_name=""
-                        fi
-            # Add fallback to host if dig returns no records or dig is not used
+            else
+                # shellcheck disable=SC2086
+                sanesecurity_mirror_name="$($host_bin $host_proxy -t A "$sanesecurity_mirror_ip" | $sed_bin -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')"
+            fi
+            # Add fallback if no records are returned
             if [ -z "$sanesecurity_mirror_name" ] ; then
-                            # shellcheck disable=SC2086
-              sanesecurity_mirror_name="$($host_bin $host_proxy -t A "$sanesecurity_mirror_ip" | $sed_bin -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')"
+                if [ -n "$dig_bin" ] ; then
+                    # shellcheck disable=SC2086
+                    sanesecurity_mirror_name="$($dig_bin $dig_proxy +short -x "$sanesecurity_mirror_ip" | command "$sed_bin" 's/\.$//')"
+                else
+                    # shellcheck disable=SC2086
+                    sanesecurity_mirror_name="$($host_bin $host_proxy -t A "$sanesecurity_mirror_ip" | $sed_bin -n '/name pointer/{s/.*pointer \([^ ]*\).*\.$/\1/;p;}')"
+                fi
             fi
             sanesecurity_mirror_site_info="$sanesecurity_mirror_name $sanesecurity_mirror_ip"
             xshok_pretty_echo_and_log "Sanesecurity mirror site used: ${sanesecurity_mirror_site_info}"
