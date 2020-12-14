@@ -1530,9 +1530,9 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="7.2"
-script_version_date="2020-12-02"
-minimum_required_config_version="94"
+script_version="7.2.1"
+script_version_date="2020-12-13"
+minimum_required_config_version="95"
 minimum_yara_clamav_version="0.100"
 
 # Discover script: name, full_path and path

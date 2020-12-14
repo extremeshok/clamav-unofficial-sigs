@@ -220,16 +220,17 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
-### Version 7.2.1 (XX December 2020)
+### Version 7.2.1 (13 December 2020)
 
-* Fix Disabled databases removed when "$remove_disabled_databases" is set to "no"
+* eXtremeSHOK.com Maintenance
 * Change yararule email/Email_generic_phishing.yar to HIGH
-* Incremented the config to version 95
 * New config option: force_host, by default dig is used when dig and host is present.
-* Refactor and correct assign and check Binaries/Commands
+* Refactor and correct the assigning of binaries/commands
 * Fix broken yara rule database names: Maldoc_hancitor_dropper and Maldoc_APT19_CVE-2017-1099
 * Ensure only dig or host is used when either dig or host is enabled
 * Enable remove_disabled_databases by default
+* Fix disabled databases removed when "$remove_disabled_databases" is set to "no"
+* Incremented the config to version 95
 
 ### Version 7.2 (07 December 2020)
 
