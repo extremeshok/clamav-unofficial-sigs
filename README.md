@@ -229,6 +229,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Refactor and correct assign and check Binaries/Commands
 * Fix broken yara rule database names: Maldoc_hancitor_dropper and Maldoc_APT19_CVE-2017-1099
 * Ensure only dig or host is used when either dig or host is enabled
+* Enable remove_disabled_databases by default
 
 ### Version 7.2 (07 December 2020)
 
