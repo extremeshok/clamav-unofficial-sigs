@@ -220,6 +220,18 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### Version 7.2.1 (13 December 2020)
+
+* eXtremeSHOK.com Maintenance
+* Change yararule email/Email_generic_phishing.yar to HIGH
+* New config option: force_host, by default dig is used when dig and host is present.
+* Refactor and correct the assigning of binaries/commands
+* Fix broken yara rule database names: Maldoc_hancitor_dropper and Maldoc_APT19_CVE-2017-1099
+* Ensure only dig or host is used when either dig or host is enabled
+* Enable remove_disabled_databases by default
+* Fix disabled databases removed when "$remove_disabled_databases" is set to "no"
+* Incremented the config to version 95
+
 ### Version 7.2 (07 December 2020)
 
 * Database rating downgrades are now supported, eg, changing from HIGH to LOW will remove the HIGH and MEDIUM rated databases.
@@ -252,12 +264,12 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Incremented the config to version 92
 * Thank you @dandanio @jkellerer @m0urs @Mrothyr @msapiro @orlitzky @RobbieTheK @SlothOfAnarchy
 
-### Version 7.0.1 (25 January 2020)
+### Version 7.0.1
 
 * Disable yara project rules duplicated in rxfn.yara (Thanks @dominicraf)
 * Incremented the config to version 91
 
-### Version 7.0.0 (24 January 2020)
+### Version 7.0.0
 
 * eXtremeSHOK.com Maintenance
 * Added urlhaus database
@@ -290,7 +302,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Only check for and notify about script updates every 12hours
 * Incremented the config to version 90
 
-### Version 6.1.1 (02 September 2019)
+### Version 6.1.1
 
 * eXtremeSHOK.com Maintenance
 * Update os.archlinux.conf, thanks @amishmm
@@ -305,7 +317,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Minor enhancement to travis-ci checks
 * Incremented the config to version 77
 
-### Version 6.1.0 (27 August 2019)
+### Version 6.1.0
 
 * eXtremeSHOK.com Maintenance
 * Thanks Reio Remma & Oliver Nissen
