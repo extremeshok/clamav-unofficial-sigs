@@ -1772,7 +1772,7 @@ for config_file in "${config_files[@]}" ; do
       clean_config=${clean_config//\#*/} # Comment line (duplicated)
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
-      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
+      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//')" # trailing and leading whitespace
       clean_config="$(echo "$clean_config" | xargs)"
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
@@ -1785,7 +1785,7 @@ for config_file in "${config_files[@]}" ; do
       clean_config="$(echo "$clean_config" | $sed_bin -e 's/#[[:space:]].*//')" # Comment line (duplicated)
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
-      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
+      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//')" # trailing and leading whitespace
       #clean_config="$(echo "$clean_config" | xargs)"
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
@@ -1797,8 +1797,7 @@ for config_file in "${config_files[@]}" ; do
       # Delete both trailing and leading whitespace
       # Delete all trailing whitespace
       # Delete all empty lines
-      clean_config="$(command "$sed_bin" -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")"
-
+      clean_config="$(command "$sed_bin" -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//' -e '/^[[:space:]]*$/d' "$config_file")"
     fi
 
     #fix eval of |
