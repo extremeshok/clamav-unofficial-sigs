@@ -1772,7 +1772,7 @@ for config_file in "${config_files[@]}" ; do
       clean_config=${clean_config//\#*/} # Comment line (duplicated)
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
-      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
+      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//')" # trailing and leading whitespace
       clean_config="$(echo "$clean_config" | xargs)"
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
@@ -1785,7 +1785,7 @@ for config_file in "${config_files[@]}" ; do
       clean_config="$(echo "$clean_config" | $sed_bin -e 's/#[[:space:]].*//')" # Comment line (duplicated)
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
-      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
+      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//')" # trailing and leading whitespace
       #clean_config="$(echo "$clean_config" | xargs)"
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
@@ -1797,8 +1797,7 @@ for config_file in "${config_files[@]}" ; do
       # Delete both trailing and leading whitespace
       # Delete all trailing whitespace
       # Delete all empty lines
-      clean_config="$(command "$sed_bin" -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")"
-
+      clean_config="$(command "$sed_bin" -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//' -e '/^[[:space:]]*$/d' "$config_file")"
     fi
 
     #fix eval of |
@@ -1813,7 +1812,7 @@ for config_file in "${config_files[@]}" ; do
     fi
 
     # Check there is an = for every set of "" optional whitespace \s* between = and "
-    config_check_vars="$(echo "$clean_config" | $grep_bin -c '=\s*\"' )"
+    config_check_vars="$(echo "$clean_config" | $grep_bin -c '=[[:space:]]*\"' )"
 
     if [ $(( ${#config_check} / 2 )) -ne "$config_check_vars" ] ; then
       xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\""
