@@ -1530,8 +1530,8 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="7.2.1"
-script_version_date="2020-12-13"
+script_version="7.2.2"
+script_version_date="2020-12-20"
 minimum_required_config_version="95"
 minimum_yara_clamav_version="0.100"
 
@@ -2400,7 +2400,6 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
     fi
         securiteinfo_dbs=( )
         if [ -n "$temp_db" ] ; then
-            #securiteinfo_dbs=( $temp_db )
             read -r -a securiteinfo_dbs <<< "$temp_db"
         fi
   fi
