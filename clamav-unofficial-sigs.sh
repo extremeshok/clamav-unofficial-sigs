@@ -409,7 +409,7 @@ function xshok_database() { # rating database_array
             continue # Skip to the next value
           fi
         fi
-        if [ -z "$current_rating" ] ; then # YARA rules are disabled
+        if [ -z "$current_rating" ] ; then
           new_dbs+=( "$db_name" )
         else
             if [[ ! "$db_name" = *"|"* ]] ; then # This old format
@@ -1530,8 +1530,8 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="7.2.1"
-script_version_date="2020-12-13"
+script_version="7.2.2"
+script_version_date="2020-12-20"
 minimum_required_config_version="95"
 minimum_yara_clamav_version="0.100"
 
@@ -1772,7 +1772,7 @@ for config_file in "${config_files[@]}" ; do
       clean_config=${clean_config//\#*/} # Comment line (duplicated)
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
-      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
+      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//')" # trailing and leading whitespace
       clean_config="$(echo "$clean_config" | xargs)"
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
@@ -1785,7 +1785,7 @@ for config_file in "${config_files[@]}" ; do
       clean_config="$(echo "$clean_config" | $sed_bin -e 's/#[[:space:]].*//')" # Comment line (duplicated)
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
-      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[ \t]*//;s/[ \t]*$//')" # trailing and leading whitespace
+      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//')" # trailing and leading whitespace
       #clean_config="$(echo "$clean_config" | xargs)"
       # shellcheck disable=SC2001
       clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
@@ -1797,8 +1797,7 @@ for config_file in "${config_files[@]}" ; do
       # Delete both trailing and leading whitespace
       # Delete all trailing whitespace
       # Delete all empty lines
-      clean_config="$(command "$sed_bin" -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[ \t]*//;s/[ \t]*$//' -e '/^\s*$/d' "$config_file")"
-
+      clean_config="$(command "$sed_bin" -e '/^#.*/d' -e 's/[[:space:]]#.*//' -e 's/#[[:space:]].*//' -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//' -e '/^[[:space:]]*$/d' "$config_file")"
     fi
 
     #fix eval of |
@@ -1813,7 +1812,7 @@ for config_file in "${config_files[@]}" ; do
     fi
 
     # Check there is an = for every set of "" optional whitespace \s* between = and "
-    config_check_vars="$(echo "$clean_config" | $grep_bin -c '=\s*\"' )"
+    config_check_vars="$(echo "$clean_config" | $grep_bin -c '=[[:space:]]*\"' )"
 
     if [ $(( ${#config_check} / 2 )) -ne "$config_check_vars" ] ; then
       xshok_pretty_echo_and_log "ERROR: Your configuration has errors, every = requires a pair of \"\""
@@ -2401,7 +2400,6 @@ if [ "$securiteinfo_enabled" == "yes" ] ; then
     fi
         securiteinfo_dbs=( )
         if [ -n "$temp_db" ] ; then
-            #securiteinfo_dbs=( $temp_db )
             read -r -a securiteinfo_dbs <<< "$temp_db"
         fi
   fi
@@ -2598,11 +2596,11 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
     if [ -n "${sanesecurity_remove_dbs[0]}" ] ; then
       for db_file in "${sanesecurity_remove_dbs[@]}" ; do
         if [ -f "${work_dir_sanesecurity}/${db_file}" ] ; then
-            echo "Removing unused file: ${work_dir_sanesecurity}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_sanesecurity}/${db_file}"
             rm -f "${work_dir_sanesecurity}/${db_file}"
         fi
         if [ -f "${clam_dbs}/${db_file}" ] ; then
-            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
             rm -f "${clam_dbs}/${db_file}"
         fi
       done
@@ -2610,11 +2608,11 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
     if [ -n "${securiteinfo_remove_dbs[0]}" ] ; then
       for db_file in "${securiteinfo_remove_dbs[@]}" ; do
         if [ -f "${work_dir_securiteinfo}/${db_file}" ] ; then
-            echo "Removing unused file: ${work_dir_securiteinfo}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_securiteinfo}/${db_file}"
             rm -f "${work_dir_securiteinfo}/${db_file}"
         fi
         if [ -f "${clam_dbs}/${db_file}" ] ; then
-            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
             rm -f "${clam_dbs}/${db_file}"
         fi
       done
@@ -2622,11 +2620,11 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
     if [ -n "${linuxmalwaredetect_remove_dbs[0]}" ] ; then
       for db_file in "${linuxmalwaredetect_remove_dbs[@]}" ; do
         if [ -f "${work_dir_linuxmalwaredetect}/${db_file}" ] ; then
-            echo "Removing unused file: ${work_dir_linuxmalwaredetect}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_linuxmalwaredetect}/${db_file}"
             rm -f "${work_dir_linuxmalwaredetect}/${db_file}"
         fi
         if [ -f "${clam_dbs}/${db_file}" ] ; then
-            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
             rm -f "${clam_dbs}/${db_file}"
         fi
       done
@@ -2634,11 +2632,11 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
     if [ -n "${interserver_remove_dbs[0]}" ] ; then
       for db_file in "${interserver_remove_dbs[@]}" ; do
         if [ -f "${work_dir_interserver}/${db_file}" ] ; then
-            echo "Removing unused file: ${work_dir_interserver}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_interserver}/${db_file}"
             rm -f "${work_dir_interserver}/${db_file}"
         fi
         if [ -f "${clam_dbs}/${db_file}" ] ; then
-            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
             rm -f "${clam_dbs}/${db_file}"
         fi
       done
@@ -2646,11 +2644,11 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
     if [ -n "${malwareexpert_remove_dbs[0]}" ] ; then
       for db_file in "${malwareexpert_remove_dbs[@]}" ; do
         if [ -f "${work_dir_malwareexpert}/${db_file}" ] ; then
-            echo "Removing unused file: ${work_dir_malwareexpert}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_malwareexpert}/${db_file}"
             rm -f "${work_dir_malwareexpert}/${db_file}"
         fi
         if [ -f "${clam_dbs}/${db_file}" ] ; then
-            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
             rm -f "${clam_dbs}/${db_file}"
         fi
       done
@@ -2664,11 +2662,11 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
               yr_dir=""
           fi
         if [ -f "${work_dir_yararulesproject}/${yr_dir}${db_file}" ] ; then
-            echo "Removing unused file: ${work_dir_yararulesproject}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_yararulesproject}/${db_file}"
             rm -f "${work_dir_yararulesproject}/${db_file}"
         fi
         if [ -f "${clam_dbs}/${db_file}" ] ; then
-            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
             rm -f "${clam_dbs}/${db_file}"
         fi
       done
@@ -2676,11 +2674,11 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
     if [ -n "${urlhaus_remove_dbs[0]}" ] ; then
       for db_file in "${urlhaus_remove_dbs[@]}" ; do
         if [ -f "${work_dir_urlhaus}/${db_file}" ] ; then
-            echo "Removing unused file: ${work_dir_urlhaus}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_urlhaus}/${db_file}"
             rm -f "${work_dir_urlhaus}/${db_file}"
         fi
         if [ -f "${clam_dbs}/${db_file}" ] ; then
-            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
             rm -f "${clam_dbs}/${db_file}"
         fi
       done
@@ -2688,11 +2686,11 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
     if [ -n "${malwarepatrol_remove_dbs[0]}" ] ; then
       for db_file in "${malwarepatrol_remove_dbs[@]}" ; do
         if [ -f "${work_dir_malwarepatrol}/${db_file}" ] ; then
-            echo "Removing unused file: ${work_dir_malwarepatrol}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_malwarepatrol}/${db_file}"
             rm -f "${work_dir_malwarepatrol}/${db_file}"
         fi
         if [ -f "${clam_dbs}/${db_file}" ] ; then
-            echo "Removing unused file: ${clam_dbs}/${db_file}"
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
             rm -f "${clam_dbs}/${db_file}"
         fi
       done
@@ -3345,7 +3343,11 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
                         # shellcheck disable=SC2035
-            $tar_bin --strip-components=1 --wildcards --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+            if [ "$enable_yararules" == "yes" ] ; then
+                $tar_bin --strip-components=1 --wildcards --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+            else
+                $tar_bin --strip-components=1 --wildcards --exclude='*.yar' --exclude='*.yara' --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+            fi
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
                 xshok_pretty_echo_and_log "---"

@@ -220,6 +220,13 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### Version 7.2.2 (20 December 2020)
+
+* eXtremeSHOK.com Maintenance
+* Use POSIX character classes instead of literals
+* Prevent linuxmalwaredetect yara files being extracted when yara is not supported
+* Replace echo with xshok_pretty_echo_and_log to silence database cleanup cron messages
+
 ### Version 7.2.1 (13 December 2020)
 
 * eXtremeSHOK.com Maintenance
