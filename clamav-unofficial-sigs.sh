@@ -1227,17 +1227,25 @@ function add_signature_whitelist_entry() { #signature
         input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`"')"
         input=${input/\.UNOFFICIAL/}
 
-    sig_full="$($grep_bin -H -m 1 "$input" ./*.*db)"
-        sig_extension=${sig_full%%\:*}
-        sig_extension=${sig_extension##*\.}
-        shopt -s nocasematch
-        if [ "$sig_extension" == "hdb" ] || [ "$sig_extension" == "hsb" ] || [ "$sig_extension" == "hdu " ] || [ "$sig_extension" == "hsu" ] || [ "$sig_extension" == "mdb" ] || [ "$sig_extension" == "msb" ] || [ "$sig_extension" == "mdu" ] || [ "$sig_extension" == "msu" ] ; then
-            # Hash-based Signature Database
-            position="4"
+        yaratest="$(echo "$input" | cut -d "." -f 1)"
+        if [ "$yaratest" == "YARA" ] || [ "$yaratest" == "yara" ] ; then
+            echo "YARA signature detected"
+            sig_full="$input"
+            sig_extension=""
+            sig_name="$input"
         else
-            position="2"
+            sig_full="$($grep_bin -H -m 1 "$input" ./*.*db)"
+            sig_extension=${sig_full%%\:*}
+            sig_extension=${sig_extension##*\.}
+            shopt -s nocasematch
+            if [ "$sig_extension" == "hdb" ] || [ "$sig_extension" == "hsb" ] || [ "$sig_extension" == "hdu " ] || [ "$sig_extension" == "hsu" ] || [ "$sig_extension" == "mdb" ] || [ "$sig_extension" == "msb" ] || [ "$sig_extension" == "mdu" ] || [ "$sig_extension" == "msu" ] ; then
+                # Hash-based Signature Database
+                position="4"
+            else
+                position="2"
+            fi
+            sig_name="$(echo "$sig_full" | cut -d ":" -f $position | cut -d "=" -f 1)"
         fi
-    sig_name="$(echo "$sig_full" | cut -d ":" -f $position | cut -d "=" -f 1)"
 
     if [ -n "$sig_name" ] ; then
       if ! $grep_bin -m 1 "$sig_name" my-whitelist.ign2 > /dev/null 2>&1 ; then
