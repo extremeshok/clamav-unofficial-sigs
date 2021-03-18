@@ -534,7 +534,7 @@ clamav-unofficial-sigs \\- Download, test, and install third-party ClamAV signat
 .B clamav-unofficial-sigs
 .RI [ options ]
 .SH DESCRIPTION
-\\fBclamav-unofficial-sigs\\fP provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. It will also generate and install cron, logrotate, and man files.
+\\fBclamav-unofficial-sigs\\fP provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. It will also generate and install cron, logrotate, and man files.
 .SH UPDATES
 Script updates can be found at: \\fBhttps://github.com/extremeshok/clamav-unofficial-sigs\\fP
 .SH OPTIONS
@@ -1227,23 +1227,36 @@ function add_signature_whitelist_entry() { #signature
         input="$(echo "${input}" | tr -d "'" | tr -d '"' | tr -d '`"')"
         input=${input/\.UNOFFICIAL/}
 
-    sig_full="$($grep_bin -H -m 1 "$input" ./*.*db)"
-        sig_extension=${sig_full%%\:*}
-        sig_extension=${sig_extension##*\.}
+        yaratest="$(echo "$input" | cut -d "." -f 1)"
         shopt -s nocasematch
-        if [ "$sig_extension" == "hdb" ] || [ "$sig_extension" == "hsb" ] || [ "$sig_extension" == "hdu " ] || [ "$sig_extension" == "hsu" ] || [ "$sig_extension" == "mdb" ] || [ "$sig_extension" == "msb" ] || [ "$sig_extension" == "mdu" ] || [ "$sig_extension" == "msu" ] ; then
-            # Hash-based Signature Database
-            position="4"
+        if [ "$yaratest" == "YARA" ] ; then
+            echo "YARA signature detected"
+            sig_full="$input"
+            sig_extension=""
+            sig_name="$input"
         else
-            position="2"
+            sig_full="$($grep_bin -H -m 1 "$input" ./*.*db)"
+            sig_extension=${sig_full%%\:*}
+            sig_extension=${sig_extension##*\.}
+            shopt -s nocasematch
+            if [ "$sig_extension" == "hdb" ] || [ "$sig_extension" == "hsb" ] || [ "$sig_extension" == "hdu " ] || [ "$sig_extension" == "hsu" ] || [ "$sig_extension" == "mdb" ] || [ "$sig_extension" == "msb" ] || [ "$sig_extension" == "mdu" ] || [ "$sig_extension" == "msu" ] ; then
+                # Hash-based Signature Database
+                position="4"
+            else
+                position="2"
+            fi
+            sig_name="$(echo "$sig_full" | cut -d ":" -f $position | cut -d "=" -f 1)"
         fi
-    sig_name="$(echo "$sig_full" | cut -d ":" -f $position | cut -d "=" -f 1)"
 
     if [ -n "$sig_name" ] ; then
       if ! $grep_bin -m 1 "$sig_name" my-whitelist.ign2 > /dev/null 2>&1 ; then
         cp -f -p my-whitelist.ign2 "$work_dir_work_configs" 2>/dev/null
         echo "$sig_name" >> "${work_dir_work_configs}/my-whitelist.ign2"
-        echo "$sig_full" >> "${work_dir_work_configs}/tracker.txt"
+        shopt -s nocasematch
+        if [ "$yaratest" != "YARA" ] ; then
+            echo "$sig_full" >> "${work_dir_work_configs}/tracker.txt"
+        fi
+
         if $clamscan_bin --quiet -d "${work_dir_work_configs}/my-whitelist.ign2" "${work_dir_work_configs}/scan-test.txt" ; then
           if $rsync_bin -pcqt "${work_dir_work_configs}/my-whitelist.ign2" "$clam_dbs" ; then
             perms chown -f "${clam_user}:${clam_group}" my-whitelist.ign2
@@ -1257,13 +1270,14 @@ function add_signature_whitelist_entry() { #signature
             if [ "$selinux_fixes" == "yes" ] ; then
               restorecon "${clam_dbs}/local.ign"
             fi
-                        do_clamd_reload="4"
+            do_clamd_reload="4"
             clamscan_reload_dbs
 
-            xshok_pretty_echo_and_log "Signature '${input}' has been added to my-whitelist.ign2 and"
-            xshok_pretty_echo_and_log "all databases have been reloaded.  The script will track any changes"
-            xshok_pretty_echo_and_log "to the offending signature and will automatically remove it if the"
-            xshok_pretty_echo_and_log "signature is modified or removed from the third-party database."
+            xshok_pretty_echo_and_log "Signature '${input}' has been added to my-whitelist.ign2 and all databases have been reloaded."
+            if [ "$yaratest" != "YARA" ] ; then
+                xshok_pretty_echo_and_log "The script will track any changes to the offending signature and will automatically remove it, "
+                xshok_pretty_echo_and_log "if the signature is modified or removed from the third-party database."
+            fi
           else
 
             xshok_pretty_echo_and_log "Failed to successfully update my-whitelist.ign2 file - SKIPPING."
@@ -1530,9 +1544,9 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="7.2.2"
-script_version_date="2020-12-20"
-minimum_required_config_version="95"
+script_version="7.2.3"
+script_version_date="2021-03-17"
+minimum_required_config_version="96"
 minimum_yara_clamav_version="0.100"
 
 # Discover script: name, full_path and path
@@ -4369,17 +4383,21 @@ if [ -r "${clam_dbs}/my-whitelist.ign2" ] && [ -s "${work_dir_work_configs}/trac
   cp -f -p my-whitelist.ign2 "${work_dir_work_configs}/my-whitelist.ign2"
 
   xshok_pretty_echo_and_log "" "=" "80"
-
+  touch "${work_dir_work_configs}/tracker-tmp.txt"
   while read -r entry ; do
-    sig_file="$(echo "$entry" | cut -d ":" -f 1)"
-    sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
-    sig_name="$(echo "$entry" | cut -d ":" -f 2)"
-    if ! $grep_bin -F "$sig_full" "$sig_file" > /dev/null 2>&1 ; then
-      perl -i -ne "print unless /$sig_name$/" "${work_dir_work_configs}/my-whitelist.ign2"
-      perl -i -ne "print unless /:$sig_name:/" "${work_dir_work_configs}/tracker-tmp.txt"
 
-      xshok_pretty_echo_and_log "${sig_name} signature no longer exists in ${sig_file}, whitelist entry removed from my-whitelist.ign2"
-      ign2_updated="1"
+      yaratest="$(echo "$entry" | cut -d "." -f 1)"
+      shopt -s nocasematch
+      if [ "$yaratest" != "YARA" ] ; then
+        sig_file="$(echo "$entry" | cut -d ":" -f 1)"
+        sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
+        sig_name="$(echo "$entry" | cut -d ":" -f 2)"
+        if ! $grep_bin -F "$sig_full" "$sig_file" > /dev/null 2>&1 ; then
+          perl -i -ne "print unless /$sig_name$/" "${work_dir_work_configs}/my-whitelist.ign2"
+          perl -i -ne "print unless /:$sig_name:/" "${work_dir_work_configs}/tracker-tmp.txt"
+          xshok_pretty_echo_and_log "${sig_name} signature no longer exists in ${sig_file}, whitelist entry removed from my-whitelist.ign2"
+          ign2_updated="1"
+        fi
     fi
   done < "${work_dir_work_configs}/tracker.txt"
   if [ -f "${work_dir_work_configs}/tracker-tmp.txt" ] ; then

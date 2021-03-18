@@ -6,7 +6,7 @@ ClamAV Unofficial Signatures Updater
 
 ## Description
 
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, MalwareExpert, interServer etc. The script will also generate and install cron, logrotate, and man files.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, MalwareExpert, interServer etc. The script will also generate and install cron, logrotate, and man files.
 
 ### Automated Testing and Linting
 
@@ -219,6 +219,17 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 ```
 
 ## Change Log
+
+### Version 7.2.3 (17 March 2021)
+
+* eXtremeSHOK.com Maintenance
+* Disable JJencode.yar , due to excessive CPU usage
+* Disable scamnailer , discontinued
+* Fix working directory variable "urlhausy" to "urlhaus"
+* Update pfsense guide for 2.5
+* Whitelist support for yararules (whitelist signature tracking is disabled for yararules)
+* Fix missing tracker-tmp.txt
+* Thank you @perplexityjeff
 
 ### Version 7.2.2 (20 December 2020)
 
