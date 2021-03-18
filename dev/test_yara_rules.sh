@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 ###################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
@@ -15,7 +15,7 @@ sed 's|include "./||g' /tmp/index.yar | sed 's|"||g' | sed -r ':a; s%(.*)/\*.*\*
 echo "" > /tmp/empty-file
 
 while IFS= read -r line ; do
-  if [ ! -z "$line" ] ; then
+  if [ -n "$line" ] ; then
     # shellcheck disable=SC2086
     sub_dir="${line/\/*}"
     mkdir -p "/tmp/yara/${sub_dir}"
@@ -25,7 +25,7 @@ while IFS= read -r line ; do
     output="$(clamscan --quiet --no-summary --database="/tmp/yara/${line}" /tmp/empty-file 2>&1)"
     ret="$?"
 
-    if [ ! -z "$output" ] || [ "$ret" != "0" ] ; then
+    if [ -n "$output" ] || [ "$ret" != "0" ] ; then
       echo "ERROR --- ${line} ---"
     else
       echo "--- ${line} ---"
@@ -42,7 +42,9 @@ done < "/tmp/rules.yara"
 # check the errorlevel at this stage.
 
 # here is some testing code which identifies all rules in .yar file, checks for which ones are duplicated in rfxn.yara, then shows the name of the rules that are not duplicated.:
-grep -ah "^rule " /var/lib/clamav/*.yar|cut -d: -f1 >/tmp/rules; while read RULE; do grep -qF "$RULE" /var/lib/clamav/rfxn.yara||echo $RULE; done</tmp/rules
+# shellcheck disable=SC2062
+grep -ah "^rule " /var/lib/clamav/*.yar|cut -d: -f1 >/tmp/rules; while read -r RULE; do grep -qF "$RULE" /var/lib/clamav/rfxn.yara||echo "$RULE"; done</tmp/rules
 
 # And this does the same check but outputs the names of the .yar files where the non-duplicated rules are found:
-grep -ah "^rule " /var/lib/clamav/*.yar|cut -d: -f1 >/tmp/rules; while read RULE; do grep -qF "$RULE" /var/lib/clamav/rfxn.yara||echo $RULE; done</tmp/rules|grep -Ff- /var/lib/clamav/*.yar
+# shellcheck disable=SC2062
+grep -ah "^rule " /var/lib/clamav/*.yar|cut -d: -f1 >/tmp/rules; while read -r RULE; do grep -qF "$RULE" /var/lib/clamav/rfxn.yara||echo "$RULE"; done</tmp/rules|grep -Ff- /var/lib/clamav/*.yar
