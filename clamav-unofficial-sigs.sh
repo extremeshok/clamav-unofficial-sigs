@@ -1252,7 +1252,11 @@ function add_signature_whitelist_entry() { #signature
       if ! $grep_bin -m 1 "$sig_name" my-whitelist.ign2 > /dev/null 2>&1 ; then
         cp -f -p my-whitelist.ign2 "$work_dir_work_configs" 2>/dev/null
         echo "$sig_name" >> "${work_dir_work_configs}/my-whitelist.ign2"
-        echo "$sig_full" >> "${work_dir_work_configs}/tracker.txt"
+        shopt -s nocasematch
+        if [ "$yaratest" != "yara" ] ; then
+            echo "$sig_full" >> "${work_dir_work_configs}/tracker.txt"
+        fi
+
         if $clamscan_bin --quiet -d "${work_dir_work_configs}/my-whitelist.ign2" "${work_dir_work_configs}/scan-test.txt" ; then
           if $rsync_bin -pcqt "${work_dir_work_configs}/my-whitelist.ign2" "$clam_dbs" ; then
             perms chown -f "${clam_user}:${clam_group}" my-whitelist.ign2
@@ -1266,13 +1270,14 @@ function add_signature_whitelist_entry() { #signature
             if [ "$selinux_fixes" == "yes" ] ; then
               restorecon "${clam_dbs}/local.ign"
             fi
-                        do_clamd_reload="4"
+            do_clamd_reload="4"
             clamscan_reload_dbs
 
-            xshok_pretty_echo_and_log "Signature '${input}' has been added to my-whitelist.ign2 and"
-            xshok_pretty_echo_and_log "all databases have been reloaded.  The script will track any changes"
-            xshok_pretty_echo_and_log "to the offending signature and will automatically remove it if the"
-            xshok_pretty_echo_and_log "signature is modified or removed from the third-party database."
+            xshok_pretty_echo_and_log "Signature '${input}' has been added to my-whitelist.ign2 and all databases have been reloaded."
+            if [ "$yaratest" != "yara" ] ; then
+                xshok_pretty_echo_and_log "The script will track any changes to the offending signature and will automatically remove it, "
+                xshok_pretty_echo_and_log "if the signature is modified or removed from the third-party database."
+            fi
           else
 
             xshok_pretty_echo_and_log "Failed to successfully update my-whitelist.ign2 file - SKIPPING."
