@@ -220,6 +220,15 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### Version 7.2.3 (17 March 2021)
+
+* eXtremeSHOK.com Maintenance
+* Disable JJencode.yar , due to excessive CPU usage
+* Disable scamnailer , discontinued
+* Fix working directory variable "urlhausy" to "urlhaus"
+* Update pfsense guide for 2.5
+* Thank you @perplexityjeff
+
 ### Version 7.2.2 (20 December 2020)
 
 * eXtremeSHOK.com Maintenance
