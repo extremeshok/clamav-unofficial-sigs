@@ -220,14 +220,21 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### Version 7.2.4 (17 March 2021)
+
+* eXtremeSHOK.com Maintenance
+* Disabled winnow_malware.yara , duplicated in EMAIL_Cryptowall.yar and no longer maintained
+* Removed gtar requirement (--wildcards is the default)
+* Incremented the config to version 97
+
 ### Version 7.2.3 (17 March 2021)
 
 * eXtremeSHOK.com Maintenance
+* Whitelist support for yararules (whitelist signature tracking is disabled for yararules)
 * Disable JJencode.yar , due to excessive CPU usage
 * Disable scamnailer , discontinued
 * Fix working directory variable "urlhausy" to "urlhaus"
 * Update pfsense guide for 2.5
-* Whitelist support for yararules (whitelist signature tracking is disabled for yararules)
 * Fix missing tracker-tmp.txt
 * Thank you @perplexityjeff
 
