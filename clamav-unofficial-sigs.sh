@@ -534,7 +534,7 @@ clamav-unofficial-sigs \\- Download, test, and install third-party ClamAV signat
 .B clamav-unofficial-sigs
 .RI [ options ]
 .SH DESCRIPTION
-\\fBclamav-unofficial-sigs\\fP provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, Scamnailer, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. It will also generate and install cron, logrotate, and man files.
+\\fBclamav-unofficial-sigs\\fP provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, etc. It will also generate and install cron, logrotate, and man files.
 .SH UPDATES
 Script updates can be found at: \\fBhttps://github.com/extremeshok/clamav-unofficial-sigs\\fP
 .SH OPTIONS
