@@ -21,3 +21,4 @@ ratings:
   paths: []
 exclude_paths:
   - .t/
+  - dev/

@@ -1,4 +1,4 @@
-# Basic guide to Installing and Updating on pfSense 2.3+
+# Basic guide to Installing and Updating on pfSense 2.5+
 
 # UPGRADE INSTRUCTIONS (version 7.0 +)
 ```
@@ -34,6 +34,8 @@ Console (shell)
 ```
 pkg install bash
 pkg install rsync
+pkg add https://pkg.freebsd.org/FreeBSD:12:amd64/quarterly/All/gsed-4.8.txz
+pkg add https://pkg.freebsd.org/FreeBSD:12:amd64/quarterly/All/gnugrep-3.6.txz
 echo "fdesc	/dev/fd		fdescfs		rw	0	0" >> /etc/fstab
 ln -s /usr/local/bin/bash /bin/bash
 curl https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master/clamav-unofficial-sigs.sh --output /usr/sbin/clamav-unofficial-sigs.sh
