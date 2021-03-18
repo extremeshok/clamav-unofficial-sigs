@@ -1228,7 +1228,8 @@ function add_signature_whitelist_entry() { #signature
         input=${input/\.UNOFFICIAL/}
 
         yaratest="$(echo "$input" | cut -d "." -f 1)"
-        if [ "$yaratest" == "YARA" ] || [ "$yaratest" == "yara" ] ; then
+        shopt -s nocasematch
+        if [ "$yaratest" == "yara" ] ; then
             echo "YARA signature detected"
             sig_full="$input"
             sig_extension=""
