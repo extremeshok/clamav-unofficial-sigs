@@ -4385,15 +4385,19 @@ if [ -r "${clam_dbs}/my-whitelist.ign2" ] && [ -s "${work_dir_work_configs}/trac
   xshok_pretty_echo_and_log "" "=" "80"
   touch "${work_dir_work_configs}/tracker-tmp.txt"
   while read -r entry ; do
-    sig_file="$(echo "$entry" | cut -d ":" -f 1)"
-    sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
-    sig_name="$(echo "$entry" | cut -d ":" -f 2)"
-    if ! $grep_bin -F "$sig_full" "$sig_file" > /dev/null 2>&1 ; then
-      perl -i -ne "print unless /$sig_name$/" "${work_dir_work_configs}/my-whitelist.ign2"
-      perl -i -ne "print unless /:$sig_name:/" "${work_dir_work_configs}/tracker-tmp.txt"
 
-      xshok_pretty_echo_and_log "${sig_name} signature no longer exists in ${sig_file}, whitelist entry removed from my-whitelist.ign2"
-      ign2_updated="1"
+      yaratest="$(echo "$entry" | cut -d "." -f 1)"
+      shopt -s nocasematch
+      if [ "$yaratest" != "yara" ] ; then
+        sig_file="$(echo "$entry" | cut -d ":" -f 1)"
+        sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
+        sig_name="$(echo "$entry" | cut -d ":" -f 2)"
+        if ! $grep_bin -F "$sig_full" "$sig_file" > /dev/null 2>&1 ; then
+          perl -i -ne "print unless /$sig_name$/" "${work_dir_work_configs}/my-whitelist.ign2"
+          perl -i -ne "print unless /:$sig_name:/" "${work_dir_work_configs}/tracker-tmp.txt"
+          xshok_pretty_echo_and_log "${sig_name} signature no longer exists in ${sig_file}, whitelist entry removed from my-whitelist.ign2"
+          ign2_updated="1"
+        fi
     fi
   done < "${work_dir_work_configs}/tracker.txt"
   if [ -f "${work_dir_work_configs}/tracker-tmp.txt" ] ; then

@@ -227,6 +227,8 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Disable scamnailer , discontinued
 * Fix working directory variable "urlhausy" to "urlhaus"
 * Update pfsense guide for 2.5
+* Whitelist support for yararules (whitelist signature tracking is disabled for yararules)
+* Fix missing tracker-tmp.txt
 * Thank you @perplexityjeff
 
 ### Version 7.2.2 (20 December 2020)
