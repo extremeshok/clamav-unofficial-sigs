@@ -4383,7 +4383,7 @@ if [ -r "${clam_dbs}/my-whitelist.ign2" ] && [ -s "${work_dir_work_configs}/trac
   cp -f -p my-whitelist.ign2 "${work_dir_work_configs}/my-whitelist.ign2"
 
   xshok_pretty_echo_and_log "" "=" "80"
-
+  touch "${work_dir_work_configs}/tracker-tmp.txt"
   while read -r entry ; do
     sig_file="$(echo "$entry" | cut -d ":" -f 1)"
     sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
