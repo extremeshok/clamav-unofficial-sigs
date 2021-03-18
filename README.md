@@ -224,6 +224,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 * eXtremeSHOK.com Maintenance
 * Disabled winnow_malware.yara , duplicated in EMAIL_Cryptowall.yar and no longer maintained
+* Removed gtar requirement (--wildcards is the default)
 * Incremented the config to version 97
 
 ### Version 7.2.3 (17 March 2021)

@@ -2020,14 +2020,14 @@ elif [[ "$rsync_bin" =~ "/" ]] ; then
 fi
 # tar_bin
 if [ -z "$tar_bin" ] ; then
-    # Detect support for tar or gtar
-    if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
-        tar_bin="$(command -v gtar 2> /dev/null)"
-    else
+    # # Detect support for tar or gtar
+    # if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
+    #     tar_bin="$(command -v gtar 2> /dev/null)"
+    # else
         tar_bin="$(command -v tar 2> /dev/null)"
-    fi
+    # fi
     if [ -z "$tar_bin" ] ; then
-        xshok_pretty_echo_and_log "ERROR: tar or gtar binary (tar_bin) not found"
+        xshok_pretty_echo_and_log "ERROR: tar binary (tar_bin) not found"
         exit 1
     fi
 elif [[ "$tar_bin" =~ "/" ]] ; then
@@ -3358,9 +3358,9 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           if [ "$ret" -eq 0 ] ; then
                         # shellcheck disable=SC2035
             if [ "$enable_yararules" == "yes" ] ; then
-                $tar_bin --strip-components=1 --wildcards --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                $tar_bin --strip-components=1 --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             else
-                $tar_bin --strip-components=1 --wildcards --exclude='*.yar' --exclude='*.yara' --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                $tar_bin --strip-components=1 --exclude='*.yar' --exclude='*.yara' --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             fi
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
