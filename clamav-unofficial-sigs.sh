@@ -1229,7 +1229,7 @@ function add_signature_whitelist_entry() { #signature
 
         yaratest="$(echo "$input" | cut -d "." -f 1)"
         shopt -s nocasematch
-        if [ "$yaratest" == "yara" ] ; then
+        if [ "$yaratest" == "YARA" ] ; then
             echo "YARA signature detected"
             sig_full="$input"
             sig_extension=""
@@ -1253,7 +1253,7 @@ function add_signature_whitelist_entry() { #signature
         cp -f -p my-whitelist.ign2 "$work_dir_work_configs" 2>/dev/null
         echo "$sig_name" >> "${work_dir_work_configs}/my-whitelist.ign2"
         shopt -s nocasematch
-        if [ "$yaratest" != "yara" ] ; then
+        if [ "$yaratest" != "YARA" ] ; then
             echo "$sig_full" >> "${work_dir_work_configs}/tracker.txt"
         fi
 
@@ -1274,7 +1274,7 @@ function add_signature_whitelist_entry() { #signature
             clamscan_reload_dbs
 
             xshok_pretty_echo_and_log "Signature '${input}' has been added to my-whitelist.ign2 and all databases have been reloaded."
-            if [ "$yaratest" != "yara" ] ; then
+            if [ "$yaratest" != "YARA" ] ; then
                 xshok_pretty_echo_and_log "The script will track any changes to the offending signature and will automatically remove it, "
                 xshok_pretty_echo_and_log "if the signature is modified or removed from the third-party database."
             fi
@@ -4388,7 +4388,7 @@ if [ -r "${clam_dbs}/my-whitelist.ign2" ] && [ -s "${work_dir_work_configs}/trac
 
       yaratest="$(echo "$entry" | cut -d "." -f 1)"
       shopt -s nocasematch
-      if [ "$yaratest" != "yara" ] ; then
+      if [ "$yaratest" != "YARA" ] ; then
         sig_file="$(echo "$entry" | cut -d ":" -f 1)"
         sig_full="$(echo "$entry" | cut -d ":" -f 2-)"
         sig_name="$(echo "$entry" | cut -d ":" -f 2)"
