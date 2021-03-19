@@ -2030,12 +2030,18 @@ if [ -z "$tar_bin" ] ; then
         xshok_pretty_echo_and_log "ERROR: tar binary (tar_bin) not found"
         exit 1
     fi
-elif [[ "$tar_bin" =~ "/" ]] ; then
+elif [[ "$tar_bin" =~ "/" ]] ; then`1
     if [ ! -x "$tar_bin" ] ; then
         xshok_pretty_echo_and_log "ERROR: tar_bin (${tar_bin}) is not executable"
         exit 1
 
     fi
+fi
+# detect support for tar --wildcards option
+if tar --help | grep -q '\-\-wildcards' ; then
+    echo tar_wildcards="--wildcards"
+else
+    echo tar_wildcards=""
 fi
 # gpg_bin
 if [ "$enable_gpg" == "yes" ] ; then
@@ -3358,9 +3364,9 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           if [ "$ret" -eq 0 ] ; then
                         # shellcheck disable=SC2035
             if [ "$enable_yararules" == "yes" ] ; then
-                $tar_bin --strip-components=1 --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                $tar_bin $tar_wildcards --strip-components=1 --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             else
-                $tar_bin --strip-components=1 --exclude='*.yar' --exclude='*.yara' --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                $tar_bin $tar_wildcards --strip-components=1 --exclude='*.yar' --exclude='*.yara' --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             fi
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then

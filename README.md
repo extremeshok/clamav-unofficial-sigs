@@ -220,6 +220,12 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### Version 7.2.5 (19 March 2021)
+
+* eXtremeSHOK.com Maintenance
+* Added : os.centos7-cpanel.conf
+* Tar bugfix : detect if --wildcards is supported and required
+
 ### Version 7.2.4 (17 March 2021)
 
 * eXtremeSHOK.com Maintenance
