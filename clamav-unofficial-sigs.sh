@@ -2038,7 +2038,7 @@ elif [[ "$tar_bin" =~ "/" ]] ; then
     fi
 fi
 # detect support for tar --wildcards option
-if tar --help | grep -q '\-\-wildcards' ; then
+if $tar_bin --help | grep -q '\-\-wildcards' ; then
     tar_wildcards="--wildcards"
 else
     tar_wildcards=""
