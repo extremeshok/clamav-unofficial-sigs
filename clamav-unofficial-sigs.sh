@@ -2039,9 +2039,9 @@ elif [[ "$tar_bin" =~ "/" ]] ; then
 fi
 # detect support for tar --wildcards option
 if tar --help | grep -q '\-\-wildcards' ; then
-    echo tar_wildcards="--wildcards"
+    tar_wildcards="--wildcards"
 else
-    echo tar_wildcards=""
+    tar_wildcards=""
 fi
 # gpg_bin
 if [ "$enable_gpg" == "yes" ] ; then
