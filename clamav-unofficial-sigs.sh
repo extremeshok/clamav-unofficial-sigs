@@ -2020,12 +2020,7 @@ elif [[ "$rsync_bin" =~ "/" ]] ; then
 fi
 # tar_bin
 if [ -z "$tar_bin" ] ; then
-    # # Detect support for tar or gtar
-    # if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
-    #     tar_bin="$(command -v gtar 2> /dev/null)"
-    # else
-        tar_bin="$(command -v tar 2> /dev/null)"
-    # fi
+    tar_bin="$(command -v tar 2> /dev/null)"
     if [ -z "$tar_bin" ] ; then
         xshok_pretty_echo_and_log "ERROR: tar binary (tar_bin) not found"
         exit 1
@@ -2034,21 +2029,9 @@ elif [[ "$tar_bin" =~ "/" ]] ; then
     if [ ! -x "$tar_bin" ] ; then
         xshok_pretty_echo_and_log "ERROR: tar_bin (${tar_bin}) is not executable"
         exit 1
-
     fi
 fi
-# detect support for tar --wildcards option
-if $tar_bin --help | grep -q '\-\-wildcards' ; then
-    tar_wildcards="--wildcards"
-else
-    tar_wildcards=""
-fi
-# detect support for tar --overwrite option
-if $tar_bin --help | grep -q '\-\-overwrite' ; then
-    tar_overwrite="--overwrite"
-else
-    tar_overwrite=""
-fi
+
 # gpg_bin
 if [ "$enable_gpg" == "yes" ] ; then
     if [ -z "$gpg_bin" ] ; then
@@ -3368,13 +3351,17 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
-                        # shellcheck disable=SC2035
+            mkdir -p "${work_dir_linuxmalwaredetect}/tmp/"
+            tar --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}/tmp/"
+            rm -f "${work_dir_linuxmalwaredetect}/sigpack.tgz"
             if [ "$enable_yararules" == "yes" ] ; then
-                $tar_bin $tar_wildcards $tar_overwrite --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                mv -f "${work_dir_linuxmalwaredetect}/tmp/rfxn.*" "${work_dir_linuxmalwaredetect}/"
             else
-                $tar_bin $tar_wildcards $tar_overwrite --strip-components=1 --exclude='*.yar' --exclude='*.yara' -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                rm -f "${work_dir_linuxmalwaredetect}/tmp/*.yar"
+                rm -f "${work_dir_linuxmalwaredetect}/tmp/*.yara"
+                mv -f "${work_dir_linuxmalwaredetect}/tmp/rfxn.*" "${work_dir_linuxmalwaredetect}/"
+                rm -f "${work_dir_linuxmalwaredetect}/tmp/"
             fi
-
 
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
