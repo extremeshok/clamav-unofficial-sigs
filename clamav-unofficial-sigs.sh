@@ -3365,8 +3365,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
         fi
 
         if [ "$found_upgrade" == "yes" ] ; then
-          echo xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
-          exit 1
+          xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
                         # shellcheck disable=SC2035
