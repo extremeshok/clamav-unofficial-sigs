@@ -2043,6 +2043,12 @@ if $tar_bin --help | grep -q '\-\-wildcards' ; then
 else
     tar_wildcards=""
 fi
+# detect support for tar --overwrite option
+if $tar_bin --help | grep -q '\-\-overwrite' ; then
+    tar_overwrite="--overwrite"
+else
+    tar_overwrite=""
+fi
 # gpg_bin
 if [ "$enable_gpg" == "yes" ] ; then
     if [ -z "$gpg_bin" ] ; then
@@ -3364,10 +3370,13 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           if [ "$ret" -eq 0 ] ; then
                         # shellcheck disable=SC2035
             if [ "$enable_yararules" == "yes" ] ; then
-                $tar_bin $tar_wildcards --strip-components=1 --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                echo $tar_bin $tar_wildcards $tar_overwrite --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             else
-                $tar_bin $tar_wildcards --strip-components=1 --exclude='*.yar' --exclude='*.yara' --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                echo $tar_bin $tar_wildcards $tar_overwrite --strip-components=1 --exclude='*.yar' --exclude='*.yara' -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             fi
+
+            exit 1
+
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
                 xshok_pretty_echo_and_log "---"
