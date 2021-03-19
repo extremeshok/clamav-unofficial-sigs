@@ -3365,17 +3365,17 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
         fi
 
         if [ "$found_upgrade" == "yes" ] ; then
-          xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
+          echo xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
+          exit 1
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
                         # shellcheck disable=SC2035
             if [ "$enable_yararules" == "yes" ] ; then
-                echo $tar_bin $tar_wildcards $tar_overwrite --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                $tar_bin $tar_wildcards $tar_overwrite --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             else
-                echo $tar_bin $tar_wildcards $tar_overwrite --strip-components=1 --exclude='*.yar' --exclude='*.yara' -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                $tar_bin $tar_wildcards $tar_overwrite --strip-components=1 --exclude='*.yar' --exclude='*.yara' -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
             fi
 
-            exit 1
 
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
