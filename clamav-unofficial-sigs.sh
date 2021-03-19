@@ -2030,7 +2030,7 @@ if [ -z "$tar_bin" ] ; then
         xshok_pretty_echo_and_log "ERROR: tar binary (tar_bin) not found"
         exit 1
     fi
-elif [[ "$tar_bin" =~ "/" ]] ; then`1
+elif [[ "$tar_bin" =~ "/" ]] ; then
     if [ ! -x "$tar_bin" ] ; then
         xshok_pretty_echo_and_log "ERROR: tar_bin (${tar_bin}) is not executable"
         exit 1
