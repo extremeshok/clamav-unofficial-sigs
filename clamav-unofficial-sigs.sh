@@ -3354,11 +3354,9 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
             mkdir -p "${work_dir_linuxmalwaredetect}/tmp/"
             $tar_bin --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}/tmp/"
             if [ "$enable_yararules" == "yes" ] ; then
-                mv -f -v "${work_dir_linuxmalwaredetect}/tmp/rfxn.*" "${work_dir_linuxmalwaredetect}/"
+                find "${work_dir_linuxmalwaredetect}/tmp/" -type f -iname "rfxn.*" -exec mv '{}' "${work_dir_linuxmalwaredetect}/" \;
             else
-                rm -f "${work_dir_linuxmalwaredetect}/tmp/*.yar"
-                rm -f "${work_dir_linuxmalwaredetect}/tmp/*.yara"
-                mv -f -v "${work_dir_linuxmalwaredetect}/tmp/rfxn.*" "${work_dir_linuxmalwaredetect}/"
+                find "${work_dir_linuxmalwaredetect}/tmp/" -type f -iname "rfxn.*" -o -iname "*.yar" -o -iname "*.yara" -exec mv '{}' "${work_dir_linuxmalwaredetect}/" \;
             fi
             # cleanup
             rm -f "${work_dir_linuxmalwaredetect}/sigpack.tgz"
