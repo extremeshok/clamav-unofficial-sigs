@@ -3348,6 +3348,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
         fi
 
         if [ "$found_upgrade" == "yes" ] ; then
+          mkdir -p "${work_dir_linuxmalwaredetect}/tmp/"
           xshok_file_download "${work_dir_linuxmalwaredetect}/tmp/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
