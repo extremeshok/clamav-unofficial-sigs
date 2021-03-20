@@ -757,7 +757,11 @@ function xshok_upgrade() {
                     exit 1
                 fi
                 # Copy over permissions from old version
-              OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf")"
+                OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf" 2> /dev/null)"
+                if [ -z "$OCTAL_MODE" ]; then
+                  OCTAL_MODE="$(stat -f '%p' "${config_dir}/master.conf")"
+                fi
+
                 xshok_pretty_echo_and_log "Running update process"
                 if ! mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf" ; then
                     xshok_pretty_echo_and_log "ERROR: failed moving ${work_dir}/master.conf.tmp to ${config_dir}/master.conf"
@@ -794,8 +798,10 @@ function xshok_upgrade() {
                     exit 1
                 fi
                 # Copy over permissions from old version
-              OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}")"
-
+                OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}" 2> /dev/null)"
+                if [ -z "$OCTAL_MODE" ]; then
+                    OCTAL_MODE="$(stat -f '%p' "${this_script_full_path}")"
+                fi
                 xshok_pretty_echo_and_log "Inserting update process..."
               # Generate the update script
               cat > "${work_dir}/xshok_update_script.sh" << EOF
