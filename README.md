@@ -220,7 +220,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
-### Version 7.2.6 (20 March 2021)
+### Version 7.2.5 (20 March 2021)
 * eXtremeSHOK.com Maintenance
 * Added : os.centos7-cpanel.conf
 * Refactor : bsd support for tar, remove gnu-tar requirement
