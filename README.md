@@ -226,7 +226,6 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Refactor : bsd support for tar, remove gnu-tar requirement
 * Refactor : remove gnu-sed requirement
 * Refactor : bsd support for stat command
-* Added : os.centos7-cpanel.conf
 
 ### Version 7.2.4 (17 March 2021)
 
