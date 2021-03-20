@@ -3348,21 +3348,20 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
         fi
 
         if [ "$found_upgrade" == "yes" ] ; then
-          xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
+          xshok_file_download "${work_dir_linuxmalwaredetect}/tmp/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
             mkdir -p "${work_dir_linuxmalwaredetect}/tmp/"
-            $tar_bin --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}/tmp/"
+            $tar_bin --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/tmp/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}/tmp/"
             ls -l "${work_dir_linuxmalwaredetect}/tmp/"
             if [ "$enable_yararules" == "yes" ] ; then
                 find "${work_dir_linuxmalwaredetect}/tmp/" -type f -iname "rfxn.*" -exec mv -f '{}' "${work_dir_linuxmalwaredetect}/" \;
             else
                 find "${work_dir_linuxmalwaredetect}/tmp/" -type f -iname "rfxn.*" ! \( -iname "*.yara" -o -iname "*.yar" \) -exec mv -f '{}' "${work_dir_linuxmalwaredetect}/" \;
             fi
-            ls -l "${work_dir_linuxmalwaredetect}/"
             # cleanup
-            rm -f "${work_dir_linuxmalwaredetect}/sigpack.tgz"
             rm -rf -- "${work_dir_linuxmalwaredetect:?}/tmp"
+            ls -l "${work_dir_linuxmalwaredetect}/"
 
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
@@ -3449,10 +3448,6 @@ else
       if [ -f "${work_dir_linuxmalwaredetect}/current_linuxmalwaredetect_version" ] ; then
         rm -f "${work_dir_linuxmalwaredetect}/current_linuxmalwaredetect_version"
       fi
-      if [ -f "${work_dir_linuxmalwaredetect}/sigpack.tgz" ] ; then
-        rm -f "${work_dir_linuxmalwaredetect}/sigpack.tgz"
-      fi
-
       for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
         if echo "$db_file" | $grep_bin -q "|" ; then
           db_file="${db_file%|*}"
