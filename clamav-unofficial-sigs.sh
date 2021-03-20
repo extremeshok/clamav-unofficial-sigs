@@ -3354,7 +3354,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           if [ "$ret" -eq 0 ] ; then
             mkdir -p "${work_dir_linuxmalwaredetect}/tmp/"
             $tar_bin --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/tmp/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}/tmp/"
-            ls -l "${work_dir_linuxmalwaredetect}/tmp/"
+            #ls -l "${work_dir_linuxmalwaredetect}/tmp/"
             if [ "$enable_yararules" == "yes" ] ; then
                 find "${work_dir_linuxmalwaredetect}/tmp/" -type f -iname "rfxn.*" -exec mv -f '{}' "${work_dir_linuxmalwaredetect}/" \;
             else
@@ -3362,7 +3362,7 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
             fi
             # cleanup
             rm -rf -- "${work_dir_linuxmalwaredetect:?}/tmp"
-            ls -l "${work_dir_linuxmalwaredetect}/"
+            #ls -l "${work_dir_linuxmalwaredetect}/"
 
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
