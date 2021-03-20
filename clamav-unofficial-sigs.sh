@@ -3352,16 +3352,17 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
             mkdir -p "${work_dir_linuxmalwaredetect}/tmp/"
-            tar --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}/tmp/"
-            rm -f "${work_dir_linuxmalwaredetect}/sigpack.tgz"
+            $tar_bin --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}/tmp/"
             if [ "$enable_yararules" == "yes" ] ; then
-                mv -f "${work_dir_linuxmalwaredetect}/tmp/rfxn.*" "${work_dir_linuxmalwaredetect}/"
+                mv -f -v "${work_dir_linuxmalwaredetect}/tmp/rfxn.*" "${work_dir_linuxmalwaredetect}/"
             else
                 rm -f "${work_dir_linuxmalwaredetect}/tmp/*.yar"
                 rm -f "${work_dir_linuxmalwaredetect}/tmp/*.yara"
-                mv -f "${work_dir_linuxmalwaredetect}/tmp/rfxn.*" "${work_dir_linuxmalwaredetect}/"
-                rm -f "${work_dir_linuxmalwaredetect}/tmp/"
+                mv -f -v "${work_dir_linuxmalwaredetect}/tmp/rfxn.*" "${work_dir_linuxmalwaredetect}/"
             fi
+            # cleanup
+            rm -f "${work_dir_linuxmalwaredetect}/sigpack.tgz"
+            rm -f "${work_dir_linuxmalwaredetect}/tmp/*"
 
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
