@@ -3359,10 +3359,10 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
             else
                 find "${work_dir_linuxmalwaredetect}/tmp/" -type f -iname "rfxn.*" ! \( -iname "*.yara" -o -iname "*.yar" \) -exec mv -f '{}' "${work_dir_linuxmalwaredetect}/" \;
             fi
-            ls -l "${work_dir_linuxmalwaredetect}/tmp/"
+            ls -l "${work_dir_linuxmalwaredetect}/"
             # cleanup
             rm -f "${work_dir_linuxmalwaredetect}/sigpack.tgz"
-            rm -f "${work_dir_linuxmalwaredetect}/tmp/*"
+            rm -rf -- "${work_dir_linuxmalwaredetect:?}/tmp"
 
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
