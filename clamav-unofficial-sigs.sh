@@ -757,7 +757,11 @@ function xshok_upgrade() {
                     exit 1
                 fi
                 # Copy over permissions from old version
-              OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf")"
+                OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf" 2> /dev/null)"
+                if [ -z "$OCTAL_MODE" ]; then
+                  OCTAL_MODE="$(stat -f '%p' "${config_dir}/master.conf")"
+                fi
+
                 xshok_pretty_echo_and_log "Running update process"
                 if ! mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf" ; then
                     xshok_pretty_echo_and_log "ERROR: failed moving ${work_dir}/master.conf.tmp to ${config_dir}/master.conf"
@@ -794,8 +798,10 @@ function xshok_upgrade() {
                     exit 1
                 fi
                 # Copy over permissions from old version
-              OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}")"
-
+                OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}" 2> /dev/null)"
+                if [ -z "$OCTAL_MODE" ]; then
+                    OCTAL_MODE="$(stat -f '%p' "${this_script_full_path}")"
+                fi
                 xshok_pretty_echo_and_log "Inserting update process..."
               # Generate the update script
               cat > "${work_dir}/xshok_update_script.sh" << EOF
@@ -1544,8 +1550,8 @@ EOF
 ################################################################################
 
 # Script Info
-script_version="7.2.4"
-script_version_date="2021-03-17"
+script_version="7.2.5"
+script_version_date="2021-03-20"
 minimum_required_config_version="96"
 minimum_yara_clamav_version="0.100"
 
@@ -2020,12 +2026,7 @@ elif [[ "$rsync_bin" =~ "/" ]] ; then
 fi
 # tar_bin
 if [ -z "$tar_bin" ] ; then
-    # # Detect support for tar or gtar
-    # if [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
-    #     tar_bin="$(command -v gtar 2> /dev/null)"
-    # else
-        tar_bin="$(command -v tar 2> /dev/null)"
-    # fi
+    tar_bin="$(command -v tar 2> /dev/null)"
     if [ -z "$tar_bin" ] ; then
         xshok_pretty_echo_and_log "ERROR: tar binary (tar_bin) not found"
         exit 1
@@ -2034,9 +2035,9 @@ elif [[ "$tar_bin" =~ "/" ]] ; then
     if [ ! -x "$tar_bin" ] ; then
         xshok_pretty_echo_and_log "ERROR: tar_bin (${tar_bin}) is not executable"
         exit 1
-
     fi
 fi
+
 # gpg_bin
 if [ "$enable_gpg" == "yes" ] ; then
     if [ -z "$gpg_bin" ] ; then
@@ -3353,15 +3354,22 @@ if [ "$linuxmalwaredetect_enabled" == "yes" ] ; then
         fi
 
         if [ "$found_upgrade" == "yes" ] ; then
-          xshok_file_download "${work_dir_linuxmalwaredetect}/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
+          mkdir -p "${work_dir_linuxmalwaredetect}/tmp/"
+          xshok_file_download "${work_dir_linuxmalwaredetect}/tmp/sigpack.tgz" "${linuxmalwaredetect_sigpack_url}"
           ret="$?"
           if [ "$ret" -eq 0 ] ; then
-                        # shellcheck disable=SC2035
+            mkdir -p "${work_dir_linuxmalwaredetect}/tmp/"
+            $tar_bin --strip-components=1 -xzf "${work_dir_linuxmalwaredetect}/tmp/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}/tmp/"
+            #ls -l "${work_dir_linuxmalwaredetect}/tmp/"
             if [ "$enable_yararules" == "yes" ] ; then
-                $tar_bin --strip-components=1 --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                find "${work_dir_linuxmalwaredetect}/tmp/" -type f -iname "rfxn.*" -exec mv -f '{}' "${work_dir_linuxmalwaredetect}/" \;
             else
-                $tar_bin --strip-components=1 --exclude='*.yar' --exclude='*.yara' --overwrite -xzf "${work_dir_linuxmalwaredetect}/sigpack.tgz" --directory "${work_dir_linuxmalwaredetect}" */rfxn.*
+                find "${work_dir_linuxmalwaredetect}/tmp/" -type f -iname "rfxn.*" ! \( -iname "*.yara" -o -iname "*.yar" \) -exec mv -f '{}' "${work_dir_linuxmalwaredetect}/" \;
             fi
+            # cleanup
+            rm -rf -- "${work_dir_linuxmalwaredetect:?}/tmp"
+            #ls -l "${work_dir_linuxmalwaredetect}/"
+
             for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
               if [ "$loop" == "1" ] ; then
                 xshok_pretty_echo_and_log "---"
@@ -3447,10 +3455,6 @@ else
       if [ -f "${work_dir_linuxmalwaredetect}/current_linuxmalwaredetect_version" ] ; then
         rm -f "${work_dir_linuxmalwaredetect}/current_linuxmalwaredetect_version"
       fi
-      if [ -f "${work_dir_linuxmalwaredetect}/sigpack.tgz" ] ; then
-        rm -f "${work_dir_linuxmalwaredetect}/sigpack.tgz"
-      fi
-
       for db_file in "${linuxmalwaredetect_dbs[@]}" ; do
         if echo "$db_file" | $grep_bin -q "|" ; then
           db_file="${db_file%|*}"
