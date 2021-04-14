@@ -2173,6 +2173,7 @@ if [ "$force_updates" == "yes" ] ; then
   malwareexpert_update_hours="0"
   malwarepatrol_update_hours="0"
   yararulesproject_update_hours="0"
+  urlhaus_update_hours="0"
   additional_update_hours="0"
 fi
 
