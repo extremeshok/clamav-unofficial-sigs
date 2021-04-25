@@ -2173,6 +2173,7 @@ if [ "$force_updates" == "yes" ] ; then
   malwareexpert_update_hours="0"
   malwarepatrol_update_hours="0"
   yararulesproject_update_hours="0"
+  urlhaus_update_hours="0"
   additional_update_hours="0"
 fi
 
@@ -2763,6 +2764,7 @@ xshok_mkdir_ownership "$work_dir_sanesecurity"
 xshok_mkdir_ownership "$work_dir_securiteinfo"
 xshok_mkdir_ownership "$work_dir_work_configs"
 xshok_mkdir_ownership "$work_dir_yararulesproject"
+xshok_mkdir_ownership "$work_dir_urlhaus"
 
 # Set secured access permissions to the GPG directory
 perms chmod -f 0700 "${work_dir_gpg}"
