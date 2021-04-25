@@ -1920,7 +1920,7 @@ if [ -z "$work_dir_malwarepatrol" ] ; then
 else
   shopt -s extglob; work_dir_malwarepatrol="${work_dir_malwarepatrol%%+(/)}"
 fi
-if [ -z "$work_dir_urlhaust" ] ; then
+if [ -z "$work_dir_urlhaus" ] ; then
   work_dir_urlhaus="$(echo "${work_dir}/${urlhaus_dir}" | $sed_bin 's:/*$::')"
 else
   shopt -s extglob; work_dir_urlhaus="${work_dir_urlhaus%%+(/)}"
