@@ -2582,12 +2582,12 @@ fi
 ############################################################################################
 if [ "$malwarepatrol_enabled" == "yes" ] ; then
     # Set the variables for MalwarePatrol
-    if [ "$malwarepatrol_product_code" != "8" ] ; then
-        # assumption, free product code is always 8 (non-free product code is never 8)
+    if [ "$malwarepatrol_product_code" != "32" ] ; then
+        # assumption, free product code is always 32 (non-free product code is never 32)
         malwarepatrol_free="no"
     fi
     if [ "$malwarepatrol_free" == "yes" ] ; then
-      malwarepatrol_product_code="8"
+      malwarepatrol_product_code="32"
       malwarepatrol_list="clamav_basic"
     else
       if [ -z $malwarepatrol_list ] ; then
@@ -2595,7 +2595,7 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
       fi
       if [ -z $malwarepatrol_product_code ] ; then
         # Not sure, it may be better to return an error.
-        malwarepatrol_product_code=8
+        malwarepatrol_product_code=32
       fi
     fi
     if [ -z "$malwarepatrol_db" ] ; then
