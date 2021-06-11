@@ -2601,6 +2601,9 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
     if [ -z "$malwarepatrol_db" ] ; then
         malwarepatrol_db="malwarepatrol.db"
     fi
+    if [ -z "$malwarepatrol_whitelist_googledrive" ] ; then
+        malwarepatrol_whitelist_googledrive="no"
+    fi
     malwarepatrol_url="${malwarepatrol_url}?receipt=${malwarepatrol_receipt_code}&product=${malwarepatrol_product_code}&list=${malwarepatrol_list}"
 elif [ "$remove_disabled_databases" == "yes" ] ; then
     malwarepatrol_remove_dbs=( "malwarepatrol.db" )
@@ -3792,6 +3795,11 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
 
             xshok_file_download "${work_dir_malwarepatrol}/${malwarepatrol_db}" "${malwarepatrol_url}"
 
+            #Check if Google Drive entries need to be removed
+            if [ "$malwarepatrol_whitelist_googledrive" == "yes" ] ; then
+                sed -i '/\=68747470733a2f2f64726976652e676f6f676c652e636f6d$/d' "${work_dir_malwarepatrol}/${malwarepatrol_db}"
+            fi
+            
             ret="$?"
             if [ "$ret" -eq 0 ] ; then
               loop="1"
