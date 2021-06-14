@@ -90,7 +90,7 @@ Usage of free URLhaus Database: <https://urlhaus.abuse.ch>
 
 ### Yara-Rules Project Support (as of June 2015, updated January 2020)
 
-Usage of free Yara-Rules Project: <https://yara-rules.github.io/blog/>
+Usage of free Yara-Rules Project: <http://yararules.com>
 
 * Enabled by default
 
