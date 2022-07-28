@@ -2761,6 +2761,7 @@ xshok_mkdir_ownership "$work_dir_malwareexpert"
 xshok_mkdir_ownership "$work_dir_malwarepatrol"
 xshok_mkdir_ownership "$work_dir_sanesecurity"
 xshok_mkdir_ownership "$work_dir_securiteinfo"
+xshok_mkdir_ownership "$work_dir_urlhaus"
 xshok_mkdir_ownership "$work_dir_work_configs"
 xshok_mkdir_ownership "$work_dir_yararulesproject"
 
