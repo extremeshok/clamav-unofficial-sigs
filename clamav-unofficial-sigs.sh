@@ -2396,6 +2396,12 @@ else
   enable_yararules="no"
 fi
 
+# The upstream Yara-Rules/rules repository is unmaintained and several of its
+# rules fail to load or crash modern clamav releases
+if [ "$yararulesproject_enabled" == "yes" ] ; then
+  xshok_pretty_echo_and_log "WARNING: yararulesproject is DEPRECATED, the upstream Yara-Rules/rules repository is unmaintained, some rules may fail to load or crash modern clamav"
+fi
+
 ############################################################################################
 # Generate the signature databases
 ############################################################################################
