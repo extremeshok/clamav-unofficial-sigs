@@ -8,11 +8,19 @@
 # Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 #
 ##################
-.include /lib/systemd/system/clamd@.service
+# NOTE: the legacy ".include" directive was removed in systemd 240, use a
+# drop-in override for the packaged clamd@.service template instead:
+#
+#   systemctl edit clamd@scan
+#
+# paste the [Unit] section below into the editor, save, then run:
+#
+#   systemctl daemon-reload
+#   systemctl enable --now clamd@scan
+#
+# Drop-in location: /etc/systemd/system/clamd@scan.service.d/override.conf
+##################
 
 [Unit]
-Description = Generic clamav scanner daemon
+Description=Generic clamav scanner daemon
 Wants=clamav-unofficial-sigs.timer
-
-[Install]
-WantedBy = multi-user.target
