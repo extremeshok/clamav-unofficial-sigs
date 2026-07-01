@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# DEPRECATED: this helper relies on the unmaintained Yara-Rules/rules github
+# repository which no longer receives updates, kept for reference only
+#
 ###################
 # This is property of eXtremeSHOK.com
 # You are free to use, modify and distribute, however you may not remove this notice.
