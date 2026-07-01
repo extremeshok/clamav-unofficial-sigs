@@ -662,7 +662,7 @@ function install_cron() {
 
   # Use defined varibles or attempt to use default varibles
   if [ -z "$cron_minute" ] ; then
-    cron_minute="$(( ( RANDOM % 59 ) + 1 ))"
+    cron_minute="$(( RANDOM % 60 ))"
   fi
   if [ -z "$cron_user" ] ; then
     cron_user="${clam_user}";
