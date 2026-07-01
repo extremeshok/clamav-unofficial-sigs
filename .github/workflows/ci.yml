@@ -52,7 +52,7 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq clamav rsync bind9-dnsutils curl wget
       - name: Build scratch config
         run: |
-          sudo mkdir -p /etc/clamav-unofficial-sigs /var/lib/clamav-test
+          sudo mkdir -p /etc/clamav-unofficial-sigs /var/lib/clamav-test/work /var/lib/clamav-test/dbs /var/lib/clamav-test/log
           sudo cp config/master.conf /etc/clamav-unofficial-sigs/master.conf
           sudo cp config/os/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
           sudo tee /etc/clamav-unofficial-sigs/user.conf > /dev/null <<CONF
