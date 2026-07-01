@@ -1329,7 +1329,24 @@ function clamscan_reload_dbs() {
 
       if [[ "$($clamd_reload_opt 2>&1)" = *"ERROR"* ]] ; then
         xshok_pretty_echo_and_log "ERROR: Failed to reload, trying again"
-        if [ -r "$clamd_pid" ] ; then
+        # Fallback: send RELOAD directly to the clamd socket
+        clamd_socket_reload_done="no"
+        if [ -n "$clamd_socket" ] && [ -S "$clamd_socket" ] ; then
+          socat="$(command -v socat 2>/dev/null)"
+          nc_bin="$(command -v nc 2>/dev/null)"
+          if [ -n "$socat" ] && [ -x "$socat" ] ; then
+            if [ "$( (echo "RELOAD"; sleep 1;) | $socat - "$clamd_socket" 2>/dev/null)" == "RELOADING" ] ; then
+              clamd_socket_reload_done="yes"
+            fi
+          elif [ -n "$nc_bin" ] && [ -x "$nc_bin" ] ; then
+            if [ "$(echo "RELOAD" | $nc_bin -U "$clamd_socket" 2>/dev/null)" == "RELOADING" ] ; then
+              clamd_socket_reload_done="yes"
+            fi
+          fi
+        fi
+        if [ "$clamd_socket_reload_done" == "yes" ] ; then
+          xshok_pretty_echo_and_log "ClamAV databases reloading (via clamd socket)" "="
+        elif [ -r "$clamd_pid" ] ; then
           mypid="$(cat "$clamd_pid")"
 
           if kill -USR2 "$mypid" ; then
