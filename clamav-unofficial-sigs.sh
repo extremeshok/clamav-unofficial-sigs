@@ -1712,10 +1712,10 @@ fi
 # Generic command line options
 while true ; do
   case "${1}" in
-    -c|--config) xshok_check_s2 "${2}"; custom_config="${2}"; shift 2; break ;;
-    -F|--force) force_updates="yes"; shift 1; break ;;
-    -v|--verbose) force_verbose="yes"; shift 1; break ;;
-    -s|--silence) force_verbose="no"; shift 1; break ;;
+    -c|--config) xshok_check_s2 "${2}"; custom_config="${2}"; shift 2 ;;
+    -F|--force) force_updates="yes"; shift 1 ;;
+    -v|--verbose) force_verbose="yes"; shift 1 ;;
+    -s|--silence) force_verbose="no"; shift 1 ;;
     *) break ;;
   esac
 done
