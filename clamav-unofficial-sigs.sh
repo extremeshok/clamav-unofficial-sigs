@@ -327,6 +327,13 @@ function xshok_draw_time_remaining() { #time_remaining #update_hours #name
   fi
 }
 
+# Convert a dotted version string into a comparable integer
+# Handles 1-4 numeric segments, strips a leading 'v'/'V' and any
+# trailing suffix (eg. 1.5.0-rc2, 1.4.3+dfsg, 0.105.0-devel-20220228)
+function xshok_version_to_int() { #version
+  echo "${1}" | $sed_bin -e 's/^[^0-9]*//' -e 's/[^0-9.].*//' | awk -F "." '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'
+}
+
 # Portable octal file mode function, GNU stat, BSD stat, fallback default
 function xshok_stat_octal() { #file #defaultmode
   OCTAL_MODE="$(stat -c "%a" "${1}" 2> /dev/null)"
@@ -746,7 +753,7 @@ function xshok_upgrade() {
   # config_dir/master.conf
     if [ "$latest_config_version" ] ; then
         # shellcheck disable=SC2183,SC2086
-        if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
+        if [ "$(xshok_version_to_int "$latest_config_version")" -gt "$(xshok_version_to_int "$config_version")" ] ; then
             found_upgrade="yes"
             xshok_pretty_echo_and_log "ALERT: Upgrading config from v${config_version} to v${latest_config_version}"
             if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
@@ -783,7 +790,7 @@ function xshok_upgrade() {
 
     if [ "$latest_version" ] ; then
         # shellcheck disable=SC2183,SC2086
-        if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
+        if [ "$(xshok_version_to_int "$latest_version")" -gt "$(xshok_version_to_int "$script_version")" ] ; then
             found_upgrade="yes"
         xshok_pretty_echo_and_log "ALERT:  Upgrading script from v${script_version} to v${latest_version}"
             if [ -w "${config_dir}/master.conf" ] && [ -f "${config_dir}/master.conf" ] ; then
@@ -1463,14 +1470,14 @@ function check_new_version() {
     fi
   if [ "$latest_version" ] ; then
         # shellcheck disable=SC2183,SC2086
-        if [ "$(printf "%02d%02d%02d%02d" ${latest_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${script_version//./ })" ] ; then
+        if [ "$(xshok_version_to_int "$latest_version")" -gt "$(xshok_version_to_int "$script_version")" ] ; then
       xshok_pretty_echo_and_log "ALERT: New version : v${latest_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
             found_upgrade="yes"
     fi
   fi
   if [ "$latest_config_version" ] ; then
         # shellcheck disable=SC2183,SC2086
-        if [ "$(printf "%02d%02d%02d%02d" ${latest_config_version//./ })" -gt "$(printf "%02d%02d%02d%02d" ${config_version//./ })" ] ; then
+        if [ "$(xshok_version_to_int "$latest_config_version")" -gt "$(xshok_version_to_int "$config_version")" ] ; then
       xshok_pretty_echo_and_log "ALERT: New config version : v${latest_config_version} @ https://github.com/extremeshok/clamav-unofficial-sigs"
             found_upgrade="yes"
     fi
@@ -2376,8 +2383,8 @@ fi
 
 # Check yararule support is available
 if [ "$enable_yararules" == "yes" ] ; then
-  current_clamav_version="$($clamscan_bin -V | cut -d " " -f 2 | cut -d "/" -f 1 | awk -F "." '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')"
-  minimum_yara_clamav_version="$(echo "$minimum_yara_clamav_version" | awk -F "." '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }')"
+  current_clamav_version="$(xshok_version_to_int "$($clamscan_bin -V | head -n1 | cut -d " " -f 2 | cut -d "/" -f 1)")"
+  minimum_yara_clamav_version="$(xshok_version_to_int "$minimum_yara_clamav_version")"
   # Check current clamav version against the minimum required version for yara support
   if [ "$current_clamav_version" -lt "$minimum_yara_clamav_version" ] ; then # Older
     yararulesproject_enabled="no"
