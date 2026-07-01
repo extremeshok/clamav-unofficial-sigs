@@ -11,11 +11,11 @@ Script updates can be found at: <https://github.com/extremeshok/clamav-unofficia
 
 ## Operating System Specific Install Guides
 
-* CentOS : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md>
-* Ubuntu : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
-* Debian : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
-* Mac OSX : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md>
-* pFsense : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md>
+* CentOS : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/centos7.md>
+* Ubuntu : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/ubuntu-debian.md>
+* Debian : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/ubuntu-debian.md>
+* Mac OSX : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/macos.md>
+* pFsense : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/pfsense.md>
 
 ## GENERIC UPGRADE INSTRUCTIONS (version 7.0 +)
 
@@ -47,7 +47,7 @@ wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 ```
 
 Select your operating system config from <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/>
-**replace os.ubuntu.conf with your required config, centos7/8 = os.centos.conf , debian9/10 = os.debian.conf**
+**replace os.ubuntu.conf with your required config, rhel/rocky/alma 8/9/10 = os.rhel.conf , centos7 = os.centos.conf , debian = os.debian.conf , macOS Apple Silicon = os.macos.applesilicon.conf**
 
 ```bash
 os_conf="os.ubuntu.conf"

@@ -1,4 +1,4 @@
-# clamav-unofficial-sigs [![GitHub Release](https://img.shields.io/github/release/extremeshok/clamav-unofficial-sigs.svg?label=Latest)](https://github.com/extremeshok/clamav-unofficial-sigs/releases/latest) [![Issue Count](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/issue_count.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
+# clamav-unofficial-sigs [![GitHub Release](https://img.shields.io/github/release/extremeshok/clamav-unofficial-sigs.svg?label=Latest)](https://github.com/extremeshok/clamav-unofficial-sigs/releases/latest) [![CI](https://github.com/extremeshok/clamav-unofficial-sigs/actions/workflows/ci.yml/badge.svg)](https://github.com/extremeshok/clamav-unofficial-sigs/actions/workflows/ci.yml)
 
 ClamAV Unofficial Signatures Updater
 
@@ -10,9 +10,11 @@ The clamav-unofficial-sigs script provides a simple way to download, test, and u
 
 ### Automated Testing and Linting
 
-* Travis-CI
+* GitHub Actions
 * Linting with markdownlint-cli and shellcheck
-* Testing with Ubuntu Focal and macOS / OSX
+* Config parse and dry-run testing with ClamAV on Ubuntu 22.04 and 24.04
+* Upgrade-path guard: the previous release must be able to parse the current master.conf
+* Weekly automated liveness checks of the signature source mirrors
 
 ### Checkout some of our other solutions: <https://github.com/extremeshok?tab=repositories>
 
@@ -29,7 +31,7 @@ Please post them on the issue tracker: <https://github.com/extremeshok/clamav-un
 
 ### Supported Operating Systems
 
-Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS), pfSense, Zimbra and derivative systems
+Debian, Ubuntu, Raspbian, RHEL (Rocky Linux, AlmaLinux, CentOS and clones), Fedora, OpenBSD, FreeBSD, OpenSUSE, Archlinux, Alpine, macOS (Intel and Apple Silicon), Slackware, Solaris (Sun OS), pfSense, Zimbra and derivative systems
 
 ### Quick Install and Upgrade Guide
 
@@ -88,13 +90,13 @@ Usage of free URLhaus Database: <https://urlhaus.abuse.ch>
 
 * Enabled by default
 
-### Yara-Rules Project Support (as of June 2015, updated January 2020)
+### Yara-Rules Project Support (DEPRECATED as of version 8.0.0)
 
-Usage of free Yara-Rules Project: <http://yararules.com>
+The upstream Yara-Rules project repository is unmaintained and several of its rules fail to load or crash modern ClamAV releases
 
-* Enabled by default
+* Disabled by default, enable at your own risk with yararulesproject_enabled="yes"
 
-Current limitations of clamav support: <http://blog.clamav.net/search/label/yara>
+Current limitations of clamav yara support: <https://docs.clamav.net/manual/Signatures/YaraRules.html>
 
 ### interServer free database support (as of December 2020)
 
