@@ -1,4 +1,10 @@
 # Basic guide to Installing and Updating on macOS and OSX
+
+> **Apple Silicon (M1 and newer) note:** Homebrew uses the `/opt/homebrew` prefix
+> instead of `/usr/local`. Use `config/os/os.macos.applesilicon.conf` as your os.conf,
+> install the config to `/opt/homebrew/etc/clamav-unofficial-sigs/` and substitute
+> `/usr/local` with `/opt/homebrew` in the paths below.
+
 Press Command+Space and type Terminal and press enter/return key.
 Run all the following in the Terminal app:
 
