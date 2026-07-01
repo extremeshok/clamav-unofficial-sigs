@@ -83,6 +83,7 @@ function xshok_create_pid_file() { # pid.file
 }
 
 # Intercept ctrl+c and calls the cleanup function
+# shellcheck disable=SC2317 # invoked indirectly via trap
 function xshok_control_c() {
   echo
   xshok_pretty_echo_and_log "---------------| Exiting ... Please wait |---------------" "-"
@@ -1674,6 +1675,7 @@ fi
 # Solaris command -v function returns garbage when the program is not found k
 # only define the new command -v function if running under Solaris
 if [ "$(uname -s)" == "SunOS" ] ; then
+  # shellcheck disable=SC2317 # invoked indirectly as a which replacement
   function which() {
     # Use the switch -p to ignore ksh internal commands
     ksh whence -p "$@"
@@ -2622,10 +2624,10 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
       malwarepatrol_product_code="32"
       malwarepatrol_list="clamav_basic"
     else
-      if [ -z $malwarepatrol_list ] ; then
+      if [ -z "$malwarepatrol_list" ] ; then
         malwarepatrol_list="clamav_basic"
       fi
-      if [ -z $malwarepatrol_product_code ] ; then
+      if [ -z "$malwarepatrol_product_code" ] ; then
         # Not sure, it may be better to return an error.
         malwarepatrol_product_code=32
       fi

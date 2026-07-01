@@ -10,7 +10,8 @@ export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/lo
 pwd
 
 echo "Shellcheck-ing script"
-shellcheck --exclude=SC2128,SC2154,SC2001,SC2119,SC2120 --shell=bash clamav-unofficial-sigs.sh
+# All remaining exceptions are inline 'shellcheck disable' directives with reasons
+shellcheck --shell=bash clamav-unofficial-sigs.sh
 if [ "$?" -eq "0" ] ; then
 	echo .. OK
 else
