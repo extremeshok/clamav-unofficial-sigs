@@ -1785,20 +1785,10 @@ for config_file in "${config_files[@]}" ; do
     # Config stripping
     xshok_pretty_echo_and_log "Loading config: ${config_file}"
 
-    if [ "$(uname -s)" == "SunOS" ] ; then
-      # Solaris FIXES only, i had issues with running with a single command..
-      clean_config="$(command "$sed_bin" -e '/^#.*/d' "$config_file")" # Comment line
-      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/#[[:space:]].*//')" # Comment line (duplicated)
-      clean_config=${clean_config//\#*/} # Comment line (duplicated)
-      # shellcheck disable=SC2001
-      clean_config="$(echo "$clean_config" | $sed_bin -e '/^[[:blank:]]*#/d;s/#.*//')" # Comments at end of line
-      #clean_config="$(echo "$clean_config" | $sed_bin -e 's/^[[:blank:]]*//;s/[[:blank:]]*$//')" # trailing and leading whitespace
-      clean_config="$(echo "$clean_config" | xargs)"
-      # shellcheck disable=SC2001
-      clean_config="$(echo "$clean_config" | $sed_bin -e '/^\s*$/d')" # Blank lines
-
-    elif [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
-      # macOS / OSX / BSD fixes, had issues with running with a single command and with SunOS work around..
+    if [ "$(uname -s)" == "SunOS" ] || [ "$(uname -s)" == "Darwin" ] || [ "$(uname -s)" == "OpenBSD" ] || [ "$(uname -s)" == "NetBSD" ] || [ "$(uname -s)" == "FreeBSD" ] ; then
+      # Solaris / macOS / OSX / BSD fixes, had issues with running with a single command..
+      # NOTE: never pipe the config through xargs here, it strips the quotes and
+      # breaks multi-word values such as clamd_reload_opt="clamdscan --reload"
       # shellcheck disable=SC2001
       clean_config="$(command "$sed_bin" -e '/^#.*/d' "$config_file")" # Comment line
       # shellcheck disable=SC2001
