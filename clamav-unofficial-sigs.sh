@@ -1904,7 +1904,7 @@ fi
 if [ -z "$work_dir_linuxmalwaredetect" ] ; then
   work_dir_linuxmalwaredetect="$(echo "${work_dir}/${linuxmalwaredetect_dir}" | $sed_bin 's:/*$::')"
 else
-  shopt -s extglob; work_dir_malwarepatrol="${work_dir_malwarepatrol%%+(/)}"
+  shopt -s extglob; work_dir_linuxmalwaredetect="${work_dir_linuxmalwaredetect%%+(/)}"
 fi
 if [ -z "$work_dir_interserver" ] ; then
   work_dir_interserver="$(echo "${work_dir}/${interserver_dir}" | $sed_bin 's:/*$::')"
