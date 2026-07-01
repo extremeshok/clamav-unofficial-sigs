@@ -1,0 +1,131 @@
+###################
+# This is property of eXtremeSHOK.com
+# You are free to use, modify and distribute, however you may not remove this notice.
+# Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+# License: BSD (Berkeley Software Distribution)
+##################
+name: CI
+
+on:
+  push:
+    branches: [master, dev]
+  pull_request:
+  schedule:
+    # weekly liveness check of the signature source mirrors
+    - cron: '17 4 * * 1'
+
+jobs:
+  lint:
+    name: Shellcheck and syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+      - name: Bash syntax check
+        run: |
+          bash -n clamav-unofficial-sigs.sh
+          for f in .t/*.sh dev/*.sh; do bash -n "$f"; done
+      - name: Shellcheck
+        run: sh -e .t/ci-shellcheck.sh
+      - name: Release integrity assertions
+        run: |
+          # the self-updater requires the last line to be exactly 'exit $?'
+          test "$(tail -n 1 clamav-unofficial-sigs.sh | cut -c 1-7)" = 'exit $?'
+          # exactly one script_version definition
+          test "$(grep -c '^script_version=' clamav-unofficial-sigs.sh)" = "1"
+          # master.conf must have an even number of quotes and no stray %
+          q="$(grep -o '"' config/master.conf | wc -l)"
+          test "$((q % 2))" = "0"
+
+  config-smoke:
+    name: Config parse and dry-run (ClamAV ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq clamav rsync bind9-dnsutils curl wget
+      - name: Build scratch config
+        run: |
+          sudo mkdir -p /etc/clamav-unofficial-sigs /var/lib/clamav-test
+          sudo cp config/master.conf /etc/clamav-unofficial-sigs/master.conf
+          sudo cp config/os/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
+          sudo tee /etc/clamav-unofficial-sigs/user.conf > /dev/null <<CONF
+          user_configuration_complete="yes"
+          work_dir="/var/lib/clamav-test/work"
+          clam_dbs="/var/lib/clamav-test/dbs"
+          log_file_path="/var/lib/clamav-test/log"
+          clam_user="root"
+          clam_group="root"
+          setmode="no"
+          reload_dbs="no"
+          enable_gpg="no"
+          enable_random="no"
+          allow_upgrades="no"
+          allow_update_checks="no"
+          sanesecurity_enabled="no"
+          securiteinfo_enabled="no"
+          linuxmalwaredetect_enabled="no"
+          interserver_enabled="no"
+          malwareexpert_enabled="no"
+          malwarepatrol_enabled="no"
+          urlhaus_enabled="no"
+          yararulesproject_enabled="no"
+          additional_enabled="no"
+          remove_disabled_databases="no"
+          CONF
+      - name: Information run
+        run: sudo bash clamav-unofficial-sigs.sh --information
+      - name: Dry run with all sources disabled
+        run: sudo bash clamav-unofficial-sigs.sh --force
+      - name: Every os config parses
+        run: |
+          for conf in config/os/os.*.conf; do
+            sudo cp "$conf" /etc/clamav-unofficial-sigs/os.conf
+            # binary-path errors are environmental, parse/config errors are not
+            out="$(sudo bash clamav-unofficial-sigs.sh --information 2>&1)" \
+              || echo "$out" | grep -q "is not executable" \
+              || { echo "$conf FAILED:"; echo "$out" | tail -5; exit 1; }
+            echo "$conf OK"
+          done
+          sudo cp config/os/os.ubuntu.conf /etc/clamav-unofficial-sigs/os.conf
+      - name: Upgrade-path guard (v7.2.5 parser reads new master.conf)
+        run: |
+          git show 7.2.5:clamav-unofficial-sigs.sh > /tmp/old-release.sh 2>/dev/null \
+            || git show ececc4b53286666d9bb65336a9ab079c804b28a6:clamav-unofficial-sigs.sh > /tmp/old-release.sh
+          sudo bash /tmp/old-release.sh --information
+
+  markdownlint:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - run: npx --yes markdownlint-cli@0.41.0 '*.md' 'guides/*.md' || true
+
+  source-liveness:
+    name: Signature source liveness
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    continue-on-error: true
+    steps:
+      - name: Probe signature sources
+        run: |
+          set +e; fail=0
+          probe() {
+            code="$(curl -sS -o /dev/null -m 30 -w '%{http_code}' -A 'clamav-unofficial-sigs-ci' "$1")"
+            echo "$code $1"
+            case "$code" in 2*|3*|401|403) ;; *) fail=1 ;; esac
+          }
+          probe "https://urlhaus.abuse.ch/downloads/urlhaus.ndb"
+          probe "https://cdn.rfxn.com/downloads/maldet.sigs.ver"
+          probe "https://sigs.interserver.net/interservertopline.db"
+          probe "https://www.securiteinfo.com/"
+          probe "https://lists.malwarepatrol.net/"
+          probe "https://www.sanesecurity.com/publickey.gpg"
+          exit $fail
