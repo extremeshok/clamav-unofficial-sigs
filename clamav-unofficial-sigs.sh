@@ -4229,7 +4229,7 @@ if [ -n "$additional_dbs" ] ; then
           # Maybe better to process each file inside work_dir_add in its own for loop.
           if [ "$ret" -eq 0 ] ; then
             for db_file in ${work_dir_add}/${db_basefile}; do
-              db_file="${db_file#${work_dir_add}/}"
+              db_file="${db_file#"${work_dir_add}"/}"
               loop="1"
               if ! cmp -s "${work_dir_add}/${db_file}" "${clam_dbs}/${db_file}" ; then
                 db_ext="${db_file#*.}"
