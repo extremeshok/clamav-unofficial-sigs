@@ -3805,13 +3805,17 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
             malwarepatrol_db_update="0"
 
             xshok_file_download "${work_dir_malwarepatrol}/${malwarepatrol_db}" "${malwarepatrol_url}"
-
-            #Check if Google Drive entries need to be removed
-            if [ "$malwarepatrol_whitelist_googledrive" == "yes" ] ; then
-                sed -i '/\=68747470733a2f2f64726976652e676f6f676c652e636f6d$/d' "${work_dir_malwarepatrol}/${malwarepatrol_db}"
-            fi
-            
             ret="$?"
+
+            if [ "$ret" -eq 0 ] && [ -f "${work_dir_malwarepatrol}/${malwarepatrol_db}" ] ; then
+              #Check if Google Drive entries need to be removed
+              if [ "$malwarepatrol_whitelist_googledrive" == "yes" ] ; then
+                awk '!/=68747470733a2f2f64726976652e676f6f676c652e636f6d$/' "${work_dir_malwarepatrol}/${malwarepatrol_db}" > "${work_dir_malwarepatrol}/${malwarepatrol_db}-tmp" && mv -f "${work_dir_malwarepatrol}/${malwarepatrol_db}-tmp" "${work_dir_malwarepatrol}/${malwarepatrol_db}"
+              fi
+              # Remove signatures longer than 8189 characters, clamav rejects
+              # lines over 8kb and would fail to load the entire database
+              awk 'length($0) <= 8189' "${work_dir_malwarepatrol}/${malwarepatrol_db}" > "${work_dir_malwarepatrol}/${malwarepatrol_db}-tmp" && mv -f "${work_dir_malwarepatrol}/${malwarepatrol_db}-tmp" "${work_dir_malwarepatrol}/${malwarepatrol_db}"
+            fi
             if [ "$ret" -eq 0 ] ; then
               loop="1"
               if ! cmp -s "${work_dir_malwarepatrol}/${malwarepatrol_db}" "${clam_dbs}/${malwarepatrol_db}" ; then
