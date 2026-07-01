@@ -222,6 +222,36 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### Version 8.0.0 (01 July 2026)
+
+* eXtremeSHOK.com Maintenance
+* Support for modern ClamAV releases (1.x series, tested against ClamAV 1.4 LTS), robust version comparison for clamav/script/config versions
+* Added : GitHub Actions CI (shellcheck, config parse smoke tests with real clamav, upgrade-path guard, weekly signature source liveness checks), replaces the defunct Travis-CI / Code Climate
+* Added : SecuriteInfo premium databases securiteinfo.pdb, securiteinfo.wdb and securiteinfo.yara
+* Added : os.rhel.conf for RHEL / Rocky Linux / AlmaLinux 8, 9 and 10
+* Added : os.macos.applesilicon.conf and /opt/homebrew config detection for Apple Silicon Macs
+* Added : clamd socket RELOAD fallback when clamd_reload_opt fails
+* Added : rsync wildcard support for additional databases, thanks @amulet1
+* Added : MalwarePatrol Google Drive whitelisting option (malwarepatrol_whitelist_googledrive), thanks @perplexityjeff
+* Fixed : urlhaus database directory never created, urlhaus updates now work, thanks @robert-scheck @Devstellar @amartin-git
+* Fixed : multiple command line options were ignored (only the first was parsed)
+* Fixed : config parser stripped quotes on Solaris, breaking clamd_reload_opt
+* Fixed : signature whitelisting (-w) for logical (ldb) signatures, thanks @falon
+* Fixed : permissions preservation during upgrades on BSD / OpenBSD (portable stat), thanks @dspruell
+* Fixed : MalwarePatrol signatures longer than 8189 characters are filtered out, thanks @justcsdr
+* Fixed : MalwarePatrol free product code updated to 32, thanks @mizzy241
+* Fixed : cron minute randomisation off-by-one
+* Fixed : wget download path no longer changes directories or creates symlinks
+* Fixed : work_dir_linuxmalwaredetect override trimming the wrong variable
+* Fixed : stray backslash warning from modern grep, thanks @code-chicken
+* Deprecated : yararulesproject databases are now disabled by default, the upstream Yara-Rules/rules repository is unmaintained and some rules crash modern clamav
+* Removed : deprecated bank_rule.yar, thanks @mnalis
+* Removed : percent signs in master.conf comments which could break config parsing, thanks @stevenhardey
+* Refresh : os.debian.conf and os.ubuntu.conf for current releases, EOL os configs marked deprecated
+* Refresh : systemd clamd.scan.service uses a drop-in override instead of the removed .include directive
+* Default clam_user/clam_group defined out of the box, thanks @VVelox
+* Incremented the config to version 100
+
 ### Version 7.2.5 (20 March 2021)
 * eXtremeSHOK.com Maintenance
 * Added : os.centos7-cpanel.conf
