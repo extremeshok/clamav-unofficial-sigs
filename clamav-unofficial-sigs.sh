@@ -358,34 +358,26 @@ function xshok_file_download() { #outputfile #url #notimestamp
             fi
         else
             if [ ! "${3}" ] ; then
-                # the following is required because wget, cannot do --timestamping and --output-document together
-                this_dir="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+                # wget cannot do --timestamping and --output-document together
                 output_file="$1"
                 url="$2"
                 output_dir="${output_file%/*}"
-                output_file="${output_file##*/}"
+                output_file_name="${output_file##*/}"
                 url_file="${url##*/}"
-                wget_output_link=""
 
-                cd "${output_dir}" || exit
-                if [ "$output_file" != "$url_file" ] ; then
-                    if [ ! -f "$url_file" ] ; then
-                        if [ ! -f "$output_file" ] ; then
-                            touch "$output_file"
-                        fi
-                        ln -s  "$output_file" "$url_file"
-                        wget_output_link="$url_file"
-                    fi
+                if [ "$output_file_name" == "$url_file" ] ; then
+                    # Download with timestamping into the target directory,
+                    # no directory change or symlink workarounds required
+                    # shellcheck disable=SC2086
+                    $wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping --directory-prefix="${output_dir}" "${2}" 2>&12
+                    result=$?
+                else
+                    # Output filename differs from the url filename,
+                    # timestamping is not possible, plain download
+                    # shellcheck disable=SC2086
+                    $wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}" 2>&12
+                    result=$?
                 fi
-          # shellcheck disable=SC2086
-                $wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --timestamping "${2}" 2>&12
-                result=$?
-                if [ -z "$wget_output_link" ] ; then
-                    if [ -L "$wget_output_link" ] ; then
-                        rm -f "$wget_output_link"
-                    fi
-                fi
-                cd "$this_dir" || exit
             else
                 # shellcheck disable=SC2086
                 $wget_bin $wget_compression $wget_proxy $wget_insecure $wget_output_level --connect-timeout="${downloader_connect_timeout}" --random-wait --tries="${downloader_tries}" --timeout="${downloader_max_time}" --output-document="${1}" "${2}" 2>&12
