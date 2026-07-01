@@ -1605,45 +1605,51 @@ we_have_a_config="0"
 
 
 # Attempt to scan for a valid config dir
+# NOTE: a missing config dir is only fatal after command line parsing,
+# so that -c/--config can still supply a custom config on fresh systems
 if [ -f "/etc/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/etc/clamav-unofficial-sigs"
 elif [ -f "/usr/local/etc/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/usr/local/etc/clamav-unofficial-sigs/"
+elif [ -f "/opt/homebrew/etc/clamav-unofficial-sigs/master.conf" ] ; then
+  # macOS Apple Silicon homebrew
+  config_dir="/opt/homebrew/etc/clamav-unofficial-sigs/"
 elif [ -f "/opt/zimbra/conf/clamav-unofficial-sigs/master.conf" ] ; then
   config_dir="/opt/zimbra/conf/clamav-unofficial-sigs/"
 else
-  xshok_pretty_echo_and_log "ERROR: config_dir (/etc/clamav-unofficial-sigs/master.conf) could not be found"
-  exit 1
+  config_dir=""
 fi
 # Default config files
-if [ -r "${config_dir}/master.conf" ] ; then
-    config_files+=( "${config_dir}/master.conf" )
-else
-    xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not readable"
-    exit 1
-fi
-if [ -r "${config_dir}/os.conf" ] ; then
-    config_files+=( "${config_dir}/os.conf" )
-else
-    #find the a suitable os.*.conf file
-    os_config_number=$(find "$config_dir" -type f -iname "os.*.conf" | wc -l)
-    if [ "$os_config_number" == "0" ] ; then
-        xshok_pretty_echo_and_log "WARNING: no os.conf or os.*.conf found"
-    elif [ "$os_config_number" == "1" ] ; then
-        config_file="$(find "$config_dir" -type f -iname "os.*.conf" | head -n1)"
-        if [ -r "${config_file}" ]; then
-            config_files+=( "${config_file}" )
-        else
-            xshok_pretty_echo_and_log "WARNING: ${config_file} is not readable"
-        fi
-    else
-        xshok_pretty_echo_and_log "WARNING: Too many os.*.conf configs found"
-    fi
-fi
-if [ -r "${config_dir}/user.conf" ] ; then
-    config_files+=( "${config_dir}/user.conf" )
-else
-    xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf is not readable"
+if [ -n "$config_dir" ] ; then
+  if [ -r "${config_dir}/master.conf" ] ; then
+      config_files+=( "${config_dir}/master.conf" )
+  else
+      xshok_pretty_echo_and_log "ERROR: ${config_dir}/master.conf is not readable"
+      exit 1
+  fi
+  if [ -r "${config_dir}/os.conf" ] ; then
+      config_files+=( "${config_dir}/os.conf" )
+  else
+      #find the a suitable os.*.conf file
+      os_config_number=$(find "$config_dir" -type f -iname "os.*.conf" | wc -l)
+      if [ "$os_config_number" == "0" ] ; then
+          xshok_pretty_echo_and_log "WARNING: no os.conf or os.*.conf found"
+      elif [ "$os_config_number" == "1" ] ; then
+          config_file="$(find "$config_dir" -type f -iname "os.*.conf" | head -n1)"
+          if [ -r "${config_file}" ]; then
+              config_files+=( "${config_file}" )
+          else
+              xshok_pretty_echo_and_log "WARNING: ${config_file} is not readable"
+          fi
+      else
+          xshok_pretty_echo_and_log "WARNING: Too many os.*.conf configs found"
+      fi
+  fi
+  if [ -r "${config_dir}/user.conf" ] ; then
+      config_files+=( "${config_dir}/user.conf" )
+  else
+      xshok_pretty_echo_and_log "WARNING: ${config_dir}/user.conf is not readable"
+  fi
 fi
 
 # Solaris command -v function returns garbage when the program is not found k
@@ -1784,6 +1790,9 @@ if [ "$custom_config" != "no" ] ; then
   else
     config_files=( "$custom_config" )
   fi
+elif [ -z "$config_dir" ] ; then
+  xshok_pretty_echo_and_log "ERROR: config_dir (/etc/clamav-unofficial-sigs/master.conf) could not be found and no custom config was given with -c/--config"
+  exit 1
 fi
 
 for config_file in "${config_files[@]}" ; do
