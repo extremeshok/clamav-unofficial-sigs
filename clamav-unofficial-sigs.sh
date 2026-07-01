@@ -327,6 +327,19 @@ function xshok_draw_time_remaining() { #time_remaining #update_hours #name
   fi
 }
 
+# Portable octal file mode function, GNU stat, BSD stat, fallback default
+function xshok_stat_octal() { #file #defaultmode
+  OCTAL_MODE="$(stat -c "%a" "${1}" 2> /dev/null)"
+  if [ -z "$OCTAL_MODE" ] ; then
+    # BSD / macOS / OpenBSD / Solaris
+    OCTAL_MODE="$(stat -f '%OLp' "${1}" 2> /dev/null)"
+  fi
+  if [ -z "$OCTAL_MODE" ] ; then
+    OCTAL_MODE="${2:-644}"
+  fi
+  echo "$OCTAL_MODE"
+}
+
 # Download function
 function xshok_file_download() { #outputfile #url #notimestamp
     if [ "$downloader_debug" == "yes" ] ; then
@@ -757,10 +770,7 @@ function xshok_upgrade() {
                     exit 1
                 fi
                 # Copy over permissions from old version
-                OCTAL_MODE="$(stat -c "%a" "${config_dir}/master.conf" 2> /dev/null)"
-                if [ -z "$OCTAL_MODE" ]; then
-                  OCTAL_MODE="$(stat -f '%p' "${config_dir}/master.conf")"
-                fi
+                OCTAL_MODE="$(xshok_stat_octal "${config_dir}/master.conf" "644")"
 
                 xshok_pretty_echo_and_log "Running update process"
                 if ! mv -f "${work_dir}/master.conf.tmp" "${config_dir}/master.conf" ; then
@@ -798,10 +808,7 @@ function xshok_upgrade() {
                     exit 1
                 fi
                 # Copy over permissions from old version
-                OCTAL_MODE="$(stat -c "%a" "${this_script_full_path}" 2> /dev/null)"
-                if [ -z "$OCTAL_MODE" ]; then
-                    OCTAL_MODE="$(stat -f '%p' "${this_script_full_path}")"
-                fi
+                OCTAL_MODE="$(xshok_stat_octal "${this_script_full_path}" "755")"
                 xshok_pretty_echo_and_log "Inserting update process..."
               # Generate the update script
               cat > "${work_dir}/xshok_update_script.sh" << EOF
