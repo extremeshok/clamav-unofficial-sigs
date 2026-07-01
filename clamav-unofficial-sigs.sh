@@ -1252,13 +1252,16 @@ function add_signature_whitelist_entry() { #signature
             sig_extension=${sig_full%%\:*}
             sig_extension=${sig_extension##*\.}
             shopt -s nocasematch
-            if [ "$sig_extension" == "hdb" ] || [ "$sig_extension" == "hsb" ] || [ "$sig_extension" == "hdu " ] || [ "$sig_extension" == "hsu" ] || [ "$sig_extension" == "mdb" ] || [ "$sig_extension" == "msb" ] || [ "$sig_extension" == "mdu" ] || [ "$sig_extension" == "msu" ] ; then
+            if [ "$sig_extension" == "hdb" ] || [ "$sig_extension" == "hsb" ] || [ "$sig_extension" == "hdu" ] || [ "$sig_extension" == "hsu" ] || [ "$sig_extension" == "mdb" ] || [ "$sig_extension" == "msb" ] || [ "$sig_extension" == "mdu" ] || [ "$sig_extension" == "msu" ] ; then
                 # Hash-based Signature Database
                 position="4"
+                sig_name="$(echo "$sig_full" | cut -d ":" -f $position | cut -d "=" -f 1)"
             else
+                # Body/logical Signature Database, strip logical signature
+                # separators (;) so ldb entries resolve to the signature name
                 position="2"
+                sig_name="$(echo "$sig_full" | cut -d ":" -f $position | cut -d ";" -f 1 | cut -d "=" -f 1)"
             fi
-            sig_name="$(echo "$sig_full" | cut -d ":" -f $position | cut -d "=" -f 1)"
         fi
 
     if [ -n "$sig_name" ] ; then
