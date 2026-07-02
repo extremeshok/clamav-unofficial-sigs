@@ -37,9 +37,22 @@ Debian, Ubuntu, Raspbian, RHEL (Rocky Linux, AlmaLinux, CentOS and clones), Fedo
 
 <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/INSTALL.md>
 
+### Docker
+
+Official image built on `clamav/clamav:stable`, see the [docker guide](https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/docker.md)
+
+```bash
+# all-in-one: clamd + freshclam + unofficial signatures
+docker run -d -p 3310:3310 -v clamdb:/var/lib/clamav ghcr.io/extremeshok/clamav-unofficial-sigs:latest
+# updater sidecar for an existing clamd
+docker run -d -e CUS_MODE=updater -v clamdb:/var/lib/clamav ghcr.io/extremeshok/clamav-unofficial-sigs:latest
+```
+
 ### Operating System Specific Install and Upgrade Guides
 
-* CentOS: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md>
+* Docker: <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/docker.md>
+* RHEL / Rocky / Alma: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/rhel.md>
+* CentOS 7 (EOL): <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md>
 * Ubuntu: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
 * Debian: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
 * macOS: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macos.md>
@@ -150,6 +163,30 @@ Usage of free Linux Malware Detect clamav signatures: <https://www.rfxn.com/proj
 
 * Enabled by default, no configuration required
 
+### False positives and whitelisting signatures (FAQ)
+
+A third-party signature fired on a clean file or legitimate mail (the signature name ends in `.UNOFFICIAL`)? You have several options, from most to least targeted:
+
+1. **Whitelist the individual signature** (recommended):
+
+    ```bash
+    clamav-unofficial-sigs.sh --whitelist 'Sanesecurity.Junk.12345'
+    ```
+
+    This adds the signature to `my-whitelist.ign2`, tells ClamAV to ignore it, and keeps ignoring it when databases update. Works for all regular database types (ndb, hdb, ldb, db, ...). Report persistent false positives to the signature provider (eg. Sanesecurity has a false positive report form) so everyone benefits.
+
+2. **YARA rules cannot be ignored via ign2** — this is a ClamAV limitation, entries such as `YARA.rulename.UNOFFICIAL` in an ign2 file have no effect. Instead, remove or disable the specific `.yar` file that contains the rule: set its entry to `DISABLED` in your user.conf, eg.
+
+    ```bash
+    yararulesproject_dbs+=( "email/Email_generic_phishing.yar|DISABLED" )
+    ```
+
+    or disable the yara rules of that source entirely (`enable_yararules="no"` disables yara files across all sources).
+
+3. **Downgrade or disable a whole database** that produces too many false positives for your environment: set the database entry or the per-source rating (`<source>_dbs_rating`) to a lower level or `DISABLE` in user.conf.
+
+4. **Ham directory scanning**: set `ham_dir` in user.conf to a directory of known-clean mail and the script automatically removes ndb signatures that match your ham before installing updated databases.
+
 ### If you want to add, report a missing one or have a problem with a database
 
 Please post on the issue tracker: <https://github.com/extremeshok/clamav-unofficial-sigs/issues>
@@ -237,6 +274,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 ### Version 8.0.0 (01 July 2026)
 
 * eXtremeSHOK.com Maintenance
+* Added : Official Docker image built on clamav/clamav:stable with all-in-one and updater-sidecar modes, multi-arch (amd64/arm64), weekly rebuilds, published to ghcr.io - thanks @mnalis for the original Dockerfile concept
 * Added : ditekshen/detection database source (disabled by default)
 * Added : twinclams database source (disabled by default)
 * Fixed : urlhaus databases were removed by the database cleanup directly after installing (missing from the current-databases tracking)
