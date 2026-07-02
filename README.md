@@ -98,6 +98,18 @@ The upstream Yara-Rules project repository is unmaintained and several of its ru
 
 Current limitations of clamav yara support: <https://docs.clamav.net/manual/Signatures/YaraRules.html>
 
+### ditekshen/detection database support (as of July 2026)
+
+Native ClamAV signatures from <https://github.com/ditekshen/detection>
+
+* Disabled by default, enable with ditekshen_enabled="yes"
+
+### twinclams database support (as of July 2026)
+
+ClamAV signatures from <https://github.com/twinwave-security/twinclams> (Splunk/TwinWave)
+
+* Disabled by default, enable with twinclams_enabled="yes"
+
 ### interServer free database support (as of December 2020)
 
 Usage of interServer: <http://rbluri.interserver.net>
@@ -225,6 +237,11 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 ### Version 8.0.0 (01 July 2026)
 
 * eXtremeSHOK.com Maintenance
+* Added : ditekshen/detection database source (disabled by default)
+* Added : twinclams database source (disabled by default)
+* Fixed : urlhaus databases were removed by the database cleanup directly after installing (missing from the current-databases tracking)
+* Fixed : keep_db_backup wrote all backups to a single _file-bak file, backups are now per-database <database>-bak files
+* Refactor : consolidated the per-source database test and install logic into shared functions (~380 fewer lines)
 * Support for modern ClamAV releases (1.x series, tested against ClamAV 1.4 LTS), robust version comparison for clamav/script/config versions
 * Added : GitHub Actions CI (shellcheck, config parse smoke tests with real clamav, upgrade-path guard, weekly signature source liveness checks), replaces the defunct Travis-CI / Code Climate
 * Added : SecuriteInfo premium databases securiteinfo.pdb, securiteinfo.wdb and securiteinfo.yara
