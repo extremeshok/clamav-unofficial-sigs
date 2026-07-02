@@ -3013,7 +3013,9 @@ xshok_mkdir_ownership "$work_dir_twinclams"
 # Set secured access permissions to the GPG directory
 perms chmod -f 0700 "${work_dir_gpg}"
 
-if [ "$enable_gpg" == "yes" ] ; then
+# The GPG key is only used to verify sanesecurity downloads, skip the
+# key setup entirely when sanesecurity is disabled
+if [ "$enable_gpg" == "yes" ] && [ "$sanesecurity_enabled" == "yes" ] ; then
   # If we haven't done so yet, download Sanesecurity public GPG key and import to custom keyring.
   if [ ! -s "${work_dir_gpg}/publickey.gpg" ] ; then
     xshok_file_download "${work_dir_gpg}/publickey.gpg" "$sanesecurity_gpg_url"
