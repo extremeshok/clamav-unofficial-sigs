@@ -335,6 +335,23 @@ function xshok_version_to_int() { #version
   echo "${1}" | $sed_bin -e 's/^[^0-9]*//' -e 's/[^0-9.].*//' | awk -F "." '{ printf("%d%03d%03d%03d\n", $1,$2,$3,$4); }'
 }
 
+# Minimal rsync replacement used when rsync is not installed and no rsync
+# based sources are enabled, supports only the local '-pcqt <file> <dir>'
+# copy used to install databases
+# shellcheck disable=SC2317 # invoked indirectly via $rsync_bin
+function xshok_rsync_shim() {
+  case "${1}" in
+    --version) echo "xshok_rsync_shim (cp fallback, rsync not installed)" ;;
+    --help) return 0 ;;
+    -pcqt)
+      if ! cmp -s "${2}" "${3}/$(basename "${2}")" 2>/dev/null ; then
+        cp -f -p "${2}" "${3}/"
+      fi
+      ;;
+    *) return 1 ;;
+  esac
+}
+
 # Portable octal file mode function, GNU stat, BSD stat, fallback default
 function xshok_stat_octal() { #file #defaultmode
   OCTAL_MODE="$(stat -c "%a" "${1}" 2> /dev/null)"
@@ -2113,8 +2130,13 @@ fi
 if [ -z "$rsync_bin" ] ; then
     rsync_bin="$(command -v rsync 2> /dev/null)"
     if [ -z "$rsync_bin" ] ; then
-        xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found"
-        exit 1
+        if [ "$sanesecurity_enabled" == "yes" ] ; then
+            xshok_pretty_echo_and_log "ERROR: rsync binary (rsync_bin) not found, rsync is required for sanesecurity, install rsync or disable sanesecurity"
+            exit 1
+        fi
+        # https only setups can run without rsync (issue #366)
+        xshok_pretty_echo_and_log "WARNING: rsync not found, using an internal cp fallback, rsync urls in additional_dbs will be skipped"
+        rsync_bin="xshok_rsync_shim"
     fi
 elif [[ "$rsync_bin" =~ "/" ]] ; then
     if [ ! -x "$rsync_bin" ] ; then
@@ -4227,8 +4249,13 @@ if [ -n "$additional_dbs" ] ; then
           additional_db_update="0"
 
           if [ "${db_url%:*}" == "rsync" ] ; then
+            if [ "$rsync_bin" == "xshok_rsync_shim" ] ; then
+              xshok_pretty_echo_and_log "WARNING: rsync is not installed - SKIPPED additional rsync url ${db_url}"
+              false
+            else
             # shellcheck disable=SC2086
             $rsync_bin $rsync_output_level $no_motd -ctuz $connect_timeout --timeout="$rsync_max_time" --exclude=*.txt --exclude=*.sha256 --exclude=*.sig --exclude=*.gz "$db_url" "$work_dir_add" 2>&13
+            fi
             ret="$?"
           else
             xshok_file_download "${work_dir_add}/${db_basefile}" "$db_url"
