@@ -1660,7 +1660,7 @@ EOF
 
 # Script Info
 script_version="8.0.0"
-script_version_date="2026-07-01"
+script_version_date="2026-07-02"
 minimum_required_config_version="96"
 minimum_yara_clamav_version="0.100"
 

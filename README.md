@@ -272,7 +272,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
-### Version 8.0.0 (01 July 2026)
+### Version 8.0.0 (02 July 2026)
 
 * eXtremeSHOK.com Maintenance
 * Added : Official Docker image built on clamav/clamav:stable with all-in-one and updater-sidecar modes, multi-arch (amd64/arm64), weekly rebuilds, published to ghcr.io - thanks @mnalis for the original Dockerfile concept
