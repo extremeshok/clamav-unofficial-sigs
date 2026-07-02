@@ -23,9 +23,10 @@ jobs:
     name: Publish GitHub release
     runs-on: ubuntu-latest
     steps:
+      # no explicit ref: a tag push checks out the tag, a manual dispatch
+      # checks out the branch it was dispatched on, so the notes file can be
+      # newer than the tag it describes
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.tag || github.ref_name }}
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
