@@ -31,12 +31,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ; then
-            echo "Release $TAG already exists, nothing to do"
-            exit 0
-          fi
           # release notes live in the repo, fall back to the auto-generated ones
           notes=".github/release-notes/${TAG}.md"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ; then
+            if [ -f "$notes" ] ; then
+              echo "Release $TAG already exists, syncing notes from ${notes}"
+              gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --notes-file "$notes"
+            else
+              echo "Release $TAG already exists, nothing to do"
+            fi
+            exit 0
+          fi
           if [ -f "$notes" ] ; then
             gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "$TAG" --notes-file "$notes"
           else
