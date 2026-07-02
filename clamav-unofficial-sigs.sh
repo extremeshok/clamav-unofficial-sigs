@@ -2014,6 +2014,16 @@ if [ -z "$work_dir_urlhaus" ] ; then
 else
   shopt -s extglob; work_dir_urlhaus="${work_dir_urlhaus%%+(/)}"
 fi
+if [ -z "$work_dir_ditekshen" ] ; then
+  work_dir_ditekshen="$(echo "${work_dir}/${ditekshen_dir}" | $sed_bin 's:/*$::')"
+else
+  shopt -s extglob; work_dir_ditekshen="${work_dir_ditekshen%%+(/)}"
+fi
+if [ -z "$work_dir_twinclams" ] ; then
+  work_dir_twinclams="$(echo "${work_dir}/${twinclams_dir}" | $sed_bin 's:/*$::')"
+else
+  shopt -s extglob; work_dir_twinclams="${work_dir_twinclams%%+(/)}"
+fi
 if [ -z "$work_dir_yararulesproject" ] ; then
   work_dir_yararulesproject="$(echo "${work_dir}/${yararulesproject_dir}" | $sed_bin 's:/*$::')"
 else
@@ -2263,6 +2273,8 @@ if [ "$force_updates" == "yes" ] ; then
   malwarepatrol_update_hours="0"
   yararulesproject_update_hours="0"
   urlhaus_update_hours="0"
+  ditekshen_update_hours="0"
+  twinclams_update_hours="0"
   additional_update_hours="0"
 fi
 
@@ -2418,6 +2430,12 @@ if [ "$default_dbs_rating" == "DISABLE" ] ; then
     if [ "$urlhaus_dbs_rating" != "LOW" ] && [ "$urlhaus_dbs_rating" != "MEDIUM" ] && [ "$urlhaus_dbs_rating" != "HIGH" ]; then
         urlhaus_enabled="no"
     fi
+    if [ "$ditekshen_dbs_rating" != "LOW" ] && [ "$ditekshen_dbs_rating" != "MEDIUM" ] && [ "$ditekshen_dbs_rating" != "HIGH" ]; then
+        ditekshen_enabled="no"
+    fi
+    if [ "$twinclams_dbs_rating" != "LOW" ] && [ "$twinclams_dbs_rating" != "MEDIUM" ] && [ "$twinclams_dbs_rating" != "HIGH" ]; then
+        twinclams_enabled="no"
+    fi
     if [ "$yararulesproject_dbs_rating" != "LOW" ] && [ "$yararulesproject_dbs_rating" != "MEDIUM" ] && [ "$yararulesproject_dbs_rating" != "HIGH" ]; then
         yararulesproject_enabled="no"
     fi
@@ -2439,6 +2457,12 @@ else
     fi
     if [ "$urlhaus_dbs_rating" == "DISABLE" ] ; then
         urlhaus_enabled="no"
+    fi
+    if [ "$ditekshen_dbs_rating" == "DISABLE" ] ; then
+        ditekshen_enabled="no"
+    fi
+    if [ "$twinclams_dbs_rating" == "DISABLE" ] ; then
+        twinclams_enabled="no"
     fi
     if [ "$yararulesproject_dbs_rating" == "DISABLE" ] ; then
         yararulesproject_enabled="no"
@@ -2675,6 +2699,59 @@ urlhaus_remove_dbs=( )
 if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
   read -r -a urlhaus_remove_dbs <<< "$temp_remove_db"
 fi
+if [ "$ditekshen_enabled" == "yes" ] ; then
+  if [ -n "$ditekshen_dbs" ] ; then
+    if [ -n "$ditekshen_dbs_rating" ] ; then
+      temp_db="$(xshok_database "$ditekshen_dbs_rating" "${ditekshen_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$ditekshen_dbs_rating" "${ditekshen_dbs[@]}")"
+      fi
+    else
+      temp_db="$(xshok_database "$default_dbs_rating" "${ditekshen_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${ditekshen_dbs[@]}")"
+      fi
+    fi
+    ditekshen_dbs=( )
+        if [ -n "$temp_db" ] ; then
+        #ditekshen_dbs=( $temp_db )
+        read -r -a ditekshen_dbs <<< "$temp_db"
+        fi
+  fi
+elif [ "$remove_disabled_databases" == "yes" ] ; then
+  temp_remove_db="$(xshok_remove_database "DISABLED" "${ditekshen_dbs[@]}")"
+fi
+ditekshen_remove_dbs=( )
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
+  read -r -a ditekshen_remove_dbs <<< "$temp_remove_db"
+fi
+
+if [ "$twinclams_enabled" == "yes" ] ; then
+  if [ -n "$twinclams_dbs" ] ; then
+    if [ -n "$twinclams_dbs_rating" ] ; then
+      temp_db="$(xshok_database "$twinclams_dbs_rating" "${twinclams_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$twinclams_dbs_rating" "${twinclams_dbs[@]}")"
+      fi
+    else
+      temp_db="$(xshok_database "$default_dbs_rating" "${twinclams_dbs[@]}")"
+      if [ "$remove_disabled_databases" == "yes" ] ; then
+          temp_remove_db="$(xshok_remove_database "$default_dbs_rating" "${twinclams_dbs[@]}")"
+      fi
+    fi
+    twinclams_dbs=( )
+        if [ -n "$temp_db" ] ; then
+        #twinclams_dbs=( $temp_db )
+        read -r -a twinclams_dbs <<< "$temp_db"
+        fi
+  fi
+elif [ "$remove_disabled_databases" == "yes" ] ; then
+  temp_remove_db="$(xshok_remove_database "DISABLED" "${twinclams_dbs[@]}")"
+fi
+twinclams_remove_dbs=( )
+if [ -n "$temp_remove_db" ] && [ "$remove_disabled_databases" == "yes" ] ; then
+  read -r -a twinclams_remove_dbs <<< "$temp_remove_db"
+fi
 ############################################################################################
 if [ "$malwarepatrol_enabled" == "yes" ] ; then
     # Set the variables for MalwarePatrol
@@ -2797,6 +2874,30 @@ if [ "$remove_disabled_databases" == "yes" ] ; then
         fi
       done
     fi
+    if [ -n "${ditekshen_remove_dbs[0]}" ] ; then
+      for db_file in "${ditekshen_remove_dbs[@]}" ; do
+        if [ -f "${work_dir_ditekshen}/${db_file}" ] ; then
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_ditekshen}/${db_file}"
+            rm -f "${work_dir_ditekshen}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
+    fi
+    if [ -n "${twinclams_remove_dbs[0]}" ] ; then
+      for db_file in "${twinclams_remove_dbs[@]}" ; do
+        if [ -f "${work_dir_twinclams}/${db_file}" ] ; then
+            xshok_pretty_echo_and_log "Removing unused file: ${work_dir_twinclams}/${db_file}"
+            rm -f "${work_dir_twinclams}/${db_file}"
+        fi
+        if [ -f "${clam_dbs}/${db_file}" ] ; then
+            xshok_pretty_echo_and_log "Removing unused file: ${clam_dbs}/${db_file}"
+            rm -f "${clam_dbs}/${db_file}"
+        fi
+      done
+    fi
     if [ -n "${malwarepatrol_remove_dbs[0]}" ] ; then
       for db_file in "${malwarepatrol_remove_dbs[@]}" ; do
         if [ -f "${work_dir_malwarepatrol}/${db_file}" ] ; then
@@ -2863,6 +2964,8 @@ xshok_mkdir_ownership "$work_dir_securiteinfo"
 xshok_mkdir_ownership "$work_dir_work_configs"
 xshok_mkdir_ownership "$work_dir_yararulesproject"
 xshok_mkdir_ownership "$work_dir_urlhaus"
+xshok_mkdir_ownership "$work_dir_ditekshen"
+xshok_mkdir_ownership "$work_dir_twinclams"
 
 # Set secured access permissions to the GPG directory
 perms chmod -f 0700 "${work_dir_gpg}"
@@ -2995,6 +3098,30 @@ if [ "$malwarepatrol_enabled" == "yes" ] ; then
   if [ -n "$malwarepatrol_db" ] ; then
     echo "${work_dir_malwarepatrol}/${malwarepatrol_db}" >> "${current_tmp}"
     clamav_files
+  fi
+fi
+if [ "$urlhaus_enabled" == "yes" ] ; then
+  if [ -n "${urlhaus_dbs[0]}" ] ; then
+    for db in "${urlhaus_dbs[@]}" ; do
+      echo "${work_dir_urlhaus}/${db}" >> "${current_tmp}"
+      clamav_files
+    done
+  fi
+fi
+if [ "$ditekshen_enabled" == "yes" ] ; then
+  if [ -n "${ditekshen_dbs[0]}" ] ; then
+    for db in "${ditekshen_dbs[@]}" ; do
+      echo "${work_dir_ditekshen}/${db}" >> "${current_tmp}"
+      clamav_files
+    done
+  fi
+fi
+if [ "$twinclams_enabled" == "yes" ] ; then
+  if [ -n "${twinclams_dbs[0]}" ] ; then
+    for db in "${twinclams_dbs[@]}" ; do
+      echo "${work_dir_twinclams}/${db}" >> "${current_tmp}"
+      clamav_files
+    done
   fi
 fi
 if [ "$yararulesproject_enabled" == "yes" ] ; then
@@ -3795,6 +3922,172 @@ else
         fi
         if [ -r "${work_dir_urlhaus}/${db_file}" ] ; then
           rm -f "${work_dir_urlhaus}/${db_file}"
+          do_clamd_reload="1"
+        fi
+        if [ -r "${clam_dbs}/${db_file}" ] ; then
+          rm -f "${clam_dbs}/${db_file}"
+          do_clamd_reload=1
+        fi
+      done
+    fi
+  fi
+fi
+
+##############################################################################################################################################
+# Check for updated ditekshen database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
+##############################################################################################################################################
+if [ "$ditekshen_enabled" == "yes" ] ; then
+  if [ -n "${ditekshen_dbs[0]}" ] ; then
+    if [ ${#ditekshen_dbs} -lt 1 ] ; then
+      xshok_pretty_echo_and_log "Failed ditekshen_dbs config is invalid or not defined - SKIPPING"
+    else
+      rm -f "${work_dir_ditekshen}/*.gz"
+      if [ -r "${work_dir_work_configs}/last-ditekshen-update.txt" ] ; then
+        last_ditekshen_update="$(cat "${work_dir_work_configs}/last-ditekshen-update.txt")"
+      else
+        last_ditekshen_update="0"
+      fi
+      db_file=""
+      loop=""
+      update_interval="$((ditekshen_update_hours * 3600))"
+      time_interval="$((current_time - last_ditekshen_update))"
+      if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
+        echo "$current_time" > "${work_dir_work_configs}/last-ditekshen-update.txt"
+
+        xshok_pretty_echo_and_log "ditekshen Database File Updates" "="
+        xshok_pretty_echo_and_log "Checking for ditekshen updates..."
+        ditekshen_updates="0"
+        for db_file in "${ditekshen_dbs[@]}" ; do
+          if echo "$db_file" | $grep_bin -q "/" ; then
+            yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
+            db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+          else yr_dir=""
+          fi
+          if [ "$loop" == "1" ] ; then
+            xshok_pretty_echo_and_log "---"
+          fi
+          xshok_pretty_echo_and_log "Checking for updated ditekshen database file: ${db_file}"
+          ditekshen_db_update="0"
+          if xshok_file_download "${work_dir_ditekshen}/${db_file}" "${ditekshen_url}/${db_file}" ; then
+            loop="1"
+            xshok_test_and_install_database "$work_dir_ditekshen" "$db_file" "ditekshen"
+            if [ "$xshok_db_installed" == "yes" ] ; then
+              ditekshen_updates=1
+              ditekshen_db_update=1
+            fi
+          else
+            xshok_pretty_echo_and_log "WARNING: Failed connection to $ditekshen_url - SKIPPED ditekshen ${db_file} update"
+          fi
+          if [ "$ditekshen_db_update" != "1" ] ; then
+            xshok_pretty_echo_and_log "No updated ditekshen ${db_file} database file"
+          fi
+        done
+        if [ "$ditekshen_updates" != "1" ] ; then
+          xshok_pretty_echo_and_log "No ditekshen database file updates" "-"
+        fi
+      else
+
+        xshok_pretty_echo_and_log "ditekshen Database File Updates" "="
+        xshok_draw_time_remaining "$((update_interval - time_interval))" "$ditekshen_update_hours" "ditekshen"
+      fi
+    fi
+  fi
+else
+  if [ -n "${ditekshen_dbs[0]}" ] ; then
+    if [ "$remove_disabled_databases" == "yes" ] ; then
+      xshok_pretty_echo_and_log "Removing disabled ditekshen Database files"
+      for db_file in "${ditekshen_dbs[@]}" ; do
+        if echo "$db_file" | $grep_bin -q "/" ; then
+          db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+        fi
+        if echo "$db_file" | $grep_bin -q "|" ; then
+          db_file="${db_file%|*}"
+        fi
+        if [ -r "${work_dir_ditekshen}/${db_file}" ] ; then
+          rm -f "${work_dir_ditekshen}/${db_file}"
+          do_clamd_reload="1"
+        fi
+        if [ -r "${clam_dbs}/${db_file}" ] ; then
+          rm -f "${clam_dbs}/${db_file}"
+          do_clamd_reload=1
+        fi
+      done
+    fi
+  fi
+fi
+
+##############################################################################################################################################
+# Check for updated twinclams database files every set number of hours as defined in the "USER CONFIGURATION" section of this script
+##############################################################################################################################################
+if [ "$twinclams_enabled" == "yes" ] ; then
+  if [ -n "${twinclams_dbs[0]}" ] ; then
+    if [ ${#twinclams_dbs} -lt 1 ] ; then
+      xshok_pretty_echo_and_log "Failed twinclams_dbs config is invalid or not defined - SKIPPING"
+    else
+      rm -f "${work_dir_twinclams}/*.gz"
+      if [ -r "${work_dir_work_configs}/last-twinclams-update.txt" ] ; then
+        last_twinclams_update="$(cat "${work_dir_work_configs}/last-twinclams-update.txt")"
+      else
+        last_twinclams_update="0"
+      fi
+      db_file=""
+      loop=""
+      update_interval="$((twinclams_update_hours * 3600))"
+      time_interval="$((current_time - last_twinclams_update))"
+      if [ "$time_interval" -ge "$((update_interval - 600))" ] ; then
+        echo "$current_time" > "${work_dir_work_configs}/last-twinclams-update.txt"
+
+        xshok_pretty_echo_and_log "twinclams Database File Updates" "="
+        xshok_pretty_echo_and_log "Checking for twinclams updates..."
+        twinclams_updates="0"
+        for db_file in "${twinclams_dbs[@]}" ; do
+          if echo "$db_file" | $grep_bin -q "/" ; then
+            yr_dir="/$(echo "$db_file" | cut -d "/" -f 1)"
+            db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+          else yr_dir=""
+          fi
+          if [ "$loop" == "1" ] ; then
+            xshok_pretty_echo_and_log "---"
+          fi
+          xshok_pretty_echo_and_log "Checking for updated twinclams database file: ${db_file}"
+          twinclams_db_update="0"
+          if xshok_file_download "${work_dir_twinclams}/${db_file}" "${twinclams_url}/${db_file}" ; then
+            loop="1"
+            xshok_test_and_install_database "$work_dir_twinclams" "$db_file" "twinclams"
+            if [ "$xshok_db_installed" == "yes" ] ; then
+              twinclams_updates=1
+              twinclams_db_update=1
+            fi
+          else
+            xshok_pretty_echo_and_log "WARNING: Failed connection to $twinclams_url - SKIPPED twinclams ${db_file} update"
+          fi
+          if [ "$twinclams_db_update" != "1" ] ; then
+            xshok_pretty_echo_and_log "No updated twinclams ${db_file} database file"
+          fi
+        done
+        if [ "$twinclams_updates" != "1" ] ; then
+          xshok_pretty_echo_and_log "No twinclams database file updates" "-"
+        fi
+      else
+
+        xshok_pretty_echo_and_log "twinclams Database File Updates" "="
+        xshok_draw_time_remaining "$((update_interval - time_interval))" "$twinclams_update_hours" "twinclams"
+      fi
+    fi
+  fi
+else
+  if [ -n "${twinclams_dbs[0]}" ] ; then
+    if [ "$remove_disabled_databases" == "yes" ] ; then
+      xshok_pretty_echo_and_log "Removing disabled twinclams Database files"
+      for db_file in "${twinclams_dbs[@]}" ; do
+        if echo "$db_file" | $grep_bin -q "/" ; then
+          db_file="$(echo "$db_file" | cut -d "/" -f 2)"
+        fi
+        if echo "$db_file" | $grep_bin -q "|" ; then
+          db_file="${db_file%|*}"
+        fi
+        if [ -r "${work_dir_twinclams}/${db_file}" ] ; then
+          rm -f "${work_dir_twinclams}/${db_file}"
           do_clamd_reload="1"
         fi
         if [ -r "${clam_dbs}/${db_file}" ] ; then
