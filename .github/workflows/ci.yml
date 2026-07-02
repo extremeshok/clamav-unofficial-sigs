@@ -100,6 +100,55 @@ jobs:
             || git show ececc4b53286666d9bb65336a9ab079c804b28a6:clamav-unofficial-sigs.sh > /tmp/old-release.sh
           sudo bash /tmp/old-release.sh --information
 
+  docker-build:
+    name: Docker image build and smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t cus-ci .
+      - name: One-shot argument mode works
+        run: docker run --rm cus-ci clamav-unofficial-sigs.sh --version || true
+      - name: Information run inside the image
+        run: |
+          docker run --rm --entrypoint bash cus-ci -c '
+            echo "user_configuration_complete=\"yes\"" > /etc/clamav-unofficial-sigs/user.conf
+            clamav-unofficial-sigs.sh --information'
+      - name: Updater mode dry run (all sources disabled)
+        run: |
+          docker run -d --name cus-smoke -e CUS_MODE=updater -e CUS_UPDATE_HOURS=1 \
+            -e CUS_USER_CONF='sanesecurity_enabled="no"
+          securiteinfo_enabled="no"
+          linuxmalwaredetect_enabled="no"
+          interserver_enabled="no"
+          malwareexpert_enabled="no"
+          malwarepatrol_enabled="no"
+          urlhaus_enabled="no"
+          yararulesproject_enabled="no"
+          additional_enabled="no"
+          remove_disabled_databases="no"' cus-ci
+          sleep 30
+          docker logs cus-smoke
+          docker inspect -f '{{.State.Status}}' cus-smoke | grep -q running
+          docker exec -e CUS_MODE=updater cus-smoke /usr/local/sbin/cus-healthcheck.sh
+          docker stop -t 30 cus-smoke
+      - name: Updater mode real download (github raw sources)
+        run: |
+          docker volume create cus-dbs
+          docker run --rm -v cus-dbs:/var/lib/clamav --entrypoint bash cus-ci -c '
+            printf "%s\n" "user_configuration_complete=\"yes\"" "enable_random=\"no\"" \
+              "sanesecurity_enabled=\"no\"" "securiteinfo_enabled=\"no\"" \
+              "linuxmalwaredetect_enabled=\"no\"" "interserver_enabled=\"no\"" \
+              "malwareexpert_enabled=\"no\"" "malwarepatrol_enabled=\"no\"" \
+              "urlhaus_enabled=\"no\"" "yararulesproject_enabled=\"no\"" \
+              "additional_enabled=\"no\"" "remove_disabled_databases=\"no\"" \
+              "ditekshen_enabled=\"yes\"" "twinclams_enabled=\"yes\"" \
+              > /etc/clamav-unofficial-sigs/user.conf
+            clamav-unofficial-sigs.sh --force
+            test -f /var/lib/clamav/clamav.ldb
+            test -f /var/lib/clamav/twinclams.hdb
+            echo "downloaded and installed OK"'
+
   markdownlint:
     name: Markdown lint
     runs-on: ubuntu-latest
