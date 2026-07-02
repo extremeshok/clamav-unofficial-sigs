@@ -8,7 +8,9 @@
 # Script updates can be found at: https://github.com/extremeshok/clamav-unofficial-sigs
 #
 ##################
-# NOTE: the legacy ".include" directive was removed in systemd 240, use a
+# NOTE: do NOT install this file directly, it has no ExecStart and can not
+# be enabled, it documents the drop-in override below.
+# The legacy ".include" directive was removed in systemd 240, use a
 # drop-in override for the packaged clamd@.service template instead:
 #
 #   systemctl edit clamd@scan

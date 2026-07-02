@@ -25,6 +25,8 @@
 
 set -u
 
+date +%s > /tmp/cus-started
+
 CUS_MODE="${CUS_MODE:-all-in-one}"
 CUS_UPDATE_HOURS="${CUS_UPDATE_HOURS:-2}"
 CONFIG_DIR="/etc/clamav-unofficial-sigs"
@@ -84,8 +86,14 @@ while true ; do
     # Run as a background child so the TERM trap fires immediately
     bash "$SCRIPT" --verbose &
     script_pid=$!
-    wait "$script_pid" || echo "WARNING: clamav-unofficial-sigs update run failed"
+    wait "$script_pid"
+    script_rc=$?
     script_pid=""
+    if [ "$script_rc" -ne 0 ] ; then
+        echo "WARNING: clamav-unofficial-sigs update run failed (exit ${script_rc})"
+    fi
+    # Loop status consumed by the container healthcheck
+    echo "$(date +%s) ${script_rc}" > /tmp/cus-status
     if [ -n "$init_pid" ] && ! kill -0 "$init_pid" 2>/dev/null ; then
         echo "ERROR: clamav init exited, stopping container"
         exit 1

@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install shellcheck
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+        run: command -v shellcheck >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck)
       - name: Bash syntax check
         run: |
           bash -n clamav-unofficial-sigs.sh
@@ -49,7 +49,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install dependencies
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq clamav rsync bind9-dnsutils curl wget
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq clamav bind9-dnsutils
       - name: Build scratch config
         run: |
           sudo mkdir -p /etc/clamav-unofficial-sigs /var/lib/clamav-test/work /var/lib/clamav-test/dbs /var/lib/clamav-test/log
@@ -155,7 +155,7 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v4
-      - run: npx --yes markdownlint-cli@0.41.0 '*.md' 'guides/*.md' || true
+      - run: npx --yes markdownlint-cli@0.41.0 '*.md' 'guides/*.md'
 
   source-liveness:
     name: Signature source liveness

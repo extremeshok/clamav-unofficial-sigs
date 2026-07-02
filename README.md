@@ -277,6 +277,10 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Added : Official Docker image built on clamav/clamav:stable with all-in-one and updater-sidecar modes, multi-arch (amd64/arm64), weekly rebuilds, published to ghcr.io - thanks @mnalis for the original Dockerfile concept
 * Added : ditekshen/detection database source (disabled by default)
 * Added : twinclams database source (disabled by default)
+* Fixed : disabled optional sources no longer delete same-named databases installed by other means (eg. via additional_dbs)
+* Fixed : wget downloads with a renamed output file use a temp file, a failed transfer no longer truncates the last good copy
+* Fixed : LinuxMalwareDetect version check on wget-only systems never detected updates
+* Fixed : sanesecurity_dbs_rating="DISABLE" now counts as disabled for the rsync requirement
 * Fixed : urlhaus databases were removed by the database cleanup directly after installing (missing from the current-databases tracking)
 * Fixed : keep_db_backup wrote all backups to a single _file-bak file, backups are now per-database <database>-bak files
 * Refactor : consolidated the per-source database test and install logic into shared functions (~380 fewer lines)

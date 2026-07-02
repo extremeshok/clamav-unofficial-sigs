@@ -73,7 +73,7 @@ See `docker/docker-compose.yml` for ready-made all-in-one and sidecar examples.
 
 ## Healthcheck
 
-The image ships a HEALTHCHECK that fails when clamd stops answering (all-in-one mode) or when the last successful update is older than twice the update interval.
+The image ships a HEALTHCHECK that fails when clamd stops answering (all-in-one mode), when the first update run does not complete within one interval of container start, when the last update run exited with an error, or when the update loop stalls for more than twice the update interval.
 
 ## Building locally
 
