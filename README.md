@@ -1,4 +1,4 @@
-# clamav-unofficial-sigs [![GitHub Release](https://img.shields.io/github/release/extremeshok/clamav-unofficial-sigs.svg?label=Latest)](https://github.com/extremeshok/clamav-unofficial-sigs/releases/latest) [![Issue Count](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs/badges/issue_count.svg)](https://codeclimate.com/github/extremeshok/clamav-unofficial-sigs)
+# clamav-unofficial-sigs [![GitHub Release](https://img.shields.io/github/release/extremeshok/clamav-unofficial-sigs.svg?label=Latest)](https://github.com/extremeshok/clamav-unofficial-sigs/releases/latest) [![CI](https://github.com/extremeshok/clamav-unofficial-sigs/actions/workflows/ci.yml/badge.svg)](https://github.com/extremeshok/clamav-unofficial-sigs/actions/workflows/ci.yml)
 
 ClamAV Unofficial Signatures Updater
 
@@ -6,13 +6,16 @@ ClamAV Unofficial Signatures Updater
 
 ## Description
 
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, MalwareExpert, interServer etc. The script will also generate and install cron, logrotate, and man files.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity (including FOXHOLE, Porcupine and other distributed signatures), SecuriteInfo, Linux Malware Detect, URLhaus, interServer, MalwarePatrol, Malware Expert, ditekshen/detection, twinclams and custom additional databases. Every downloaded database is integrity tested with clamscan before it is installed. The script will also generate and install cron, logrotate, and man files, and is available as a Docker image.
 
 ### Automated Testing and Linting
 
-* Travis-CI
+* GitHub Actions
 * Linting with markdownlint-cli and shellcheck
-* Testing with Ubuntu Focal and macOS / OSX
+* Config parse and dry-run testing with ClamAV on Ubuntu 22.04 and 24.04, every os config is parse-tested
+* Docker image build and smoke test of both container modes, including a real signature download
+* Upgrade-path guard: the previous release must be able to parse the current master.conf
+* Weekly automated liveness checks of the signature source mirrors
 
 ### Checkout some of our other solutions: <https://github.com/extremeshok?tab=repositories>
 
@@ -24,20 +27,33 @@ Please post them on the issue tracker: <https://github.com/extremeshok/clamav-un
 
 ### Required Ports / Firewall Exceptions
 
-* rsync: TCP port 873
+* rsync: TCP port 873 (only required for Sanesecurity, since 8.0.0 rsync is optional when Sanesecurity is disabled)
 * wget/curl: TCP port 443
 
 ### Supported Operating Systems
 
-Debian, Ubuntu, Raspbian, CentOS (RHEL and clones), OpenBSD, FreeBSD, OpenSUSE, Archlinux, Mac OS X, Slackware, Solaris (Sun OS), pfSense, Zimbra and derivative systems
+Debian, Ubuntu, Raspbian, RHEL (Rocky Linux, AlmaLinux, CentOS and clones), Fedora, OpenBSD, FreeBSD, OpenSUSE, Archlinux, Alpine, macOS (Intel and Apple Silicon), Slackware, Solaris (Sun OS), pfSense, Zimbra and derivative systems
 
 ### Quick Install and Upgrade Guide
 
 <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/INSTALL.md>
 
+### Docker
+
+Official image built on `clamav/clamav:stable`, see the [docker guide](https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/docker.md)
+
+```bash
+# all-in-one: clamd + freshclam + unofficial signatures
+docker run -d -p 3310:3310 -v clamdb:/var/lib/clamav ghcr.io/extremeshok/clamav-unofficial-sigs:latest
+# updater sidecar for an existing clamd
+docker run -d -e CUS_MODE=updater -v clamdb:/var/lib/clamav ghcr.io/extremeshok/clamav-unofficial-sigs:latest
+```
+
 ### Operating System Specific Install and Upgrade Guides
 
-* CentOS: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md>
+* Docker: <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/docker.md>
+* RHEL / Rocky / Alma: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/rhel.md>
+* CentOS 7 (EOL): <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md>
 * Ubuntu: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
 * Debian: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
 * macOS: <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macos.md>
@@ -88,13 +104,25 @@ Usage of free URLhaus Database: <https://urlhaus.abuse.ch>
 
 * Enabled by default
 
-### Yara-Rules Project Support (as of June 2015, updated January 2020)
+### Yara-Rules Project Support (DEPRECATED as of version 8.0.0)
 
-Usage of free Yara-Rules Project: <http://yararules.com>
+The upstream Yara-Rules project repository is unmaintained and several of its rules fail to load or crash modern ClamAV releases
 
-* Enabled by default
+* Disabled by default, enable at your own risk with yararulesproject_enabled="yes"
 
-Current limitations of clamav support: <http://blog.clamav.net/search/label/yara>
+Current limitations of clamav yara support: <https://docs.clamav.net/manual/Signatures/YaraRules.html>
+
+### ditekshen/detection database support (as of July 2026)
+
+Native ClamAV signatures from <https://github.com/ditekshen/detection>
+
+* Disabled by default, enable with ditekshen_enabled="yes"
+
+### twinclams database support (as of July 2026)
+
+ClamAV signatures from <https://github.com/twinwave-security/twinclams> (Splunk/TwinWave)
+
+* Disabled by default, enable with twinclams_enabled="yes"
 
 ### interServer free database support (as of December 2020)
 
@@ -135,6 +163,30 @@ Usage of SecuriteInfo 2015 free clamav signatures: <https://www.securiteinfo.com
 Usage of free Linux Malware Detect clamav signatures: <https://www.rfxn.com/projects/linux-malware-detect/>
 
 * Enabled by default, no configuration required
+
+### False positives and whitelisting signatures (FAQ)
+
+A third-party signature fired on a clean file or legitimate mail (the signature name ends in `.UNOFFICIAL`)? You have several options, from most to least targeted:
+
+1. **Whitelist the individual signature** (recommended):
+
+    ```bash
+    clamav-unofficial-sigs.sh --whitelist 'Sanesecurity.Junk.12345'
+    ```
+
+    This adds the signature to `my-whitelist.ign2`, tells ClamAV to ignore it, and keeps ignoring it when databases update. Works for all regular database types (ndb, hdb, ldb, db, ...). Report persistent false positives to the signature provider (eg. Sanesecurity has a false positive report form) so everyone benefits.
+
+2. **YARA rules cannot be ignored via ign2** — this is a ClamAV limitation, entries such as `YARA.rulename.UNOFFICIAL` in an ign2 file have no effect. Instead, remove or disable the specific `.yar` file that contains the rule: set its entry to `DISABLED` in your user.conf, eg.
+
+    ```bash
+    yararulesproject_dbs+=( "email/Email_generic_phishing.yar|DISABLED" )
+    ```
+
+    or disable the yara rules of that source entirely (`enable_yararules="no"` disables yara files across all sources).
+
+3. **Downgrade or disable a whole database** that produces too many false positives for your environment: set the database entry or the per-source rating (`<source>_dbs_rating`) to a lower level or `DISABLE` in user.conf.
+
+4. **Ham directory scanning**: set `ham_dir` in user.conf to a directory of known-clean mail and the script automatically removes ndb signatures that match your ham before installing updated databases.
 
 ### If you want to add, report a missing one or have a problem with a database
 
@@ -220,7 +272,56 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 
 ## Change Log
 
+### Version 8.0.0 (02 July 2026)
+
+* eXtremeSHOK.com Maintenance
+* Added : Official Docker image built on clamav/clamav:stable with all-in-one and updater-sidecar modes, multi-arch (amd64/arm64), weekly rebuilds, published to ghcr.io - thanks @mnalis for the original Dockerfile concept
+* Added : ditekshen/detection database source (disabled by default)
+* Added : twinclams database source (disabled by default)
+* Fixed : disabled optional sources no longer delete same-named databases installed by other means (eg. via additional_dbs)
+* Fixed : wget downloads with a renamed output file use a temp file, a failed transfer no longer truncates the last good copy
+* Fixed : LinuxMalwareDetect version check on wget-only systems never detected updates
+* Fixed : sanesecurity_dbs_rating="DISABLE" now counts as disabled for the rsync requirement
+* Added : rsync is now optional for https-only setups, an internal cp fallback handles the database installs when Sanesecurity is disabled
+* Added : clamd socket RELOAD fallback supports perl, socat and nc transports
+* Added : False positive / signature whitelisting FAQ in the README
+* Added : Install guides for RHEL / Rocky Linux / AlmaLinux and Docker
+* Fixed : os.alpine.conf executed clamdscan during config parsing (stray unquoted line) and used a reload command as clamd_restart_opt
+* Fixed : the Sanesecurity GPG key setup no longer runs (and aborts every update on failure) when sanesecurity is disabled
+* Fixed : -c with a config file now derives the config directory, fixing --upgrade and --information on systems without an installed config
+* Fixed : additional database wildcard downloads no longer test the literal glob pattern when nothing matched
+* Fixed : urlhaus databases were removed by the database cleanup directly after installing (missing from the current-databases tracking)
+* Fixed : keep_db_backup wrote all backups to a single _file-bak file, backups are now per-database `<database>-bak` files
+* Refactor : consolidated the per-source database test and install logic into shared functions (~380 fewer lines)
+* Support for modern ClamAV releases (1.x series, tested against ClamAV 1.4 LTS and 1.5 stable), robust version comparison for clamav/script/config versions
+* Added : GitHub Actions CI (shellcheck, config parse smoke tests with real clamav, upgrade-path guard, weekly signature source liveness checks), replaces the defunct Travis-CI / Code Climate
+* Added : SecuriteInfo premium databases securiteinfo.pdb, securiteinfo.wdb and securiteinfo.yara
+* Added : os.rhel.conf for RHEL / Rocky Linux / AlmaLinux 8, 9 and 10
+* Added : os.macos.applesilicon.conf and /opt/homebrew config detection for Apple Silicon Macs
+* Added : clamd socket RELOAD fallback when clamd_reload_opt fails
+* Added : rsync wildcard support for additional databases, thanks @amulet1
+* Added : MalwarePatrol Google Drive whitelisting option (malwarepatrol_whitelist_googledrive), thanks @perplexityjeff
+* Fixed : urlhaus database directory never created, urlhaus updates now work, thanks @robert-scheck @Devstellar @amartin-git
+* Fixed : multiple command line options were ignored (only the first was parsed)
+* Fixed : config parser stripped quotes on Solaris, breaking clamd_reload_opt
+* Fixed : signature whitelisting (-w) for logical (ldb) signatures, thanks @falon
+* Fixed : permissions preservation during upgrades on BSD / OpenBSD (portable stat), thanks @dspruell
+* Fixed : MalwarePatrol signatures longer than 8189 characters are filtered out, thanks @justcsdr
+* Fixed : MalwarePatrol free product code updated to 32, thanks @mizzy241
+* Fixed : cron minute randomisation off-by-one
+* Fixed : wget download path no longer changes directories or creates symlinks
+* Fixed : work_dir_linuxmalwaredetect override trimming the wrong variable
+* Fixed : stray backslash warning from modern grep, thanks @code-chicken
+* Deprecated : yararulesproject databases are now disabled by default, the upstream Yara-Rules/rules repository is unmaintained and some rules crash modern clamav
+* Removed : deprecated bank_rule.yar, thanks @mnalis
+* Removed : percent signs in master.conf comments which could break config parsing, thanks @stevenhardey
+* Refresh : os.debian.conf and os.ubuntu.conf for current releases (Ubuntu 26.04 LTS covered, CI also tests on 26.04), EOL os configs marked deprecated, install guides refreshed
+* Refresh : systemd clamd.scan.service uses a drop-in override instead of the removed .include directive
+* Default clam_user/clam_group defined out of the box, thanks @VVelox
+* Incremented the config to version 100
+
 ### Version 7.2.5 (20 March 2021)
+
 * eXtremeSHOK.com Maintenance
 * Added : os.centos7-cpanel.conf
 * Refactor : bsd support for tar, remove gnu-tar requirement

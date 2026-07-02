@@ -1,4 +1,6 @@
 # Basic guide to Installing and Updating on Ubuntu / Debian
+
+Covers Ubuntu 20.04, 22.04, 24.04 and 26.04 LTS and Debian 11, 12 and 13, the clamav packaging is identical across these releases.
 Run the following as root
 
 # UPGRADE INSTRUCTIONS (version 7.0 +)

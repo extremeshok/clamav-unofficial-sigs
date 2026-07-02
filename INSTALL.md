@@ -4,18 +4,19 @@
 
 This is property of eXtremeSHOK.com
 You are free to use, modify and distribute, however you may not remove this notice.
-Copyright (c) Adrian Jon Kriel :: admin@extremeshok.com
+Copyright (c) Adrian Jon Kriel :: <admin@extremeshok.com>
 License: BSD (Berkeley Software Distribution)
 
 Script updates can be found at: <https://github.com/extremeshok/clamav-unofficial-sigs>
 
 ## Operating System Specific Install Guides
 
-* CentOS : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/centos7.md>
-* Ubuntu : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
-* Debian : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/ubuntu-debian.md>
-* Mac OSX : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/macosx.md>
-* pFsense : <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/guides/pfsense.md>
+* RHEL / Rocky / Alma : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/rhel.md>
+* CentOS 7 (EOL) : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/centos7.md>
+* Ubuntu : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/ubuntu-debian.md>
+* Debian : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/ubuntu-debian.md>
+* Mac OSX : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/macos.md>
+* pFsense : <https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/pfsense.md>
 
 ## GENERIC UPGRADE INSTRUCTIONS (version 7.0 +)
 
@@ -47,7 +48,7 @@ wget https://raw.githubusercontent.com/extremeshok/clamav-unofficial-sigs/master
 ```
 
 Select your operating system config from <https://github.com/extremeshok/clamav-unofficial-sigs/tree/master/config/>
-**replace os.ubuntu.conf with your required config, centos7/8 = os.centos.conf , debian9/10 = os.debian.conf**
+**replace os.ubuntu.conf with your required config, rhel/rocky/alma 8/9/10 = os.rhel.conf , centos7 = os.centos.conf , debian = os.debian.conf , macOS Apple Silicon = os.macos.applesilicon.conf**
 
 ```bash
 os_conf="os.ubuntu.conf"
