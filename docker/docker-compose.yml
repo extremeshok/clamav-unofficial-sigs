@@ -1,0 +1,43 @@
+# Example compose file for clamav-unofficial-sigs
+#
+# Variant 1 (default): all-in-one, clamd + freshclam + unofficial signatures
+# Variant 2 (commented): official clamav image + unofficial-sigs updater sidecar
+#
+# Build locally with: docker compose build
+# or use the published image: ghcr.io/extremeshok/clamav-unofficial-sigs
+
+services:
+  clamav:
+    build: ..
+    image: ghcr.io/extremeshok/clamav-unofficial-sigs:latest
+    restart: unless-stopped
+    ports:
+      - "3310:3310"
+    environment:
+      CUS_MODE: all-in-one
+      CUS_UPDATE_HOURS: "2"
+    volumes:
+      - clamdb:/var/lib/clamav
+      # Optional: your own configuration overrides
+      # - ./user.conf:/etc/clamav-unofficial-sigs/user.conf:ro
+
+# --- Variant 2: sidecar next to the official clamav image ---
+#  clamd:
+#    image: clamav/clamav:stable
+#    restart: unless-stopped
+#    ports:
+#      - "3310:3310"
+#    volumes:
+#      - clamdb:/var/lib/clamav
+#
+#  unofficial-sigs:
+#    image: ghcr.io/extremeshok/clamav-unofficial-sigs:latest
+#    restart: unless-stopped
+#    environment:
+#      CUS_MODE: updater
+#      CUS_UPDATE_HOURS: "2"
+#    volumes:
+#      - clamdb:/var/lib/clamav
+
+volumes:
+  clamdb:
