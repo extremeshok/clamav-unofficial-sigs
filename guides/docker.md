@@ -1,6 +1,6 @@
 # Docker guide for clamav-unofficial-sigs
 
-The container image is built on the official `clamav/clamav:stable` image, so it always carries a current ClamAV for signature integrity testing.
+The container image is built on the official ClamAV image (the published multi-arch image uses `clamav/clamav-debian:stable`, the only official variant with amd64 and arm64 manifests), so it always carries a current ClamAV for signature integrity testing.
 
 ## Quick start (all-in-one)
 

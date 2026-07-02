@@ -46,6 +46,10 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          # the alpine clamav/clamav image only publishes amd64, the official
+          # debian variant is the multi-arch (amd64/arm64) image
+          build-args: |
+            BASE_IMAGE=clamav/clamav-debian:stable
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

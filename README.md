@@ -40,7 +40,7 @@ Debian, Ubuntu, Raspbian, RHEL (Rocky Linux, AlmaLinux, CentOS and clones), Fedo
 
 ### Docker
 
-Official image built on `clamav/clamav:stable`, see the [docker guide](https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/docker.md)
+Official multi-arch image built on the official ClamAV image, see the [docker guide](https://github.com/extremeshok/clamav-unofficial-sigs/blob/master/guides/docker.md)
 
 ```bash
 # all-in-one: clamd + freshclam + unofficial signatures
