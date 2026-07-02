@@ -6,13 +6,14 @@ ClamAV Unofficial Signatures Updater
 
 ## Description
 
-The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity, FOXHOLE, OITC, BOFHLAND, CRDF, Porcupine, Securiteinfo, MalwarePatrol, Yara-Rules Project, urlhaus, MalwareExpert, interServer etc. The script will also generate and install cron, logrotate, and man files.
+The clamav-unofficial-sigs script provides a simple way to download, test, and update third-party signature databases provided by Sanesecurity (including FOXHOLE, Porcupine and other distributed signatures), SecuriteInfo, Linux Malware Detect, URLhaus, interServer, MalwarePatrol, Malware Expert, ditekshen/detection, twinclams and custom additional databases. Every downloaded database is integrity tested with clamscan before it is installed. The script will also generate and install cron, logrotate, and man files, and is available as a Docker image.
 
 ### Automated Testing and Linting
 
 * GitHub Actions
 * Linting with markdownlint-cli and shellcheck
-* Config parse and dry-run testing with ClamAV on Ubuntu 22.04 and 24.04
+* Config parse and dry-run testing with ClamAV on Ubuntu 22.04 and 24.04, every os config is parse-tested
+* Docker image build and smoke test of both container modes, including a real signature download
 * Upgrade-path guard: the previous release must be able to parse the current master.conf
 * Weekly automated liveness checks of the signature source mirrors
 
@@ -26,7 +27,7 @@ Please post them on the issue tracker: <https://github.com/extremeshok/clamav-un
 
 ### Required Ports / Firewall Exceptions
 
-* rsync: TCP port 873
+* rsync: TCP port 873 (only required for Sanesecurity, since 8.0.0 rsync is optional when Sanesecurity is disabled)
 * wget/curl: TCP port 443
 
 ### Supported Operating Systems
@@ -281,10 +282,18 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Fixed : wget downloads with a renamed output file use a temp file, a failed transfer no longer truncates the last good copy
 * Fixed : LinuxMalwareDetect version check on wget-only systems never detected updates
 * Fixed : sanesecurity_dbs_rating="DISABLE" now counts as disabled for the rsync requirement
+* Added : rsync is now optional for https-only setups, an internal cp fallback handles the database installs when Sanesecurity is disabled
+* Added : clamd socket RELOAD fallback supports perl, socat and nc transports
+* Added : False positive / signature whitelisting FAQ in the README
+* Added : Install guides for RHEL / Rocky Linux / AlmaLinux and Docker
+* Fixed : os.alpine.conf executed clamdscan during config parsing (stray unquoted line) and used a reload command as clamd_restart_opt
+* Fixed : the Sanesecurity GPG key setup no longer runs (and aborts every update on failure) when sanesecurity is disabled
+* Fixed : -c with a config file now derives the config directory, fixing --upgrade and --information on systems without an installed config
+* Fixed : additional database wildcard downloads no longer test the literal glob pattern when nothing matched
 * Fixed : urlhaus databases were removed by the database cleanup directly after installing (missing from the current-databases tracking)
 * Fixed : keep_db_backup wrote all backups to a single _file-bak file, backups are now per-database `<database>-bak` files
 * Refactor : consolidated the per-source database test and install logic into shared functions (~380 fewer lines)
-* Support for modern ClamAV releases (1.x series, tested against ClamAV 1.4 LTS), robust version comparison for clamav/script/config versions
+* Support for modern ClamAV releases (1.x series, tested against ClamAV 1.4 LTS and 1.5 stable), robust version comparison for clamav/script/config versions
 * Added : GitHub Actions CI (shellcheck, config parse smoke tests with real clamav, upgrade-path guard, weekly signature source liveness checks), replaces the defunct Travis-CI / Code Climate
 * Added : SecuriteInfo premium databases securiteinfo.pdb, securiteinfo.wdb and securiteinfo.yara
 * Added : os.rhel.conf for RHEL / Rocky Linux / AlmaLinux 8, 9 and 10
