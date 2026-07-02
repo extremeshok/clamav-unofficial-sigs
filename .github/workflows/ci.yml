@@ -41,9 +41,15 @@ jobs:
   config-smoke:
     name: Config parse and dry-run (ClamAV ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    # the ubuntu-26.04 runner image is in public preview, do not block on it
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
+        experimental: [false]
+        include:
+          - os: ubuntu-26.04
+            experimental: true
     steps:
       - uses: actions/checkout@v4
         with:

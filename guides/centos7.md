@@ -1,4 +1,8 @@
 # Basic guide to Installing and Updating on CentOS 7
+
+> **DEPRECATED:** CentOS 7 reached end of life in June 2024. For RHEL, Rocky Linux
+> and AlmaLinux 8, 9 and 10 use the [RHEL guide](rhel.md) with config/os/os.rhel.conf.
+> This guide is kept for legacy installs only.
 Run the following as root
 
 # UPGRADE INSTRUCTIONS (version 7.0 +)

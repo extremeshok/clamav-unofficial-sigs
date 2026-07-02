@@ -15,7 +15,7 @@ clamav-unofficial-sigs.sh --force
 ```
 
 ## Notes:
-Tested on macOS Big Sur (OSX 11)
+Tested on macOS Big Sur (OSX 11) and newer, Intel and Apple Silicon
 
 ## Install Requirements
 # Step 1 Install Homebrew

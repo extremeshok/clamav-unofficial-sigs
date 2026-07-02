@@ -315,7 +315,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Deprecated : yararulesproject databases are now disabled by default, the upstream Yara-Rules/rules repository is unmaintained and some rules crash modern clamav
 * Removed : deprecated bank_rule.yar, thanks @mnalis
 * Removed : percent signs in master.conf comments which could break config parsing, thanks @stevenhardey
-* Refresh : os.debian.conf and os.ubuntu.conf for current releases, EOL os configs marked deprecated
+* Refresh : os.debian.conf and os.ubuntu.conf for current releases (Ubuntu 26.04 LTS covered, CI also tests on 26.04), EOL os configs marked deprecated, install guides refreshed
 * Refresh : systemd clamd.scan.service uses a drop-in override instead of the removed .include directive
 * Default clam_user/clam_group defined out of the box, thanks @VVelox
 * Incremented the config to version 100
