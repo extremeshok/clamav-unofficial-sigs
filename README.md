@@ -282,7 +282,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Fixed : LinuxMalwareDetect version check on wget-only systems never detected updates
 * Fixed : sanesecurity_dbs_rating="DISABLE" now counts as disabled for the rsync requirement
 * Fixed : urlhaus databases were removed by the database cleanup directly after installing (missing from the current-databases tracking)
-* Fixed : keep_db_backup wrote all backups to a single _file-bak file, backups are now per-database <database>-bak files
+* Fixed : keep_db_backup wrote all backups to a single _file-bak file, backups are now per-database `<database>-bak` files
 * Refactor : consolidated the per-source database test and install logic into shared functions (~380 fewer lines)
 * Support for modern ClamAV releases (1.x series, tested against ClamAV 1.4 LTS), robust version comparison for clamav/script/config versions
 * Added : GitHub Actions CI (shellcheck, config parse smoke tests with real clamav, upgrade-path guard, weekly signature source liveness checks), replaces the defunct Travis-CI / Code Climate
@@ -312,6 +312,7 @@ Usage: clamav-unofficial-sigs.sh   [OPTION] [PATH|FILE]
 * Incremented the config to version 100
 
 ### Version 7.2.5 (20 March 2021)
+
 * eXtremeSHOK.com Maintenance
 * Added : os.centos7-cpanel.conf
 * Refactor : bsd support for tar, remove gnu-tar requirement
